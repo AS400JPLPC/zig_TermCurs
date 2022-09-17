@@ -19,7 +19,20 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-17   compile.sh if ok remove cache<BR />
 
 in development Source is not available available <BR />
-test alt-ctrl  event... <BR />  
+
+<u>---peculiarity-------------------------------------------</u><BR />
+test alt-ctrl ctrshift... etc for <BR />  
+there is a possibility to recover all the keys if we pass through GTK and use sys/shm.h.  
+  
+
+But it is no longer transportable.
+another way is to use IOCTL but again, there is a good chance of being forced to use root.
+
+Anyway, to make management applications or Terminal type tools are more than enough.
+
+ctrl or alt combinations plus Fn(1..24) TAB Backspace home end insert delete pageup pagedown enter escape altgr
+and the utf8 keyboard is a lot.<BR />
+<u>---------------------------------------------------------</u><BR />  
  <BR />
  <BR />
  <BR />
