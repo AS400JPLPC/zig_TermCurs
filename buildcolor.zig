@@ -9,13 +9,14 @@ pub fn build(b: *std.build.Builder) void {
     // examples
 
 
-	// zig-src   source projet
-	// zig-deps  depot
-	// src_c     source c/c++
+// zig-src   source projet
+// zig-deps  depot
+// src_c     source c/c++
 
     const color = b.addExecutable("color", "src-zig/color.zig");
     color.setTarget(target);
-    color.addPackagePath("mibu", "deps/mibu/main.zig")
+    color.addPackagePath("mibu", "deps/mibu/main.zig");
+    color.setBuildMode(mode);
     color.install();
 
     const run_cmd = color.run();

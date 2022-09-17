@@ -91,5 +91,6 @@ fi
 		ls -lrtsh $folder_bin | cut -d " " -f6
 
 		mv $folder_bin $lib_projet
+		rm -r $folder_cache
 	fi
 exit

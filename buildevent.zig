@@ -6,11 +6,10 @@ pub fn build(b: *std.build.Builder) void {
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
 
-    // examples
-	
-	// zig-src   source projet
-	// zig-deps  depot
-	// src_c     source c/c++
+// examples
+// zig-src  source projet
+// zig-deps depot
+// src_c    source c/c++
 
     const event = b.addExecutable("event", "src-zig/event.zig");
     event.setTarget(target);

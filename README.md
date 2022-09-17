@@ -6,19 +6,25 @@ terminal access basic function
 
 <u>Keyboard management and respect for the terminal philosophy</u><br />
 
-rerpise du projet https://github.com/xyaman/mibu
+Resumption of the project https://github.com/xyaman/mibu
 
-merci : XYAMAN
+a little more : XYAMAN
 
 les news:<BR />
 &rarr;&nbsp; 2022-09-17  activate mouse<BR />
 &rarr;&nbsp; 2022-09-17  all keyboard keys are enabled<BR />
 
-change:<BR />
-en developpement<BR />
+modification from :<BR />
+&rarr;&nbsp; 2022-09-17   build... Misplaced comment lines<BR />
+&rarr;&nbsp; 2022-09-17   compile.sh if ok remove cache<BR />
 
-
-un  petit plus<BR />  
+in development Source is not available available <BR />
+test alt-ctrl  event... <BR />  
+ <BR />
+ <BR />
+ <BR />
+ <BR />
+a little more<BR />  
 
 .vscode  contains some tricks and simplification.<BR />
 
