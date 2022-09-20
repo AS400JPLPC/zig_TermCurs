@@ -58,7 +58,7 @@
 /// ex:
 ///------------------------------------------
 
-#define WORKPGM		"./event"
+#define WORKPGM		"./code"
 
 bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 
@@ -109,6 +109,7 @@ bool ctrlPgm(std::string v_TEXT)
 											switch(strswitch(p.stem().c_str()))
 											{
 												case  strswitch("event")		: b_pgm =true;		break;
+												case  strswitch("code")		: b_pgm =true;		break;
 											}
 	return b_pgm;
 }

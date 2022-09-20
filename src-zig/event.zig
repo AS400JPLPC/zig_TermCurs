@@ -1,12 +1,9 @@
 const std = @import("std");
 const io = std.io;
 
-const mibu = @import("mibu");
-const events = mibu.events;
-const term = mibu.term;
-const utils = mibu.utils;
-const cursor = mibu.cursor;
-const clear = mibu.clear;
+const events = @import("events");
+const term   = @import("term");
+const mouse  = @import("mouse");
 
 pub fn main() !void {
     const stdin = io.getStdIn();
@@ -16,13 +13,13 @@ pub fn main() !void {
     var raw_term = try term.enableRawMode(stdin.handle, .blocking);
     defer raw_term.disableRawMode() catch {};
 
-    try stdout.writer().print("{s}",.{utils.mouseCsi(utils.on_mouse)});
+    mouse.fmouse(mouse.on_mouse);
 
     try stdout.writer().print("Press Ctrl-q to exit... crtl-c clear\n\r", .{});
 
     while (true) {
         try raw_term.flushMode();
-        switch (try events.next(stdin)) {
+        switch (try events.getKey(stdin)) {
             .key => |k| switch (k) {
                 // char can have more than 1 u8, because of unicode
                 .char => |c| switch (c) {
@@ -31,8 +28,8 @@ pub fn main() !void {
                 .ctrl => |c| switch (c) {
                     'q' => break,
                     'c' =>{
-                        try clear.all(stdout.writer());
-                        try cursor.goTo(stdout.writer(),1,1);
+                        //try clear.all(stdout.writer());
+                        //try cursor.goTo(stdout.writer(),1,1);
                         try stdout.writer().print("Press Ctrl-q to exit... crtl-c clear\n\r", .{});
                     },
                     else => try stdout.writer().print("Key: {s}\n\r", .{k}),

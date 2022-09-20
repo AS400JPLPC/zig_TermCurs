@@ -18,9 +18,28 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-17   build... Misplaced comment lines<BR />
 &rarr;&nbsp; 2022-09-17   compile.sh if ok remove cache<BR />
 
-in development Source is not available available <BR />
+&rarr;&nbsp; 2022-09-21   Complete restructuring of the project<BR />
+<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for styling (style.zig)<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for events  (event.zig)<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for mouse   (mouse.zig)<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for clear   (clear.zig)<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for the cursor (cursor.zig -> in development)<BR />
+<BR />
+<u>---.VSCODE-------------------------------------------</u><BR />
+&rarr;&nbsp; 2022-09-21   New methodology for clear compile.sh<BR />
+&rarr;&nbsp; 2022-09-21   New methodology for clear compilelib.sh<BR />
+&rarr;&nbsp; 2022-09-21   New tasck.json  use: Task Manager<BR />
+<BR />
 
-<u>---peculiarity-------------------------------------------</u><BR />
+<u>---Organization-project------------------------------------------</u><BR />
+&rarr;&nbsp; folder deps: Filing of files zig including reference sources<BR />
+&rarr;&nbsp; folder src_c: C/C++ source files<BR />
+&rarr;&nbsp; folder src_zig: zig source files<BR />
+&rarr;&nbsp; build: build+source-name ex: buildevent<BR />
+&rarr;&nbsp; makefile<BR />
+<BR />
+<u>--peculiarity-------------------------------------------------</u><BR />  
 test alt-ctrl ctrshift... etc for <BR />  
 there is a possibility to recover all the keys if we pass through GTK and use sys/shm.h.  
   
@@ -32,6 +51,35 @@ Anyway, to make management applications or Terminal type tools are more than eno
 
 ctrl or alt combinations plus Fn(1..24) TAB Backspace home end insert delete pageup pagedown enter escape altgr
 and the utf8 keyboard is a lot.<BR />
+
+<u>--styling-------------------------------------------------</u><BR />  
+make it compatible as close as possible to IBM 400 ex:<BR />  
+<BR />
+pub const defAtrLabel : stl.ZONATRB = .{<BR />
+&nbsp;&nbsp;&nbsp;.styled=[_]i32{@enumToInt(stl.Style.styleBright),<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.styleItalic),<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.notstyle),<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.notstyle)},<BR />
+&nbsp;&nbsp;&nbsp;.backgr = stl.BackgroundColor.bgBlack,<BR />
+&nbsp;&nbsp;&nbsp;.backBright = false,<BR />
+&nbsp;&nbsp;&nbsp;.foregr = stl.ForegroundColor.fgGreen,<BR />
+&nbsp;&nbsp;&nbsp;.foreBright = true<BR />
+};
+
+
+<u>-------is not finished------------------------------------</u><BR />  
+&rarr;&nbsp; label.zig<BR />
+&rarr;&nbsp; cursor.zig<BR />
+&rarr;&nbsp; testing<BR />
+<u>-------To write and think--------------------------------</u><BR />  
+&rarr;&nbsp; inspiration<BR />
+* [nim-termcurs](https://github.com/AS400JPLPC)<br />
+&rarr;&nbsp; panel.zig<BR />
+&rarr;&nbsp; imput.zig<BR />
+&rarr;&nbsp; menu.zig<BR />
+&rarr;&nbsp; grid.zig<BR />
+&rarr;&nbsp; button.zig<BR />
+
 <u>---------------------------------------------------------</u><BR />  
  <BR />
  <BR />

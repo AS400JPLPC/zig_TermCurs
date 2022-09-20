@@ -13,7 +13,9 @@ pub fn build(b: *std.build.Builder) void {
 
     const event = b.addExecutable("event", "src-zig/event.zig");
     event.setTarget(target);
-    event.addPackagePath("mibu", "deps/mibu/main.zig");
+    event.addPackagePath("events", "deps/curse/event.zig");
+    event.addPackagePath("term",  "deps/curse/term.zig");
+    event.addPackagePath("mouse", "deps/curse/mouse.zig");
     event.setBuildMode(mode);
     event.install();
 
