@@ -1,6 +1,8 @@
 const std = @import("std");
 const io = std.io;
 
+const stdin = io.getStdIn();
+
 const Key = union(enum) {
     // unicode character
     char: u21,
@@ -35,7 +37,7 @@ const Key = union(enum) {
     ) !void {
         _ = options;
         _ = fmt;
-        try writer.writeAll("Key.");
+        writer.writeAll("Key.")catch {return;} ;
 
         switch (value) {
             .ctrl => |c| try std.fmt.format(writer, "ctrl({u})", .{c}),
@@ -90,10 +92,11 @@ pub var MouseInfo : Mouse = undefined;
 /// otherwise it will return `.none` if it didnt read any event
 ///
 /// `in`: needs to be reader
-pub fn getKey(in: anytype) !Event {
+pub fn getKey() !Event {
     // TODO: Check buffer size
     var buf: [30]u8 = undefined;
-    const c = try in.read(&buf);
+
+    const c = try stdin.read(&buf);
     if (c == 0) {
         return .none;
     }
@@ -127,6 +130,7 @@ pub fn getKey(in: anytype) !Event {
                     return Event{ .key = Key{ .alt = c1 } };
                 },
             } else {
+                //std.debug.print("\n\rbuf len :{d}\n", .{buf.len});
                 return Event{ .key = .esc };
             }
         },
@@ -140,7 +144,9 @@ pub fn getKey(in: anytype) !Event {
         '\x0D' => return Event{ .key = .enter },
 
         // chars and shift + chars
-        else => return Event{ .key = Key{ .char = c0 } },
+        else => {
+            return Event{ .key = Key{ .char = c0 } };
+        },
     };
 
     return event;
@@ -194,12 +200,39 @@ fn parse_csi(buf: []const u8) !Event {
                     else => {},
                 }
             }
-            if ((buf[2]) == 50) { // f11..f14
+            if ((buf[2]) == 50) { // f11..f14 and // shift
                 switch (buf[3]) {
                     'P' => return Event{ .key = Key{ .fun = 13 } },
                     'Q' => return Event{ .key = Key{ .fun = 14 } },
                     'R' => return Event{ .key = Key{ .fun = 15 } },
                     'S' => return Event{ .key = Key{ .fun = 16 } },
+                    'A' => return Event{ .key = .up },
+                    'B' => return Event{ .key = .down },
+                    'C' => return Event{ .key = .right },
+                    'D' => return Event{ .key = .left },
+                    'E' => return Event{ .key = Key{ .fun = 5 } },
+                    'F' => return Event{ .key = .end },
+                    '3' => return Event{ .key = .delete },
+                    else => {},
+                }
+            }
+            if ((buf[2]) == 53) { //  sihft ctrl
+                    switch (buf[3]) {
+                    'A' => return Event{ .key = .up },
+                    'B' => return Event{ .key = .down },
+                    'C' => return Event{ .key = .right },
+                    'D' => return Event{ .key = .left },
+                    'F' => return Event{ .key = .end },
+                    'H' => return Event{ .key = .home },
+                    '5' => return Event{ .key = .pageup },
+                    else => {},
+                }
+            }
+
+            if ((buf[2]) == 54) { //  sihft / controle
+                    switch (buf[3]) {
+                    'C' => return Event{ .key = .right },
+                    'D' => return Event{ .key = .left },
                     else => {},
                 }
             }
@@ -230,6 +263,13 @@ fn parse_csi(buf: []const u8) !Event {
         '5'...'6' => {
             if (buf[1] == 126) {
                  switch (buf[0]) {
+                    '5' => return Event{ .key = .pageup },
+                    '6' => return Event{ .key = .pagedown },
+                    else => {},
+                }
+            }
+            if (buf[3] == 126) {
+                 switch (buf[2]) {
                     '5' => return Event{ .key = .pageup },
                     '6' => return Event{ .key = .pagedown },
                     else => {},
@@ -308,16 +348,19 @@ fn parse_csi(buf: []const u8) !Event {
             }
             if ((buf[1]) == 54 and (buf[2]) == 52 ) {
                 MouseInfo.scrollDir = ScrollDirection.msUp;
+                MouseInfo.x = 0;
+                MouseInfo.y = 0;
             }
             if ((buf[1]) == 54 and (buf[2]) == 53 ) {
                 MouseInfo.scrollDir = ScrollDirection.msDown;
+                MouseInfo.x = 0;
+                MouseInfo.y = 0;
             }
 
             return Event{ .key = .mouse };
         },
         else => {},
     }
-
     return .not_supported;
 }
 

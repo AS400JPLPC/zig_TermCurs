@@ -38,7 +38,7 @@ pub fn gotoRight( y: anytype) void {
 
 /// Hide the cursor
 pub fn hide() void {
-    output.writer().print("\x1b[?25l", .{ }) catch {return;} catch {return;} ;
+    output.writer().print("\x1b[?25l", .{ }) catch {return;};
 }
 
 /// Show the cursor
@@ -46,15 +46,6 @@ pub fn show() void {
     output.writer().print("\x1b[?25h", .{}) catch {return;} ;
 }
 
-/// Save cursor position
-pub fn save() void {
-    output.writer().print("\x1b[u", .{ }) catch {return;} ;
-}
-
-/// Restore cursor position
-pub fn restore() void {
-    output.writer().print("\x1b[s", .{ }) catch {return;} ;
-}
 
 
 

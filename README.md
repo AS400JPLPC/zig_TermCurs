@@ -27,7 +27,13 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-21   cursor  in development<BR />
 
 &rarr;&nbsp; 2022-09-22   update  deps(mouse/cursor)  src-zig(update event)<BR />
-&rarr;&nbsp; 2022-09-22   New methodology for cursor (cursor.zig)<BR />
+&rarr;&nbsp; 2022-09-22   New methodology for cursor  verify (cursor.zig)<BR />
+
+&rarr;&nbsp; 2022-09-22   Upadte  deps(event.zig cursor.zig) verify <BR />
+&rarr;&nbsp; 2022-09-22   
+&nbsp;&nbsp;&nbsp;&nbsp;Check and change important, all keyboard keys tested module without beug and cancel job.<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouse and cursor are harmonized.<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Removed save/restore cursor, but gotoXY() & getCursor() <BR />
 <BR />
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; 2022-09-21   New methodology for clear compile.sh<BR />
@@ -72,7 +78,6 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------is not finished------------------------------------</u><BR />  
 &rarr;&nbsp; label.zig<BR />
-&rarr;&nbsp; cursor.zig<BR />
 &rarr;&nbsp; testing<BR />
 <u>-------To write and think--------------------------------</u><BR />  
 &rarr;&nbsp; inspiration<BR />

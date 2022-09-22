@@ -16,13 +16,14 @@ pub fn main() !void {
     var raw_term = try term.enableRawMode(stdin.handle, .blocking);
     defer raw_term.disableRawMode() catch {};
 
+
     mouse.fmouse(mouse.on_mouse);
 
     try stdout.writer().print("Press Ctrl-q to exit... crtl-c clear\n\r", .{});
 
     while (true) {
         try raw_term.flushMode();
-        switch (try events.getKey(stdin)) {
+        switch (try events.getKey()) {
             .key => |k| switch (k) {
                 // char can have more than 1 u8, because of unicode
                 .char => |c| switch (c) {
@@ -44,11 +45,24 @@ pub fn main() !void {
                             try stdout.writer().print("cursor X:{d}  Y:{d}\n\r", .{cursor.posCurs.x, cursor.posCurs.y});
                             }
                         },
+                    's' => cursor.show(),
+                    'h' => cursor.hide(),
                     else => try stdout.writer().print("Key: {s}\n\r", .{k}),
                 },
                 .pageup   =>  try stdout.writer().print("Key: {s}\n\r", .{k}),
                 .pagedown =>  try stdout.writer().print("Key: {s}\n\r", .{k}),
-
+                .up =>  {
+                    cursor.gotoUp(1);
+                },
+                .down =>  {
+                    cursor.gotoDown(1);
+                },
+                .left =>  {
+                    cursor.gotoLeft(1);
+                },
+                .right =>  {
+                    cursor.gotoRight(1);
+                },
                 .mouse => {
                     try stdout.writer().print("Key: {s}\n\r", .{k});
                     try stdout.writer().print("X :{d}\n\r", .{events.MouseInfo.x});
@@ -72,7 +86,7 @@ pub fn main() !void {
                 },
                 else => try stdout.writer().print("Key: {s}\n\r", .{k}),
             },
-            // ex. mouse events not supported yet
+            // ex. Pause Imp ...  events not supported yet
             else => {},
         }
     }
