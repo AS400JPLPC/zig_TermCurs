@@ -15,7 +15,7 @@ pub const ZONATRB = struct {
 
 // def. standard style
 pub const  Style = enum (u8)  {
-    notstyle = 0,      // not styled
+    notStyle = 0,      // not styled
     styleBright = 1,   // bright text
     styleDim,          // dim text
     styleItalic,       // italic (or reverse on terminals not supporting)

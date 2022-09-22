@@ -4,6 +4,9 @@ const io = std.io;
 const events = @import("events");
 const term   = @import("term");
 const mouse  = @import("mouse");
+const clear  = @import("clear");
+const cursor = @import("cursor");
+
 
 pub fn main() !void {
     const stdin = io.getStdIn();
@@ -27,14 +30,21 @@ pub fn main() !void {
                 },
                 .ctrl => |c| switch (c) {
                     'q' => break,
-                    'c' =>{
-                        //try clear.all(stdout.writer());
-                        //try cursor.goTo(stdout.writer(),1,1);
-                        try stdout.writer().print("Press Ctrl-q to exit... crtl-c clear\n\r", .{});
-                    },
+                    'c' =>
+                        {
+                            clear.cls();
+                            cursor.gotoXY(1,10);
+                            try stdout.writer().print("Press Ctrl-q to exit... crtl-c clear\n\r", .{});
+                        },
+                    'w' =>
+                        {
+                        if (events.MouseInfo.x >0){
+                            cursor.gotoXY(events.MouseInfo.x,events.MouseInfo.y);
+                            cursor.getCursor();
+                            try stdout.writer().print("cursor X:{d}  Y:{d}\n\r", .{cursor.posCurs.x, cursor.posCurs.y});
+                            }
+                        },
                     else => try stdout.writer().print("Key: {s}\n\r", .{k}),
-
-
                 },
                 .pageup   =>  try stdout.writer().print("Key: {s}\n\r", .{k}),
                 .pagedown =>  try stdout.writer().print("Key: {s}\n\r", .{k}),

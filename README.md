@@ -24,7 +24,10 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-21   New methodology for events  (event.zig)<BR />
 &rarr;&nbsp; 2022-09-21   New methodology for mouse   (mouse.zig)<BR />
 &rarr;&nbsp; 2022-09-21   New methodology for clear   (clear.zig)<BR />
-&rarr;&nbsp; 2022-09-21   New methodology for the cursor (cursor.zig -> in development)<BR />
+&rarr;&nbsp; 2022-09-21   cursor  in development<BR />
+
+&rarr;&nbsp; 2022-09-22   update  deps(mouse/cursor)  src-zig(update event)<BR />
+&rarr;&nbsp; 2022-09-22   New methodology for cursor (cursor.zig)<BR />
 <BR />
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; 2022-09-21   New methodology for clear compile.sh<BR />

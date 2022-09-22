@@ -7,8 +7,8 @@ const stl= @import("style.zig");
 pub const defAtrLabel : stl.ZONATRB = .{
     .styled=[_]i32{@enumToInt(stl.Style.styleBright),
                    @enumToInt(stl.Style.styleItalic),
-                   @enumToInt(stl.Style.notstyle),
-                   @enumToInt(stl.Style.notstyle)},
+                   @enumToInt(stl.Style.notStyle),
+                   @enumToInt(stl.Style.notStyle)},
     .backgr = stl.BackgroundColor.bgBlack,
     .backBright = false,
     .foregr = stl.ForegroundColor.fgGreen,
@@ -18,9 +18,9 @@ pub const defAtrLabel : stl.ZONATRB = .{
 // define attribut default TITLE
 pub const defAtrTitle : stl.ZONATRB = .{
     .styled=[_]i32{@enumToInt(stl.Style.styleBright),
-                   @enumToInt(stl.Style.notstyle),
-                   @enumToInt(stl.Style.notstyle),
-                   @enumToInt(stl.Style.notstyle)},
+                   @enumToInt(stl.Style.notStyle),
+                   @enumToInt(stl.Style.notStyle),
+                   @enumToInt(stl.Style.notStyle)},
     .backgr = stl.BackgroundColor.bgBlack,
     .backBright = false,
     .foregr = stl.ForegroundColor.fgCyan,

@@ -245,17 +245,17 @@ fn parse_csi(buf: []const u8) !Event {
 
             var i:usize = 3;
             while (true) {
-                if (buf[i] != 59 and MouseInfo.x == 0 ) MouseInfo.x = convInt(buf[3]);
+                if (buf[i] != 59 and MouseInfo.y == 0 ) MouseInfo.y = convInt(buf[3]);
                 if (buf[i] == 59 ) break;
-                if (buf[i] != 59 and i > 3 ) MouseInfo.x = (MouseInfo.x * 10) + convInt(buf[i]);
+                if (buf[i] != 59 and i > 3 ) MouseInfo.y = (MouseInfo.y * 10) + convInt(buf[i]);
                 i += 1;
             }
 
             var u:usize = i + 1;
             while (true) {
-                if (buf[u] != 59 and MouseInfo.y == 0 ) MouseInfo.y = convInt(buf[u]);
+                if (buf[u] != 59 and MouseInfo.x == 0 ) MouseInfo.x = convInt(buf[u]);
                 if (buf[u] == 59 or  buf[u] == 77 or buf[u] == 109) break;
-                if (buf[u] != 59 and u > (i+1) ) MouseInfo.y = (MouseInfo.y * 10) + convInt(buf[u]);
+                if (buf[u] != 59 and u > (i+1) ) MouseInfo.x = (MouseInfo.x * 10) + convInt(buf[u]);
                 u += 1;
             }
 

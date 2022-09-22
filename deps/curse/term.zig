@@ -21,6 +21,8 @@ pub fn enableRawMode(handle: os.system.fd_t, blocking: ReadMode) !RawTerm {
 
     termios.iflag &= ~(os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK |os.system.ISTRIP |
                        os.system.INLCR | os.system.IGNCR| os.system.ICRNL | os.system.IXON);
+
+
     termios.oflag &= ~(os.system.OPOST);
     termios.cflag &= ~(os.system.CSIZE | os.system.PARENB);
     termios.cflag |= (os.system.CS8);
