@@ -29,7 +29,7 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-22   update  deps(mouse/cursor)  src-zig(update event)<BR />
 &rarr;&nbsp; 2022-09-22   New methodology for cursor  verify (cursor.zig)<BR />
 
-&rarr;&nbsp; 2022-09-22   Upadte  deps(event.zig cursor.zig) verify <BR />
+&rarr;&nbsp; 2022-09-22   Update  deps(event.zig cursor.zig) verify <BR />
 &rarr;&nbsp; 2022-09-22   
 &nbsp;&nbsp;&nbsp;&nbsp;Check and change important, all keyboard keys tested module without beug and cancel job.<BR />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouse and cursor are harmonized.<BR />
