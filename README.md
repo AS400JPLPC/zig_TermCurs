@@ -41,7 +41,7 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-26   *Read the Project installation documentation* <BR />
 &rarr;&nbsp; 2022-09-26   After discussion on ZULIP it seems important to redesign the project that serves me as a ZIG learning and to simplify as much as possible the calls seen developer see Tcursed.zig    
 doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
-* [READ-PROJECT](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/Read_Projet.html)<BR />
+* [READ-PROJECT](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Read_Projet.html)<BR />
 &rarr;&nbsp; 2022-09-26   Read the Project installation documentation <BR />
 &rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
 &rarr;&nbsp; 2022-09-26   creat dds common definition module for cursed and forms <BR />
