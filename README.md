@@ -1,6 +1,7 @@
-# zig_Termkey
-terminal access basic function
+# zig_TermCurs
+terminal access function<br />
 
+*TESTING*
 
 **os linux**
 
@@ -44,7 +45,7 @@ doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 * [READ-PROJECT](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Read_Projet.html)<BR />
 &rarr;&nbsp; 2022-09-26   Read the Project installation documentation <BR />
 &rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
-&rarr;&nbsp; 2022-09-26   creat dds common definition module for cursed and forms <BR />
+&rarr;&nbsp; 2022-09-26   creat deps/curse/dds common definition module for cursed and forms <BR />
 
 
 <BR />
@@ -101,7 +102,8 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 &rarr;&nbsp; inspiration<BR />
 * [nim-termcurs](https://github.com/AS400JPLPC)<br />
 &rarr;&nbsp; panel.zig<BR />
-&rarr;&nbsp; imput.zig<BR />
+&rarr;&nbsp; label.zig<BR />
+&rarr;&nbsp; field.zig<BR />
 &rarr;&nbsp; menu.zig<BR />
 &rarr;&nbsp; grid.zig<BR />
 &rarr;&nbsp; button.zig<BR />
