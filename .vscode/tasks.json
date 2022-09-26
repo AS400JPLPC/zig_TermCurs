@@ -37,6 +37,39 @@
       }
     },
     {
+      "label": "Zig_TESTED",
+      "type": "shell",
+      "command": "./.vscode/compile.sh DEBUG TESTED ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true
+      }
+    },
+    {
+      "label": "lib-Zig_PROD",
+      "type": "shell",
+      "command": "./.vscode/compilelib.sh PROD ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true
+      }
+    },
+    {
+      "label": "lib-Zig_FAST",
+      "type": "shell",
+      "command": "./.vscode/compilelib.sh FAST ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true
+      }
+    },
+    {
       "label": "Cpp_Prod",
       "type": "shell",
       "command": "./.vscode/compileCCP.sh PROD PIE ${fileBasename} ${fileBasenameNoExtension}  ${fileDirname}",
@@ -101,17 +134,6 @@
       }
     },
     {
-      "label": "GREP-ZIG-2",
-      "type": "shell",
-      "command": "/usr/bin/xfce4-terminal --title=GREP --hold --geometry 160x20 --zoom=2 -e ./.vscode/grep_zig.sh",
-      "problemMatcher": [],
-      "presentation": {
-        "echo": false,
-        "reveal": "never",
-        "focus": true
-      }
-    },
-    {
         "label": "Clear VSCodium ",
         "type": "shell",
         "command": "./.vscode/clearVsCodium.sh",
@@ -123,10 +145,21 @@
           "clear": true
       }
     },
+    {
+      "label": "Clear ZIG",
+      "type": "shell",
+      "command": "./.vscode/clearcache.sh ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true
+      }
+    },
    {
     "label": "A-GTKVTE",
     "type": "shell",
-    "command": "$HOME/termvte ${fileDirname}/${fileBasenameNoExtension}",
+    "command": "${workspaceFolder}/Term ./${fileBasenameNoExtension}",
     "problemMatcher": [],
     "presentation": {
       "echo": true,

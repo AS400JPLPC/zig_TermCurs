@@ -11,21 +11,20 @@ pub fn build(b: *std.build.Builder) void {
 // zig-deps depot
 // src_c    source c/c++
 
-    const event = b.addExecutable("event", "src-zig/event.zig");
-    event.setTarget(target);
-    event.addPackagePath("events", "deps/curse/event.zig");
-    event.addPackagePath("term",  "deps/curse/term.zig");
-    event.addPackagePath("mouse", "deps/curse/mouse.zig");
-    event.setBuildMode(mode);
-    event.install();
+    const prog = b.addExecutable("Tcursed", "src-zig/Tcursed.zig");
+    prog.setTarget(target);
+    prog.addPackagePath("dds", "deps/curse/dds.zig");
+    prog.addPackagePath("cursed", "deps/curse/cursed.zig");
+    prog.setBuildMode(mode);
+    prog.install();
 
-    const run_cmd = event.run();
+    const run_cmd = prog.run();
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
 
-    const run_step = b.step("runEvent", "Run the app");
+    const run_step = b.step("tested", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
 

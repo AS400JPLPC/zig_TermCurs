@@ -110,6 +110,7 @@ bool ctrlPgm(std::string v_TEXT)
 											{
 												case  strswitch("event")		: b_pgm =true;		break;
 												case  strswitch("code")		: b_pgm =true;		break;
+												case  strswitch("Tcursed")		: b_pgm =true;		break;
 											}
 	return b_pgm;
 }
