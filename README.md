@@ -46,8 +46,12 @@ doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 &rarr;&nbsp; 2022-09-26   Read the Project installation documentation <BR />
 &rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
 &rarr;&nbsp; 2022-09-26   creat deps/curse/dds common definition module for cursed and forms <BR />
-
-
+<BR /><BR />
+&rarr;&nbsp; 2022-10-08   creat deps/curse/ cursed chgange Title and resize terminal <BR />
+&rarr;&nbsp; 2022-10-08   creat deps/string/ introduction of zig-string tests <BR />
+&rarr;&nbsp; 2022-10-08   Testing manipulation char mult-problem unicode  <BR />
+&rarr;&nbsp; 2022-10-08   creat deps/zyglyph/ working lowerStr and upperStr<BR />  
+&rarr;&nbsp; 2022-10-08   stabilization deps/curse/cursed<BR />
 <BR />
 <BR />
 
