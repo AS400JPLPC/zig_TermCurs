@@ -92,6 +92,17 @@
       }
     },
     {
+      "label": "Cpp_Lib",
+      "type": "shell",
+      "command": "./.vscode/compileCCP.sh LIB PIE ${fileBasename} ${fileBasenameNoExtension}  ${fileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true,
+      }
+    },
+    {
       "label": "Glade",
       "type": "shell",
       "command": "/usr/bin/glade  ${fileBasename}",

@@ -1,0 +1,57 @@
+#définition des cibles particulières
+.PHONY: all clean build
+
+# désactivation des règles implicites
+.SUFFIXES:
+# nom de l'executable :
+PROJET = Transform
+
+OBJLIB = $(PROJET).a
+
+# Addresse   , sources, lib , objets , includes :
+SRCDIR = $(CURDIR)/src_lib/
+
+BINDIR = $(CURDIR)/lib/
+
+OBJDIR = $(CURDIR)/obj/
+
+INCLUDES = \
+-I $(CURDIR)/ \
+-I $(SRCDIR) \
+-I $(OBJDIR)
+
+# choix du compilateur :
+CXX = clang++
+# options compilations :
+#CXXFLAGS=  -fexpensive-optimizations -O2 -Os -Wmain -pedantic-errors -Wfatal-errors -Wall -Wextra -std=c++17   -Wparentheses -fpermissive
+CXXFLAGS=   -Os -Wmain -pedantic-errors -Wfatal-errors -Wall -Wextra -std=c++17   -Wparentheses -fpermissive
+
+OBJCPP = $(patsubst %.cpp,$(OBJDIR)%.o,$(notdir $(wildcard $(SRCDIR)*.cpp)))
+
+
+all : $(PROJET)
+
+$(PROJET) : $(OBJCPP)
+		ar -r -c -s  $(BINDIR)$(OBJLIB)  $^
+
+$(OBJDIR)%.o: $(SRCDIR)%.cpp
+	$(CXX)  $(CXXFLAGS) $(INCLUDES)  -c $< -o $@
+
+
+
+msg: clean
+	@echo "$(PROJET)"
+	@echo "$(CURDIR)"
+	@echo "$(SRCDIR)"
+	@echo "$(OBJDIR)"
+	@echo "$(OBJCPP)"
+
+# pour effacer tous les objet et les executables :
+clean:
+
+	rm -rf $(OBJDIR)*.*
+	rm -rf $(BINDIR)*.*
+# affiche la taille de l'objet résultant
+build:
+
+	du -sh $(BINDIR)$(OBJLIB)

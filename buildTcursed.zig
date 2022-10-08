@@ -6,6 +6,7 @@ pub fn build(b: *std.build.Builder) void {
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
 
+
 // examples
 // zig-src  source projet
 // zig-deps depot
@@ -15,6 +16,8 @@ pub fn build(b: *std.build.Builder) void {
     prog.setTarget(target);
     prog.addPackagePath("dds", "deps/curse/dds.zig");
     prog.addPackagePath("cursed", "deps/curse/cursed.zig");
+    prog.addPackagePath("zig_string", "deps/string/zig_string.zig");
+    //prog.addPackagePath("ziglyph", "deps/ziglyph/ziglyph.zig");
     prog.setBuildMode(mode);
     prog.install();
 
@@ -26,6 +29,6 @@ pub fn build(b: *std.build.Builder) void {
 
     const run_step = b.step("tested", "Run the app");
     run_step.dependOn(&run_cmd.step);
-
-
 }
+
+

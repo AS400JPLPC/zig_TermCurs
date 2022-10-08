@@ -1,4 +1,6 @@
-/// MOUSE ON or OFF the ANSI sequence to set MOUSE mode
+/// Define use terminal basic
+
+
 const std = @import("std");
 const dds= @import("dds.zig");
 
@@ -189,22 +191,23 @@ pub fn setStyle(style:[4]u32 ) void {
 }
 
 /// Sets the terminal's foreground color.
-pub fn  setForegroundColor(attribut : dds.ZONATRB) void {
-    output.writer().print("\x1b[{d}m", .{@enumToInt(attribut.foregr)}) catch {return;} ;
+pub fn  setForegroundColor(color : dds.BackgroundColor) void {
+    output.writer().print("\x1b[{d}m", .{@enumToInt(color)}) catch {return;} ;
 }
 
 /// Sets the terminal's Background color.
-pub fn  setBackgroundColor(attribut : dds.ZONATRB) void {
-    output.writer().print("\x1b[{d}m", .{@enumToInt(attribut.backgr)})  catch {return;} ;
+pub fn  setBackgroundColor(color : dds.ForegroundColor) void {
+    output.writer().print("\x1b[{d}m", .{@enumToInt(color)})  catch {return;} ;
 }
 
 /// write text and attribut
 pub fn writeStyled(text: []const u8 , attribut : dds.ZONATRB ) void {
-    setForegroundColor(attribut);
-    setBackgroundColor(attribut);
+    setForegroundColor(attribut.backgr);
+    setBackgroundColor(attribut.foregr);
     setStyle(attribut.styled);
     output.writer().print("{s}", .{text}) catch {return;} ;
     resetStyle();
+    flushIO();
 }
 
 
@@ -232,7 +235,6 @@ pub const RawTerm = struct {
         try os.tcsetattr(self.handle,.FLUSH, self.cur_termios);
     }
 };
-
 
 
 
@@ -279,6 +281,10 @@ pub fn enableRawMode() !RawTerm {
     };
 }
 
+/// flush terminal in-out
+pub fn flushIO() void {
+    buf_Output.flush() catch unreachable;
+}
 
 
 /// get size terminal
@@ -297,79 +303,62 @@ fn getSize() !TermSize {
     };
 }
 
+/// Update title terminal
+pub fn  titleTerm( title : [] const u8) void {
+    if (title.len > 0 ) {
+        output.writer().print("\x1b]0;{s}\x07", .{title}) catch {return;};
+        flushIO();
+    }
+}
+
+
+
+// if use resize  ok : vte application terminal ex TermVte
+// change XTERM
+// sudo thunar /etc/X11/app-defaults/XTerm
+// *allowWindowOps: true  *eightBitInput: false
+
+pub fn resizeTerm(line : usize ,cols : usize) void {
+    if (line > 0  and cols > 0) {
+        output.writer().print("\x1b[8;{d};{d};t",.{line,cols}) catch {return;};
+        flushIO();
+    }
+}
+
 
 
 
 ///--------------------------------------------
 /// Event keyboard and mouse
 ///--------------------------------------------
-
-const Key = union(enum) {
-    // unicode character
+pub const KEY = union(enum) {
+        // unicode character
     char: u21,
     ctrl: u21,
     alt: u21,
     fun: u8,
 
     // arrow keys
-    up: void,
-    down: void,
-    left: void,
-    right: void,
-    pageup: void,
-    pagedown: void,
-    home: void,
-    end: void,
-    esc: void,
-    delete: void,
-    enter: void,
-    del: void,
-    ins: void,
-    tab: void,
-    backspace: void,
-    mouse: void,
+    up ,
+    down,
+    left,
+    right,
+    pageup,
+    pagedown,
+    home,
+    end,
+    esc,
+    delete,
+    enter,
+    ins,
+    tab,
+    backspace,
+    mouse,
 
-    pub fn format(
-        value: Key,
-        comptime fmt: []const u8,
-        options: std.fmt.FormatOptions,
-        writer: anytype,
-    ) !void {
-        _ = options;
-        _ = fmt;
-        writer.writeAll("Key.") catch {return;} ;
-
-        switch (value) {
-            .ctrl => |c| try std.fmt.format(writer, "ctrl({u})", .{c}),
-            .alt => |c| try std.fmt.format(writer, "alt({u})", .{c}),
-            .char => |c| try std.fmt.format(writer, "char({u})", .{c}),
-            .fun => |c| try std.fmt.format(writer, "fun({d})", .{c}),
-
-            // arrow keys
-            .up => try std.fmt.format(writer, "up", .{}),
-            .down => try std.fmt.format(writer, "down", .{}),
-            .left => try std.fmt.format(writer, "left", .{}),
-            .right => try std.fmt.format(writer, "right", .{}),
-            .pageup => try std.fmt.format(writer, "Pageup", .{}),
-            .pagedown => try std.fmt.format(writer, "Pagedown", .{}),
-            .home => try std.fmt.format(writer, "Home", .{}),
-            .end => try std.fmt.format(writer, "End", .{}),
-            .delete => try std.fmt.format(writer, "delete", .{}),
-            .ins => try std.fmt.format(writer, "ins", .{}),
-            .tab => try std.fmt.format(writer, "tab", .{}),
-            .backspace => try std.fmt.format(writer, "backspace", .{}),
-            // special keys
-            .esc => try std.fmt.format(writer, "esc", .{}),
-            .enter => try std.fmt.format(writer, "enter", .{}),
-            .mouse => try std.fmt.format(writer, "mouse", .{}),
-            else => try std.fmt.format(writer, "Not available yet", .{}),
-        }
-    }
 };
 
-
-const Event = union(enum) {
-    key: Key,
+pub const Event = union(enum) {
+    key: KEY,
     none,
 };
 
@@ -433,7 +422,7 @@ pub fn getKey() !Event {
                 // fn (1 - 4)
                 // O - 0x6f - 111
                 '\x4f' => {
-                    return Event{ .key = Key{ .fun = (1 + buf[2] - '\x50') } };
+                    return Event{ .key = KEY{ .fun = (1 + buf[2] - '\x50') } };
                 },
 
                 // csi
@@ -444,25 +433,26 @@ pub fn getKey() !Event {
 
                 // alt key
                 else => {
-                    return Event{ .key = Key{ .alt = c1 } };
+                    return Event{ .key = KEY{ .alt = c1 } };
                 },
             } else {
-                return Event{ .key = .esc };
+                return Event{ .key = KEY.esc };
             }
         },
         // ctrl keys (avoids  crtl-i (x09)   ctrl-m (x0D) )
-        '\x01'...'\x08','\x0A'...'\x0C','\x0E'...'\x1A' => return Event{ .key = Key{ .ctrl = c0 + '\x60' } },
+        '\x01'...'\x08','\x0A'...'\x0C','\x0E'...'\x1A' => return Event{ .key = KEY{ .ctrl = c0 + '\x60' } },
         // tab
-        '\x09' => return Event{ .key = .tab },
+        '\x09' => return Event{ .key = KEY.tab },
         // backspace
-        '\x7f' => return Event{ .key = .backspace },
+        '\x7f' => return Event{ .key = KEY.backspace },
         // special chars
-        '\x0D' => return Event{ .key = .enter },
+        '\x0D' => return Event{ .key = KEY.enter },
 
         // chars and shift + chars
         else => {
-            return Event{ .key = Key{ .char = c0 } };
-        },
+            //std.debug.print("\n\rview:{any}\n", .{c0});
+            return Event{ .key = KEY{ .char = c0 } };
+        }
     };
 
      return .none ;
@@ -490,97 +480,96 @@ fn parse_csi(buf: []const u8) !Event {
     //std.debug.print("\n\rview:{any}\n", .{buf});
     switch (buf[0]) {
         // keys
-        'A' => return Event{ .key = .up },
-        'B' => return Event{ .key = .down },
-        'C' => return Event{ .key = .right },
-        'D' => return Event{ .key = .left },
-        'H' => return Event{ .key = .home },
-        'F' => return Event{ .key = .end },
-        '3' => return Event{ .key = .delete },
+        'A' => return Event{ .key = KEY.up },
+        'B' => return Event{ .key = KEY.down },
+        'C' => return Event{ .key = KEY.right },
+        'D' => return Event{ .key = KEY.left },
+        'H' => return Event{ .key = KEY.home },
+        'F' => return Event{ .key = KEY.end },
+        '3' => return Event{ .key = KEY.delete },
 
         '1'...'2' => {
             if (buf[1] == 126) {
                 switch (buf[0]) { // insert
-                    '2' => return Event{ .key = .ins },
+                    '2' => return Event{ .key = KEY.ins },
                     else => return .none ,
                 }
             }
             if (buf[2] == 126) {
                 switch (buf[1]) { // f5..f12
-                    '5' => return Event{ .key = Key{ .fun = 5 } },
-                    '7' => return Event{ .key = Key{ .fun = 6 } },
-                    '8' => return Event{ .key = Key{ .fun = 7 } },
-                    '9' => return Event{ .key = Key{ .fun = 8 } },
-                    '0' => return Event{ .key = Key{ .fun = 9 } },
-                    '1' => return Event{ .key = Key{ .fun = 10 } },
-                    '3' => return Event{ .key = Key{ .fun = 11 } },
-                    '4' => return Event{ .key = Key{ .fun = 12 } },
+                    '5' => return Event{ .key = KEY{ .fun = 5 } },
+                    '7' => return Event{ .key = KEY{ .fun = 6 } },
+                    '8' => return Event{ .key = KEY{ .fun = 7 } },
+                    '9' => return Event{ .key = KEY{ .fun = 8 } },
+                    '0' => return Event{ .key = KEY{ .fun = 9 } },
+                    '1' => return Event{ .key = KEY{ .fun = 10 } },
+                    '3' => return Event{ .key = KEY{ .fun = 11 } },
+                    '4' => return Event{ .key = KEY{ .fun = 12 } },
                     else =>  return .none ,
                 }
             }
             if ((buf[2]) == 50) { // f11..f14 and // shift
                 switch (buf[3]) {
-                    'P' => return Event{ .key = Key{ .fun = 13 } },
-                    'Q' => return Event{ .key = Key{ .fun = 14 } },
-                    'R' => return Event{ .key = Key{ .fun = 15 } },
-                    'S' => return Event{ .key = Key{ .fun = 16 } },
-                    'A' => return Event{ .key = .up },
-                    'B' => return Event{ .key = .down },
-                    'C' => return Event{ .key = .right },
-                    'D' => return Event{ .key = .left },
-                    'F' => return Event{ .key = .end },
-                    '3' => return Event{ .key = .delete },
-                    '5' => return Event{ .key = .pageup },
-                    '6' => return Event{ .key = .pagedown },
+                    'P' => return Event{ .key = KEY{ .fun = 13 } },
+                    'Q' => return Event{ .key = KEY{ .fun = 14 } },
+                    'R' => return Event{ .key = KEY{ .fun = 15 } },
+                    'S' => return Event{ .key = KEY{ .fun = 16 } },
+                    'A' => return Event{ .key = KEY.up },
+                    'B' => return Event{ .key = KEY.down },
+                    'C' => return Event{ .key = KEY.right },
+                    'D' => return Event{ .key = KEY.left },
+                    'H' => return Event{ .key = KEY.home },
+                    'F' => return Event{ .key = KEY.end },
+                    '3' => return Event{ .key = KEY.delete },
+                    '5' => return Event{ .key = KEY.pageup },
+                    '6' => return Event{ .key = KEY.pagedown },
                     else =>  return .none ,
                 }
             }
             if ((buf[2]) == 53) { //  sihft ctrl
                     switch (buf[3]) {
-                    'A' => return Event{ .key = .up },
-                    'B' => return Event{ .key = .down },
-                    'C' => return Event{ .key = .right },
-                    'D' => return Event{ .key = .left },
-                    'F' => return Event{ .key = .end },
-                    'H' => return Event{ .key = .home },
-                    '5' => return Event{ .key = .pageup },
-                    '6' => return Event{ .key = .pagedown },
+                    'A' => return Event{ .key = KEY.up },
+                    'B' => return Event{ .key = KEY.down },
+                    'C' => return Event{ .key = KEY.right },
+                    'D' => return Event{ .key = KEY.left },
+                    'H' => return Event{ .key = KEY.home },
+                    '5' => return Event{ .key = KEY.pageup },
+                    '6' => return Event{ .key = KEY.pagedown },
                     else =>  return .none ,
                 }
             }
 
             if ((buf[2]) == 54) { //  sihft / controle
                     switch (buf[3]) {
-                    'A' => return Event{ .key = .up },
-                    'B' => return Event{ .key = .down },
-                    'C' => return Event{ .key = .right },
-                    'D' => return Event{ .key = .left },
-                    'F' => return Event{ .key = .end },
-                    'H' => return Event{ .key = .home },
-                    '5' => return Event{ .key = .pageup },
-                    '6' => return Event{ .key = .pagedown },
+                    'A' => return Event{ .key = KEY.up },
+                    'B' => return Event{ .key = KEY.down },
+                    'C' => return Event{ .key = KEY.right },
+                    'D' => return Event{ .key = KEY.left },
+                    'H' => return Event{ .key = KEY.home },
+                    '5' => return Event{ .key = KEY.pageup },
+                    '6' => return Event{ .key = KEY.pagedown },
                     else =>  return .none ,
                 }
             }
             if ((buf[2]) == 60) { // f11..f14
                 switch (buf[3]) {
-                    'P' => return Event{ .key = Key{ .fun = 13 } },
-                    'Q' => return Event{ .key = Key{ .fun = 14 } },
-                    'R' => return Event{ .key = Key{ .fun = 15 } },
-                    'S' => return Event{ .key = Key{ .fun = 16 } },
+                    'P' => return Event{ .key = KEY{ .fun = 13 } },
+                    'Q' => return Event{ .key = KEY{ .fun = 14 } },
+                    'R' => return Event{ .key = KEY{ .fun = 15 } },
+                    'S' => return Event{ .key = KEY{ .fun = 16 } },
                     else =>  return .none ,
                 }
             }
             if ((buf[4]) == 126) { // f15..f24
                 switch (buf[1]) {
-                    '5' => return Event{ .key = Key{ .fun = 17 } },
-                    '7' => return Event{ .key = Key{ .fun = 18 } },
-                    '8' => return Event{ .key = Key{ .fun = 19 } },
-                    '9' => return Event{ .key = Key{ .fun = 20 } },
-                    '0' => return Event{ .key = Key{ .fun = 21 } },
-                    '1' => return Event{ .key = Key{ .fun = 22 } },
-                    '3' => return Event{ .key = Key{ .fun = 23 } },
-                    '4' => return Event{ .key = Key{ .fun = 24 } },
+                    '5' => return Event{ .key = KEY{ .fun = 17 } },
+                    '7' => return Event{ .key = KEY{ .fun = 18 } },
+                    '8' => return Event{ .key = KEY{ .fun = 19 } },
+                    '9' => return Event{ .key = KEY{ .fun = 20 } },
+                    '0' => return Event{ .key = KEY{ .fun = 21 } },
+                    '1' => return Event{ .key = KEY{ .fun = 22 } },
+                    '3' => return Event{ .key = KEY{ .fun = 23 } },
+                    '4' => return Event{ .key = KEY{ .fun = 24 } },
                     else =>  return .none ,
                 }
             }
@@ -589,15 +578,15 @@ fn parse_csi(buf: []const u8) !Event {
         '5'...'6' => {
             if (buf[1] == 126) {
                  switch (buf[0]) {
-                    '5' => return Event{ .key = .pageup },
-                    '6' => return Event{ .key = .pagedown },
+                    '5' => return Event{ .key = KEY.pageup },
+                    '6' => return Event{ .key = KEY.pagedown },
                     else =>  return .none ,
                 }
             }
             if (buf[3] == 126) {
                  switch (buf[2]) {
-                    '5' => return Event{ .key = .pageup },
-                    '6' => return Event{ .key = .pagedown },
+                    '5' => return Event{ .key = KEY.pageup },
+                    '6' => return Event{ .key = KEY.pagedown },
                     else =>  return .none ,
                 }
             }
@@ -681,17 +670,12 @@ fn parse_csi(buf: []const u8) !Event {
                 MouseInfo.y = 0;
             }
 
-            return Event{ .key = .mouse };
+            return Event{ .key = KEY.mouse };
         },
         else =>  return .none ,
     }
     return .none ;
 }
-
-
-
-
-
 
 
 
@@ -709,13 +693,8 @@ test "tested" {
                    @enumToInt(dds.Style.notStyle),
                    @enumToInt(dds.Style.notStyle)},
     .backgr = dds.BackgroundColor.bgBlack,
-    .backBright = false,
     .foregr = dds.ForegroundColor.fgGreen,
-    .foreBright = true
     };
-    //const stdin = io.getStdIn();
-    // Enable terminal raw mode, its very recommended when listening for events  stdin.handle
-
     var raw_term = try enableRawMode();
     defer raw_term.disableRawMode() catch {};
 
@@ -725,5 +704,15 @@ test "tested" {
     var size: TermSize = try getSize();
     std.debug.print("screen width:{d} height:{d}\n\r",.{size.width , size.height });
 
-}
+    var a:[] const u8 = undefined;
+    var b:[] const u8 = "test";
+    var c:[] const u8 = "moi";
 
+    a = b ;
+    std.debug.print("zoned {s} {s}\n\r",.{a, b });
+
+    a = c ;
+    std.debug.print("zoned {s} {s}\n\r",.{a, c });
+    flushIO();
+
+}

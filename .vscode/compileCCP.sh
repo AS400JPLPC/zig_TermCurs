@@ -63,15 +63,24 @@ if [ "$mode" == "PROD" ] ; then
   fi
 fi
 
+if [ "$mode" == "LIB" ] ; then
+  if [ "$projet_typ" == "PIE" ] ; then
+		( set -x ; \
+				make -f ./Makelib  clean all PGM=$projet_bin \
+	)
+  fi
+fi
 #-------------------------------------------------------------------
 # resultat
 #-------------------------------------------------------------------
 
 	echo -en '\033[0;0m'	# video normal
 	echo " "
-	if test -f "$projet_bin"; then
-		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
-		echo -en "  size : "
-		ls -lrtsh $projet_bin | cut -d " " -f6
+	if [ "$mode" != "LIB" ] ; then
+		if test -f "$projet_bin"; then
+			echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
+			echo -en "  size : "
+			ls -lrtsh $projet_bin | cut -d " " -f6
+		fi
 	fi
 exit
