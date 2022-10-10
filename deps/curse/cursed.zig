@@ -76,7 +76,7 @@ pub var posCurs : Point = undefined;
 
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY( x: usize, y: usize) void {
-    output.writer().print("\x1b[{d};{d}H", .{ x, y }) catch {return;} ;
+    output.writer().print("\x1b[{d};{d}f", .{ x, y }) catch {return;} ;
 }
 
 /// Moves cursor up `y` rows
@@ -137,10 +137,7 @@ pub fn getCursor() void {
     posCurs.y=0;
 
     // Don't forget to flush!
-    buf_Output.flush() catch {return;} ;
     output.writer().print("\x1b[?6n", .{}) catch {return;} ;
-    buf_Output.flush() catch {return;} ;
-
 
     while (true) {
         const  c =   stdin.read(&cursBuf) catch {return;} ;
@@ -167,6 +164,7 @@ pub fn getCursor() void {
                 break;
             }
         }
+    flushIO();
 
 }
 
@@ -207,7 +205,7 @@ pub fn writeStyled(text: []const u8 , attribut : dds.ZONATRB ) void {
     setStyle(attribut.styled);
     output.writer().print("{s}", .{text}) catch {return;} ;
     resetStyle();
-    flushIO();
+    //flushIO();
 }
 
 
@@ -698,9 +696,14 @@ test "tested" {
     var raw_term = try enableRawMode();
     defer raw_term.disableRawMode() catch {};
 
-    writeStyled("bonjour \n",defAtrLabel );
+    writeStyled("bonjour \n\r",defAtrLabel );
+
     getCursor();
-    std.debug.print("cursor X:{d}  Y:{d}\n\r", .{posCurs.x, posCurs.y});
+    std.debug.print("\n\rcursor X:{d}  Y:{d}\n\r", .{posCurs.x, posCurs.y}) ;
+    gotoXY(10,100);  // use terminal
+    getCursor();
+    std.debug.print("gotoXY X:{d}  Y:{d}\n\r", .{posCurs.x, posCurs.y});
+
     var size: TermSize = try getSize();
     std.debug.print("screen width:{d} height:{d}\n\r",.{size.width , size.height });
 
@@ -714,5 +717,7 @@ test "tested" {
     a = c ;
     std.debug.print("zoned {s} {s}\n\r",.{a, c });
     flushIO();
-
+    switch (try getKey()) {
+            else => {}
+        }
 }

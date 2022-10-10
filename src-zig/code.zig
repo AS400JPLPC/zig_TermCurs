@@ -1,7 +1,7 @@
 const std = @import("std");
-const stl = @import("style");
-const lbl = @import("label");
-
+const term = @import("cursed");
+const lbl = @import("forms").lbl;
+const dds = @import("dds");
 
 const output =std.io.getStdOut();
 
@@ -13,21 +13,21 @@ pub var rcd_label = std.ArrayList(lbl.LABEL).init(allocator);
 
 pub fn stockLabel() void{
 
-    rcd_label.append(lbl.flabel ("Name",1,1,
+    rcd_label.append(lbl.newLabel("Name-1",1,1,
                         "Jean-Pierre",
-                        lbl.defAtrLabel,
+                        lbl.AtrLabel,
                         true,
-        ))catch {return;} ;
+        )) catch {return;} ;
     //example: option specific
-    rcd_label.items[0].attribut.styled[2] = @enumToInt(stl.Style.styleReverse);
-    rcd_label.items[0].attribut.styled[3] = @enumToInt(stl.Style.styleBlink);
+    rcd_label.items[0].attribut.styled[2] = @enumToInt(dds.Style.styleReverse);
+    rcd_label.items[0].attribut.styled[3] = @enumToInt(dds.Style.styleBlink);
 
 
-    rcd_label.append(lbl.flabel ("Name",1,1,
+    rcd_label.append(lbl.newLabel("Name-2",1,1,
                         "Marie",
-                        lbl.defAtrLabel,
+                        lbl.AtrLabel,
                         true,
-        ))catch {return;} ;
+        )) catch {return;} ;
 }
 
 
@@ -59,14 +59,14 @@ pub fn main() !void {
     std.debug.print("LABEL not found\n", .{});
     }
 
-    stl.writeStyled("bonjour \n",lbl.defAtrLabel );
+    term.writeStyled("bonjour \n",lbl.AtrLabel );
 
-    stl.writeStyled("------------------ \n",lbl.defAtrLabel );
+    term.writeStyled("------------------ \n",lbl.AtrLabel );
     for (rcd_label.items) |xLABEL| {
-          stl.writeStyled(xLABEL.text,xLABEL.attribut);
+          term.writeStyled(xLABEL.text,xLABEL.attribut);
           //only fo test
           output.writer().print("\n", .{}) catch {return;} ;
-          stl.writeStyled("------------------ \n",lbl.defAtrLabel );
+          term.writeStyled("------------------ \n",lbl.AtrLabel );
         }
 
 }

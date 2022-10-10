@@ -15,7 +15,7 @@ const allocator = std.heap.page_allocator;
 
 
 const TERMINAL_CHAR = struct {
-  ch : const u8,
+  ch : u8,
   style : dds.Styled,
   bg : dds.BackgroundColor,
   fg : dds.ForegroundColor,
@@ -346,7 +346,7 @@ pub const  lbl = struct {
 
   // define attribut default LABEL
   pub const AtrLabel : dds.ZONATRB = .{
-      .styled=[_]i32{@enumToInt(dds.Style.styleBright),
+      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
                     @enumToInt(dds.Style.styleItalic),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -356,7 +356,7 @@ pub const  lbl = struct {
 
   // define attribut default TITLE
   pub const AtrTitle : dds.ZONATRB = .{
-      .styled=[_]i32{@enumToInt(dds.Style.styleBright),
+      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -364,15 +364,16 @@ pub const  lbl = struct {
       .foregr = dds.ForegroundColor.fgCyan,
   };
 
-  pub const LABEL = struct {
-    name: dds.name ,
-    posx: dds.posx,
-    posy: dds.posy ,
-    attribut:dds.attribut,
-    text: dds.text,
-    title: dds.title ,
-    actif: dds.actif
-  };
+   pub const LABEL = struct {
+    name : []const u8 ,
+    posx: usize,
+    posy: usize,
+    attribut:dds.ZONATRB,
+    text: []const u8,
+    title: bool,
+    actif: bool
+    };
+
 
   // func LABEL
   pub fn newLabel(name: []const u8,posx:usize,posy:usize,
@@ -423,7 +424,7 @@ pub const  lbl = struct {
 
 
 
-test "testeForms" {
+test "testForms" {
 //pub fn main() !void {
     const AtrLabel : dds.ZONATRB = .{
     .styled=[_]u32{@enumToInt(dds.Style.styleBright),
@@ -437,8 +438,10 @@ test "testeForms" {
     var raw_term = try term.enableRawMode();
     defer raw_term.disableRawMode() catch {};
     var text : []const u8  = "東京市";
+    term.gotoXY(5,10);
     term.writeStyled(text,AtrLabel );
     const text2  = "\nJPL\n";
+    term.gotoXY(6,10);
     term.writeStyled(text2,AtrLabel );
 
 

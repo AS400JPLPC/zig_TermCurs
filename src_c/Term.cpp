@@ -108,9 +108,10 @@ bool ctrlPgm(std::string v_TEXT)
 	std::filesystem::path p(v_TEXT.c_str());
 											switch(strswitch(p.stem().c_str()))
 											{
-												case  strswitch("event")		: b_pgm =true;		break;
-												case  strswitch("code")		: b_pgm =true;		break;
+												case  strswitch("event")			: b_pgm =true;		break;
+												case  strswitch("code")				: b_pgm =true;		break;
 												case  strswitch("Tcursed")		: b_pgm =true;		break;
+												case  strswitch("cursed")			: b_pgm =true;		break;
 											}
 	return b_pgm;
 }

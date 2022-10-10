@@ -1,7 +1,8 @@
 # zig_TermCurs
 terminal access function<br />
 
-*TESTING*
+**TESTING**<br />
+*look at the bottom of the testing page*<br />
 
 **os linux**
 
@@ -52,6 +53,11 @@ doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 &rarr;&nbsp; 2022-10-08   Testing manipulation char mult-problem unicode  <BR />
 &rarr;&nbsp; 2022-10-08   creat deps/zyglyph/ working lowerStr and upperStr<BR />  
 &rarr;&nbsp; 2022-10-08   stabilization deps/curse/cursed<BR />
+<BR /><BR />
+&rarr;&nbsp; 2022-10-10   add flushIO()<BR />
+&rarr;&nbsp; 2022-10-10   update getCursor  add flushIO()<BR />
+&rarr;&nbsp; 2022-10-10   update gotoXY     "\x1b[{d};{d}f" not H<BR />
+&rarr;&nbsp; 2022-10-10   creat Forms only test  **Only to test my build in Zig-lang it's not fully operational nor stable, double buffer process is not in place**<BR />
 <BR />
 <BR />
 
@@ -100,8 +106,13 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 
 <u>-------is not finished------------------------------------</u><BR />
-&rarr;&nbsp; label.zig<BR />
-&rarr;&nbsp; testing<BR />
+&rarr;&nbsp; forms.zig<BR />
+
+<u>-------TESTING------------------------------------</u><BR />
+&rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
+&rarr;&nbsp; cursed  Tcursed.zig<BR />
+&rarr;&nbsp; label forms.zig      code.zig<BR />
+
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration<BR />
 * [nim-termcurs](https://github.com/AS400JPLPC)<br />
