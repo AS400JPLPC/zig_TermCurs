@@ -19,18 +19,6 @@ pub const ErrForms = error{
         InvalidePanel,
     };
 
-const TERMINAL_CHAR = struct {
-  ch :   [] const u8,
-  attribut:dds.ZONATRB,
-  on:bool
-};
-
-
-
-
-
-
-
 
 
 
@@ -110,10 +98,10 @@ pub const  lbl = struct {
 };
 
 
-pub const box = struct {
+pub const frm = struct {
 
-  // define attribut default BORDER
-  pub const AtrBorder : dds.ZONATRB = .{
+  // define attribut default FRAME
+  pub const AtrFrame : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
@@ -123,8 +111,8 @@ pub const box = struct {
 
   };
 
-  // define attribut default TITLE BORDER
-  pub const BorderTitle : dds.ZONATRB = .{
+  // define attribut default TITLE FRAME
+  pub const AtrTitle : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.styleBright),
                     @enumToInt(dds.Style.notStyle),
@@ -134,9 +122,9 @@ pub const box = struct {
   };
 
 
-  /// BORDER
+  /// FRAME
 
-  pub const BORDER = struct {
+  pub const FRAME = struct {
     name :  []const u8,
     posx:   usize,
     posy:   usize,
@@ -149,7 +137,7 @@ pub const box = struct {
     actif:  bool
     };
 
-  pub fn newBorder(vname:[]const u8,
+  pub fn newFrame(vname:[]const u8,
                   vposx:usize, vposy:usize,
                   vlines:usize,
                   vcols:usize,
@@ -157,9 +145,9 @@ pub const box = struct {
                   vattribut:dds.ZONATRB,
                   vtitle:[]const u8,
                   vtitleAttribut:dds.ZONATRB,
-                  ) BORDER {
+                  ) FRAME {
 
-        const xborder = BORDER {
+        const xframe = FRAME {
             .name = vname,
             .posx = vposx,
             .posy = vposy,
@@ -171,13 +159,13 @@ pub const box = struct {
             .titleAttribut = vtitleAttribut,
             .actif = true
         };
-    return xborder;
+    return xframe;
 
   }
 
-    pub fn printBorder(vpnl : pnl.PANEL , vbox: BORDER) void {
+    pub fn printFrame(vpnl : pnl.PANEL , vfram: FRAME) void {
 
-      const ACS_Hlines  = "_";
+      const ACS_Hlines  = "─";
       const ACS_Vlines  = "│";
       const ACS_UCLEFT  = "┌";
       const ACS_UCRIGHT = "┐";
@@ -194,72 +182,70 @@ pub const box = struct {
       var trait: []const u8 = "";
       var edt :bool   = undefined ;
 
-      var x  = vbox.posx ;
+      var x  = vfram.posx ;
       var row: usize = 1 ;
       var y: usize = 0 ;
       var col: usize = 0 ;
-      var npos: usize = 0;
-      var n: usize = 0;
 
-      while (row <= vbox.lines) {
-        y = vbox.posy;
+
+      while (row <= vfram.lines) {
+        y = vfram.posy;
         col = 1;
-        while ( col <= vbox.cols ){
+        while ( col <= vfram.cols ){
           edt = false;
           if (row == 1) {
               if (col == 1) {
-                if ( dds.CADRE.line1 == vbox.cadre ) {
+                if ( dds.CADRE.line1 == vfram.cadre ) {
                     trait = ACS_UCLEFT;
                 } else  trait = ACS_UCLEFT2 ;
                 edt = true;
               }
-              if ( col == vbox.cols ) {
-                if (dds.CADRE.line1 == vbox.cadre) {
+              if ( col == vfram.cols ) {
+                if (dds.CADRE.line1 == vfram.cadre) {
                   trait = ACS_UCRIGHT;
                 } else  trait = ACS_UCRIGHT2 ;
                 edt = true;
               }
-              if ( col > 1 and col < vbox.cols ) {
-                if (dds.CADRE.line1 == vbox.cadre ) {
+              if ( col > 1 and col < vfram.cols ) {
+                if (dds.CADRE.line1 == vfram.cadre ) {
                   trait = ACS_Hlines;
                 } else  trait = ACS_Hline2;
                 edt = true;
               }
-          } else if ( row == vbox.lines ) {
+          } else if ( row == vfram.lines ) {
               if (col == 1) {
-                if ( dds.CADRE.line1 == vbox.cadre ) {
+                if ( dds.CADRE.line1 == vfram.cadre ) {
                   trait = ACS_LCLEFT;
                 } else  trait = ACS_LCLEFT2;
                 edt = true;
               }
-              if ( col == vbox.cols ) {
-                if ( dds.CADRE.line1 == vbox.cadre ) {
+              if ( col == vfram.cols ) {
+                if ( dds.CADRE.line1 == vfram.cadre ) {
                   trait = ACS_LCRIGHT;
                 } else  trait = ACS_LCRIGHT2 ;
                 edt = true ;
               }
-              if ( col > 1 and col < vbox.cols ) {
-                if ( dds.CADRE.line1 == vbox.cadre ) {
+              if ( col > 1 and col < vfram.cols ) {
+                if ( dds.CADRE.line1 == vfram.cadre ) {
                   trait = ACS_Hlines;
                 } else  trait = ACS_Hline2 ;
                 edt = true;
               }
-          } else if ( row > 1 and row < vbox.lines ) {
-            if ( col == 1 or col == vbox.cols ) {
-              if ( dds.CADRE.line1 == vbox.cadre ) {
+          } else if ( row > 1 and row < vfram.lines ) {
+            if ( col == 1 or col == vfram.cols ) {
+              if ( dds.CADRE.line1 == vfram.cadre ) {
                 trait = ACS_Vlines;
               } else trait = ACS_Vline2 ;
               edt = true;
             }
           }
-          if  ( edt) {
-            npos = vbox.cols * x ;
-            n =  npos + y;
+          if  ( edt and vfram.cadre != dds.CADRE.line0) {
             term.gotoXY(x,y);
-            term.writeStyled(trait,vbox.titleAttribut);
-            vpnl.buf.items[n].ch  = trait;
-            vpnl.buf.items[n].attribut  =  vbox.attribut;
-            vpnl.buf.items[n].on = true;
+            term.writeStyled(trait,vfram.attribut);
+          }
+          else {
+            term.gotoXY(x,y);
+            term.writeStyled(" ",vpnl.attribut);
           }
           y += 1;
           col += 1;
@@ -267,26 +253,13 @@ pub const box = struct {
         x += 1;
         row +=1 ;
       }
-      if (vbox.title.len > 0 ) {
-        for (vbox.title) |_, index| {
-          _ = index;
-        }
-        if (vbox.title.len > vbox.cols - 2 ) return ;
-
-        npos = vbox.cols * vbox.posx ;
-        n =  npos + (((vbox.cols - vbox.title.len ) / 2) + vbox.posy) ;
-
-        var svar = vbox.title;
-        var iter = utl.iteratS.iterator(svar);
-        term.gotoXY(vbox.posx , ((vbox.cols - vbox.title.len ) / 2));
-        while (iter.next()) |ch| {
-                            //try stdout.writer().print("\n\r iter outils => {s}\n\r",.{ch});
-          //vpnl.buf.items[n].ch  = ch;
-          //vpnl.buf.items[n].attribut = vbox.titleAttribut;
-          //vpnl.buf.items[n].on = true;
-          term.writeStyled(ch,vbox.titleAttribut);
-          n +=1 ;
-        }
+      if (vfram.title.len > 0 and vfram.cadre != dds.CADRE.line0) {
+        var iter = utl.iteratS.iterator(vfram.title);
+        var wlen : usize = 0;
+        while (iter.next()) |_| { wlen += 1 ; }
+        if (wlen > vfram.cols - 2 ) return ;
+        term.gotoXY(vfram.posx , ((vfram.cols - vfram.title.len ) / 2) + vfram.posy);
+        term.writeStyled(vfram.title,vfram.titleAttribut);
       }
 
     }
@@ -325,18 +298,15 @@ pub const  pnl = struct {
 
     attribut: dds.ZONATRB,
 
-    border: box.BORDER ,
+    frame: frm.FRAME ,
 
-    //box: std.ArrayList(box.BORDER).init(allocator),
+    //frame: std.ArrayList(frame.FRAME).init(allocator),
 
     label: std.ArrayList(lbl.LABEL),
 
     //button: std.ArrayList(btn.BUTTON).init(allocator),
 
     //funcKey:std.ArrayList(Tkey).init(allocator),
-
-
-    buf:std.ArrayList(TERMINAL_CHAR),
 
     mouse: bool,
 
@@ -351,9 +321,9 @@ pub const  pnl = struct {
                   vcols: usize,
                   vAttribut: dds.ZONATRB,
                   vcadre : dds.CADRE,
-                  vAtrBorder: dds.ZONATRB,
+                  vAtrFrame: dds.ZONATRB,
                   vtitle: [] const u8 ,
-                  vBorderTitle: dds.ZONATRB) ErrForms! PANEL {
+                  vFrameTitle: dds.ZONATRB) ErrForms! PANEL {
 
     var xpanel = PANEL {
           .name   = vname,
@@ -364,29 +334,17 @@ pub const  pnl = struct {
           .attribut = vAttribut,
           .mouse  = false,
           .actif  = true,
-          .border = undefined,
+          .frame = undefined,
           .label  = std.ArrayList(lbl.LABEL).init(allocator),
-          .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
       };
 
 
-    // INIT doublebuffer
-    var i:usize = (xpanel.lines+1) * (xpanel.cols+1);
-    var doublebuffer = TERMINAL_CHAR  { .ch =  "",
-                                        .attribut = xpanel.attribut,
-                                        .on = false};
-    while (true) {
-        if (i == 0) break ;
-        xpanel.buf.append(doublebuffer) catch {return ErrForms.InvalidePanel;};
-        i -=1 ;
-    }
-
-        // init border Panel
-    xpanel.border = box.newBorder(xpanel.name,
+    // init frame Panel
+    xpanel.frame = frm.newFrame(xpanel.name,
                               xpanel.posx , xpanel.posy,
                               xpanel.lines, xpanel.cols,
-                              vcadre, vAtrBorder,
-                              vtitle, vBorderTitle );
+                              vcadre, vAtrFrame,
+                              vtitle, vFrameTitle );
 
     return xpanel;
 
@@ -398,19 +356,19 @@ pub const  pnl = struct {
                   vcols: usize,
                   vAtrPanel: dds.ZONATRB,
                   vcadre : dds.CADRE,
-                  vAtrBorder: dds.ZONATRB,
+                  vAtrFrame: dds.ZONATRB,
                   vtitle: [] const u8,
-                  vBorderTitle: dds.ZONATRB) PANEL {
+                  vFrameTitle: dds.ZONATRB) PANEL {
 
       var result_1 = pnl.newPanel(vname, vposx , vposy ,
                                   vlines , vcols,
                                   vAtrPanel,
                                   vcadre,
-                                  vAtrBorder,
+                                  vAtrFrame,
                                   vtitle,
-                                  vBorderTitle
-                                  ) catch |err| blk: {
-                                      std.debug.print("newPanel err={}\n", .{err});
+                                  vFrameTitle
+                                  ) catch |ErrForms| blk: {
+                                      std.debug.print("newPanel err={}\n", .{ErrForms});
                                       break :blk null;
                                     };
 
@@ -421,37 +379,26 @@ pub const  pnl = struct {
       return panel ;
   }
 
-  pub fn displayPanel (vpnl: pnl.PANEL) void {
-  // display matrice PANEL
-  if ( !vpnl.actif ) return ;
-  for (vpnl.buf.items) | _, x| {
-    for (vpnl.buf.items) |pnln, y| {
-      term.gotoXY(x + vpnl.posx , y + vpnl.posy);
-      if ( pnln.on == true ) {
-        term.writeStyled(pnln.ch,pnln.attribut);
-      } else {
-        //setStyle(pnl.attribut.styled);
-        term.writeStyled(" ",vpnl.attribut);
-      }
-    }
-  }
-  term.flushIO();
-}
+
 
 
   /// print PANEL
   pub fn printPanel  (vpnl: PANEL) void {
     // assigne PANEL and all OBJECT to matrice for display
 
-    std.debug.print("panel {s}",.{vpnl.name});
-    box.printBorder(vpnl,vpnl.border);
-    //}
+    // FRAME (window panel)
+    frm.printFrame(vpnl,vpnl.frame);
 
-    //for (vpnl.box) |nbox| {
-    //  if (nbox.actif)  box.printBorder(vpnl,nbox) ;
-    //}
+    // LABEL
+    for (vpnl.label.items) |lblprt| {
+      if (lblprt.actif)  {
+        if (vpnl.frame.cadre == dds.CADRE.line0) term.gotoXY(vpnl.posx + lblprt.posx - 1,vpnl.posy + lblprt.posy - 1)
+        else term.gotoXY(vpnl.posx + lblprt.posx ,vpnl.posy + lblprt.posy );
+        term.writeStyled(lblprt.text,lblprt.attribut);
+      }
+    }
 
-    //displayPanel(vpnl);
+    term.flushIO();
   }
 
 
@@ -488,7 +435,7 @@ test "testForms" {
                         lbl.AtrLabel );
     term.writeStyled(xlabel.text,xlabel.attribut);
 
-    var panel = pnl.initPanel("panel-0", 1 , 1 ,10 ,20, pnl.AtrPanel,dds.CADRE.line1,box.AtrBorder,"TITRE",box.BorderTitle);
+    var panel = pnl.initPanel("panel-0", 1 , 1 ,10 ,20, pnl.AtrPanel,dds.CADRE.line1,frm.AtrFrame,"TITRE",frm.AtrTitle);
 
     pnl.printPanel(panel);
 }

@@ -62,6 +62,7 @@ modification from :<BR />
 
 <BR /><BR />
 &rarr;&nbsp; 2022-10-11   creat deps/curse/ utils iterator for [] const u8  Retrieval "const char" allows to know the number of characters<BR />
+&rarr;&nbsp; 2022-10-11   Box-border Panel Label are operational no double buffer 👍  😄 <BR />
 <BR />
 <BR />
 
@@ -109,12 +110,12 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
-&rarr;&nbsp; box / panel <BR />
+&rarr;&nbsp; box / panel / label    OK <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
 &rarr;&nbsp; cursed  Tcursed.zig<BR />
-&rarr;&nbsp; label forms.zig      code.zig<BR />
+&rarr;&nbsp; label / box / panel  forms.zig      code.zig<BR />
 
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration<BR />

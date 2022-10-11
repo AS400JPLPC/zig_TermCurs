@@ -1,5 +1,6 @@
 const std = @import("std");
 const utf = @import("std").unicode;
+const utl = @import("utils");
 const os = std.os;
 const io = std.io;
 
@@ -31,7 +32,6 @@ fn charToConst (vZone:[4]u8 , i: usize) ![]const u8 {
     return string;
 
 }
-
 
 
 
@@ -150,11 +150,20 @@ pub fn main() !void {
                         //myStr.normalize(4);
                         //std.debug.print("\n\r normalze 4  str @ {s}\n",.{myStr.str()});
                         try myStr.toUpperStr();
-                        try stdout.writer().print("\n\r zoned len => {any}  mysStr len => {any} capacity {any} {s} \n", .{zoned.len,myStr.len() ,myStr.capacity(), myStr.str()});
+                        var wl : usize =0;
+                        var zz = try myStr.clone();
+                        //zz.normalize(4);
+                        string = zz.str();
+                        var iterx = utl.iteratS.iterator(string);
+                        while (iterx.next()) |_| {
+                            //try stdout.writer().print("\n\r iter outils => {s}\n\r",.{ch});
+                            wl += 1 ;
+                        }
+                        try stdout.writer().print("\n\r zoned len => {any} : {d}  mysStr len => {any} capacity {any} {s} \n\r", .{zoned.len, wl, myStr.len() ,myStr.capacity(), myStr.str()});
 
                         try myStr.toLowerStr();
                             term.titleTerm("TEST 5250");
-                            term.resizeTerm(10,132) ;
+                            //term.resizeTerm(10,132) ;
                     }
                 },
                 .ctrl => |c| switch (c) {
