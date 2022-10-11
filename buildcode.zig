@@ -10,13 +10,14 @@ pub fn build(b: *std.build.Builder) void {
 // zig-src   source projet
 // zig-deps  depot
 // src_c     source c/c++
-//     test.addPackagePath("curse", "deps/curse/main.zig");
+// test.addPackagePath("curse", "deps/curse/main.zig");
 
     const code = b.addExecutable("code", "src-zig/code.zig");
     code.setTarget(target);
     code.addPackagePath("cursed", "deps/curse/cursed.zig");
     code.addPackagePath("forms", "deps/curse/forms.zig");
     code.addPackagePath("dds", "deps/curse/dds.zig");
+    code.addPackagePath("utils", "deps/curse/utils.zig");
     code.setBuildMode(mode);
     code.install();
 

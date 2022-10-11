@@ -15,6 +15,7 @@ pub fn build(b: *std.build.Builder) void {
     forms.setTarget(target);
     forms.addPackagePath("dds", "deps/curse/dds.zig");
     forms.addPackagePath("term", "deps/curse/cursed.zig");
+    forms.addPackagePath("utils", "deps/curse/utils.zig");
     forms.setBuildMode(mode);
     forms.install();
 

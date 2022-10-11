@@ -5,6 +5,8 @@ const std = @import("std");
 const dds= @import("dds.zig");
 const Tkey= @import("cursed.zig").KEY;
 const term= @import("cursed.zig");
+const utl = @import("utils.zig");
+
 
 const os = std.os;
 const io = std.io;
@@ -12,82 +14,118 @@ const io = std.io;
 
 const allocator = std.heap.page_allocator;
 
-
+/// Errors that may occur when using String
+pub const ErrForms = error{
+        InvalidePanel,
+    };
 
 const TERMINAL_CHAR = struct {
-  ch : u8,
-  style : dds.Styled,
-  bg : dds.BackgroundColor,
-  fg : dds.ForegroundColor,
+  ch :   [] const u8,
+  attribut:dds.ZONATRB,
   on:bool
 };
 
 
 
-pub fn displayPanel (vpnl: pnl.PANEL) void {
-  // display matrice PANEL
-  if ( !vpnl.actif ) return ;
-  const stdout = io.getStdOut();
-  var bufout = std.io.bufferedWriter(stdout.writer());
 
-  for (vpnl.buf.items) |pnlx, x| {
-    for (pnlx.items) |pnln, y| {
-      term.gotoXY(x + pnln.posx , y + pnln.posy);
-      if ( pnln.buf[y].on ) {
-        term.setBackgroundColor(pnln.buf[y].bg);
-        term.setForegroundColor(pnln.buf[y].fg);
-        term.writeStyled(pnln.buf[y].ch,pnln.buf[y].style);
-      } else {
-        //setStyle(pnl.attribut.styled);
-        term.setBackgroundColor(pnln.attribut.backgr);
-        term.setForegroundColor(pnln.attribut.foregr);
-        term.writeStyled(" ",pnln.attribut.styled);
-      }
-    }
-  }
-  try bufout.flush();
-}
 
-pub const  btn = struct {
 
-  pub const BUTTON = struct {
-    key:Tkey,
-    text : dds.text,
-    ctrl : dds.ctrl,
-    actif : dds.actif
+
+
+
+
+pub const  lbl = struct {
+
+  // define attribut default LABEL
+  pub const AtrLabel : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+                    @enumToInt(dds.Style.styleItalic),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgGreen,
   };
 
-  fn newButton(vkey:Tkey, vtext:dds.text, vctrl:dds.ctrl, vactif:dds.actif) BUTTON {
+  // define attribut default TITLE
+  pub const AtrTitle : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgCyan,
+  };
 
-    const xbutton = BUTTON {
-      .key = vkey,
-      .text = vtext,
-      .ctrl = vctrl,
-      .actif = vactif
+  pub const LABEL = struct {
+    name :  []const u8,
+    posx:   usize,
+    posy:   usize,
+    attribut:dds.ZONATRB,
+    text:   []const u8,
+    title:  bool,
+    actif:  bool
     };
-    return xbutton ;
 
+
+  // func LABEL
+  pub fn newLabel(vname: [] const u8, vposx:usize, vposy:usize,
+              vtext: [] const u8,
+              vattribut : dds.ZONATRB,) LABEL {
+
+        const xlabel = LABEL {
+            .name = vname,
+            .posx = vposx ,
+            .posy = vposy,
+            .attribut = vattribut,
+            .text = vtext,
+            .title = false,
+            .actif = true
+        };
+
+        return xlabel;
   }
 
+  // func TITLE
+  pub fn newTile(vname: [] const u8, vposx:usize, vposy:usize,
+              vtext: [] const u8,
+              vattribut : dds.ZONATRB) LABEL {
+
+        const xlabel = LABEL{
+            .name = vname,
+            .posx = vposx ,
+            .posy = vposy,
+            .attribut = vattribut,
+            .text = vtext,
+            .title = true,
+            .actif = true,
+        };
+
+        return xlabel;
+  }
+
+  pub fn getName(vpnl:pnl.PANEL , n: dds.index) []u8 {
+    return vpnl.label[n].name;
+  }
 
 };
+
 
 pub const box = struct {
 
   // define attribut default BORDER
   pub const AtrBorder : dds.ZONATRB = .{
-      .styled=[_]i32{@enumToInt(dds.Style.styleDim),
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgred
+      .foregr = dds.ForegroundColor.fgRed
 
   };
 
   // define attribut default TITLE BORDER
   pub const BorderTitle : dds.ZONATRB = .{
-      .styled=[_]i32{@enumToInt(dds.Style.styleDim),
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.styleBright),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -97,29 +135,28 @@ pub const box = struct {
 
 
   /// BORDER
+
   pub const BORDER = struct {
-    name: dds.name ,
-    posx: dds.posx,
-    posy: dds.posy ,
-    lines: dds.lines,
-    cols: dds.cols,
-    cadre: dds.CADRE,
-    attribut:dds.attribut,
-    title:dds.title,
-    titleAttibut: dds.attribut,
-    actif:dds.actif
+    name :  []const u8,
+    posx:   usize,
+    posy:   usize,
+    lines:  usize,
+    cols:   usize,
+    cadre:  dds.CADRE,
+    attribut:dds.ZONATRB,
+    title:  []const u8,
+    titleAttribut: dds.ZONATRB,
+    actif:  bool
     };
 
-
-  pub fn newBorder(vname:dds.name,
-                  vposx:dds.posx, vposy:dds.posy,
-                  vlines:dds.lines,
-                  vcols:dds.cols,
+  pub fn newBorder(vname:[]const u8,
+                  vposx:usize, vposy:usize,
+                  vlines:usize,
+                  vcols:usize,
                   vcadre:dds.CADRE,
-                  vattribut:dds.attribut,
-                  vtitle:dds.title,
-                  vtitleAttibut: dds.attribut,
-                  vactif:dds.actif
+                  vattribut:dds.ZONATRB,
+                  vtitle:[]const u8,
+                  vtitleAttribut:dds.ZONATRB,
                   ) BORDER {
 
         const xborder = BORDER {
@@ -130,9 +167,9 @@ pub const box = struct {
             .cols = vcols,
             .cadre = vcadre,
             .attribut = vattribut,
-            .tilte = vtitle,
-            .titleAtribut = vtitleAttibut,
-            .actif = vactif
+            .title = vtitle,
+            .titleAttribut = vtitleAttribut,
+            .actif = true
         };
     return xborder;
 
@@ -154,7 +191,7 @@ pub const box = struct {
       const ACS_LCLEFT2   = "╚";
       const ACS_LCRIGHT2  = "╝";
 
-      var trait: []u8 = "";
+      var trait: []const u8 = "";
       var edt :bool   = undefined ;
 
       var x  = vbox.posx ;
@@ -218,13 +255,11 @@ pub const box = struct {
           if  ( edt) {
             npos = vbox.cols * x ;
             n =  npos + y;
-            vpnl.buf.append( pnl.buf (
-              trait,
-              vbox.attribut.styled,
-              vbox.attribut.backgr,
-              vbox.attribut.foregr,
-              true
-            ));
+            term.gotoXY(x,y);
+            term.writeStyled(trait,vbox.titleAttribut);
+            vpnl.buf.items[n].ch  = trait;
+            vpnl.buf.items[n].attribut  =  vbox.attribut;
+            vpnl.buf.items[n].on = true;
           }
           y += 1;
           col += 1;
@@ -232,18 +267,24 @@ pub const box = struct {
         x += 1;
         row +=1 ;
       }
-      if (vbox.title > "" ) {
-
-        if (vbox.title.len() > vbox.cols - 2 ) return ;
+      if (vbox.title.len > 0 ) {
+        for (vbox.title) |_, index| {
+          _ = index;
+        }
+        if (vbox.title.len > vbox.cols - 2 ) return ;
 
         npos = vbox.cols * vbox.posx ;
-        n =  npos + (((vbox.cols - vbox.title.len() ) / 2) + vbox.posy) ;
-        for (vbox.title) | ch | {
-          vpnl.buf[n].ch  = ch;
-          vpnl.buf[n].bg  =  vbox.titlebackgr;
-          vpnl.buf[n].fg  =  vbox.titleforegr;
-          vpnl.buf[n].style = vbox.titlestyle;
-          vpnl.buf[n].on = true;
+        n =  npos + (((vbox.cols - vbox.title.len ) / 2) + vbox.posy) ;
+
+        var svar = vbox.title;
+        var iter = utl.iteratS.iterator(svar);
+        term.gotoXY(vbox.posx , ((vbox.cols - vbox.title.len ) / 2));
+        while (iter.next()) |ch| {
+                            //try stdout.writer().print("\n\r iter outils => {s}\n\r",.{ch});
+          //vpnl.buf.items[n].ch  = ch;
+          //vpnl.buf.items[n].attribut = vbox.titleAttribut;
+          //vpnl.buf.items[n].on = true;
+          term.writeStyled(ch,vbox.titleAttribut);
           n +=1 ;
         }
       }
@@ -259,163 +300,162 @@ pub const  pnl = struct {
 
   // define attribut default PANEL
   pub const AtrPanel : dds.ZONATRB = .{
-      .styled=[_]i32{@enumToInt(dds.Style.styleDim),
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgwhite,
+      .foregr = dds.ForegroundColor.fgWhite
   };
+
+
+
+
+
+
 
   /// define PANEL
   pub const PANEL = struct {
-    name: dds.name ,
-    posx: dds.posx,
-    posy: dds.posy ,
+    name:   [] const u8,
+    posx:   usize,
+    posy:   usize,
 
-    lines: dds.lines,
-    cols: dds.cols,
+    lines:  usize,
+    cols:   usize,
 
-    attribut:dds.attribut,
-
-    title:dds.title,
+    attribut: dds.ZONATRB,
 
     border: box.BORDER ,
 
-    box: std.ArrayList(box.BORDER).init(allocator),
+    //box: std.ArrayList(box.BORDER).init(allocator),
 
-    label: std.ArrayList(lbl.LABEL).init(allocator),
+    label: std.ArrayList(lbl.LABEL),
 
-    button: std.ArrayList(btn.BUTTON).init(allocator),
+    //button: std.ArrayList(btn.BUTTON).init(allocator),
 
-    funcKey:std.ArrayList(Tkey).init(allocator),
+    //funcKey:std.ArrayList(Tkey).init(allocator),
 
 
-    buf:std.ArrayList(TERMINAL_CHAR).init(allocator),
+    buf:std.ArrayList(TERMINAL_CHAR),
 
     mouse: bool,
 
-    actif: dds.actif
+    actif: bool
   };
 
 
 
-  pub fn newPanel(vname:dds.name,
-                  vposx:dds.posx, vposy:dds.posy,
-                  vlines:dds.lines,
-                  vcols:dds.cols,
-                  vattribut:dds.attribut,
-                  vtitle:dds.title) PANEL {
+  pub fn newPanel(vname: [] const u8,
+                  vposx: usize, vposy: usize,
+                  vlines: usize,
+                  vcols: usize,
+                  vAttribut: dds.ZONATRB,
+                  vcadre : dds.CADRE,
+                  vAtrBorder: dds.ZONATRB,
+                  vtitle: [] const u8 ,
+                  vBorderTitle: dds.ZONATRB) ErrForms! PANEL {
 
-      const xpanel = PANEL {
-          .name = vname,
-          .posx = vposx,
-          .posy = vposy,
-          .lines = vlines,
-          .cols = vcols,
-          .attribut = vattribut,
-          .title = vtitle
+    var xpanel = PANEL {
+          .name   = vname,
+          .posx   = vposx,
+          .posy   = vposy,
+          .lines  = vlines,
+          .cols   = vcols,
+          .attribut = vAttribut,
+          .mouse  = false,
+          .actif  = true,
+          .border = undefined,
+          .label  = std.ArrayList(lbl.LABEL).init(allocator),
+          .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
       };
 
-      return xpanel;
+
+    // INIT doublebuffer
+    var i:usize = (xpanel.lines+1) * (xpanel.cols+1);
+    var doublebuffer = TERMINAL_CHAR  { .ch =  "",
+                                        .attribut = xpanel.attribut,
+                                        .on = false};
+    while (true) {
+        if (i == 0) break ;
+        xpanel.buf.append(doublebuffer) catch {return ErrForms.InvalidePanel;};
+        i -=1 ;
+    }
+
+        // init border Panel
+    xpanel.border = box.newBorder(xpanel.name,
+                              xpanel.posx , xpanel.posy,
+                              xpanel.lines, xpanel.cols,
+                              vcadre, vAtrBorder,
+                              vtitle, vBorderTitle );
+
+    return xpanel;
 
   }
+
+  pub fn initPanel(vname: [] const u8,
+                  vposx: usize, vposy: usize,
+                  vlines: usize,
+                  vcols: usize,
+                  vAtrPanel: dds.ZONATRB,
+                  vcadre : dds.CADRE,
+                  vAtrBorder: dds.ZONATRB,
+                  vtitle: [] const u8,
+                  vBorderTitle: dds.ZONATRB) PANEL {
+
+      var result_1 = pnl.newPanel(vname, vposx , vposy ,
+                                  vlines , vcols,
+                                  vAtrPanel,
+                                  vcadre,
+                                  vAtrBorder,
+                                  vtitle,
+                                  vBorderTitle
+                                  ) catch |err| blk: {
+                                      std.debug.print("newPanel err={}\n", .{err});
+                                      break :blk null;
+                                    };
+
+      var panel : PANEL = undefined;
+      if (result_1) |xpanel| {
+        panel = xpanel;
+      }
+      return panel ;
+  }
+
+  pub fn displayPanel (vpnl: pnl.PANEL) void {
+  // display matrice PANEL
+  if ( !vpnl.actif ) return ;
+  for (vpnl.buf.items) | _, x| {
+    for (vpnl.buf.items) |pnln, y| {
+      term.gotoXY(x + vpnl.posx , y + vpnl.posy);
+      if ( pnln.on == true ) {
+        term.writeStyled(pnln.ch,pnln.attribut);
+      } else {
+        //setStyle(pnl.attribut.styled);
+        term.writeStyled(" ",vpnl.attribut);
+      }
+    }
+  }
+  term.flushIO();
+}
+
 
   /// print PANEL
   pub fn printPanel  (vpnl: PANEL) void {
     // assigne PANEL and all OBJECT to matrice for display
 
+    std.debug.print("panel {s}",.{vpnl.name});
+    box.printBorder(vpnl,vpnl.border);
+    //}
 
-    if ( vpnl.cadre.line1 == dds.CADRE.line1 or pnl.cadre == dds.CADRE.line2 ) {
-        box.printBorder(pnl,pnl.border);
-    }
+    //for (vpnl.box) |nbox| {
+    //  if (nbox.actif)  box.printBorder(vpnl,nbox) ;
+    //}
 
-    for (vpnl.box) |nbox| {
-      if (nbox.actif)  box.printBorder(vpnl,nbox) ;
-    }
-
-    //displayPanel(pnl)
+    //displayPanel(vpnl);
   }
 
 
 
-};
-
-
-pub const  lbl = struct {
-
-  // define attribut default LABEL
-  pub const AtrLabel : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
-                    @enumToInt(dds.Style.styleItalic),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle)},
-      .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgGreen,
-  };
-
-  // define attribut default TITLE
-  pub const AtrTitle : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle)},
-      .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgCyan,
-  };
-
-   pub const LABEL = struct {
-    name : []const u8 ,
-    posx: usize,
-    posy: usize,
-    attribut:dds.ZONATRB,
-    text: []const u8,
-    title: bool,
-    actif: bool
-    };
-
-
-  // func LABEL
-  pub fn newLabel(name: []const u8,posx:usize,posy:usize,
-              text: []const u8,
-              attribut : dds.ZONATRB,
-              actif:bool) LABEL {
-
-        const xlabel = LABEL {
-            .name = name,
-            .posx = posx ,
-            .posy = posy,
-            .attribut = attribut,
-            .text = text,
-            .title = false,
-            .actif = actif
-        };
-
-        return xlabel;
-  }
-
-  // func TITLE
-  pub fn newTile(name: []const u8,posx:usize,posy:usize,
-              text: []const u8,
-              attribut : dds.ZONATRB,
-              actif:bool) LABEL {
-
-        const xlabel = LABEL{
-            .name = name,
-            .posx = posx ,
-            .posy = posy,
-            .attribut = attribut,
-            .text = text,
-            .title = true,
-            .actif = actif,
-        };
-
-        return xlabel;
-  }
-
-  pub fn getName(vpnl:pnl.PANEL , n: dds.index) []u8 {
-    return vpnl.label[n].name;
-  }
 
 };
 
@@ -443,7 +483,13 @@ test "testForms" {
     const text2  = "\nJPL\n";
     term.gotoXY(6,10);
     term.writeStyled(text2,AtrLabel );
+    const xlabel = lbl.newLabel("Name-1",1,1,
+                        "Jean-Pierre",
+                        lbl.AtrLabel );
+    term.writeStyled(xlabel.text,xlabel.attribut);
 
+    var panel = pnl.initPanel("panel-0", 1 , 1 ,10 ,20, pnl.AtrPanel,dds.CADRE.line1,box.AtrBorder,"TITRE",box.BorderTitle);
 
+    pnl.printPanel(panel);
 }
 

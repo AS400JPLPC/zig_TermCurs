@@ -16,6 +16,7 @@ pub fn build(b: *std.build.Builder) void {
     prog.setTarget(target);
     prog.addPackagePath("dds", "deps/curse/dds.zig");
     prog.addPackagePath("cursed", "deps/curse/cursed.zig");
+    prog.addPackagePath("utils", "deps/curse/utils.zig");
     prog.addPackagePath("zig_string", "deps/string/zig_string.zig");
     //prog.addPackagePath("ziglyph", "deps/ziglyph/ziglyph.zig");
     prog.setBuildMode(mode);

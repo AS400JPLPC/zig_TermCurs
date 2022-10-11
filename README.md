@@ -48,7 +48,7 @@ doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 &rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
 &rarr;&nbsp; 2022-09-26   creat deps/curse/dds common definition module for cursed and forms <BR />
 <BR /><BR />
-&rarr;&nbsp; 2022-10-08   creat deps/curse/ cursed chgange Title and resize terminal <BR />
+&rarr;&nbsp; 2022-10-08   creat deps/curse/ cursed change Title and resize terminal <BR />
 &rarr;&nbsp; 2022-10-08   creat deps/string/ introduction of zig-string tests <BR />
 &rarr;&nbsp; 2022-10-08   Testing manipulation char mult-problem unicode  <BR />
 &rarr;&nbsp; 2022-10-08   creat deps/zyglyph/ working lowerStr and upperStr<BR />  
@@ -58,6 +58,9 @@ doc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 &rarr;&nbsp; 2022-10-10   update getCursor  add flushIO()<BR />
 &rarr;&nbsp; 2022-10-10   update gotoXY     "\x1b[{d};{d}f" not H<BR />
 &rarr;&nbsp; 2022-10-10   creat Forms only test  **Only to test my build in Zig-lang it's not fully operational nor stable, double buffer process is not in place**<BR />
+
+<BR /><BR />
+&rarr;&nbsp; 2022-10-11   creat deps/curse/ utils iterator for [] const u8  Retrieval "const char" allows to know the number of characters<BR />
 <BR />
 <BR />
 
@@ -105,8 +108,9 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 };
 
 
-<u>-------is not finished------------------------------------</u><BR />
+<u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
+&rarr;&nbsp; box / panel <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />

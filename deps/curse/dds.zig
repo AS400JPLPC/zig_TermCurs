@@ -43,7 +43,7 @@
     pub const ZONATRB = struct {
         styled      : [4]u32,
         backgr      : BackgroundColor,
-        foregr      : ForegroundColor,
+        foregr      : ForegroundColor
 
     };
 
@@ -54,18 +54,3 @@
         line2
     };
 
-    var name: []const u8 = undefined ;
-    var posx: usize = undefined ;
-    var posy: usize = undefined ;
-    var attribut:ZONATRB = undefined;
-
-    var title: bool = undefined ;
-
-    var crtl: bool = undefined;
-    var actif: bool = undefined ;
-
-    var lines: usize = undefined ;
-    var cols:  usize = undefined ;
-    var index: usize = undefined ;
-
-    var text: []const u8 = undefined ;

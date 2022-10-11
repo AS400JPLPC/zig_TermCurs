@@ -76,7 +76,7 @@ pub var posCurs : Point = undefined;
 
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY( x: usize, y: usize) void {
-    output.writer().print("\x1b[{d};{d}f", .{ x, y }) catch {return;} ;
+    output.writer().print("\x1b[{d};{d}H", .{ x, y }) catch {return;} ;
 }
 
 /// Moves cursor up `y` rows
@@ -716,6 +716,7 @@ test "tested" {
 
     a = c ;
     std.debug.print("zoned {s} {s}\n\r",.{a, c });
+
     flushIO();
     switch (try getKey()) {
             else => {}
