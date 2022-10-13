@@ -44,26 +44,32 @@ modification from :<BR />
 &rarr;&nbsp; 2022-09-26   *Read the Project installation documentation* <BR />
 &rarr;&nbsp; 2022-09-26   After discussion on ZULIP it seems important to redesign the project that serves me as a ZIG learning and to simplify as much as possible the calls seen developer see Tcursed.zigdoc : [ZULIP](https://zig-lang.zulipchat.com/) <BR />
 
-* [READ-PROJECT](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Read_Projet.html)<BR />
-  &rarr;&nbsp; 2022-09-26   Read the Project installation documentation <BR />
-  &rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
-  &rarr;&nbsp; 2022-09-26   creat deps/curse/dds common definition module for cursed and forms <BR />
-  <BR /><BR />
-  &rarr;&nbsp; 2022-10-08   creat deps/curse/ cursed change Title and resize terminal <BR />
-  &rarr;&nbsp; 2022-10-08   creat deps/string/ introduction of zig-string tests <BR />
-  &rarr;&nbsp; 2022-10-08   Testing manipulation char mult-problem unicode  <BR />
-  &rarr;&nbsp; 2022-10-08   creat deps/zyglyph/ working lowerStr and upperStr<BR />
-  &rarr;&nbsp; 2022-10-08   stabilization deps/curse/cursed<BR />
-  <BR /><BR />
-  &rarr;&nbsp; 2022-10-10   add flushIO()<BR />
-  &rarr;&nbsp; 2022-10-10   update getCursor <BR />
-  &rarr;&nbsp; 2022-10-10   ~~update gotoXY     "\x1b[{d};{d}f" not H~~<BR />
-  &rarr;&nbsp; 2022-10-10   creat Forms only test  **Only to test my build in Zig-lang it's not fully operational nor stable, double buffer process is not in place**<BR />
+[READ-PROJECT](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Read_Projet.html)<BR />
+&rarr;&nbsp; 2022-09-26   Read the Project installation documentation <BR />
+&rarr;&nbsp; 2022-09-26   Update deps/curse/cursed contrôl full et testing scrash  <BR />
+&rarr;&nbsp; 2022-09-26   creat deps/curse/dds common definition module for cursed and forms <BR />
+<BR /><BR />
+&rarr;&nbsp; 2022-10-08   creat deps/curse/ cursed change Title and resize terminal <BR />
+&rarr;&nbsp; 2022-10-08   creat deps/string/ introduction of zig-string tests <BR />
+&rarr;&nbsp; 2022-10-08   Testing manipulation char mult-problem unicode  <BR />
+&rarr;&nbsp; 2022-10-08   creat deps/zyglyph/ working lowerStr and upperStr<BR />
+&rarr;&nbsp; 2022-10-08   stabilization deps/curse/cursed<BR />
+<BR /><BR />
+&rarr;&nbsp; 2022-10-10   add flushIO()<BR />
+&rarr;&nbsp; 2022-10-10   update getCursor <BR />
+&rarr;&nbsp; 2022-10-10   ~~update gotoXY     "\x1b[{d};{d}f" not H~~<BR />
+&rarr;&nbsp; 2022-10-10   creat Forms only test  **Only to test my build in Zig-lang it's not fully operational nor stable, double buffer process is not in place**<BR />
 
 <BR /><BR />
 &rarr;&nbsp; 2022-10-11   creat deps/curse/ utils iterator for [] const u8  Retrieval "const char" allows to know the number of characters<BR />
-&rarr;&nbsp; 2022-10-11   Box-border Panel Label are operational no double buffer 👍  😄 <BR />
+&rarr;&nbsp; 2022-10-11   Frame-border Panel Label are operational no double buffer <BR />
+&rarr;&nbsp; 2022-10-12   Frame-border Panel Label are **operational  double buffer** Opens the possibility of backup restore Panel 👍  😄 <BR/>
+
+&rarr;&nbsp; 2022-10-12   Introduction of fn cls Panel <BR />
+&rarr;&nbsp; 2022-10-12   double buffer: it is a matrix which is the decomposition  [ character + attribute + on/off] * (nbr line * column)<BR />
 <BR />
+<BR />
+
 <BR />
 
 <BR />

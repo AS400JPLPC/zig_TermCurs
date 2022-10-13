@@ -20,6 +20,12 @@ pub const ErrForms = error{
     };
 
 
+const TERMINAL_CHAR = struct {
+  ch :   [] const u8,
+  attribut:dds.ZONATRB,
+  on:bool
+};
+
 
 
 pub const  lbl = struct {
@@ -41,7 +47,7 @@ pub const  lbl = struct {
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgCyan,
+      .foregr = dds.ForegroundColor.fgGreen,
   };
 
   pub const LABEL = struct {
@@ -95,8 +101,27 @@ pub const  lbl = struct {
     return vpnl.label[n].name;
   }
 
-};
+  pub fn printLabel(vpnl: pnl.PANEL, vlbl : LABEL ) void {
+    // assigne LABEL to matrice for display
+    var npos = vpnl.cols * vlbl.posx;
+    var n =  npos + vlbl.posy - 1;
 
+    var iter = utl.iteratS.iterator(vlbl.text);
+    while (iter.next()) |ch| {
+      if (vlbl.actif == true) {
+        vpnl.buf.items[n].ch = ch ;
+        vpnl.buf.items[n].attribut = vlbl.attribut;
+        vpnl.buf.items[n].on = true;
+      }
+      else {
+        vpnl.buf.items[n].ch = " ";
+        vpnl.buf.items[n].attribut  = vpnl.attribut;
+        vpnl.buf.items[n].on = false;
+      }
+      n += 1;
+    }
+  }
+};
 
 pub const frm = struct {
 
@@ -164,6 +189,8 @@ pub const frm = struct {
   }
 
     pub fn printFrame(vpnl : pnl.PANEL , vfram: FRAME) void {
+      // assigne FRAME to init matrice for display
+      if (dds.CADRE.line0 == vfram.cadre ) return ;
 
       const ACS_Hlines  = "─";
       const ACS_Vlines  = "│";
@@ -182,14 +209,22 @@ pub const frm = struct {
       var trait: []const u8 = "";
       var edt :bool   = undefined ;
 
-      var x  = vfram.posx ;
-      var row: usize = 1 ;
-      var y: usize = 0 ;
-      var col: usize = 0 ;
+      var row:  usize = 1 ;
+      var y:    usize = 0 ;
+      var col:  usize = 0 ;
+      var npos: usize = 0 ;
 
+      var wlen : usize = 0;
+      var iter = utl.iteratS.iterator(vfram.title);
+      while (iter.next()) |_| { wlen +=1 ; }
+
+      var n:    usize = 0 ;
+      var x :usize = 1;
+
+      x  = vfram.posx -1 ;
 
       while (row <= vfram.lines) {
-        y = vfram.posy;
+        y = vfram.posy -1;
         col = 1;
         while ( col <= vfram.cols ){
           edt = false;
@@ -239,29 +274,31 @@ pub const frm = struct {
               edt = true;
             }
           }
-          if  ( edt and vfram.cadre != dds.CADRE.line0) {
-            term.gotoXY(x,y);
-            term.writeStyled(trait,vfram.attribut);
+          if  ( edt ) {
+              npos =  vfram.cols * x;
+              n =  npos  + y;
+              vpnl.buf.items[n].ch = trait ;
+              vpnl.buf.items[n].attribut = vfram.attribut;
+              vpnl.buf.items[n].on = true;
           }
-          else {
-            term.gotoXY(x,y);
-            term.writeStyled(" ",vpnl.attribut);
-          }
+
           y += 1;
           col += 1;
         }
         x += 1;
         row +=1 ;
       }
-      if (vfram.title.len > 0 and vfram.cadre != dds.CADRE.line0) {
-        var iter = utl.iteratS.iterator(vfram.title);
-        var wlen : usize = 0;
-        while (iter.next()) |_| { wlen += 1 ; }
-        if (wlen > vfram.cols - 2 ) return ;
-        term.gotoXY(vfram.posx , ((vfram.cols - vfram.title.len ) / 2) + vfram.posy);
-        term.writeStyled(vfram.title,vfram.titleAttribut);
-      }
 
+      if (wlen > vfram.cols - 2 or wlen == 0 )  return ;
+        npos = vfram.posx;
+        n =  npos + (((vfram.cols - wlen ) / 2)) -1 ;
+        iter = utl.iteratS.iterator(vfram.title);
+        while (iter.next()) |ch| {
+          vpnl.buf.items[n].ch = ch ;
+          vpnl.buf.items[n].attribut = vfram.titleAttribut;
+          vpnl.buf.items[n].on = true;
+          n +=1;
+         }
     }
 
 };
@@ -308,6 +345,8 @@ pub const  pnl = struct {
 
     //funcKey:std.ArrayList(Tkey).init(allocator),
 
+    buf:std.ArrayList(TERMINAL_CHAR),
+
     mouse: bool,
 
     actif: bool
@@ -336,12 +375,27 @@ pub const  pnl = struct {
           .actif  = true,
           .frame = undefined,
           .label  = std.ArrayList(lbl.LABEL).init(allocator),
+          .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
       };
+
+
+    // INIT doublebuffer
+    var i:usize = (xpanel.lines+1) * (xpanel.cols+1);
+    var doublebuffer = TERMINAL_CHAR  { .ch =  " ",
+                                        .attribut = xpanel.attribut,
+                                        .on = false};
+
+    // init matrix
+    while (true) {
+        if (i == 0) break ;
+        xpanel.buf.append(doublebuffer) catch {return ErrForms.InvalidePanel;};
+        i -=1 ;
+    }
 
 
     // init frame Panel
     xpanel.frame = frm.newFrame(xpanel.name,
-                              xpanel.posx , xpanel.posy,
+                              1 , 1,  // border panel
                               xpanel.lines, xpanel.cols,
                               vcadre, vAtrFrame,
                               vtitle, vFrameTitle );
@@ -380,27 +434,60 @@ pub const  pnl = struct {
   }
 
 
+  pub fn displayPanel(vpnl: PANEL)  void {
+  // display matrice PANEL
+    if (vpnl.actif == false ) return ;
+      var x :usize = 1;
+      var y :usize = 0;
+      var n :usize = 0;
+      while (x <= vpnl.lines) : (x += 1) {
+        y = 1;
+        while (y <= vpnl.cols) : (y += 1) {
+          term.gotoXY(x + vpnl.posx -1  , y + vpnl.posy -1 );
+          term.writeStyled(vpnl.buf.items[n].ch,vpnl.buf.items[n].attribut);
+          n += 1;
+        }
+      }
+
+  }
+
+
+  // clear matrix
+  pub fn clsPanel( vpnl : PANEL) void {
+    var y:    usize = 1 ;
+    var n:    usize = 0 ;
+    var x :usize = 0;
+    while (x <= vpnl.lines) : (x += 1) {
+        y = 1;
+        while (y <= vpnl.cols) : (y += 1) {
+          vpnl.buf.items[n].ch = " ";
+          vpnl.buf.items[n].attribut  = vpnl.attribut;
+          vpnl.buf.items[n].on = false;
+          n += 1;
+        }
+      }
+    displayPanel(vpnl);
+  }
 
 
   /// print PANEL
   pub fn printPanel  (vpnl: PANEL) void {
-    // assigne PANEL and all OBJECT to matrice for display
+    // assigne PANEL and all OBJECT to matrix for display
+
+    // clear matrix
+    clsPanel(vpnl);
 
     // FRAME (window panel)
     frm.printFrame(vpnl,vpnl.frame);
 
     // LABEL
     for (vpnl.label.items) |lblprt| {
-      if (lblprt.actif)  {
-        if (vpnl.frame.cadre == dds.CADRE.line0) term.gotoXY(vpnl.posx + lblprt.posx - 1,vpnl.posy + lblprt.posy - 1)
-        else term.gotoXY(vpnl.posx + lblprt.posx ,vpnl.posy + lblprt.posy );
-        term.writeStyled(lblprt.text,lblprt.attribut);
-      }
+      if (lblprt.actif) lbl.printLabel(vpnl, lblprt);
     }
 
+    displayPanel(vpnl);
     term.flushIO();
   }
-
 
 
 
