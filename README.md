@@ -63,10 +63,18 @@ modification from :<BR />
 <BR /><BR />
 &rarr;&nbsp; 2022-10-11   creat deps/curse/ utils iterator for [] const u8  Retrieval "const char" allows to know the number of characters<BR />
 &rarr;&nbsp; 2022-10-11   Frame-border Panel Label are operational no double buffer <BR />
+<BR /><BR />
 &rarr;&nbsp; 2022-10-12   Frame-border Panel Label are **operational  double buffer** Opens the possibility of backup restore Panel 👍  😄 <BR/>
-
 &rarr;&nbsp; 2022-10-12   Introduction of fn cls Panel <BR />
 &rarr;&nbsp; 2022-10-12   double buffer: it is a matrix which is the decomposition  [ character + attribute + on/off] * (nbr line * column)<BR />
+<BR /><BR />
+&rarr;&nbsp; 2022-10-13   chgange hide/show  cursHide cursShow <BR />
+&rarr;&nbsp; 2022-10-13   chgange printPanel  cursHide and open terminal<BR />
+&rarr;&nbsp; 2022-10-13   add getFunc F1..24 alt.. ctrl.. <BR />
+&rarr;&nbsp; 2022-10-13   add parsecsiFunc <BR />
+&rarr;&nbsp; 2022-10-13   the Hide/Show cursor is managed by getKey getFunc <BR />
+&rarr;&nbsp; 2022-10-13   exemple :Panel show    code.zig <BR />
+&rarr;&nbsp; 2022-10-13   use code.zig for test window and Term ex: cd folder ....  click ./term  <BR />
 <BR />
 <BR />
 

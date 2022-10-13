@@ -221,10 +221,10 @@ pub const frm = struct {
       var n:    usize = 0 ;
       var x :usize = 1;
 
-      x  = vfram.posx -1 ;
+      x  = vfram.posx - 1 ;
 
       while (row <= vfram.lines) {
-        y = vfram.posy -1;
+        y = vfram.posy - 1;
         col = 1;
         while ( col <= vfram.cols ){
           edt = false;
@@ -291,7 +291,7 @@ pub const frm = struct {
 
       if (wlen > vfram.cols - 2 or wlen == 0 )  return ;
         npos = vfram.posx;
-        n =  npos + (((vfram.cols - wlen ) / 2)) -1 ;
+        n =  npos + (((vfram.cols - wlen ) / 2)) - 1 ;
         iter = utl.iteratS.iterator(vfram.title);
         while (iter.next()) |ch| {
           vpnl.buf.items[n].ch = ch ;
@@ -440,23 +440,24 @@ pub const  pnl = struct {
       var x :usize = 1;
       var y :usize = 0;
       var n :usize = 0;
+
       while (x <= vpnl.lines) : (x += 1) {
         y = 1;
         while (y <= vpnl.cols) : (y += 1) {
-          term.gotoXY(x + vpnl.posx -1  , y + vpnl.posy -1 );
+          term.gotoXY(x + vpnl.posx - 1  , y + vpnl.posy - 1 );
           term.writeStyled(vpnl.buf.items[n].ch,vpnl.buf.items[n].attribut);
           n += 1;
         }
       }
-
   }
 
 
   // clear matrix
   pub fn clsPanel( vpnl : PANEL) void {
-    var y:    usize = 1 ;
-    var n:    usize = 0 ;
-    var x :usize = 0;
+    var x :usize = 1;
+    var y :usize = 0;
+    var n :usize = 0;
+
     while (x <= vpnl.lines) : (x += 1) {
         y = 1;
         while (y <= vpnl.cols) : (y += 1) {
@@ -469,10 +470,29 @@ pub const  pnl = struct {
     displayPanel(vpnl);
   }
 
+  pub fn rstPanel( vpnlsrc : PANEL , vpnldst : PANEL) void {
+    if (vpnldst.actif == false)  return ;
+    if (vpnlsrc.posx + vpnlsrc.lines > vpnldst.posx + vpnldst.lines  )  return ;
+    if (vpnlsrc.posy + vpnlsrc.cols > vpnldst.posy + vpnldst.cols  )  return ;
+    var x :usize = 1;
+    var y :usize = 0;
+    var n :usize = 0;
+    while (x <= vpnlsrc.lines) : (x += 1) {
+        y = 1;
+        while (y <= vpnlsrc.cols) : (y += 1) {
+          term.gotoXY(x + vpnlsrc.posx - 1  , y + vpnlsrc.posy - 1 );
+          term.writeStyled(vpnldst.buf.items[n].ch,vpnldst.buf.items[n].attribut);
+          n += 1;
+        }
+      }
+  }
 
   /// print PANEL
   pub fn printPanel  (vpnl: PANEL) void {
     // assigne PANEL and all OBJECT to matrix for display
+
+    // cursor HIDE par défault
+    term.cursHide();
 
     // clear matrix
     clsPanel(vpnl);
@@ -517,7 +537,7 @@ test "testForms" {
     const text2  = "\nJPL\n";
     term.gotoXY(6,10);
     term.writeStyled(text2,AtrLabel );
-    const xlabel = lbl.newLabel("Name-1",1,1,
+    const xlabel = lbl.newLabel("Name- 1",1,1,
                         "Jean-Pierre",
                         lbl.AtrLabel );
     term.writeStyled(xlabel.text,xlabel.attribut);

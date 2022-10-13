@@ -51,19 +51,25 @@ pub fn main() !void {
         }
     }
 
-    var i : usize = 1 ;
-    while ( i <= 40) : ( i += 1) {
-        output.writer().print("12345678901234567890123456789012345678901234567890\n\r", .{}) catch {return;} ;
-    }
+    // for control
+    const AtrPanelx : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgCyan,
+      .foregr = dds.ForegroundColor.fgWhite
+    };
 
-    var panel = pnl.initPanel("PANEL0",
-                  5, 3, // x,y
-                  10,   // lines
-                  20,   // cols
-                  pnl.AtrPanel,     // attribut Panel
+
+    var panel = pnl.initPanel("PANEL",
+                  1, 1, // x,y
+                  30,   // lines
+                  132,   // cols
+                  AtrPanelx,     // attribut Panel
                   dds.CADRE.line1,  // type de cadre
                   frm.AtrFrame,    // atribut BOX
-                  "TITLE-Pnl0",
+                  "TITLE",
                   frm.AtrTitle);
     for (rcd_label.items) |xLABEL| {
         panel.label.append(xLABEL) catch {return;} ;
@@ -71,29 +77,45 @@ pub fn main() !void {
 
 
     var panel2 = pnl.initPanel("PANEL2",
-                  15, 30, // x,y
+                  10,50, // x,y
                   10,   // lines
                   20,   // cols
                   pnl.AtrPanel,     // attribut Panel
                   dds.CADRE.line1,  // type de cadre
                   frm.AtrFrame,    // atribut BOX
-                  "TITLE-Pnl0",
+                  "PANEL2",
                   frm.AtrTitle);
     for (rcd_label.items) |xLABEL| {
         panel2.label.append(xLABEL) catch {return;} ;
     }
 
-    pnl.printPanel(panel);
-    switch (try term.getKey()) {
-        else => {}
-        }
 
-    pnl.clsPanel(panel);
+    term.offMouse();
+
+    pnl.printPanel(panel);
+    // get f1..f24 Alt.. crtl..
+    while (true) {
+        switch (try term.getFunc()) {
+                .key  => break ,
+                .none => continue ,
+            }
+    }
+
+
 
     pnl.printPanel(panel2);
 
+    while (true) {
+        switch (try term.getFunc()) {
+                .key  => break ,
+                .none => continue ,
+            }
+    }
+
+    pnl.rstPanel(panel,panel);
+
     switch (try term.getKey()) {
-        else => {}
+            else => {},
         }
 
 

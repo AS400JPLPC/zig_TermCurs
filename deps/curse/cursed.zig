@@ -100,12 +100,12 @@ pub fn gotoRight( y: usize) void {
 }
 
 /// Hide the cursor
-pub fn hide() void {
+pub fn cursHide() void {
     output.writer().print("\x1b[?25l", .{ }) catch {return;};
 }
 
 /// Show the cursor
-pub fn show() void {
+pub fn cursShow() void {
     output.writer().print("\x1b[?25h", .{}) catch {return;} ;
 }
 
@@ -272,6 +272,9 @@ pub fn enableRawMode() !RawTerm {
     // apply changes
     try os.tcsetattr(stdin.handle, .FLUSH, termios);
 
+    // cursor HIDE par défault
+    cursHide();
+
     return RawTerm{
         .orig_termios = original_termios,
         .cur_termios = termios,
@@ -399,11 +402,13 @@ pub fn getKey() !Event {
     // TODO: Check buffer size
 
     var buf: [30]u8 = undefined;
+    cursShow();
     const stdin = io.getStdIn();
     //var event :Event = .none;
 
     const c = try stdin.read(&buf);
     if (c == 0) {
+        cursHide();
         return .none;
     }
 
@@ -420,40 +425,48 @@ pub fn getKey() !Event {
                 // fn (1 - 4)
                 // O - 0x6f - 111
                 '\x4f' => {
+                    cursHide();
                     return Event{ .key = KEY{ .fun = (1 + buf[2] - '\x50') } };
                 },
 
                 // csi
                 '[' => {
+                    cursHide();
                     return try parse_csi(buf[2..c]);
 
                 },
 
                 // alt key
                 else => {
+                    cursHide();
                     return Event{ .key = KEY{ .alt = c1 } };
                 },
             } else {
+                cursHide();
                 return Event{ .key = KEY.esc };
             }
         },
         // ctrl keys (avoids  crtl-i (x09)   ctrl-m (x0D) )
-        '\x01'...'\x08','\x0A'...'\x0C','\x0E'...'\x1A' => return Event{ .key = KEY{ .ctrl = c0 + '\x60' } },
+        '\x01'...'\x08','\x0A'...'\x0C','\x0E'...'\x1A' => {
+            cursHide();
+            return Event{ .key = KEY{ .ctrl = c0 + '\x60' }};
+            },
         // tab
-        '\x09' => return Event{ .key = KEY.tab },
+        '\x09' => { cursHide(); return Event{ .key = KEY.tab }; },
         // backspace
-        '\x7f' => return Event{ .key = KEY.backspace },
+        '\x7f' => { cursHide(); return Event{ .key = KEY.backspace };},
         // special chars
-        '\x0D' => return Event{ .key = KEY.enter },
+        '\x0D' => {cursHide(); return Event{ .key = KEY.enter };},
 
         // chars and shift + chars
         else => {
             //std.debug.print("\n\rview:{any}\n", .{c0});
+            cursHide();
             return Event{ .key = KEY{ .char = c0 } };
         }
     };
 
-     return .none ;
+     cursHide(); return .none ;
 }
 
 
@@ -677,6 +690,118 @@ fn parse_csi(buf: []const u8) !Event {
 
 
 
+// get F1..F24 ctrl.A..Z Alt.A..Z
+pub fn getFunc() !Event {
+    // TODO: Check buffer size
+
+    var buf: [30]u8 = undefined;
+    cursHide();
+    const stdin = io.getStdIn();
+    //var event :Event = .none;
+
+    const c = try stdin.read(&buf);
+    if (c == 0) {
+        cursHide();
+        return .none;
+    }
+
+    const view = try std.unicode.Utf8View.init(buf[0..c]);
+
+    var iter = view.iterator();
+
+    //std.debug.print("\n\rview:{any}\n", .{buf});
+
+    // TODO: Find a better way to iterate buffer
+
+    if (iter.nextCodepoint()) |c0| switch (c0) {
+        '\x1b' => {
+            if (iter.nextCodepoint()) |c1| switch (c1) {
+                // fn (1 - 4)
+                // O - 0x6f - 111
+                '\x4f' => {
+                    return Event{ .key = KEY{ .fun = (1 + buf[2] - '\x50') } };
+                },
+
+                // csi
+                '[' => {
+                    return try parse_csiFunc(buf[2..c]);
+
+                },
+
+                // alt key
+                else => {
+                    return Event{ .key = KEY{ .alt = c1 } };
+                },
+            } else {
+                return .none;
+            }
+        },
+        // ctrl keys (avoids  crtl-i (x09)   ctrl-m (x0D) )
+        '\x01'...'\x08','\x0A'...'\x0C','\x0E'...'\x1A' => {
+            return Event{ .key = KEY{ .ctrl = c0 + '\x60' }};
+            },
+        else => {return .none; }
+    };
+
+    return .none;
+
+}
+
+fn parse_csiFunc(buf: []const u8) !Event {
+    //std.debug.print("\n\rview:{any}\n", .{buf});
+    switch (buf[0]) {
+        '1'...'2' => {
+            if (buf[2] == 126) {
+                switch (buf[1]) { // f5..f12
+                    '5' => return Event{ .key = KEY{ .fun = 5 } },
+                    '7' => return Event{ .key = KEY{ .fun = 6 } },
+                    '8' => return Event{ .key = KEY{ .fun = 7 } },
+                    '9' => return Event{ .key = KEY{ .fun = 8 } },
+                    '0' => return Event{ .key = KEY{ .fun = 9 } },
+                    '1' => return Event{ .key = KEY{ .fun = 10 } },
+                    '3' => return Event{ .key = KEY{ .fun = 11 } },
+                    '4' => return Event{ .key = KEY{ .fun = 12 } },
+                    else =>  return .none ,
+                }
+            }
+            if ((buf[2]) == 50) { // f11..f14 and // shift
+                switch (buf[3]) {
+                    'P' => return Event{ .key = KEY{ .fun = 13 } },
+                    'Q' => return Event{ .key = KEY{ .fun = 14 } },
+                    'R' => return Event{ .key = KEY{ .fun = 15 } },
+                    'S' => return Event{ .key = KEY{ .fun = 16 } },
+                    else =>  return .none ,
+                }
+            }
+           if ((buf[2]) == 60) { // f11..f14
+                switch (buf[3]) {
+                    'P' => return Event{ .key = KEY{ .fun = 13 } },
+                    'Q' => return Event{ .key = KEY{ .fun = 14 } },
+                    'R' => return Event{ .key = KEY{ .fun = 15 } },
+                    'S' => return Event{ .key = KEY{ .fun = 16 } },
+                    else =>  return .none ,
+                }
+            }
+            if ((buf[4]) == 126) { // f15..f24
+                switch (buf[1]) {
+                    '5' => return Event{ .key = KEY{ .fun = 17 } },
+                    '7' => return Event{ .key = KEY{ .fun = 18 } },
+                    '8' => return Event{ .key = KEY{ .fun = 19 } },
+                    '9' => return Event{ .key = KEY{ .fun = 20 } },
+                    '0' => return Event{ .key = KEY{ .fun = 21 } },
+                    '1' => return Event{ .key = KEY{ .fun = 22 } },
+                    '3' => return Event{ .key = KEY{ .fun = 23 } },
+                    '4' => return Event{ .key = KEY{ .fun = 24 } },
+                    else =>  return .none ,
+                }
+            }
+
+        },
+        else =>  return .none,
+    }
+    return .none;
+}
+
 
 
 
@@ -719,6 +844,7 @@ test "tested" {
 
     flushIO();
     switch (try getKey()) {
-            else => {}
-        }
+                else => {},
+            }
+
 }
