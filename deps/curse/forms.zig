@@ -104,7 +104,7 @@ pub const  lbl = struct {
   pub fn printLabel(vpnl: pnl.PANEL, vlbl : LABEL ) void {
     // assigne LABEL to matrice for display
     var npos = vpnl.cols * vlbl.posx;
-    var n =  npos + vlbl.posy - 1;
+    var n =  npos + vlbl.posy;
 
     var iter = utl.iteratS.iterator(vlbl.text);
     while (iter.next()) |ch| {
@@ -305,6 +305,45 @@ pub const frm = struct {
 
 
 
+pub const btn = struct{
+
+  // nbr espace intercaler
+  const  btnspc : usize =3 ;
+  // define attribut default PANEL
+  pub const AtrButton : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgred
+  };
+  pub const AtrTitle : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.styleItalic),
+                    @enumToInt(dds.Style.styleUnderscore),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgCyan
+  };
+
+
+
+  // define BUTTON
+  pub const BUTTON = struct {
+    key : term.KEY,
+    text: []const u8,
+    actif: bool,
+  };
+
+
+};
+
+
+
+
+
+
 
 pub const  pnl = struct {
 
@@ -477,13 +516,16 @@ pub const  pnl = struct {
     var x :usize = 1;
     var y :usize = 0;
     var n :usize = 0;
+    var npos : usize =  vpnlsrc.posx - vpnldst.posx;
     while (x <= vpnlsrc.lines) : (x += 1) {
+        n = vpnldst.cols * npos + vpnlsrc.posy - vpnldst.posy  ;
         y = 1;
         while (y <= vpnlsrc.cols) : (y += 1) {
+          n += 1;
           term.gotoXY(x + vpnlsrc.posx - 1  , y + vpnlsrc.posy - 1 );
           term.writeStyled(vpnldst.buf.items[n].ch,vpnldst.buf.items[n].attribut);
-          n += 1;
         }
+      npos += 1;
       }
   }
 

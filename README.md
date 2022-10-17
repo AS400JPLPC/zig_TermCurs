@@ -68,13 +68,17 @@ modification from :<BR />
 &rarr;&nbsp; 2022-10-12   Introduction of fn cls Panel <BR />
 &rarr;&nbsp; 2022-10-12   double buffer: it is a matrix which is the decomposition  [ character + attribute + on/off] * (nbr line * column)<BR />
 <BR /><BR />
-&rarr;&nbsp; 2022-10-13   chgange hide/show  cursHide cursShow <BR />
-&rarr;&nbsp; 2022-10-13   chgange printPanel  cursHide and open terminal<BR />
+&rarr;&nbsp; 2022-10-13   change hide/show  cursHide cursShow <BR />
+&rarr;&nbsp; 2022-10-13   change printPanel  cursHide and open terminal<BR />
 &rarr;&nbsp; 2022-10-13   add getFunc F1..24 alt.. ctrl.. <BR />
 &rarr;&nbsp; 2022-10-13   add parsecsiFunc <BR />
 &rarr;&nbsp; 2022-10-13   the Hide/Show cursor is managed by getKey getFunc <BR />
 &rarr;&nbsp; 2022-10-13   exemple :Panel show    code.zig <BR />
 &rarr;&nbsp; 2022-10-13   use code.zig for test window and Term ex: cd folder ....  click ./term  <BR />
+<BR /><BR />
+&rarr;&nbsp; 2022-10-17   **Change the processing of getKEY: return struct {key, char}for button and input processing **<BR />
+&rarr;&nbsp; 2022-10-13   extensive testing of labels panels frame restore panel cls panel<BR />
+
 <BR />
 <BR />
 
@@ -124,7 +128,7 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
-&rarr;&nbsp; box / panel / label    OK <BR />
+&rarr;&nbsp; box / panel / label OK <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />

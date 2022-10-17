@@ -1,10 +1,12 @@
 const std = @import("std");
 const term = @import("cursed");
+const kbd = @import("cursed").kbd;
 
 const dds = @import("dds");
 const frm = @import("forms").frm;
 const lbl = @import("forms").lbl;
 const pnl = @import("forms").pnl;
+
 
 const output =std.io.getStdOut();
 
@@ -14,9 +16,11 @@ const output =std.io.getStdOut();
 const allocator = std.heap.page_allocator;
 pub var rcd_label = std.ArrayList(lbl.LABEL).init(allocator);
 
+pub var rcd_label2 = std.ArrayList(lbl.LABEL).init(allocator);
+
 pub fn stockLabel() void{
 
-    rcd_label.append(lbl.newLabel("Name-1",1,2,
+    rcd_label.append(lbl.newLabel("Name-1",1,1,
                         "Jean-Pierre",
                         lbl.AtrLabel
         )) catch {return;} ;
@@ -25,13 +29,68 @@ pub fn stockLabel() void{
     rcd_label.items[0].attribut.styled[3] = @enumToInt(dds.Style.styleBlink);
 
 
-    rcd_label.append(lbl.newLabel("Name-2",2,2,
+    rcd_label.append(lbl.newLabel("Name-2",3,1,
                         "Marie",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+
+
+     rcd_label.append(lbl.newLabel("Name-3",8,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;};
+
+    rcd_label.append(lbl.newLabel("Name-3",9,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;};
+
+
+    rcd_label.append(lbl.newLabel("Name-4",11,50,
+                        "Eric",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+
+    rcd_label.append(lbl.newLabel("Name-5",12,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+
+    rcd_label.append(lbl.newLabel("Name-6",13,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+    rcd_label.append(lbl.newLabel("Name-6",16,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+    rcd_label.append(lbl.newLabel("Name-6",18,48,
+                        "------------------------------",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+
+    rcd_label.append(lbl.newLabel("Name-6",19,48,
+                        "------------------------------",
                         lbl.AtrLabel
         )) catch {return;} ;
 }
 
+pub fn stockLabel2() void{
 
+    rcd_label2.append(lbl.newLabel("Name-1",1,2,
+                        "Jean-Pierre",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+    //example: option specific
+    rcd_label2.items[0].attribut.styled[2] = @enumToInt(dds.Style.styleReverse);
+    rcd_label2.items[0].attribut.styled[3] = @enumToInt(dds.Style.styleBlink);
+
+
+    rcd_label2.append(lbl.newLabel("Name-2",2,2,
+                        "Marie",
+                        lbl.AtrLabel
+        )) catch {return;} ;
+}
 
 
 pub fn main() !void {
@@ -51,22 +110,13 @@ pub fn main() !void {
         }
     }
 
-    // for control
-    const AtrPanelx : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle)},
-      .backgr = dds.BackgroundColor.bgCyan,
-      .foregr = dds.ForegroundColor.fgWhite
-    };
 
-
+    stockLabel2();
     var panel = pnl.initPanel("PANEL",
                   1, 1, // x,y
                   30,   // lines
                   132,   // cols
-                  AtrPanelx,     // attribut Panel
+                  pnl.AtrPanel,     // attribut Panel
                   dds.CADRE.line1,  // type de cadre
                   frm.AtrFrame,    // atribut BOX
                   "TITLE",
@@ -85,7 +135,7 @@ pub fn main() !void {
                   frm.AtrFrame,    // atribut BOX
                   "PANEL2",
                   frm.AtrTitle);
-    for (rcd_label.items) |xLABEL| {
+    for (rcd_label2.items) |xLABEL| {
         panel2.label.append(xLABEL) catch {return;} ;
     }
 
@@ -94,27 +144,79 @@ pub fn main() !void {
 
     pnl.printPanel(panel);
     // get f1..f24 Alt.. crtl..
-    while (true) {
-        switch (try term.getFunc()) {
-                .key  => break ,
-                .none => continue ,
-            }
-    }
+    var Tkey = kbd.getKEY();
+    switch (Tkey.Key) {
+            else => {},
+        }
 
 
 
     pnl.printPanel(panel2);
 
     while (true) {
-        switch (try term.getFunc()) {
-                .key  => break ,
-                .none => continue ,
+
+        Tkey = kbd.getKEY();
+        switch (Tkey.Key) {
+                .F5 => {
+                    term.onMouse();
+                },
+                .F6 => {
+                    term.offMouse();
+                },
+                .F11 => {
+                    std.debug.print("F11 \n\r",.{});
+                },
+                .altA => {
+                    std.debug.print("Key .alt: {s}\n\r",.{kbd.str(Tkey.Key)});
+                },
+                .ctrlA => {
+                    std.debug.print("Key .ctrl: {s}\n\r",.{kbd.str(Tkey.Key)});
+                },
+                .char => {
+
+                    std.debug.print("Key .char: {s}\n\r",.{Tkey.Char});
+                },
+                .mouse => {
+                    try stdout.writer().print("Key: {s}\n\r", .{@tagName(term.kbd.mouse)});
+                    try stdout.writer().print("X :{d}\n\r", .{term.MouseInfo.x});
+                    try stdout.writer().print("Y :{d}\n\r", .{term.MouseInfo.y});
+                    switch (term.MouseInfo.action) {
+                        term.MouseAction.maPressed => try stdout.writer().print("Button-Pressed\n\r",.{}),
+                        term.MouseAction.maReleased => try stdout.writer().print("Button-Released\n\r",.{}),
+                        else => {}
+                    }
+                    switch (term.MouseInfo.button) {
+                        term.MouseButton.mbLeft => try stdout.writer().print("Button-mbLeft\n\r",.{}),
+                        term.MouseButton.mbMiddle => try stdout.writer().print("Button-mbMiddle\n\r",.{}),
+                        term.MouseButton.mbRight => try stdout.writer().print("Button-Right\n\r",.{}),
+                        else => {}
+                    }
+                    switch (term.MouseInfo.scrollDir) {
+                        term.ScrollDirection.msUp => try stdout.writer().print("Button-Scroll up\n\r",.{}),
+                        term.ScrollDirection.msDown => try stdout.writer().print("Button-Scroll Down\n\r",.{}),
+                        else => {}
+                    }
+                },
+                else => {
+                    //std.debug.print("?? {}",.{Tkey.Key});
+                },
             }
+
+        if (Tkey.Key == kbd.F3) break;
+
     }
 
-    pnl.rstPanel(panel,panel);
+    pnl.rstPanel(panel2,panel);
 
-    switch (try term.getKey()) {
+    Tkey = kbd.getKEY();
+    switch (Tkey.Key) {
+            else => {},
+        }
+
+    pnl.clsPanel(panel2);
+
+    Tkey = kbd.getKEY();
+    switch (Tkey.Key) {
             else => {},
         }
 
