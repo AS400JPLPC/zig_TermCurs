@@ -77,7 +77,7 @@ modification from :<BR />
 &rarr;&nbsp; 2022-10-13   use code.zig for test window and Term ex: cd folder ....  click ./term  <BR />
 <BR /><BR />
 &rarr;&nbsp; 2022-10-17   **Change the processing of getKEY: return struct {key, char}for button and input processing **<BR />
-&rarr;&nbsp; 2022-10-13   extensive testing of labels panels frame restore panel cls panel<BR />
+&rarr;&nbsp; 2022-10-17   extensive testing of labels panels frame restore panel cls panel<BR />
 
 <BR />
 <BR />
@@ -88,9 +88,9 @@ modification from :<BR />
 <BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />
-&rarr;&nbsp; 2022-09-21   New methodology for clear compile.sh<BR />
-&rarr;&nbsp; 2022-09-21   New methodology for clear compilelib.sh<BR />
-&rarr;&nbsp; 2022-09-21   New tasck.json  use: Task Manager<BR />
+&rarr;&nbsp; New methodology for clear compile.sh<BR />
+&rarr;&nbsp; New methodology for clear compilelib.sh<BR />
+&rarr;&nbsp; New tasck.json  use: Task Manager<BR />
 <BR />
 
 <u>---Organization-project------------------------------------------</u><BR />
