@@ -13,8 +13,7 @@ const io = std.io;
 
 const output =std.io.getStdOut();
 var buf_Output = std.io.bufferedWriter(output.writer());
-
-var vUnicode : [4]u8 = undefined;
+const allocator = std.heap.page_allocator;
 
 
 ///-------------
@@ -279,6 +278,7 @@ pub fn enableRawMode() !RawTerm {
 
     // cursor HIDE par défault
     cursHide();
+    offMouse();
 
     return RawTerm{
         .orig_termios = original_termios,
@@ -357,7 +357,7 @@ const  Mouse = struct {
 pub var MouseInfo : Mouse = undefined;
 
 
-const Keyboard = struct {
+pub const Keyboard = struct {
      Key: kbd,
      Char : []const u8
 };
@@ -637,18 +637,19 @@ pub const kbd = enum {
         }
     }
 
-
     // get All keyboard keys allowed in terminal
     pub fn getKEY()  Keyboard {
-        // TODO: Check buffer size
 
-        var buf: [30]u8 = undefined;
-        const stdin = io.getStdIn();
-
-        // init
+        // init Event
         var Event : Keyboard = Keyboard{.Key = kbd.none ,.Char =""};
 
+        // variable --> Event.Char
+        var vUnicode: []u8 = undefined;
+        vUnicode = allocator. alloc(u8, 4) catch unreachable;
 
+        // TODO: Check buffer size
+        var buf: [12]u8 = undefined;
+        const stdin = io.getStdIn();
 
         const c =  stdin.read(&buf) catch {Event.Key = kbd.none; return Event;};
         if (c == 0) {
@@ -764,9 +765,10 @@ pub const kbd = enum {
             '\x0D' =>   { Event.Key = kbd.enter; return Event;},
 
             else => {
-                vUnicode = [_]u8{0} ** 4;
+                // var vUnicode : [4]u8 = undefined; // if en Global then initaliser avec 0
+                // vUnicode = [_]u8{0} ** 4; //
 
-                var i = utf.utf8Encode(c0,&vUnicode) catch unreachable;
+                var i = utf.utf8Encode(c0,vUnicode) catch unreachable;
 
                 Event.Char  = vUnicode[0..i];
 
@@ -1013,7 +1015,7 @@ test "tested" {
     flushIO();
 
 
-    const Tkey =kbd.getKEY();
+    const Tkey = kbd.getKEY();
     std.debug.print("F.. {any}\n\r",.{Tkey});
     switch (Tkey.Key) {
                 .F16    => std.debug.print("F.. {} \n\r",.{Tkey.Key}),

@@ -70,15 +70,21 @@ modification from :<BR />
 <BR /><BR />
 &rarr;&nbsp; 2022-10-13   change hide/show  cursHide cursShow <BR />
 &rarr;&nbsp; 2022-10-13   change printPanel  cursHide and open terminal<BR />
-&rarr;&nbsp; 2022-10-13   add getFunc F1..24 alt.. ctrl.. <BR />
-&rarr;&nbsp; 2022-10-13   add parsecsiFunc <BR />
-&rarr;&nbsp; 2022-10-13   the Hide/Show cursor is managed by getKey getFunc <BR />
+&rarr;&nbsp; 2022-10-13   ~~add getFunc F1..24 alt.. ctrl..~~ <BR />
+&rarr;&nbsp; 2022-10-13   ~~add parsecsiFunc~~ <BR />
+&rarr;&nbsp; 2022-10-13   the Hide/Show cursor is managed by getKey ~~getFunc ~~<BR />
 &rarr;&nbsp; 2022-10-13   exemple :Panel show    code.zig <BR />
 &rarr;&nbsp; 2022-10-13   use code.zig for test window and Term ex: cd folder ....  click ./term  <BR />
 <BR /><BR />
 &rarr;&nbsp; 2022-10-17   **Change the processing of getKEY: return struct {key, char}for button and input processing **<BR />
 &rarr;&nbsp; 2022-10-17   extensive testing of labels panels frame restore panel cls panel<BR />
-
+<BR /><BR />
+&rarr;&nbsp; 2022-10-21   **There's still much to do. I'm progressing slowly Thank you for your patience**<BR />
+&rarr;&nbsp; 2022-10-21   no global variable except system<BR />
+&rarr;&nbsp; 2022-10-21   This programme **code.zig** my testing<BR />
+&rarr;&nbsp; 2022-10-21   This programme** Pcurse. zig** => *Exemple*<BR />
+&rarr;&nbsp; 2022-10-21   update src_c/term.cpp<BR />
+<BR /><BR />
 <BR />
 <BR />
 
@@ -128,13 +134,12 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
-&rarr;&nbsp; box / panel / label OK <BR />
+&rarr;&nbsp; box / panel / label /button OK <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
-&rarr;&nbsp; cursed  Tcursed.zig<BR />
-&rarr;&nbsp; label / box / panel  forms.zig      code.zig<BR />
-
+&rarr;&nbsp; label / box / panel  forms.zig   testing --->  code.zig<BR />
+&rarr;&nbsp; label / box / panel  forms.zig   Exemple --->  exemple.zig<BR />
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration<BR />
 
