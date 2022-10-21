@@ -82,7 +82,7 @@ modification from :<BR />
 &rarr;&nbsp; 2022-10-21   **There's still much to do. I'm progressing slowly Thank you for your patience**<BR />
 &rarr;&nbsp; 2022-10-21   no global variable except system<BR />
 &rarr;&nbsp; 2022-10-21   This programme **code.zig** my testing<BR />
-&rarr;&nbsp; 2022-10-21   This programme** Pcurse. zig** => *Exemple*<BR />
+&rarr;&nbsp; 2022-10-21   This programme** Exemple. zig** => *Exemple*<BR />
 &rarr;&nbsp; 2022-10-21   update src_c/term.cpp<BR />
 <BR /><BR />
 <BR />
