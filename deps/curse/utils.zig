@@ -7,9 +7,9 @@ const utf = @import("std").unicode;
 pub const iteratS = struct {
     var strbuf:[] const u8 = undefined;
 
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     //defer arena.deinit();
-    const allocator = arena.allocator();
+    const allocator = arenastr.allocator();
     /// Errors that may occur when using String
     pub const ErrNbrch = error{
         InvalideAllocBuffer,
@@ -41,6 +41,22 @@ pub const iteratS = struct {
             return it.buf[i..it.index];
 
         }
+        pub fn preview(it: *StringIterator) ?[]const u8 {
+            var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+            it.buf= optional_buf orelse "";
+            var n : usize = 0;
+            while (true) {
+                if (n >= strbuf.len) break;
+                it.buf[n] = strbuf[n];
+                n += 1;
+            }
+
+            if (it.index == 0) return null;
+            var i = it.buf.len;
+            it.index -= getUTF8Size(it.buf[i]);
+            return it.buf[i..it.index];
+
+        }
     };
 
     pub fn iterator(str:[] const u8) StringIterator {
@@ -57,4 +73,18 @@ pub const iteratS = struct {
             return 1;
         };
     }
+
 };
+
+// number characters
+pub fn Lenw(str:[] const u8) usize {
+        var wl : usize =0;
+        var iter = iteratS.iterator(str);
+        while (iter.next()) |_| { wl +=1; }
+        return wl;
+}
+
+pub fn Trim(str:[] const u8) [] const u8{
+        var val =std.mem.trim(u8, str ," ");
+        return val;
+}

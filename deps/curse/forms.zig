@@ -15,8 +15,9 @@ const io = std.io;
 const allocator = std.heap.page_allocator;
 
 /// Errors that may occur when using String
-pub const ErrForms = error{
-        InvalidePanel,
+const ErrForms = error{
+        Invalide_Panel,
+        Invalide_Menu,
     };
 
 
@@ -27,7 +28,7 @@ const TERMINAL_CHAR = struct {
 };
 
 
-
+// defined Label
 pub const  lbl = struct {
 
   // define attribut default LABEL
@@ -123,6 +124,8 @@ pub const  lbl = struct {
   }
 };
 
+
+// defined Trait and Frame for Panel
 pub const frm = struct {
 
   // define attribut default FRAME
@@ -214,9 +217,7 @@ pub const frm = struct {
       var col:  usize = 0 ;
       var npos: usize = 0 ;
 
-      var wlen : usize = 0;
-      var iter = utl.iteratS.iterator(vfram.title);
-      while (iter.next()) |_| { wlen +=1 ; }
+      var wlen : usize = utl.Lenw(vfram.title);
 
       var n:    usize = 0 ;
       var x :usize = 1;
@@ -292,7 +293,7 @@ pub const frm = struct {
       if (wlen > vfram.cols - 2 or wlen == 0 )  return ;
         npos = vfram.posx;
         n =  npos + (((vfram.cols - wlen ) / 2)) - 1 ;
-        iter = utl.iteratS.iterator(vfram.title);
+        var iter = utl.iteratS.iterator(vfram.title);
         while (iter.next()) |ch| {
           vpnl.buf.items[n].ch = ch ;
           vpnl.buf.items[n].attribut = vfram.titleAttribut;
@@ -304,11 +305,11 @@ pub const frm = struct {
 };
 
 
-
+// defined button
 pub const btn = struct{
 
   // nbr espace intercaler
-  const  btnspc : usize =3 ;
+  pub var btnspc : usize =3 ;
   // define attribut default PANEL
   pub const AtrButton : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.styleDim),
@@ -425,11 +426,380 @@ pub const btn = struct{
 };
 
 
+// defined Menu
+pub const  mnu = struct {
+
+  // nbr espace intercaler
+  pub var  mnuspc : usize =3 ;
+
+  // define attribut default MENU
+  pub const AtrMnu : dds.ZONATRB = .{
+    .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+    .backgr = dds.BackgroundColor.bgBlack,
+    .foregr = dds.ForegroundColor.fgRed
+
+  };
+
+  pub const AtrBar : dds.ZONATRB = .{
+    .styled=[_]u32{@enumToInt(dds.Style.styleReverse),
+                    @enumToInt(dds.Style.styleItalic),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+    .backgr = dds.BackgroundColor.bgBlack,
+    .foregr = dds.ForegroundColor.fgWhite
+
+  };
+
+  pub const AtrCell : dds.ZONATRB= .{
+    .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+    .backgr = dds.BackgroundColor.bgBlack,
+    .foregr = dds.ForegroundColor.fgWhite,
+  };
+
+  // define BUTTON
+  pub const MENU = struct {
+
+    name : [] const u8,
+    posx : usize,
+    posy : usize,
+    lines: usize,
+    cols : usize,
+
+    cadre: dds.CADRE,
+    mnuvh : dds.MNUVH,
+
+    attribut: dds.ZONATRB,
+    attrBar: dds.ZONATRB,
+    attrCell: dds.ZONATRB,
+
+    xitem: std.ArrayList([] const u8),
+    selMenu : usize,
+    actif: bool
+  };
+
+  fn newMenu(vname: [] const u8,
+                vposx: usize, vposy: usize,
+                vlines: usize,
+                vcols: usize,
+                vattribut: dds.ZONATRB,
+                vattrbar: dds.ZONATRB,
+                vattrcell: dds.ZONATRB,
+                vcadre : dds.CADRE,
+                vmnuvh : dds.MNUVH,
+                vitem: std.ArrayList([] const u8)
+                ) ErrForms! MENU {
+
+     var xmenu = MENU {
+            .name = vname,
+            .posx   = vposx,
+            .posy   = vposy,
+            .lines  = vlines,
+            .cols   = vcols,
+            .attribut =vattribut,
+            .attrBar = vattrbar,
+            .attrCell= vattrcell,
+            .cadre = vcadre,
+            .mnuvh = vmnuvh,
+            .xitem  = std.ArrayList([] const u8).init(allocator),
+            .selMenu = 0,
+            .actif = true
+        };
+
+        for (vitem.items) |cells| {
+          xmenu.xitem.append(cells) catch {return ErrForms.Invalide_Menu;};
+        }
+        return xmenu;
+  }
+
+  pub fn initMenu(vname: [] const u8,
+                vposx: usize, vposy: usize,
+                vlines: usize,
+                vcols: usize,
+                vattribut: dds.ZONATRB,
+                vattrbar: dds.ZONATRB,
+                vattrcell: dds.ZONATRB,
+                vcadre : dds.CADRE,
+                vmnuvh : dds.MNUVH,
+                vitem: std.ArrayList([] const u8)
+                ) MENU {
+
+    var result_1 = newMenu(vname,
+                vposx , vposy ,
+                vlines ,
+                vcols ,
+                vattribut ,
+                vattrbar ,
+                vattrcell ,
+                vcadre  ,
+                vmnuvh ,
+                vitem
+                )  catch |Err| blk: {
+                        std.debug.print("newMenu err={}\n", .{Err});
+                        break :blk null;
+                        };
+
+    var menu : MENU = undefined;
+    if (result_1) |xmenu| {
+      menu = xmenu;
+    }
+    return menu;
+  }
+
+  // print Menu
+  fn printMenu(vpnl: pnl.PANEL, vmnu: MENU) void {
+
+      const ACS_Hlines  = "─";
+      const ACS_Vlines  = "│";
+      const ACS_UCLEFT  = "┌";
+      const ACS_UCRIGHT = "┐";
+      const ACS_LCLEFT  = "└";
+      const ACS_LCRIGHT = "┘";
+
+      const ACS_Hline2    = "═";
+      const ACS_Vline2    = "║";
+      const ACS_UCLEFT2   = "╔";
+      const ACS_UCRIGHT2  = "╗";
+      const ACS_LCLEFT2   = "╚";
+      const ACS_LCRIGHT2  = "╝";
+
+      var trait: []const u8 = "";
+      var edt :bool   = undefined ;
+
+      var row:  usize = 1 ;
+      var y:    usize = 0 ;
+      var col:  usize = 0 ;
+
+      var x :usize = 1;
+
+      x  = vmnu.posx - 1 ;
+    // if line 0 ex: directory tab
+    if (dds.CADRE.line0 != vmnu.cadre ) {
+      while (row <= vmnu.lines) {
+        y = vmnu.posy - 1;
+        col = 1;
+        while ( col <= vmnu.cols ){
+          edt = false;
+          if (row == 1) {
+              if (col == 1) {
+                if ( dds.CADRE.line1 == vmnu.cadre ) {
+                    trait = ACS_UCLEFT;
+                } else  trait = ACS_UCLEFT2 ;
+                edt = true;
+              }
+              if ( col == vmnu.cols ) {
+                if (dds.CADRE.line1 == vmnu.cadre) {
+                  trait = ACS_UCRIGHT;
+                } else  trait = ACS_UCRIGHT2 ;
+                edt = true;
+              }
+              if ( col > 1 and col < vmnu.cols ) {
+                if (dds.CADRE.line1 == vmnu.cadre ) {
+                  trait = ACS_Hlines;
+                } else  trait = ACS_Hline2;
+                edt = true;
+              }
+          } else if ( row == vmnu.lines ) {
+              if (col == 1) {
+                if ( dds.CADRE.line1 == vmnu.cadre ) {
+                  trait = ACS_LCLEFT;
+                } else  trait = ACS_LCLEFT2;
+                edt = true;
+              }
+              if ( col == vmnu.cols ) {
+                if ( dds.CADRE.line1 == vmnu.cadre ) {
+                  trait = ACS_LCRIGHT;
+                } else  trait = ACS_LCRIGHT2 ;
+                edt = true ;
+              }
+              if ( col > 1 and col < vmnu.cols ) {
+                if ( dds.CADRE.line1 == vmnu.cadre ) {
+                  trait = ACS_Hlines;
+                } else  trait = ACS_Hline2 ;
+                edt = true;
+              }
+          } else if ( row > 1 and row < vmnu.lines ) {
+            if ( col == 1 or col == vmnu.cols ) {
+              if ( dds.CADRE.line1 == vmnu.cadre ) {
+                trait = ACS_Vlines;
+              } else trait = ACS_Vline2 ;
+              edt = true;
+            }
+          }
+          if  ( edt ) {
+            term.gotoXY(row + vmnu.posx + vpnl.posx - 1  , col + vmnu.posy + vpnl.posy - 1);
+            term.writeStyled(trait,vmnu.attribut);
+          }
+          else {
+            term.gotoXY(row + vmnu.posx + vpnl.posx - 1 , col + vmnu.posy + vpnl.posy - 1);
+            term.writeStyled(" ",vmnu.attribut);
+          }
+
+          y += 1;
+          col += 1;
+        }
+        x += 1;
+        row +=1 ;
+      }
+    }
 
 
+  }
+
+  fn displayMenu(vpnl: pnl.PANEL, vmnu:MENU, npos: usize) void {
+    var pos : usize = npos;
+    var n : usize = 0;
+    var h : usize = 0;
+    var nbrItem:usize = vmnu.xitem.items.len;
+
+    printMenu(vpnl, vmnu);
+
+    term.onMouse();
+    term.cursHide();
 
 
+    if (npos > nbrItem or npos == 0 )  pos = 0  ;
 
+    n = 0;
+    h = 0;
+    for (vmnu.xitem.items) | cell |  {
+      if (vmnu.mnuvh == dds.MNUVH.vertical) {
+        if (vmnu.cadre == dds.CADRE.line0)
+          term.gotoXY(vmnu.posx + vpnl.posx  + n  , vmnu.posy + vpnl.posy  )
+        else
+          term.gotoXY(vmnu.posx + vpnl.posx  + n + 1 , vmnu.posy + vpnl.posy + 1);
+      }
+      if (vmnu.mnuvh == dds.MNUVH.horizontal) {
+        if (vmnu.cadre == dds.CADRE.line0 )
+          term.gotoXY(vmnu.posx + vpnl.posx   , h   + vmnu.posy + vpnl.posy  )
+        else
+          term.gotoXY(vmnu.posx + vpnl.posx + 1  , h  +  vmnu.posy + vpnl.posy + 1);
+      }
+      //var xcell = utl.Trim(cell);
+      if (pos == n)
+        term.writeStyled(cell,vmnu.attrBar)
+      else
+        term.writeStyled(cell,vmnu.attrCell);
+
+      n += 1;
+      h += utl.Lenw(cell);
+      if (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;
+    }
+  }
+
+  pub fn rstPanel( vsrc : MENU , vpnldst : pnl.PANEL) void {
+    if (vpnldst.actif == false)  return ;
+    if (vsrc.posx + vsrc.lines > vpnldst.posx + vpnldst.lines  )  return ;
+    if (vsrc.posy + vsrc.cols > vpnldst.posy + vpnldst.cols  )  return ;
+    var x :usize = 0;
+    var y :usize = 0;
+    var n :usize = 0;
+    var npos : usize =  vsrc.posx - vpnldst.posx;
+    while (x <= vsrc.lines) : (x += 1) {
+        n = vpnldst.cols * npos + vsrc.posy - vpnldst.posy  ;
+        y = 1;
+        while (y <= vsrc.cols) : (y += 1) {
+          n += 1;
+          term.gotoXY(x + vsrc.posx   , y + vsrc.posy  );
+          term.writeStyled(vpnldst.buf.items[n].ch,vpnldst.buf.items[n].attribut);
+        }
+      npos += 1;
+      }
+  }
+  //----------------------------------------------------------------
+  // menu processing enter = select  1..n 0 = abort (Escape)
+  // Turning on the mouse
+  // UP DOWN LEFT RIGHT
+  // movement width the wheel and validation width the clik
+  //----------------------------------------------------------------
+  pub fn ioMenu(vpnl: pnl.PANEL, vmnu:mnu.MENU, npos: usize) usize {
+    var pos : usize = 0;
+    var n   : usize = 0;
+    var h   : usize = 0;
+
+    var nbrItem:usize = vmnu.xitem.items.len;
+    term.onMouse();
+    term.cursHide();
+
+
+    mnu.displayMenu(vpnl,vmnu,npos);
+
+    if (npos > nbrItem or npos == 0 )  pos = 0  ;
+    term.flushIO();
+    while (true) {
+      n = 0;
+      h = 0;
+      for (vmnu.xitem.items) | cell |  {
+
+        if (vmnu.mnuvh == dds.MNUVH.vertical) {
+          if (vmnu.cadre == dds.CADRE.line0 )
+            term.gotoXY(vmnu.posx + vpnl.posx  + n  , vmnu.posy + vpnl.posy )
+          else
+            term.gotoXY(vmnu.posx + vpnl.posx  + n + 1, vmnu.posy + vpnl.posy + 1);
+          }
+        if (vmnu.mnuvh == dds.MNUVH.horizontal) {
+          if (vmnu.cadre == dds.CADRE.line0)
+            term.gotoXY(vmnu.posx + vpnl.posx   , h  + vmnu.posy + vpnl.posy )
+          else
+            term.gotoXY(vmnu.posx + vpnl.posx  + 1, h +  vmnu.posy + vpnl.posy + 1);
+        }
+        if (pos == n)
+          term.writeStyled(cell,vmnu.attrBar)
+        else
+          term.writeStyled(cell,vmnu.attrCell);
+
+        n += 1;
+        h += utl.Lenw(cell);
+        if (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;
+      }
+
+      var Tkey  = kbd.getKEY();
+
+      if (Tkey.Key == kbd.mouse) {
+        Tkey.Key = kbd.none;
+        if (term.MouseInfo.action == term.MouseAction.maPressed) {
+          if ( term.MouseInfo.scroll and term.MouseInfo.scrollDir == term.ScrollDirection.msUp ) {
+            if (vmnu.mnuvh == dds.MNUVH.vertical)    Tkey.Key = kbd.up;
+            if (vmnu.mnuvh == dds.MNUVH.horizontal)  Tkey.Key = kbd.left;
+          }
+
+          if (term.MouseInfo.scroll and term.MouseInfo.scrollDir == term.ScrollDirection.msDown) {
+            if (vmnu.mnuvh == dds.MNUVH.vertical)    Tkey.Key = kbd.down;
+            if (vmnu.mnuvh == dds.MNUVH.horizontal)  Tkey.Key = kbd.right;
+          }
+          if  (term.MouseInfo.button ==  term.MouseButton.mbLeft)  Tkey.Key = kbd.enter;
+          if  (term.MouseInfo.button ==  term.MouseButton.mbRight) Tkey.Key = kbd.enter;
+        //if (term.MouseInfo.action == term.MouseAction.maReleased ) key = kbd.Enter;
+        }
+      }
+      //std.debug.print("pos: {d}  nbritem:{d}  {d}",.{pos,nbrItem , vmnu.xitem.items.len});
+      switch (Tkey.Key) {
+        .esc => {
+          term.offMouse();
+          return 0;
+        },
+        .enter => {
+          term.offMouse();
+          return pos + 1;
+        },
+        .down  => { if (pos < nbrItem - 1 )  pos +=1; } ,
+        .up    => { if (pos > 0 )  pos -=1; },
+        .right => { if (pos < nbrItem - 1 )  pos +=1; },
+        .left  => { if (pos > 0 ) pos -=1; },
+        else => {},
+      }
+    }
+  }
+
+};
+
+
+// defined Panel
 pub const  pnl = struct {
 
   // define attribut default PANEL
@@ -467,8 +837,9 @@ pub const  pnl = struct {
 
     button: std.ArrayList(btn.BUTTON),
 
-    //funcKey:std.ArrayList(Tkey).init(allocator),
+    menu: std.ArrayList(mnu.MENU),
 
+    // double buffer screen
     buf:std.ArrayList(TERMINAL_CHAR),
 
     mouse: bool,
@@ -478,7 +849,7 @@ pub const  pnl = struct {
 
 
 
-  pub fn newPanel(vname: [] const u8,
+  fn newPanel(vname: [] const u8,
                   vposx: usize, vposy: usize,
                   vlines: usize,
                   vcols: usize,
@@ -499,7 +870,8 @@ pub const  pnl = struct {
           .actif  = true,
           .frame = undefined,
           .label  = std.ArrayList(lbl.LABEL).init(allocator),
-          .button  = std.ArrayList(btn.BUTTON).init(allocator),
+          .button = std.ArrayList(btn.BUTTON).init(allocator),
+          .menu   = std.ArrayList(mnu.MENU).init(allocator),
           .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
       };
 
@@ -513,7 +885,7 @@ pub const  pnl = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        xpanel.buf.append(doublebuffer) catch {return ErrForms.InvalidePanel;};
+        xpanel.buf.append(doublebuffer) catch {return ErrForms.Invalide_Panel;};
         i -=1 ;
     }
 

@@ -646,6 +646,8 @@ pub const kbd = enum {
         // variable --> Event.Char
         var vUnicode: []u8 = undefined;
         vUnicode = allocator. alloc(u8, 4) catch unreachable;
+        var x :usize = 0;
+        while (x < 4) : (x += 1 ) vUnicode[x] = 0 ;
 
         // TODO: Check buffer size
         var buf: [12]u8 = undefined;
@@ -913,8 +915,10 @@ pub const kbd = enum {
                 MouseInfo.action = MouseAction.maNone;
                 MouseInfo.button = MouseButton.mbNone;
                 MouseInfo.scrollDir = ScrollDirection.msNone;
+                MouseInfo.scroll = false;
                 MouseInfo.x = 0;
                 MouseInfo.y = 0;
+
 
                 var i:usize = 3;
                 while (true) {
@@ -963,12 +967,14 @@ pub const kbd = enum {
                 if ((buf[1]) == 50 )    MouseInfo.button = MouseButton.mbRight;
 
                 if ((buf[1]) == 54 and (buf[2]) == 52 ) {
+                    MouseInfo.scroll = true;
                     MouseInfo.scrollDir = ScrollDirection.msUp;
                     MouseInfo.x = 0;
                     MouseInfo.y = 0;
                 }
 
                 if ((buf[1]) == 54 and (buf[2]) == 53 ) {
+                    MouseInfo.scroll = true;
                     MouseInfo.scrollDir = ScrollDirection.msDown;
                     MouseInfo.x = 0;
                     MouseInfo.y = 0;

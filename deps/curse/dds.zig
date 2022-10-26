@@ -54,3 +54,7 @@
         line2
     };
 
+    pub const MNUVH = enum {
+    vertical ,
+    horizontal
+    };

@@ -6,7 +6,8 @@ const dds = @import("dds");
 const frm = @import("forms").frm;
 const lbl = @import("forms").lbl;
 const pnl = @import("forms").pnl;
-
+const btn = @import("forms").btn;
+const mnu = @import("forms").mnu;
 
 const output =std.io.getStdOut();
 
@@ -93,6 +94,72 @@ pub fn stockLabel2() void{
 }
 
 
+var rcd_button = std.ArrayList(btn.BUTTON).init(allocator);
+
+
+pub fn stockButton() void{
+
+    rcd_button.append(btn.newButton(
+                        kbd.str(kbd.F1),
+                        true, // show
+                        btn.AtrButton,
+                        "Help Jean-Pierre",
+                        btn.AtrTitle,
+                        true //check
+                        )) catch unreachable ;
+}
+
+var rcd_Menu = std.ArrayList(mnu.MENU).init(allocator);
+
+
+pub fn stockMenu_1() void{
+
+    var item= std.ArrayList([] const u8).init(allocator);
+
+    item.append("Panel ") catch unreachable ;
+    item.append("Sav.  ") catch unreachable ;
+    item.append("Exit  ") catch unreachable ;
+
+    rcd_Menu.append(mnu.initMenu(
+                        "Menu01",
+                        1, 1,
+                        3,
+                        50,
+                        mnu.AtrMnu,
+                        mnu.AtrBar,
+                        mnu.AtrCell,
+                        dds.CADRE.line1,
+                        dds.MNUVH.horizontal,
+                        item,
+                        )) catch unreachable ;
+}
+
+pub fn stockMenu_2() void{
+
+    var item= std.ArrayList([] const u8).init(allocator);
+
+    item.append("Panel ") catch unreachable ;
+    item.append("Sav.  ") catch unreachable ;
+    item.append("Exit  ") catch unreachable ;
+
+    rcd_Menu.append(mnu.initMenu(
+                        "Menu01",
+                        1, 1,
+                        10,
+                        15,
+                        mnu.AtrMnu,
+                        mnu.AtrBar,
+                        mnu.AtrCell,
+                        dds.CADRE.line1,
+                        dds.MNUVH.vertical,
+                        item,
+                        )) catch unreachable ;
+}
+
+
+
+
+
 pub fn main() !void {
 
 
@@ -112,6 +179,7 @@ pub fn main() !void {
 
 
     stockLabel2();
+    stockButton() ;
     var panel = pnl.initPanel("PANEL",
                   1, 1, // x,y
                   30,   // lines
@@ -121,14 +189,20 @@ pub fn main() !void {
                   frm.AtrFrame,    // atribut BOX
                   "TITLE",
                   frm.AtrTitle);
-    for (rcd_label.items) |xLABEL| {
-        panel.label.append(xLABEL) catch {return;} ;
-    }
+
+        for (rcd_label.items) |xLABEL| {
+            panel.label.append(xLABEL) catch {return;} ;
+        }
+
+        for (rcd_button.items) |xBUTTON| {
+            panel.button.append(xBUTTON) catch {unreachable;} ;
+        }
+
 
 
     var panel2 = pnl.initPanel("PANEL2",
                   10,50, // x,y
-                  10,   // lines
+                  15,   // lines
                   20,   // cols
                   pnl.AtrPanel,     // attribut Panel
                   dds.CADRE.line1,  // type de cadre
@@ -143,6 +217,9 @@ pub fn main() !void {
     term.offMouse();
 
     pnl.printPanel(panel);
+
+
+
     // get f1..f24 Alt.. crtl..
     var Tkey = kbd.getKEY();
     switch (Tkey.Key) {
@@ -198,7 +275,7 @@ pub fn main() !void {
                     }
                 },
                 else => {
-                    //std.debug.print("?? {}",.{Tkey.Key});
+                    std.debug.print("?? {}",.{Tkey.Key});
                 },
             }
 
@@ -213,7 +290,16 @@ pub fn main() !void {
             else => {},
         }
 
-    pnl.clsPanel(panel2);
+    pnl.printPanel(panel2);
+    stockMenu_2();
+    for (rcd_Menu.items) |xMENU| {
+            panel2.menu.append(xMENU) catch unreachable ;
+        }
+
+
+    var nitem = mnu.ioMenu(panel2,panel2.menu.items[0],0);
+    panel2.menu.items[0].selMenu = nitem;
+    std.debug.print("n°item {}",.{panel2.menu.items[0].selMenu});
 
     Tkey = kbd.getKEY();
     switch (Tkey.Key) {

@@ -85,6 +85,11 @@ modification from :<BR />
 &rarr;&nbsp; 2022-10-21   This programme** Exemple. zig** => *Exemple*<BR />
 &rarr;&nbsp; 2022-10-21   update src_c/term.cpp<BR />
 <BR /><BR />
+&rarr;&nbsp; 2022-10-26   creat Menu -> forms.zig<BR />
+&rarr;&nbsp; 2022-10-26   creat Lenw number word String -> utils.zig<BR />
+&rarr;&nbsp; 2022-10-26   creat Trim String -> utils.zig<BR />
+&rarr;&nbsp; 2022-10-26   Update Exemple add menu  <BR />
+<BR /><BR />
 <BR />
 <BR />
 
@@ -115,13 +120,13 @@ another way is to use IOCTL but again, there is a good chance of being forced to
 
 Anyway, to make management applications or Terminal type tools are more than enough.
 
-ctrl or alt combinations plus Fn(1..24) TAB Backspace home end insert delete pageup pagedown enter escape altgr
+ctrl or alt combinations plus Fn(1..24) TAB Backspace home end insert delete pageup pagedown enter escape altgr mouse
 and the utf8 keyboard is a lot.<BR />
 
 <u>--styling-------------------------------------------------</u><BR />
 make it compatible as close as possible to IBM 400 ex:<BR />
 <BR />
-pub const defAtrLabel : stl.ZONATRB = .{<BR />
+pub const AtrLabel : stl.ZONATRB = .{<BR />
 &nbsp;&nbsp;&nbsp;.styled=[_]i32{@enumToInt(stl.Style.styleBright),<BR />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.styleItalic),<BR />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.notstyle),<BR />
@@ -134,12 +139,12 @@ pub const defAtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
-&rarr;&nbsp; box / panel / label /button OK <BR />
+&rarr;&nbsp; fram / panel / label /button / Menu OK <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
-&rarr;&nbsp; label / box / panel  forms.zig   testing --->  code.zig<BR />
-&rarr;&nbsp; label / box / panel  forms.zig   Exemple --->  exemple.zig<BR />
+&rarr;&nbsp; forms.zig   testing --->  code.zig<BR />
+&rarr;&nbsp; forms.zig   Exemple --->  exemple.zig<BR />
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration<BR />
 

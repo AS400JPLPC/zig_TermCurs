@@ -20,6 +20,8 @@ const pnl = @import("forms").pnl;
 const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
+// menu
+const mnu = @import("forms").mnu;
 
 
 
@@ -61,7 +63,10 @@ pub fn Panel_Fmt01() pnl.PANEL {
                         lbl.AtrLabel)
     ) catch unreachable ;
 
-
+  Panel.label.append(lbl.newLabel("Name-1",10,1,
+                        "Eric",
+                        lbl.AtrLabel)
+    ) catch unreachable ;
 
   // button
   // F.. , Sow/hiden, Attribut,
@@ -86,6 +91,38 @@ pub fn Panel_Fmt01() pnl.PANEL {
                       true //check
                       )
     ) catch unreachable ;
+
+  Panel.button.append(btn.newButton(
+                        kbd.str(kbd.F7),
+                        true, // show
+                        btn.AtrButton,
+                        "Test menu",
+                        btn.AtrTitle,
+                        true //check
+                        )
+    ) catch unreachable ;
+
+
+
+  var item= std.ArrayList([] const u8).init(allocator);
+
+  item.append("Panel ") catch unreachable ;
+  item.append("Exmpl.") catch unreachable ;
+  item.append("Sav.  ") catch unreachable ;
+  item.append("Exit  ") catch unreachable ;
+
+  Panel.menu.append(mnu.initMenu(
+                      "Menu01",
+                      1, 1,
+                      10,
+                      15,
+                      mnu.AtrMnu,
+                      mnu.AtrBar,
+                      mnu.AtrCell,
+                      dds.CADRE.line1,
+                      dds.MNUVH.vertical,
+                      item,
+                      )) catch unreachable ;
 
   return Panel;
 }
@@ -157,9 +194,15 @@ pub fn main() !void {
             if (Tkey.Key == kbd.F12) { Tkey.Key = kbd.none; break; }
           }
         },
+
+      .F7 => {
+          var nitem = mnu.ioMenu(pFmt01,pFmt01.menu.items[0],0);
+          pFmt01.menu.items[0].selMenu = nitem;
+          std.debug.print("n°item {}",.{pFmt01.menu.items[0].selMenu});
+          mnu.rstPanel(pFmt01.menu.items[0], pFmt01);
+        },
       else => {},
     }
-
     if (Tkey.Key == kbd.F3) break; // end work
   }
 
