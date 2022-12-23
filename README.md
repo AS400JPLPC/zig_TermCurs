@@ -13,6 +13,9 @@ Resumption of the project https://github.com/xyaman/mibu
 
 a little more : XYAMAN
 
+https://zig.news/
+
+
 les news:<BR />
 &rarr;&nbsp; 2022-09-17  activate mouse<BR />
 &rarr;&nbsp; 2022-09-17  all keyboard keys are enabled<BR />
