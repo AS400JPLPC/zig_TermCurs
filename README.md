@@ -106,6 +106,9 @@ modification from :<BR />
 <BR />
 &rarr;&nbsp; 2022-12-23  Exemple.zig show the progress
 <BR />
+&rarr;&nbsp; 2022-12-23  Grid row deletion enabled
+
+<BR />
 
 <BR />
 <BR />
