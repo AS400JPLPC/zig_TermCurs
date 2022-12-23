@@ -1121,7 +1121,7 @@ pub const  grd = struct {
   }
 
   pub fn dltRows(self: *GRID,  r :usize )  void {
-    self.data = utl.removeListString(self.data, r);
+    self.data.orderedRemove(r);
     setPageGrid(self) ;
   }
 

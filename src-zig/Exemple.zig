@@ -274,7 +274,7 @@ pub fn main() !void {
           grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","0"});
           grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","0"});
 
-
+          grd.dltRows(&pFmt01.grid.items[0] , 5);
           var Gkey :grd.GridSelect = undefined ;
 
           Gkey =grd.ioGrid(&pFmt01.grid.items[0]);
