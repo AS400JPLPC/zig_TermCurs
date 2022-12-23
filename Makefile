@@ -1,3 +1,6 @@
+#définition des cibles particulières
+.PHONY: all clean build
+
 # nom de l'executable :
 PROJET = $(PGM)
 
@@ -26,6 +29,7 @@ RESULT = $(BINDIR)$(PROJET)
 
 # choix du compilateur :
 CXX = g++
+#CXX =clang++
 
 # options compilations : voir vte-dev  -Wextra -Wno-unused-parameter   use juste for debug only for you  -Os -s
 # -------------------------------------------------------------------
@@ -37,7 +41,7 @@ ifeq ($(PROD), true)
  			-Wsign-compare -fpermissive 	-fstack-clash-protection	-fstack-protector-all \
  			`pkg-config --cflags vte-2.91`
 #  -no-pie because it's the master program of the project so the caller  `pkg-config gmodule-2.0 --libs`
-LDFLAGS =	-lX11 -no-pie `pkg-config --libs vte-2.91`
+LDFLAGS =	-lX11 -no-pie `pkg-config --libs vte-2.91` -licuuc
 
 OPTIMIZE = -fexpensive-optimizations -Os -s
 
@@ -51,7 +55,7 @@ CPPFLAGS=	-std=c++17 -ggdb -g3  \
 			-Wsign-compare -fpermissive \
 			`pkg-config --cflags vte-2.91`
 
-LDFLAGS =	-lX11   -no-pie  `pkg-config --libs vte-2.91`
+LDFLAGS =	-lX11   -no-pie  `pkg-config --libs vte-2.91` -licuuc
 
 OPTIMIZE =
 endif

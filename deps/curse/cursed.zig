@@ -10,11 +10,23 @@ const os = std.os;
 const io = std.io;
 
 
+var STDIN_TERM  = std.io.getStdIn();
+var original_termios : os.linux.termios = undefined;
+var cur_termios: os.linux.termios = undefined;
 
 const output =std.io.getStdOut();
 var buf_Output = std.io.bufferedWriter(output.writer());
+// Get the Writer interface from BufferedWriter
+var w = buf_Output.writer();
+
 const allocator = std.heap.page_allocator;
 
+
+/// flush terminal in-out
+pub fn flushIO() void {
+    buf_Output.flush() catch unreachable;
+    os.tcsetattr(STDIN_TERM.handle,.FLUSH, cur_termios) catch unreachable;
+}
 
 ///-------------
 /// mouse
@@ -23,12 +35,14 @@ const allocator = std.heap.page_allocator;
 
 /// onMouse
 pub fn onMouse() void {
-    output.writer().print("\x1b[?1000;1005;1006h", .{})  catch {return;} ;
+    w.print("\x1b[?1000;1005;1006h", .{})  catch {return;} ;
+    flushIO();
 }
 
 /// offMouse
 pub fn offMouse() void {
-    output.writer().print("\x1b[?1000;1005;1006l", .{})  catch {return;} ;
+    w.print("\x1b[?1000;1005;1006l", .{})  catch {return;} ;
+    flushIO();
 }
 
 ///-------------
@@ -38,32 +52,38 @@ pub fn offMouse() void {
 
 /// Clear from cursor until end of screen
 pub fn cls_from_cursor_toEndScreen() void {
-    output.writer().print("\x1b[0J", .{}) catch {return;} ;
+    w.print("\x1b[0J", .{}) catch {return;} ;
+    flushIO();
 }
 
 /// Clear from cursor to beginning of screen
 pub fn cls_from_cursor_toStartScreen() void {
-    output.writer().print("\x1b[1J", .{}) catch {return;} ;
+    w.print("\x1b[1J", .{}) catch {return;} ;
+    flushIO();
 }
 
 /// Clear all screen
 pub fn cls() void {
-    output.writer().print("\x1b[2J", .{}) catch {return;} ;
+    w.print("\x1b[2J", .{}) catch {return;} ;
+    flushIO();
 }
 
 /// Clear from cursor to end of line
 pub fn cls_from_cursor_toEndline() void {
-    output.writer().print("\x1b[0K", .{}) catch {return;} ;
+    w.print("\x1b[0K", .{}) catch {return;} ;
+    flushIO();
 }
 
 /// Clear start of line to the cursor
 pub fn cls_from_cursor_toStartLine() void {
-    output.writer().print("\x1b[1K", .{}) catch {return;} ;
+    w.print("\x1b[1K", .{}) catch {return;} ;
+    flushIO();
 }
 
 /// Clear from cursor to end of line
 pub fn cls_line() void {
-    output.writer().print("\x1b[2K", .{}) catch {return;} ;
+    w.print("\x1b[2K", .{}) catch {return;} ;
+    flushIO();
 }
 
 ///-------------
@@ -79,37 +99,44 @@ pub var posCurs : Point = undefined;
 
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY( x: usize, y: usize) void {
-    output.writer().print("\x1b[{d};{d}H", .{ x, y }) catch {return;} ;
+    w.print("\x1b[{d};{d}H", .{ x, y }) catch {return;} ;
+    flushIO();
 }
 
 /// Moves cursor up `y` rows
 pub fn gotoUp( x: usize) void {
-    output.writer().print("\x1b[{d}A", .{ x }) catch {return;} ;
+    w.print("\x1b[{d}A", .{ x }) catch {return;} ;
+    flushIO();
 }
 
 /// Moves cursor down `y` rows
 pub fn gotoDown( x: usize) void {
-    output.writer().print("\x1b[{d}B", .{ x }) catch {return;} ;
+    w.print("\x1b[{d}B", .{ x }) catch {return;} ;
+    flushIO();
 }
 
 /// Moves cursor left `y` columns
 pub fn gotoLeft(y: usize) void {
-    output.writer().print("\x1b[{d}D", .{ y }) catch {return;} ;
+    w.print("\x1b[{d}D", .{ y }) catch {return;} ;
+    flushIO();
 }
 
 /// Moves cursor right `y` columns
 pub fn gotoRight( y: usize) void {
-    output.writer().print("\x1b[{d}C", .{y}) catch {return;} ;
+    w.print("\x1b[{d}C", .{y}) catch {return;} ;
+    flushIO();
 }
 
 /// Hide the cursor
 pub fn cursHide() void {
-    output.writer().print("\x1b[?25l", .{ }) catch {return;};
+    w.print("\x1b[?25l", .{ }) catch {return;};
+    flushIO();
 }
 
 /// Show the cursor
 pub fn cursShow() void {
-    output.writer().print("\x1b[?25h", .{}) catch {return;} ;
+    w.print("\x1b[?25h", .{}) catch {return;} ;
+    flushIO();
 }
 
 
@@ -132,43 +159,40 @@ fn convIntCursor( x:u8) usize {
     }
 }
 pub fn getCursor() void {
-    const stdin = io.getStdIn();
     // get Cursor form terminal
     var cursBuf: [13]u8 = undefined;
 
     posCurs.x=0;
     posCurs.y=0;
 
-    // Don't forget to flush!
-    output.writer().print("\x1b[?6n", .{}) catch {return;} ;
-
-    while (true) {
-        const  c =   stdin.read(&cursBuf) catch {return;} ;
-        if (c != 0 ) {
-            // columns
-            posCurs.x= convIntCursor(cursBuf[3])   ;
-            if (cursBuf[4] != 59) {
-                // columns 2 caractères ex: x:24
-                posCurs.x = (posCurs.x * 10) + convIntCursor(cursBuf[4]) ;
-
-                    // rows ex y: 1..172
-                    posCurs.y = convIntCursor(cursBuf[6]);
-                    if (cursBuf[7] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]) ;
-                    if (cursBuf[8] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[8]) ;
-                }
-            // rows rows ex y: 1..172
-                else {
-                    posCurs.y = convIntCursor(cursBuf[5]);
-                    if (cursBuf[6] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[6]) ;
-                    if (cursBuf[7] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]) ;
-                }
-
-
-                break;
-            }
-        }
     flushIO();
 
+    // Don't forget to flush!
+    w.print("\x1b[?6n", .{}) catch {return;} ;
+    
+    var c : usize = 0;
+    while (c == 0)  {  
+        c =  STDIN_TERM.read(&cursBuf) catch continue;
+    }
+    // columns
+    posCurs.x= convIntCursor(cursBuf[3])   ;
+    if (cursBuf[4] != 59) {
+        // columns 2 caractères ex: x:24
+        posCurs.x = (posCurs.x * 10) + convIntCursor(cursBuf[4]) ;
+
+            // rows ex y: 1..172
+            posCurs.y = convIntCursor(cursBuf[6]);
+            if (cursBuf[7] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]) ;
+            if (cursBuf[8] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[8]) ;
+        }
+    // rows rows ex y: 1..172
+        else {
+            posCurs.y = convIntCursor(cursBuf[5]);
+            if (cursBuf[6] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[6]) ;
+            if (cursBuf[7] != 59)  posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]) ;
+        }
+
+    flushIO();
 }
 
 
@@ -177,28 +201,27 @@ pub fn getCursor() void {
 ///-------------------------
 
 /// Reset the terminal style.
-pub fn resetStyle() void {
-    output.writer().print("\x1b[0m", .{}) catch {return;} ;
-
+fn resetStyle() void {
+   w.print("\x1b[0m", .{}) catch {return;} ;
 }
 
 /// Sets the terminal style.
-pub fn setStyle(style:[4]u32 ) void {
+fn setStyle(style:[4]u32 ) void {
     for (style) |v| {
         if (v != 0) {
-        output.writer().print("\x1b[{d}m", .{v}) catch {return;} ;
+        w.print("\x1b[{d}m", .{v}) catch {return;} ;
         }
     }
 }
 
 /// Sets the terminal's foreground color.
-pub fn  setForegroundColor(color : dds.BackgroundColor) void {
-    output.writer().print("\x1b[{d}m", .{@enumToInt(color)}) catch {return;} ;
+fn  setForegroundColor(color : dds.BackgroundColor) void {
+    w.print("\x1b[{d}m", .{@enumToInt(color)}) catch {return;} ;
 }
 
 /// Sets the terminal's Background color.
-pub fn  setBackgroundColor(color : dds.ForegroundColor) void {
-    output.writer().print("\x1b[{d}m", .{@enumToInt(color)})  catch {return;} ;
+fn  setBackgroundColor(color : dds.ForegroundColor) void {
+    w.print("\x1b[{d}m", .{@enumToInt(color)})  catch {return;} ;
 }
 
 /// write text and attribut
@@ -206,9 +229,9 @@ pub fn writeStyled(text: []const u8 , attribut : dds.ZONATRB ) void {
     setForegroundColor(attribut.backgr);
     setBackgroundColor(attribut.foregr);
     setStyle(attribut.styled);
-    output.writer().print("{s}", .{text}) catch {return;} ;
+    w.print("{s}", .{text}) catch {return;} ;
     resetStyle();
-    //flushIO();
+    flushIO();
 }
 
 
@@ -220,33 +243,19 @@ pub fn writeStyled(text: []const u8 , attribut : dds.ZONATRB ) void {
 /// A raw terminal representation, you can enter terminal raw mode
 /// using this struct. Raw mode is essential to create a TUI.
 
-pub const RawTerm = struct {
-    orig_termios: os.termios,
-    cur_termios: os.termios,
-    /// The OS-specific file descriptor or file handle.
-    handle: os.system.fd_t,
-
-    const Self = @This();
-
-    /// Returns to the previous terminal state
-    pub fn disableRawMode(self: *Self) !void {
-        try os.tcsetattr(self.handle, .FLUSH, self.orig_termios);
-        offMouse();
-    }
-    pub fn flushMode(self: *Self) !void {
-        try os.tcsetattr(self.handle,.FLUSH, self.cur_termios);
-    }
-};
-
-
 
 /// open terminal and config
-pub fn enableRawMode() !RawTerm {
-    // var original_termios = try os.tcgetattr(handle);
-    const stdin = io.getStdIn();
-    var original_termios = try os.tcgetattr(stdin.handle );
+pub fn enableRawMode() void {
 
-    var termios = original_termios;
+
+    STDIN_TERM.handle = 1;  // stdin = 1 
+   
+    _= os.linux.tcgetattr(STDIN_TERM.handle,&original_termios)  ;
+    
+    var use_termios = original_termios;
+
+    
+
 
     // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
     // https://codeberg.org/josias/zigcurses/src/branch/master/src/main.zig
@@ -254,42 +263,42 @@ pub fn enableRawMode() !RawTerm {
 
     // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
 
-    termios.iflag &= ~(
-                        os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK | os.system.ISTRIP |
-                        os.system.INLCR | os.system.IGNCR | os.system.ICRNL | os.system.IXON
-                    );
+    use_termios.iflag &= ~(
+                            os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK | os.system.ISTRIP |
+                            os.system.INLCR | os.system.IGNCR | os.system.ICRNL | os.system.IXON
+                        );
 
 
-    termios.oflag &= ~(os.system.OPOST);
-    termios.cflag &= ~(os.system.CSIZE | os.system.PARENB);
-    termios.cflag |= (os.system.CS8 );
-    termios.lflag &= ~(os.system.ECHO | os.system.ECHONL | os.system.ICANON | os.system.IEXTEN | os.system.ISIG);
+    use_termios.oflag &= ~(os.system.OPOST);
+    use_termios.cflag &= ~(os.system.CSIZE | os.system.PARENB);
+    use_termios.cflag |= (os.system.CS8 );
+    use_termios.lflag &= ~(os.system.ECHO | os.system.ECHONL | os.system.ICANON | os.system.IEXTEN | os.system.ISIG);
 
+ 
 
     // Wait until it reads at least one byte  terminal standard
-    termios.cc[os.system.V.MIN] = 1;
+    use_termios.cc[os.system.V.MIN] = 1;
 
 
     // Wait 100 miliseconds at maximum.
-    termios.cc[os.system.V.TIME] = 1;
+    use_termios.cc[os.system.V.TIME] = 0;
 
     // apply changes
-    try os.tcsetattr(stdin.handle, .FLUSH, termios);
+    _= os.linux.tcsetattr(STDIN_TERM.handle, .NOW, &use_termios) ;
+
 
     // cursor HIDE par défault
     cursHide();
     offMouse();
 
-    return RawTerm{
-        .orig_termios = original_termios,
-        .cur_termios = termios,
-        .handle = stdin.handle ,
-    };
+    cur_termios = use_termios;
+
 }
 
-/// flush terminal in-out
-pub fn flushIO() void {
-    buf_Output.flush() catch unreachable;
+/// Returns to the previous terminal state
+pub fn disableRawMode() void {
+    _=  os.linux.tcsetattr(STDIN_TERM.handle, .FLUSH, &original_termios);
+    offMouse();
 }
 
 
@@ -298,8 +307,8 @@ const TermSize = struct { width: usize, height: usize };
 
 fn getSize() !TermSize {
     var win_size: std.os.system.winsize = undefined;
-    const stdin = io.getStdIn();
-    const err = os.system.ioctl(stdin.handle, os.system.T.IOCGWINSZ, @ptrToInt(&win_size));
+    
+    const err = os.system.ioctl(STDIN_TERM.handle, os.system.T.IOCGWINSZ, @ptrToInt(&win_size));
     if (os.errno(err) != .SUCCESS) {
         return os.unexpectedErrno(@intToEnum(os.system.E, err));
     }
@@ -312,7 +321,7 @@ fn getSize() !TermSize {
 /// Update title terminal
 pub fn  titleTerm( title : [] const u8) void {
     if (title.len > 0 ) {
-        output.writer().print("\x1b]0;{s}\x07", .{title}) catch {return;};
+        w.print("\x1b]0;{s}\x07", .{title}) catch {return;};
         flushIO();
     }
 }
@@ -326,7 +335,7 @@ pub fn  titleTerm( title : [] const u8) void {
 
 pub fn resizeTerm(line : usize ,cols : usize) void {
     if (line > 0  and cols > 0) {
-        output.writer().print("\x1b[8;{d};{d};t",.{line,cols}) catch {return;};
+        w.print("\x1b[8;{d};{d};t",.{line,cols}) catch {return;};
         flushIO();
     }
 }
@@ -651,11 +660,12 @@ pub const kbd = enum {
 
         // TODO: Check buffer size
         var buf: [12]u8 = undefined;
-        const stdin = io.getStdIn();
+        
+        flushIO();
 
-        const c =  stdin.read(&buf) catch {Event.Key = kbd.none; return Event;};
-        if (c == 0) {
-            Event.Key = kbd.none; return Event;
+        var c : usize = 0;
+        while (c == 0)  {  
+        c =  STDIN_TERM.read(&buf) catch continue;
         }
 
         const view = std.unicode.Utf8View.init(buf[0..c]) catch { Event.Key = kbd.none; return Event;};
@@ -990,48 +1000,3 @@ pub const kbd = enum {
     }
 
 };
-
-
-
-
-test "tested" {
-//pub fn main() !void {
-    const defAtrLabel : dds.ZONATRB = .{
-    .styled=[_]u32{@enumToInt(dds.Style.styleBright),
-                   @enumToInt(dds.Style.styleItalic),
-                   @enumToInt(dds.Style.notStyle),
-                   @enumToInt(dds.Style.notStyle)},
-    .backgr = dds.BackgroundColor.bgBlack,
-    .foregr = dds.ForegroundColor.fgGreen,
-    };
-    var raw_term = try enableRawMode();
-    defer raw_term.disableRawMode() catch {};
-
-    writeStyled("bonjour \n\r",defAtrLabel );
-
-    getCursor();
-    std.debug.print("\n\rcursor X:{d}  Y:{d}\n\r", .{posCurs.x, posCurs.y}) ;
-    gotoXY(10,100);  // use terminal
-    getCursor();
-    std.debug.print("gotoXY X:{d}  Y:{d}\n\r", .{posCurs.x, posCurs.y});
-
-    var size: TermSize = try getSize();
-    std.debug.print("screen width:{d} height:{d}\n\r",.{size.width , size.height });
-    offMouse();
-    flushIO();
-
-
-    const Tkey = kbd.getKEY();
-    std.debug.print("F.. {any}\n\r",.{Tkey});
-    switch (Tkey.Key) {
-                .F16    => std.debug.print("F.. {} \n\r",.{Tkey.Key}),
-                .altB   => std.debug.print("Alt. {} \n\r",.{Tkey.Key}),
-                .ctrlG  => std.debug.print("Ctrl. {} \n\r",.{Tkey.Key}),
-                .mouse  => std.debug.print("Ctrl. {} \n\r",.{Tkey.Key}),
-                .char  =>  {
-                    std.debug.print("Char. {s}\n\r",.{Tkey.Char });
-                },
-                else    => std.debug.print("F.. {} \n\r",.{Tkey.Key}),
-            }
-
-}

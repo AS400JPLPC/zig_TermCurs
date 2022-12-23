@@ -157,9 +157,9 @@
       }
     },
     {
-      "label": "Clear ZIG",
+      "label": "Clear Projet ZIG",
       "type": "shell",
-      "command": "./.vscode/clearcache.sh ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "command": "./.vscode/clearProjet.sh ${fileBasename} ${fileDirname} ${relativeFileDirname}",
       "presentation": {
         "echo": true,
         "reveal": "always",

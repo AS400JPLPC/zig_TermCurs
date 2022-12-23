@@ -45,6 +45,8 @@ folder_cache=$lib_projet"zig-cache"
 
 folder_cachetest=$lib_projet$folder_src"/zig-cache"
 
+tested="test"$projet_bin
+
 #echo -en $folder_bin\\n
 #echo -en $lib_projet\\n
 #echo -en $projet_src\\n
@@ -53,6 +55,7 @@ folder_cachetest=$lib_projet$folder_src"/zig-cache"
 #echo -en $projet_bin\\n
 #echo -en $folder_cachetest\\n
 
+echo -en $tested\\n
 
 #-------------------------------------------------------------------
 # clean
@@ -84,7 +87,7 @@ if [ "$mode" == "DEBUG" ] ; then
 		)
 	else
 		(set -x ; \
-					zig test $lib_projet$folder_src"/"$projet_src ;\
+					zig test  $lib_projet$folder_src"/"$projet_src ;\
 		)
 	fi
 fi

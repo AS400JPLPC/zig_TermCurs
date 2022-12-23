@@ -7,4 +7,6 @@ rm -v -rf $HOME/.config/VSCodium/Cache/*
 
 # clear log
 rm -v -rf $HOME/.config/VSCodium/logs/*
+
+
 exit

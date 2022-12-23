@@ -11,21 +11,18 @@ pub fn build(b: *std.build.Builder) void {
 // zig-deps depot
 // src_c    source c/c++
 
-    const forms = b.addExecutable("forms", "deps/curse/forms.zig");
-    forms.setTarget(target);
-    forms.addPackagePath("dds", "deps/curse/dds.zig");
-    forms.addPackagePath("term", "deps/curse/cursed.zig");
-    forms.addPackagePath("utils", "deps/curse/utils.zig");
-    forms.setBuildMode(mode);
-    forms.install();
+    const utils = b.addExecutable("utils", "deps/curse/utils.zig");
+    utils.setTarget(target);
+    utils.setBuildMode(mode);
+    utils.install();
 
-    const run_cmd = forms.run();
+    const run_cmd = utils.run();
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
 
-    const run_step = b.step("testforms", "Run the app");
+    const run_step = b.step("testUtils", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
 

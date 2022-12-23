@@ -90,9 +90,21 @@ modification from :<BR />
 &rarr;&nbsp; 2022-10-26   creat Trim String -> utils.zig<BR />
 &rarr;&nbsp; 2022-10-26   Update Exemple add menu  <BR />
 <BR /><BR />
-<BR />
-<BR />
 
+&rarr;&nbsp; 2022-12-23   **General Overhaul**
+<BR />
+****Cursed taking into account Linux STDIN Handle****
+****purge of the source and net improvement of the getkey function****
+****cursed cleaning.** <BR />
+<BR />
+&rarr;&nbsp; 2022-12-23  update flushIO flushing stdin / output 
+&rarr;&nbsp; 2022-12-23  **grid creation** **Not all functions that need to be implemented are present**
+<BR />
+&rarr;&nbsp; 2022-12-23  Enrichment of "utils" tools
+<BR />
+&rarr;&nbsp; 2022-12-23  the grid is considered as a processing subfile:MultiArrayList
+<BR />
+&rarr;&nbsp; 2022-12-23  Exemple.zig show the progress
 <BR />
 
 <BR />
@@ -143,7 +155,6 @@ pub const AtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
-&rarr;&nbsp; forms.zig   testing --->  code.zig<BR />
 &rarr;&nbsp; forms.zig   Exemple --->  exemple.zig<BR />
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration<BR />

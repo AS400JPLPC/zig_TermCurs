@@ -3,9 +3,10 @@
 projet_src=$1
 projet_lib=$2
 folder_src=$3
-
+set +x
 
 folder_len=${#folder_src}
+
 
 lib_len=${#projet_lib}
 
@@ -22,14 +23,13 @@ folder_cache=$lib_projet"zig-cache"
 folder_cachetest=$lib_projet$folder_src"/zig-cache"
 
 
-
-#echo -en $folder_bin\\n
-#echo -en $lib_projet\\n
-#echo -en $projet_src\\n
-#echo -en $folder_src\\n
-#echo -en $projet_typ\\n
-#echo -en $projet_bin\\n
-#echo -en $folder_cachetest\\n
+echo -en $folder_bin\\n
+echo -en $lib_projet\\n
+echo -en $projet_src\\n
+echo -en $folder_src\\n
+echo -en $projet_typ\\n
+echo -en $projet_bin\\n
+echo -en $folder_cachetest\\n
 
 
 if test -d $folder_cache ; then

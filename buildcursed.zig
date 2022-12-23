@@ -14,6 +14,7 @@ pub fn build(b: *std.build.Builder) void {
     const cursed = b.addExecutable("cursed", "deps/curse/cursed.zig");
     cursed.setTarget(target);
     cursed.addPackagePath("dds", "deps/curse/dds.zig");
+    cursed.addPackagePath("utl", "deps/curse/utils.zig");
     cursed.setBuildMode(mode);
     cursed.install();
 

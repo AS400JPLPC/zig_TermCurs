@@ -58,7 +58,7 @@
 /// ex:
 ///------------------------------------------
 
-#define WORKPGM		"./code"
+#define WORKPGM		"./Exemple"
 
 bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 
@@ -108,7 +108,7 @@ bool ctrlPgm(std::string v_TEXT)
 	std::filesystem::path p(v_TEXT.c_str());
 											switch(strswitch(p.stem().c_str()))
 											{
-												case  strswitch("code")				: b_pgm =true;		break;
+												case  strswitch("Tcursed")				: b_pgm =true;		break;
 												case  strswitch("Exemple")		: b_pgm =true;		break;
 											}
 	return b_pgm;
@@ -189,13 +189,13 @@ void	init_Terminal()
 	/// Font DejaVu Sans Mono -> xfce4-terminal
 	/// confortable and extend numbers columns and rows
 
-	if ( s->width <= 1600 && s->height >=1024 ) {				/// généralement 13"... 15"
-		sprintf(font_terminal,"%s %s" , VTEFONT,"13");
+	if ( s->width <= 1600 && s->height >=1024 ) {				/// ex: 13"... 15"
+		sprintf(font_terminal,"%s %s" , VTEFONT,"11");
 		COL = 132;
 		ROW = 32;
 		}
-	else if ( s->width <= 1920 && s->height >=1080 ) {			/// généralement 17"... 22"
-		sprintf(font_terminal,"%s %s" , VTEFONT,"15");
+	else if ( s->width <= 1920 && s->height >=1080 ) {			/// ex: 17"... 32"
+		sprintf(font_terminal,"%s %s" , VTEFONT,"12");
 		COL = 152;
 		ROW = 42;
 		}
@@ -205,7 +205,8 @@ void	init_Terminal()
 		ROW = 52;
 	}
 
-
+	//COL = 132;
+	//ROW = 32;
 	// resize  title  font
     VTE = VTE_TERMINAL (terminal);
 
