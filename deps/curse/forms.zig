@@ -772,7 +772,6 @@ pub const  mnu = struct {
 // ----------------
 // PadingCell()
 // setPageGrid()
-// setLastPage()
 // initGrid()
 // setActif()
 // getLenHeaders()
@@ -934,22 +933,17 @@ pub const  grd = struct {
 
   pub fn setPageGrid(self : *GRID  ) void {
     self.lignes = self.data.len ;
-    if (self.lignes <= self.pageRows)  self.pages = 1
+    if (self.lignes < self.pageRows)  self.pages = 1
     else {
-      self.pages = self.lignes / self.pageRows ;
-      if  (  @rem(self.lignes ,  (self.pageRows-1))  > 0 ) self.pages += 1;
+      self.pages = self.lignes / (self.pageRows - 1) ;
+      if  (  @rem(self.lignes ,  (self.pageRows - 1))  > 0 ) self.pages += 1;
     }
   }
 
 
-
-
-  pub fn setLastPage(self :*GRID) void {
-    self.curspage = self.pages;
-  }
-
   pub fn initGrid(vname: [] const u8 ,
-              vposx: usize, vposy: usize, vpageRows : usize ,
+              vposx: usize, vposy: usize, 
+              vpageRows : usize , // nbr ligne  + header
               vseparator: [] const u8 ,
               vattribut : dds.ZONATRB ,
               vatrTilte : dds.ZONATRB ,
@@ -962,8 +956,8 @@ pub const  grd = struct {
       .name  = vname,
       .posx  = vposx,
       .posy  = vposy,
-      .lines = vpageRows + 2 , //  row per page line + cadre + header
-      .cols  = 0,              // regarde setHeaders()
+      .lines = vpageRows + 2 , //  row per page  + cadre 
+      .cols  = 0,              
       .separator = vseparator ,
       .pageRows = vpageRows,
       .data = std.MultiArrayList(ArgData){},
@@ -1359,8 +1353,9 @@ pub const  grd = struct {
             while (iter.next()) |ch| : ( n += 1) {
               self.buf.items[n].ch = ch;
               self.buf.items[n].attribut  = self.headers.items[h].atrCell;
-              self.buf.items[n].on = true; 
-              if (self.cursligne == r ) self.buf.items[n].attribut = AtrCellBar
+              self.buf.items[n].on = true;
+              
+              if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
               else  self.buf.items[n].attribut = AtrCell;      
             }
           //n =  n + self.headers.items[h].long;
@@ -1411,14 +1406,13 @@ pub const  grd = struct {
     gSelect.Key = term.kbd.none;
 
 
-
-    
     var CountLigne : usize = 0;
     self.cursligne = 0;
     printGridHeader(self) ;
     
     term.cursHide();
     term.onMouse();
+
 
     var grid_key : term.Keyboard = undefined ;
     while (true) {
@@ -1476,7 +1470,7 @@ pub const  grd = struct {
             self.cursligne += 1;
           },
         .pageUp =>
-          if (self.curspage > 0 ) {
+          if (self.curspage > 1 ) {
             self.curspage -=1;
             self.cursligne = 0;
             CountLigne = 0;
@@ -1490,6 +1484,111 @@ pub const  grd = struct {
             printGridHeader(self);
           },
         else => {}
+      }
+    }
+  }
+
+
+  pub fn ioCombo(self: *GRID , pos : usize) GridSelect {
+    var CountLigne : usize = 0;
+    var gSelect : GridSelect = .{
+      .Key = term.kbd.none,
+      .Buf = std.ArrayList([]const u8).init(allocator)
+    };
+
+    if ( self.actif == false ) return gSelect ; 
+
+    gSelect.Key = term.kbd.none;
+
+    if (pos == 0 )  self.cursligne = 0
+    else { 
+      var r :usize = 0;
+      var n :usize = 0;
+      self.curspage = 0;
+      while (r < self.lignes) : ( r +=1 ) {
+        n += 1;
+        if (n == self.pageRows - 1) { self.curspage +=1 ; n= 0;}
+        if (r == pos) {
+          self.cursligne = r;
+          
+          break ;
+        }
+      }
+      CountLigne = self.cursligne;
+      if ( n > 0 ) self.curspage += 1;
+    }
+    
+    printGridHeader(self) ;
+
+    term.cursHide();
+    term.onMouse();
+
+    var grid_key : term.Keyboard = undefined ;
+    while (true) {
+      
+      printGridRows(self);
+      
+
+      grid_key = kbd.getKEY();
+      
+      if (grid_key.Key == kbd.mouse) {
+        grid_key.Key = kbd.none;
+        switch (term.MouseInfo.scrollDir) {
+          term.ScrollDirection.msUp =>    grid_key.Key = kbd.up,
+          term.ScrollDirection.msDown =>  grid_key.Key = kbd.down,
+          else => {}
+        }
+
+        switch (term.MouseInfo.button) {
+          term.MouseButton.mbLeft  =>  grid_key.Key = kbd.enter,
+          term.MouseButton.mbRight =>  grid_key.Key = kbd.enter,
+          else => {}
+        }
+
+        if (grid_key.Key == kbd.none ) continue;
+      }
+
+      switch (grid_key.Key) {
+        .esc => {
+          self.cursligne = 0;
+          gSelect.Key = kbd.esc;
+          gSelect.Buf = undefined;
+          term.offMouse();
+          return gSelect;
+        },
+         .enter  =>
+          if (self.lignes > 0 ) {
+            gSelect.Key = kbd.enter;
+            gSelect.Buf = self.data.items(.buf)[self.cursligne];
+            term.offMouse();
+            self.cursligne = 0;
+            return gSelect;
+          },
+        .up     =>
+          if (CountLigne > 0 ) {
+            CountLigne -= 1 ;
+            self.cursligne -= 1 ;
+          },
+        .down   =>
+          if (CountLigne < self.maxligne and self.cursligne < self.maxligne ) {
+            CountLigne += 1;
+            self.cursligne += 1;
+          },
+        .pageUp =>
+          if (self.curspage > 1 ) {
+            self.curspage -=1;
+            self.cursligne = 0;
+            CountLigne = 0;
+            printGridHeader(self);
+          },
+        .pageDown =>
+          if (self.curspage < self.pages ) {
+            self.curspage += 1;
+            self.cursligne = 0;
+            CountLigne = 0;
+            printGridHeader(self);
+          },
+        else => {},
       }
     }
   }
@@ -1718,3 +1817,69 @@ pub const  pnl = struct {
 
 
 };
+
+test "testforms" {
+  term.enableRawMode();
+  defer term.disableRawMode() ;
+
+  const xlabel = lbl.newLabel("Name- 1",1,1,
+                      "Jean-Pierre",
+                      lbl.AtrLabel );
+  //term.writeStyled(xlabel.text,xlabel.attribut);
+
+  const xbutton = btn.newButton(
+                      kbd.str(kbd.F1),
+                      true, // show
+                      btn.AtrButton,
+                      "Help Jean-Pierre",
+                      btn.AtrTitle,
+                      true  ); // check
+
+  var panel = pnl.initPanel("panel-0", 1 , 1 ,30 ,50, pnl.AtrPanel,dds.CADRE.line1,frm.AtrFrame,"TITRE",frm.AtrTitle);
+
+  panel.label.append(xlabel) catch {return;} ;
+  panel.button.append(xbutton) catch {return;} ;
+  pnl.printPanel(panel);
+
+  panel.grid.append(grd.initGrid(
+                "Grid01",
+                20, 2,
+                7,
+                grd.gridStyle,
+                grd.AtrGrid,
+                grd.AtrTitle,
+                grd.AtrCell,
+                dds.CADRE.line1,
+                )) catch unreachable ;
+
+  var Cell = std.ArrayList(grd.CELL).init(allocator);
+  Cell.append(grd.newCell("ID",3,dds.REFTYP.DIGIT,dds.ForegroundColor.fgGreen)) catch unreachable ;
+  Cell.append(grd.newCell("Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
+  Cell.append(grd.newCell("animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) catch unreachable ;
+  //Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
+  // setCellEditCar(g_prix,"€")
+  Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgWhite)) catch unreachable ;
+  grd.setHeaders(&panel.grid.items[0], Cell) catch unreachable ;
+  grd.printGridHeader(&panel.grid.items[0]);
+  //std.debug.print("len haeder:{}",.{grd.getLenHeaders(&panel.grid.items[0])});
+  
+  grd.addRows(&panel.grid.items[0] , &.{"01", "Adam","Aigle","1"});
+  grd.addRows(&panel.grid.items[0] , &.{"02", "eve", "poisson","0"});
+  
+  grd.addRows(&panel.grid.items[0] , &.{"03", "Rouge","Aigle","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"04", "Bleu", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"05", "Bleu5", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"06", "Bleu6", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"07", "Bleu7", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"08", "Bleu8", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"09", "Bleu9", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"10", "Bleu10", "poisson","0"});
+  grd.addRows(&panel.grid.items[0] , &.{"11", "Bleu11", "poisson","0"});
+
+  var Gkey :grd.GridSelect = undefined ;
+
+  Gkey =grd.ioCombo(&panel.grid.items[0],3);
+  std.debug.print("key:{} \r\n",.{Gkey.Key});
+  if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[1]});
+
+}

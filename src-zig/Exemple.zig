@@ -115,6 +115,16 @@ pub fn Panel_Fmt01() pnl.PANEL {
                         )
     ) catch unreachable ;
 
+  Panel.button.append(btn.newButton(
+                        kbd.str(kbd.F9),
+                        true, // show
+                        btn.AtrButton,
+                        "Test Combo",
+                        btn.AtrTitle,
+                        true //check
+                        )
+    ) catch unreachable ;
+
   //-------------------------------------------------
   //the menu is not double buffered it is not a Panel
   // name,
@@ -205,6 +215,43 @@ fn setID( lineID : usize ) usize {
   return lineID;
 }
 
+fn tstCombo( fld : [] const u8) []const u8 {
+  var cellPos:usize = 0;
+   
+  var Xcombo = grd.initGrid(
+                  "Grid01",
+                  20, 2,
+                  3 ,  // nbr ligne  + header
+                  grd.gridStyle,
+                  grd.AtrGrid,
+                  grd.AtrTitle,
+                  grd.AtrCell,
+                  dds.CADRE.line1,
+                  )  ;
+
+  var Cell = std.ArrayList(grd.CELL).init(allocator);
+  Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
+  grd.setHeaders(&Xcombo, Cell) catch unreachable ;
+
+  grd.addRows(&Xcombo , &.{"---"});
+  grd.addRows(&Xcombo , &.{"Famille"});        
+  grd.addRows(&Xcombo , &.{"Amis"}); 
+  grd.addRows(&Xcombo , &.{"Professionel"});
+
+  if (std.mem.eql(u8,fld,"---") == true)      cellPos = 0;
+  if (std.mem.eql(u8,fld,"Famille") == true)  cellPos = 1;
+  if (std.mem.eql(u8,fld,"Amis") == true)     cellPos = 2;
+  if (std.mem.eql(u8,fld,"Professionel") == true) cellPos = 3;
+
+  var Gkey :grd.GridSelect = undefined ;
+
+  Gkey =grd.ioCombo(&Xcombo,cellPos);
+  std.debug.print("key:{} \r\n",.{Gkey.Key});
+  if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[0]})
+  else return "";
+  return Gkey.Buf.items[0] ;
+}
+
 pub fn main() !void {
 
   // open terminal and config and offMouse , cursHide->(cursor hide)
@@ -282,6 +329,11 @@ pub fn main() !void {
           if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[1]});
 
         },
+
+      .F9 => {
+        var fld : [] const u8 = "Professionel";
+        fld = tstCombo(fld) ;
+      },
       else => {},
     }
     if (Tkey.Key == kbd.F3) break; // end work

@@ -110,9 +110,11 @@ modification from :<BR />
 &rarr;&nbsp; 2022-12-23  Exemple.zig show the progress
 <BR />
 &rarr;&nbsp; 2022-12-23  Grid row deletion enabled
-
 <BR />
-
+<BR />
+&rarr;&nbsp; 2022-12-24  Add ioCombo see example
+&rarr;&nbsp; 2022-12-24  Update different GRID setting
+&rarr;&nbsp; 2022-12-24  GRID cursor fix
 <BR />
 <BR />
 
@@ -157,7 +159,7 @@ pub const AtrLabel : stl.ZONATRB = .{<BR />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
-&rarr;&nbsp; fram / panel / label /button / Menu OK <BR />
+&rarr;&nbsp; fram / panel / label /button / Menu / Grid OK <BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />
