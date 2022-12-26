@@ -102,7 +102,7 @@ modification from :<BR />
 ****purge of the source and net improvement of the getkey function****
 ****cursed cleaning.** <BR />
 <BR />
-&rarr;&nbsp; 2022-12-23  update flushIO flushing stdin / output 
+&rarr;&nbsp; 2022-12-23  update flushIO flushing stdin / output <BR />
 &rarr;&nbsp; 2022-12-23  **grid creation** **Not all functions that need to be implemented are present**
 <BR />
 &rarr;&nbsp; 2022-12-23  Enrichment of "utils" tools
@@ -114,9 +114,9 @@ modification from :<BR />
 &rarr;&nbsp; 2022-12-23  Grid row deletion enabled
 <BR />
 <BR />
-&rarr;&nbsp; 2022-12-24  Add ioCombo see example
-&rarr;&nbsp; 2022-12-24  Update different GRID setting
-&rarr;&nbsp; 2022-12-24  GRID cursor fix
+&rarr;&nbsp; 2022-12-24  Add ioCombo see example <BR />
+&rarr;&nbsp; 2022-12-24  Update different GRID setting<BR />
+&rarr;&nbsp; 2022-12-24  GRID cursor fix<BR />
 <BR />
 
 <BR />
@@ -127,7 +127,7 @@ modification from :<BR />
 <BR />
 &rarr;&nbsp; 2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");<BR />
 <BR />
-&rarr;&nbsp; 2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u<> <BR />
+&rarr;&nbsp; 2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u> <BR />
 <BR />
 <BR />
 
