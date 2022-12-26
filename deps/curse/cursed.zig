@@ -10,7 +10,7 @@ const os = std.os;
 const fs = std.fs;
 var TTY : fs.File = undefined;
 
-var STDIN_TERM  = std.io.getStdIn();
+
 var original_termios : os.linux.termios = undefined;
 var use_termios: os.linux.termios = undefined;
 
@@ -25,7 +25,8 @@ const allocator = std.heap.page_allocator;
 /// flush terminal in-out
 pub fn flushIO() void {
     buf_Output.flush() catch unreachable;
-    _= os.linux.tcsetattr(STDIN_TERM.handle,.FLUSH, &use_termios) ;
+    _= os.linux.tcsetattr(TTY.handle,.FLUSH, &use_termios) ;
+
 }
 
 ///-------------
@@ -172,7 +173,7 @@ pub fn getCursor() void {
     
     var c : usize = 0;
     while (c == 0)  {  
-        c =  STDIN_TERM.handle.read(&cursBuf) catch continue;
+        c =  TTY.read(&cursBuf) catch continue;
     }
     // columns
     posCurs.x= convIntCursor(cursBuf[3])   ;
@@ -249,11 +250,12 @@ pub fn enableRawMode() void {
 
 
     TTY = fs.cwd().openFile("/dev/tty", .{ .mode = .read_write}) catch unreachable;
-    defer TTY.close();
+    //defer TTY.close();
 
        
+   
     _= os.linux.tcgetattr(TTY.handle,&original_termios)  ;
-    
+
     _= os.linux.tcgetattr(TTY.handle,&use_termios)  ;
 
     
@@ -267,34 +269,32 @@ pub fn enableRawMode() void {
 
 
 
-    use_termios.iflag &= ~( os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK | os.system.ISTRIP |
-                            os.system.INLCR | os.system.IGNCR | os.system.ICRNL | os.system.IXON
+    use_termios.iflag &= ~( os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |
+                            os.linux.INLCR | os.linux.IGNCR | os.linux.ICRNL | os.linux.IXON
                         );
 
 
-    use_termios.oflag &= ~(os.system.OPOST);
-    use_termios.cflag &= ~(os.system.CSIZE | os.system.PARENB);
-    use_termios.cflag |= (os.system.CS8 );
-    use_termios.lflag &= ~(os.system.ECHO | os.system.ECHONL | os.system.ICANON | os.system.IEXTEN | os.system.ISIG);
+    use_termios.oflag &= ~(os.linux.OPOST);
+    use_termios.cflag &= ~(os.linux.CSIZE | os.linux.PARENB);
+    use_termios.cflag |= (os.linux.CS8 );
+    use_termios.lflag &= ~(os.linux.ECHO | os.linux.ECHONL | os.linux.ICANON | os.linux.IEXTEN | os.linux.ISIG);
 
  
 
     // Wait until it reads at least one byte  terminal standard
-    use_termios.cc[os.system.V.MIN] = 1;
+    use_termios.cc[os.linux.V.MIN] = 1;
 
 
     // Wait 100 miliseconds at maximum.
-    use_termios.cc[os.system.V.TIME] = 0;
+    use_termios.cc[os.linux.V.TIME] = 0;
 
     // apply changes
     _= os.linux.tcsetattr(TTY.handle, .NOW, &use_termios) ;
-
 
     // cursor HIDE par défault
     cursHide();
     offMouse();
 
-    STDIN_TERM = io.getStdIn();
 
 }
 
@@ -305,7 +305,8 @@ pub fn disableRawMode() void {
     w.print("\x1b[2J", .{}) catch unreachable ;
     w.print("\x1b[H", .{}) catch unreachable ;
     cursShow();
-    _= os.linux.tcsetattr(STDIN_TERM.handle, .NOW, &original_termios) ;
+    //_= os.linux.tcsetattr(TTY.handle, .NOW, &original_termios) ;
+    os.tcsetattr(TTY.handle, .NOW, original_termios) catch unreachable;
 }
 
 
@@ -313,11 +314,11 @@ pub fn disableRawMode() void {
 const TermSize = struct { width: usize, height: usize };
 
 fn getSize() !TermSize {
-    var win_size: std.os.system.winsize = undefined;
+    var win_size: std.os.linux.winsize = undefined;
     
-    const err = os.system.ioctl(STDIN_TERM.handle, os.system.T.IOCGWINSZ, @ptrToInt(&win_size));
+    const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @ptrToInt(&win_size));
     if (os.errno(err) != .SUCCESS) {
-        return os.unexpectedErrno(@intToEnum(os.system.E, err));
+        return os.unexpectedErrno(@intToEnum(os.linux.E, err));
     }
     return TermSize{
         .height = win_size.ws_row,
@@ -672,7 +673,7 @@ pub const kbd = enum {
 
         var c : usize = 0;
         while (c == 0)  {  
-        c =  STDIN_TERM.read(&keybuf) catch continue ;
+        c =  TTY.read(&keybuf) catch continue ;
         }
         
         const view = std.unicode.Utf8View.init(keybuf[0..c]) catch { Event.Key = kbd.none; return Event;};

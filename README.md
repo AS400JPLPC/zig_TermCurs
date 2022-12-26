@@ -6,14 +6,16 @@ terminal access function<br />
 *look at the bottom of the testing page*<br />
 
 **os linux**
-
+<u>Normally should work POSIX</u><br />
 <u>Keyboard management and respect for the terminal philosophy</u><br />
 
 Resumption of the project https://github.com/xyaman/mibu
 
 a little more : XYAMAN
 
-https://zig.news/
+Thank you
+https://zig.news/<BR />
+https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm<BR />
 
 
 les news:<BR />
@@ -122,7 +124,10 @@ modification from :<BR />
 &rarr;&nbsp; 2022-12-25  terminal assignment test<BR />
 &rarr;&nbsp; 2022-12-26  Update cursed <BR />
 &rarr;&nbsp; 2022-12-26  restore terminal fix<BR />
-&rarr;&nbsp; 2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");
+<BR />
+&rarr;&nbsp; 2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");<BR />
+<BR />
+&rarr;&nbsp; 2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u<> <BR />
 <BR />
 <BR />
 

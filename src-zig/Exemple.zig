@@ -322,7 +322,7 @@ pub fn main() !void {
 
 
           grd.resetRows(&pFmt01.grid.items[0]);
-          //std.debug.print("len haeder:{}",.{grd.getLenHeaders(&panel.grid.items[0])});
+
           grd.addRows(&pFmt01.grid.items[0] , &.{"01", "Adam","Aigle","1000,00","1"});
           grd.addRows(&pFmt01.grid.items[0] , &.{"02", "Eve", "poisson","1001,00","1"});
           grd.addRows(&pFmt01.grid.items[0] , &.{"03", "Rouge","Aigle","1002,00","0"});
@@ -339,7 +339,7 @@ pub fn main() !void {
           var Gkey :grd.GridSelect = undefined ;
 
           Gkey =grd.ioGrid(&pFmt01.grid.items[0]);
-          std.debug.print("key:{} \r\n",.{Gkey.Key});
+          //std.debug.print("key:{} \r\n",.{Gkey.Key});
           if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[1]});
 
         },
