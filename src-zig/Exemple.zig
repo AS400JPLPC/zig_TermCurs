@@ -42,8 +42,8 @@ pub fn Panel_Fmt01() pnl.PANEL {
   // Title Panel, Attribut Title
   var Panel = pnl.initPanel("Format01",
                   1, 1,
-                  42,
-                  152,
+                  30,
+                  132,
                   pnl.AtrPanel,
                   dds.CADRE.line1,
                   frm.AtrFrame,
@@ -257,6 +257,7 @@ pub fn main() !void {
   // open terminal and config and offMouse , cursHide->(cursor hide)
   term.enableRawMode();
   defer term.disableRawMode() ;
+  
 
   // define Panel
   var pFmt01 = Panel_Fmt01();
@@ -267,7 +268,9 @@ pub fn main() !void {
 
   // work Panel-01
   pnl.printPanel(pFmt01);
+  
   while (true) {
+    
 
     Tkey = kbd.getKEY();
     switch (Tkey.Key) {
@@ -339,4 +342,5 @@ pub fn main() !void {
     if (Tkey.Key == kbd.F3) break; // end work
   }
 
+  term.disableRawMode() ;
 }

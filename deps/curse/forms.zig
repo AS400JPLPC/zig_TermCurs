@@ -1420,7 +1420,7 @@ pub const  grd = struct {
       printGridRows(self);
       
 
-      grid_key = kbd.getKEY();
+      grid_key = kbd.getKEY() ;
       
       if (grid_key.Key == kbd.mouse) {
         grid_key.Key = kbd.none;
@@ -1510,12 +1510,11 @@ pub const  grd = struct {
         if (n == self.pageRows - 1) { self.curspage +=1 ; n= 0;}
         if (r == pos) {
           self.cursligne = r;
-          
           break ;
         }
       }
-      CountLigne = self.cursligne;
       if ( n > 0 ) self.curspage += 1;
+      CountLigne = (self.curspage * (self.pageRows - 1) ) - self.cursligne ;
     }
     
     printGridHeader(self) ;
@@ -1524,6 +1523,7 @@ pub const  grd = struct {
     term.onMouse();
 
     var grid_key : term.Keyboard = undefined ;
+
     while (true) {
       
       printGridRows(self);

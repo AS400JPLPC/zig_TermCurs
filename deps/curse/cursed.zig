@@ -5,17 +5,17 @@ const dds = @import("dds.zig");
 const utl = @import("utils");
 
 
-
-const os = std.os;
 const io = std.io;
-
+const os = std.os;
+const fs = std.fs;
+var TTY : fs.File = undefined;
 
 var STDIN_TERM  = std.io.getStdIn();
 var original_termios : os.linux.termios = undefined;
-var cur_termios: os.linux.termios = undefined;
+var use_termios: os.linux.termios = undefined;
 
-const output =std.io.getStdOut();
-var buf_Output = std.io.bufferedWriter(output.writer());
+const STDOUT_TERM =std.io.getStdOut();
+var buf_Output = std.io.bufferedWriter(STDOUT_TERM.writer());
 // Get the Writer interface from BufferedWriter
 var w = buf_Output.writer();
 
@@ -25,7 +25,7 @@ const allocator = std.heap.page_allocator;
 /// flush terminal in-out
 pub fn flushIO() void {
     buf_Output.flush() catch unreachable;
-    os.tcsetattr(STDIN_TERM.handle,.FLUSH, cur_termios) catch unreachable;
+    _= os.linux.tcsetattr(STDIN_TERM.handle,.FLUSH, &use_termios) ;
 }
 
 ///-------------
@@ -172,7 +172,7 @@ pub fn getCursor() void {
     
     var c : usize = 0;
     while (c == 0)  {  
-        c =  STDIN_TERM.read(&cursBuf) catch continue;
+        c =  STDIN_TERM.handle.read(&cursBuf) catch continue;
     }
     // columns
     posCurs.x= convIntCursor(cursBuf[3])   ;
@@ -248,11 +248,13 @@ pub fn writeStyled(text: []const u8 , attribut : dds.ZONATRB ) void {
 pub fn enableRawMode() void {
 
 
-    STDIN_TERM.handle = 1;  // stdin = 1 
-   
-    _= os.linux.tcgetattr(STDIN_TERM.handle,&original_termios)  ;
+    TTY = fs.cwd().openFile("/dev/tty", .{ .mode = .read_write}) catch unreachable;
+    defer TTY.close();
+
+       
+    _= os.linux.tcgetattr(TTY.handle,&original_termios)  ;
     
-    var use_termios = original_termios;
+    _= os.linux.tcgetattr(TTY.handle,&use_termios)  ;
 
     
 
@@ -263,8 +265,9 @@ pub fn enableRawMode() void {
 
     // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
 
-    use_termios.iflag &= ~(
-                            os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK | os.system.ISTRIP |
+
+
+    use_termios.iflag &= ~( os.system.IGNBRK | os.system.BRKINT | os.system.PARMRK | os.system.INPCK | os.system.ISTRIP |
                             os.system.INLCR | os.system.IGNCR | os.system.ICRNL | os.system.IXON
                         );
 
@@ -284,21 +287,25 @@ pub fn enableRawMode() void {
     use_termios.cc[os.system.V.TIME] = 0;
 
     // apply changes
-    _= os.linux.tcsetattr(STDIN_TERM.handle, .NOW, &use_termios) ;
+    _= os.linux.tcsetattr(TTY.handle, .NOW, &use_termios) ;
 
 
     // cursor HIDE par défault
     cursHide();
     offMouse();
 
-    cur_termios = use_termios;
+    STDIN_TERM = io.getStdIn();
 
 }
 
 /// Returns to the previous terminal state
 pub fn disableRawMode() void {
-    _=  os.linux.tcsetattr(STDIN_TERM.handle, .FLUSH, &original_termios);
     offMouse();
+    // clear screen
+    w.print("\x1b[2J", .{}) catch unreachable ;
+    w.print("\x1b[H", .{}) catch unreachable ;
+    cursShow();
+    _= os.linux.tcsetattr(STDIN_TERM.handle, .NOW, &original_termios) ;
 }
 
 
@@ -659,16 +666,16 @@ pub const kbd = enum {
         while (x < 4) : (x += 1 ) vUnicode[x] = 0 ;
 
         // TODO: Check buffer size
-        var buf: [12]u8 = undefined;
-        
+        var keybuf: [13]u8 = undefined;
+
         flushIO();
 
         var c : usize = 0;
         while (c == 0)  {  
-        c =  STDIN_TERM.read(&buf) catch continue;
+        c =  STDIN_TERM.read(&keybuf) catch continue ;
         }
-
-        const view = std.unicode.Utf8View.init(buf[0..c]) catch { Event.Key = kbd.none; return Event;};
+        
+        const view = std.unicode.Utf8View.init(keybuf[0..c]) catch { Event.Key = kbd.none; return Event;};
 
         var iter = view.iterator();
 
@@ -684,7 +691,7 @@ pub const kbd = enum {
                     // fn (1 - 4)
                     // O - 0x6f - 111
                     '\x4f' => {
-                            switch ((1 + buf[2] - '\x50') ) {
+                            switch ((1 + keybuf[2] - '\x50') ) {
                                 1 => { Event.Key = kbd.F1; return Event;},
                                 2 => { Event.Key = kbd.F2; return Event;},
                                 3 => { Event.Key = kbd.F3; return Event;},
@@ -695,7 +702,7 @@ pub const kbd = enum {
 
                     // csi
                     '[' => {
-                        return  parse_csiFunc(buf[2..c]);
+                        return  parse_csiFunc(keybuf[2..c]);
 
                     },
 
@@ -797,12 +804,12 @@ pub const kbd = enum {
 
     }
 
-    fn parse_csiFunc(buf: []const u8) Keyboard {
+    fn parse_csiFunc(csibuf: []const u8) Keyboard {
         //std.debug.print("\n\rview:{any}\n", .{buf});
         // init
         var Event : Keyboard = Keyboard{.Key = kbd.none , .Char =""};
 
-        switch (buf[0]) {
+        switch (csibuf[0]) {
             // keys
             'A' => { Event.Key = kbd.up; return Event;},
             'B' => { Event.Key = kbd.down; return Event;},
@@ -815,14 +822,14 @@ pub const kbd = enum {
 
             '1'...'2' => {
 
-                if (buf[1] == 126) {
-                    switch (buf[0]) { // insert
+                if (csibuf[1] == 126) {
+                    switch (csibuf[0]) { // insert
                         '2' => { Event.Key = kbd.ins; return Event;},
                         else => { Event.Key = kbd.none; return Event;},
                     }
                 }
-                if (buf[2] == 126) {
-                    switch (buf[1]) { // f5..f12
+                if (csibuf[2] == 126) {
+                    switch (csibuf[1]) { // f5..f12
                         '5' => { Event.Key = kbd.F5; return Event;},
                         '7' => { Event.Key = kbd.F6; return Event;},
                         '8' => { Event.Key = kbd.F7; return Event;},
@@ -834,8 +841,8 @@ pub const kbd = enum {
                         else =>  { Event.Key = kbd.none; return Event;},
                     }
                 }
-                if (buf[2] == 50) { // f11..f14 and // shift
-                    switch (buf[3]) {
+                if (csibuf[2] == 50) { // f11..f14 and // shift
+                    switch (csibuf[3]) {
                         'P' => { Event.Key = kbd.F13; return Event;},
                         'Q' => { Event.Key = kbd.F14; return Event;},
                         'R' => { Event.Key = kbd.F15; return Event;},
@@ -852,8 +859,8 @@ pub const kbd = enum {
                         else =>  { Event.Key = kbd.none ; return Event;},
                     }
                 }
-                if (buf[2] == 53) { //  sihft ctrl
-                    switch (buf[3]) {
+                if (csibuf[2] == 53) { //  sihft ctrl
+                    switch (csibuf[3]) {
                     'A' => { Event.Key = kbd.up; return Event;},
                     'B' => { Event.Key = kbd.down; return Event;},
                     'C' => { Event.Key = kbd.right; return Event;},
@@ -865,8 +872,8 @@ pub const kbd = enum {
                     }
                 }
 
-                if (buf[2] == 54) { //  sihft / controle
-                    switch (buf[3]) {
+                if (csibuf[2] == 54) { //  sihft / controle
+                    switch (csibuf[3]) {
                     'A' => { Event.Key = kbd.up; return Event;},
                     'B' => { Event.Key = kbd.down; return Event;},
                     'C' => { Event.Key = kbd.right; return Event;},
@@ -878,8 +885,8 @@ pub const kbd = enum {
                     }
                 }
 
-                if (buf[2] == 60) { // f11..f14
-                    switch (buf[3]) {
+                if (csibuf[2] == 60) { // f11..f14
+                    switch (csibuf[3]) {
                         'P' => { Event.Key = kbd.F13; return Event;},
                         'Q' => { Event.Key = kbd.F14; return Event;},
                         'R' => { Event.Key = kbd.F15; return Event;},
@@ -887,8 +894,8 @@ pub const kbd = enum {
                         else =>  { Event.Key = kbd.none; return Event;},
                     }
                 }
-                if (buf[4] == 126) { // f15..f24
-                    switch (buf[1]) {
+                if (csibuf[4] == 126) { // f15..f24
+                    switch (csibuf[1]) {
                         '5' => { Event.Key = kbd.F17; return Event;},
                         '7' => { Event.Key = kbd.F18; return Event;},
                         '8' => { Event.Key = kbd.F19; return Event;},
@@ -904,15 +911,15 @@ pub const kbd = enum {
             },
 
             '5'...'6' => {
-                if (buf[1] == 126) {
-                    switch (buf[0]) {
+                if (csibuf[1] == 126) {
+                    switch (csibuf[0]) {
                         '5' => { Event.Key = kbd.pageUp; return Event;},
                         '6' => { Event.Key = kbd.pageDown; return Event;},
                         else =>  { Event.Key = kbd.none ; return Event;},
                     }
                 }
-                if (buf[3] == 126) {
-                    switch (buf[2]) {
+                if (csibuf[3] == 126) {
+                    switch (csibuf[2]) {
                         '5' => { Event.Key = kbd.pageUp; return Event;},
                         '6' => { Event.Key = kbd.pageDown; return Event;},
                         else =>  { Event.Key = kbd.none ; return Event;},
@@ -932,58 +939,58 @@ pub const kbd = enum {
 
                 var i:usize = 3;
                 while (true) {
-                    if (buf[i] != 59 and MouseInfo.y == 0 ) MouseInfo.y = convIntMouse(buf[3]);
-                    if (buf[i] == 59 ) break;
-                    if (buf[i] != 59 and i > 3 ) MouseInfo.y = (MouseInfo.y * 10) + convIntMouse(buf[i]);
+                    if (csibuf[i] != 59 and MouseInfo.y == 0 ) MouseInfo.y = convIntMouse(csibuf[3]);
+                    if (csibuf[i] == 59 ) break;
+                    if (csibuf[i] != 59 and i > 3 ) MouseInfo.y = (MouseInfo.y * 10) + convIntMouse(csibuf[i]);
                     i += 1;
                 }
 
                 var u:usize = i + 1;
                 while (true) {
-                    if (buf[u] != 59 and MouseInfo.x == 0 ) MouseInfo.x = convIntMouse(buf[u]);
-                    if (buf[u] == 59 or  buf[u] == 77 or buf[u] == 109) break;
-                    if (buf[u] != 59 and u > (i+1) ) MouseInfo.x = (MouseInfo.x * 10) + convIntMouse(buf[u]);
+                    if (csibuf[u] != 59 and MouseInfo.x == 0 ) MouseInfo.x = convIntMouse(csibuf[u]);
+                    if (csibuf[u] == 59 or  csibuf[u] == 77 or csibuf[u] == 109) break;
+                    if (csibuf[u] != 59 and u > (i+1) ) MouseInfo.x = (MouseInfo.x * 10) + convIntMouse(csibuf[u]);
                     u += 1;
                 }
 
-                if (buf.len == 7) {
-                    if ((buf[6]) == 77 )    MouseInfo.action = MouseAction.maPressed;
+                if (csibuf.len == 7) {
+                    if (csibuf[6] == 77 )    MouseInfo.action = MouseAction.maPressed;
 
-                    if ((buf[6]) == 109 )   MouseInfo.action = MouseAction.maReleased;
+                    if (csibuf[6] == 109 )   MouseInfo.action = MouseAction.maReleased;
                 }
 
-                if (buf.len == 8) {
-                    if ((buf[7]) == 77 )    MouseInfo.action = MouseAction.maPressed;
+                if (csibuf.len == 8) {
+                    if (csibuf[7] == 77 )    MouseInfo.action = MouseAction.maPressed;
 
-                    if ((buf[7]) == 109 )   MouseInfo.action = MouseAction.maReleased;
+                    if (csibuf[7] == 109 )   MouseInfo.action = MouseAction.maReleased;
                 }
 
-                if (buf.len == 9) {
-                    if ((buf[8]) == 77 )    MouseInfo.action = MouseAction.maPressed;
+                if (csibuf.len == 9) {
+                    if (csibuf[8] == 77 )    MouseInfo.action = MouseAction.maPressed;
 
-                    if ((buf[8]) == 109 )   MouseInfo.action = MouseAction.maReleased;
+                    if (csibuf[8] == 109 )   MouseInfo.action = MouseAction.maReleased;
                 }
 
-                if (buf.len == 10) {
-                    if ((buf[9]) == 77 )    MouseInfo.action = MouseAction.maPressed;
+                if (csibuf.len == 10) {
+                    if (csibuf[9] == 77 )    MouseInfo.action = MouseAction.maPressed;
 
-                    if ((buf[9]) == 109 )   MouseInfo.action = MouseAction.maReleased;
+                    if (csibuf[9] == 109 )   MouseInfo.action = MouseAction.maReleased;
                 }
 
-                if ((buf[1]) == 48 )    MouseInfo.button = MouseButton.mbLeft;
+                if (csibuf[1] == 48 )    MouseInfo.button = MouseButton.mbLeft;
 
-                if ((buf[1]) == 49 )    MouseInfo.button = MouseButton.mbMiddle;
+                if (csibuf[1] == 49 )    MouseInfo.button = MouseButton.mbMiddle;
 
-                if ((buf[1]) == 50 )    MouseInfo.button = MouseButton.mbRight;
+                if (csibuf[1] == 50 )    MouseInfo.button = MouseButton.mbRight;
 
-                if ((buf[1]) == 54 and (buf[2]) == 52 ) {
+                if (csibuf[1] == 54 and csibuf[2] == 52 ) {
                     MouseInfo.scroll = true;
                     MouseInfo.scrollDir = ScrollDirection.msUp;
                     MouseInfo.x = 0;
                     MouseInfo.y = 0;
                 }
 
-                if ((buf[1]) == 54 and (buf[2]) == 53 ) {
+                if (csibuf[1] == 54 and csibuf[2] == 53 ) {
                     MouseInfo.scroll = true;
                     MouseInfo.scrollDir = ScrollDirection.msDown;
                     MouseInfo.x = 0;

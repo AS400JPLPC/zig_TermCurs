@@ -116,6 +116,13 @@ modification from :<BR />
 &rarr;&nbsp; 2022-12-24  Update different GRID setting
 &rarr;&nbsp; 2022-12-24  GRID cursor fix
 <BR />
+
+<BR />
+&rarr;&nbsp; 2022-12-25  grid ioCombo fix scrool
+&rarr;&nbsp; 2022-12-25  terminal assignment test
+&rarr;&nbsp; 2022-12-26  Update cursed 
+&rarr;&nbsp; 2022-12-26  restore terminal fix
+<BR />
 <BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />
