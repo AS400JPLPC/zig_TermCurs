@@ -42,7 +42,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   // Title Panel, Attribut Title
   var Panel = pnl.initPanel("Format01",
                   1, 1,
-                  30,
+                  32,
                   132,
                   pnl.AtrPanel,
                   dds.CADRE.line1,
@@ -120,6 +120,16 @@ pub fn Panel_Fmt01() pnl.PANEL {
                         true, // show
                         btn.AtrButton,
                         "Test Combo",
+                        btn.AtrTitle,
+                        true //check
+                        )
+    ) catch unreachable ;
+
+  Panel.button.append(btn.newButton(
+                        kbd.str(kbd.F12),
+                        true, // show
+                        btn.AtrButton,
+                        "ReDisplay",
                         btn.AtrTitle,
                         true //check
                         )
@@ -267,6 +277,7 @@ pub fn main() !void {
   var Tkey : term.Keyboard = undefined ;
 
   // work Panel-01
+  term.resizeTerm(pFmt01.lines,pFmt01.cols);
   pnl.printPanel(pFmt01);
   
   while (true) {
@@ -336,6 +347,10 @@ pub fn main() !void {
       .F9 => {
         var fld : [] const u8 = "Professionel";
         fld = tstCombo(fld) ;
+      },
+
+      .F12 => {
+        pnl.printPanel(pFmt01); 
       },
       else => {},
     }
