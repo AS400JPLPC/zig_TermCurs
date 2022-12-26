@@ -118,10 +118,11 @@ modification from :<BR />
 <BR />
 
 <BR />
-&rarr;&nbsp; 2022-12-25  grid ioCombo fix scrool
-&rarr;&nbsp; 2022-12-25  terminal assignment test
-&rarr;&nbsp; 2022-12-26  Update cursed 
-&rarr;&nbsp; 2022-12-26  restore terminal fix
+&rarr;&nbsp; 2022-12-25  grid ioCombo fix scrool <BR />
+&rarr;&nbsp; 2022-12-25  terminal assignment test<BR />
+&rarr;&nbsp; 2022-12-26  Update cursed <BR />
+&rarr;&nbsp; 2022-12-26  restore terminal fix<BR />
+&rarr;&nbsp; 2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");
 <BR />
 <BR />
 

@@ -920,11 +920,11 @@ pub const  grd = struct {
 
 
     if (cell.reftyp == dds.REFTYP.SWITCH) {
-      if ( text == "true" or text == "1" ) e_FIELD = "◉"
+      if ( std.mem.eql(u8, text[0..],"true")  or std.mem.eql(u8, text[0..] , "1" ) ) e_FIELD = "◉"
       else e_FIELD = "◎";
     }
 
-    if ( cell.edtcar != "")  e_FIELD =  try utl.concat(e_FIELD,cell.edtcar);
+    if ( std.mem.eql(u8,cell.edtcar , "") == false)  e_FIELD =  try utl.concat(e_FIELD,cell.edtcar);
 
     return e_FIELD;
 
@@ -1335,6 +1335,7 @@ pub const  grd = struct {
     var start : usize = 0 ;
     var l : usize = 0;
     var buf : [] const u8 = "";
+    var bufItems : [] const u8 = "";
     self.maxligne = 0;
     if (self.curspage == 0)  start = 0
     else  start = (self.pageRows - 1 ) * (self.curspage - 1 ) ;
@@ -1346,8 +1347,37 @@ pub const  grd = struct {
         self.maxligne = r;
         h= 0;
         while (h < nColumns ) : (h += 1) {
-          //n = n + self.posx  * r ;
-          buf  = self.data.items(.buf)[l].items[h];
+
+
+          // formatage buffer
+          bufItems  = self.data.items(.buf)[l].items[h];
+
+          if ( self.headers.items[h].reftyp == dds.REFTYP.DIGIT or
+              self.headers.items[h].reftyp  == dds.REFTYP.DIGIT_SIGNED or
+              self.headers.items[h].reftyp  == dds.REFTYP.DECIMAL or
+              self.headers.items[h].reftyp  == dds.REFTYP.DECIMAL_SIGNED)
+
+               buf = std.fmt.allocPrint(allocator,
+                "{s}", .{ 
+                                utl.alignStr(bufItems,
+                                dds.ALIGNS.rigth,
+                                self.headers.items[h].long) }) catch unreachable
+
+          else if (self.headers.items[h].reftyp != dds.REFTYP.SWITCH) {
+              buf = std.fmt.allocPrint(allocator,
+               "{s}", .{
+                               utl.alignStr(bufItems,
+                               dds.ALIGNS.left,
+                               self.headers.items[h].long) }) catch unreachable;
+          }
+          else if (self.headers.items[h].reftyp == dds.REFTYP.SWITCH) {
+            if ( utl.cmpStr(bufItems, "1") == true) buf = dds.CTRUE
+            else buf = dds.CFALSE;
+          }
+          if (utl.cmpStr(self.headers.items[h].edtcar , "") == false ) 
+          buf = std.fmt.allocPrint(allocator,"{s}{s}", .{ buf,self.headers.items[h].edtcar}) catch unreachable;
+          
+          // write matrice 
           var iter = utl.iteratStr.iterator(buf);
             n = nposy + self.headers.items[h].posy;
             while (iter.next()) |ch| : ( n += 1) {
@@ -1358,7 +1388,7 @@ pub const  grd = struct {
               if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
               else  self.buf.items[n].attribut = AtrCell;      
             }
-          //n =  n + self.headers.items[h].long;
+          
         }
       nposy = nposy + getLenHeaders(self) ;
         

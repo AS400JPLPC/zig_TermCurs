@@ -133,7 +133,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                         btn.AtrTitle,
                         true //check
                         )
-    ) catch unreachable ;
+    ) catch unreachable;
 
   //-------------------------------------------------
   //the menu is not double buffered it is not a Panel
@@ -313,8 +313,8 @@ pub fn main() !void {
           Cell.append(grd.newCell("ID",3,dds.REFTYP.DIGIT,dds.ForegroundColor.fgGreen)) catch unreachable ;
           Cell.append(grd.newCell("Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
           Cell.append(grd.newCell("animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) catch unreachable ;
-          //Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
-          // setCellEditCar(g_prix,"€")
+          Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
+          grd.setCellEditCar(&Cell.items[3],"€");
           Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgWhite)) catch unreachable ;
           grd.setHeaders(&pFmt01.grid.items[0], Cell) catch unreachable ;
           grd.printGridHeader(&pFmt01.grid.items[0]);
@@ -323,17 +323,17 @@ pub fn main() !void {
 
           grd.resetRows(&pFmt01.grid.items[0]);
           //std.debug.print("len haeder:{}",.{grd.getLenHeaders(&panel.grid.items[0])});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"01", "Adam","Aigle","1"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"02", "Eve", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"03", "Rouge","Aigle","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"04", "Bleu", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"05", "Bleu5", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"06", "Bleu6", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"07", "Bleu7", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"08", "Bleu8", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"09", "Bleu9", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","0"});
-          grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"01", "Adam","Aigle","1000,00","1"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"02", "Eve", "poisson","1001,00","1"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"03", "Rouge","Aigle","1002,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"04", "Bleu", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"05", "Bleu5", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"06", "Bleu6", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"07", "Bleu7", "poisson","100,00","1"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"08", "Bleu8", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"09", "Bleu9", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","100,00","0"});
+          grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100,00","0"});
 
           grd.dltRows(&pFmt01.grid.items[0] , 5);
           var Gkey :grd.GridSelect = undefined ;
