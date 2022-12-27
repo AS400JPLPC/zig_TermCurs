@@ -315,7 +315,7 @@ pub fn main() !void {
           Cell.append(grd.newCell("animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) catch unreachable ;
           Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
           grd.setCellEditCar(&Cell.items[3],"€");
-          Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgWhite)) catch unreachable ;
+          Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgYellow)) catch unreachable ;
           grd.setHeaders(&pFmt01.grid.items[0], Cell) catch unreachable ;
           grd.printGridHeader(&pFmt01.grid.items[0]);
         }
@@ -357,5 +357,5 @@ pub fn main() !void {
     if (Tkey.Key == kbd.F3) break; // end work
   }
 
-  term.disableRawMode() ;
+
 }

@@ -1381,12 +1381,10 @@ pub const  grd = struct {
           var iter = utl.iteratStr.iterator(buf);
             n = nposy + self.headers.items[h].posy;
             while (iter.next()) |ch| : ( n += 1) {
-              self.buf.items[n].ch = ch;
-              self.buf.items[n].attribut  = self.headers.items[h].atrCell;
-              self.buf.items[n].on = true;
-              
+              self.buf.items[n].ch = ch;           
               if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
-              else  self.buf.items[n].attribut = AtrCell;      
+              else  self.buf.items[n].attribut = self.headers.items[h].atrCell; 
+              self.buf.items[n].on = true;     
             }
           
         }

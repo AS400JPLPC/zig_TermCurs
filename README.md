@@ -17,7 +17,6 @@ Thank you
 https://zig.news/<BR />
 https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm<BR />
 
-
 les news:<BR />
 &rarr;&nbsp; 2022-09-17  activate mouse<BR />
 &rarr;&nbsp; 2022-09-17  all keyboard keys are enabled<BR />
@@ -120,15 +119,20 @@ modification from :<BR />
 <BR />
 
 <BR />
-&rarr;&nbsp; 2022-12-25  grid ioCombo fix scrool <BR />
-&rarr;&nbsp; 2022-12-25  terminal assignment test<BR />
-&rarr;&nbsp; 2022-12-26  Update cursed <BR />
-&rarr;&nbsp; 2022-12-26  restore terminal fix<BR />
+→  2022-12-25  grid ioCombo fix scrool <BR />
+→  2022-12-25  terminal assignment test<BR />
+→  2022-12-26  Update cursed <BR />
+→  2022-12-26  restore terminal fix<BR />
 <BR />
-&rarr;&nbsp; 2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");<BR />
+→  2022-12-26  update printRows taking into account edtcar and alignment if digit ex: grd.setCellEditCar(&Cell.items[3],"€");<BR />
 <BR />
-&rarr;&nbsp; 2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u> <BR />
+→  2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u> <BR />
 <BR />
+→  2022-12-27  Color line grid fix
+
+<BR />
+
+![](assets/20221227_135950_Exemple.png)
 <BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />

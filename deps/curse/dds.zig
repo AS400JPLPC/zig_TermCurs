@@ -26,7 +26,7 @@ pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
 };
 
 pub const  BackgroundColor = enum (u8)  { // terminal's background colors
-    bgBlack = 40,         // black
+    bgBlack = 90,         // black
     bgRed,                // red
     bgGreen,              // green
     bgYellow,             // yellow
@@ -85,3 +85,5 @@ pub const ALIGNS = enum {
     left ,
     rigth
     };
+pub const CTRUE = "✓";
+pub const CFALSE = " ";
