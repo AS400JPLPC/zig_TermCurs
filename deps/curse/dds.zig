@@ -1,7 +1,7 @@
 // def. standard style
 pub const  Style = enum (u8)  {
     notStyle = 0,      // not styled
-    styleBright = 1,   // bright text
+    styleBold = 1,     // bold text
     styleDim,          // dim text
     styleItalic,       // italic (or reverse on terminals not supporting)
     styleUnderscore,   // underscored text
@@ -9,32 +9,30 @@ pub const  Style = enum (u8)  {
     styleBlinkRapid,   // rapid blinking/bold text (not widely supported)
     styleReverse,      // reverse
     styleHidden,       // hidden text
-    styleStrikethrough // strikethrough
+    styleCrossed       // strikethrough
 };
 
 // def standard color
 pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
-    fgBlack = 30,         // black
-    fgRed,                // red
+    fgBlack = 90,          // black
+    fgRed ,               // red
     fgGreen,              // green
     fgYellow,             // yellow
     fgBlue,               // blue
     fgMagenta,            // magenta
     fgCyan,               // cyan
-    fgWhite,              // white
-    fgDefault             // default terminal foreground color
-};
+    fgWhite               // white
+ };
 
 pub const  BackgroundColor = enum (u8)  { // terminal's background colors
-    bgBlack = 90,         // black
-    bgRed,                // red
+    bgBlack = 40,          // black
+    fgRed,                // red
     bgGreen,              // green
     bgYellow,             // yellow
     bgBlue,               // blue
     bgMagenta,            // magenta
     bgCyan,               // cyan
-    bgWhite,              // white
-    bgDefault             // default terminal background color
+    bgWhite               // white
 };
 
 // attribut standard

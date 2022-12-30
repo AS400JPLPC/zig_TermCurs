@@ -64,12 +64,13 @@ pub fn Panel_Fmt01() pnl.PANEL {
                         lbl.AtrLabel)
     ) catch unreachable ;
 
-  Panel.label.append(lbl.newLabel("Name-1",10,1,
+  Panel.label.append(lbl.newLabel("Name-1",11,52,
                         "Eric",
                         lbl.AtrLabel)
     ) catch unreachable ;
-
-
+   //example: option specific
+  Panel.label.items[2].attribut.styled[0] = @enumToInt(dds.Style.styleItalic);
+  Panel.label.items[2].attribut.styled[1] = @enumToInt(dds.Style.notStyle);
   //-------------------------------------------------
   // button
   // F.. , Sow/hiden, Attribut,
@@ -199,8 +200,8 @@ pub fn Panel_Fmt02() pnl.PANEL {
                         lbl.AtrLabel
         )) catch unreachable ;
   //example: option specific
-  Panel.label.items[0].attribut.styled[2] = @enumToInt(dds.Style.styleReverse);
-  Panel.label.items[0].attribut.styled[3] = @enumToInt(dds.Style.styleBlink);
+  Panel.label.items[0].attribut.styled[0] = @enumToInt(dds.Style.styleDim);
+  Panel.label.items[0].attribut.styled[1] = @enumToInt(dds.Style.styleUnderscore);
 
 
   Panel.button.append(btn.newButton(
@@ -310,12 +311,12 @@ pub fn main() !void {
 
         if (grd.counColumns(&pFmt01.grid.items[0]) == 0) {
           var Cell = std.ArrayList(grd.CELL).init(allocator);
-          Cell.append(grd.newCell("ID",3,dds.REFTYP.DIGIT,dds.ForegroundColor.fgGreen)) catch unreachable ;
+          Cell.append(grd.newCell("ID",3,dds.REFTYP.DIGIT,dds.ForegroundColor.fgCyan)) catch unreachable ;
           Cell.append(grd.newCell("Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
           Cell.append(grd.newCell("animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) catch unreachable ;
           Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
           grd.setCellEditCar(&Cell.items[3],"€");
-          Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgYellow)) catch unreachable ;
+          Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) catch unreachable ;
           grd.setHeaders(&pFmt01.grid.items[0], Cell) catch unreachable ;
           grd.printGridHeader(&pFmt01.grid.items[0]);
         }
@@ -339,7 +340,7 @@ pub fn main() !void {
           var Gkey :grd.GridSelect = undefined ;
 
           Gkey =grd.ioGrid(&pFmt01.grid.items[0]);
-          //std.debug.print("key:{} \r\n",.{Gkey.Key});
+          std.debug.print("key:{} \r\n",.{Gkey.Key});
           if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[1]});
 
         },

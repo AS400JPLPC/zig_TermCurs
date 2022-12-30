@@ -267,6 +267,7 @@ pub fn enableRawMode() void {
 
     // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
 
+    // https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm
 
 
     use_termios.iflag &= ~( os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |
@@ -305,8 +306,7 @@ pub fn disableRawMode() void {
     w.print("\x1b[2J", .{}) catch unreachable ;
     w.print("\x1b[H", .{}) catch unreachable ;
     cursShow();
-    //_= os.linux.tcsetattr(TTY.handle, .NOW, &original_termios) ;
-    os.tcsetattr(TTY.handle, .NOW, original_termios) catch unreachable;
+    _= os.linux.tcsetattr(TTY.handle, .NOW, &original_termios) ;
 }
 
 

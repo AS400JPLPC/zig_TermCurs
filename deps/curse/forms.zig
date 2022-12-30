@@ -35,7 +35,7 @@ pub const  lbl = struct {
 
   // define attribut default LABEL
   pub const AtrLabel : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.styleItalic),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -45,7 +45,7 @@ pub const  lbl = struct {
 
   // define attribut default TITLE
   pub const AtrTitle : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+      .styled=[_]u32{@enumToInt(dds.Style.styleBold),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -143,8 +143,8 @@ pub const frm = struct {
 
   // define attribut default TITLE FRAME
   pub const AtrTitle : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
-                    @enumToInt(dds.Style.styleBright),
+      .styled=[_]u32{@enumToInt(dds.Style.styleBold),
+                    @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgWhite,
@@ -454,7 +454,7 @@ pub const  mnu = struct {
   };
 
   pub const AtrCell : dds.ZONATRB= .{
-    .styled=[_]u32{@enumToInt(dds.Style.styleBright),
+    .styled=[_]u32{@enumToInt(dds.Style.styleItalic),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
@@ -807,7 +807,7 @@ pub const  grd = struct {
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgWhite
+      .foregr = dds.ForegroundColor.fgGreen
 
   };
 
@@ -824,8 +824,8 @@ pub const  grd = struct {
 
   // define attribut default CELL GRID
   pub const AtrCell : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
-                    @enumToInt(dds.Style.styleItalic),
+      .styled=[_]u32{@enumToInt(dds.Style.styleItalic),
+                    @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
@@ -1038,9 +1038,7 @@ pub const  grd = struct {
       .fgBlue    =>  vAtrCell.foregr = dds.ForegroundColor.fgBlue,
       .fgMagenta =>  vAtrCell.foregr = dds.ForegroundColor.fgMagenta,
       .fgCyan    =>  vAtrCell.foregr = dds.ForegroundColor.fgCyan,
-      .fgWhite   =>  vAtrCell.foregr = dds.ForegroundColor.fgWhite,
-
-      else => vAtrCell.foregr = dds.ForegroundColor.fgCyan,
+      .fgWhite   =>  vAtrCell.foregr = dds.ForegroundColor.fgWhite
     }
     return vAtrCell;
   }
