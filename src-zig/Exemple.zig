@@ -12,6 +12,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+
+// error
+const dsperr = @import("forms").dsperr;
 // frame
 const frm = @import("forms").frm;
 // panel
@@ -24,11 +27,11 @@ const lbl = @import("forms").lbl;
 const mnu = @import("forms").mnu;
 // grid
 const grd = @import("forms").grd;
+// flied
+const fld = @import("forms").fld;
 
 
 const allocator = std.heap.page_allocator;
-
-
 
 
 pub fn Panel_Fmt01() pnl.PANEL {
@@ -71,13 +74,43 @@ pub fn Panel_Fmt01() pnl.PANEL {
    //example: option specific
   Panel.label.items[2].attribut.styled[0] = @enumToInt(dds.Style.styleItalic);
   Panel.label.items[2].attribut.styled[1] = @enumToInt(dds.Style.notStyle);
+
+
+  Panel.field.append(fld.newFieldString("NOM",5,2,
+                                        dds.REFTYP.TEXT_FREE,
+                                        30,                       // width
+                                        "my name",                // text
+                                        false,                    // empty
+                                        "required",               // error msg
+                                        "please enter your name", // help
+                                        "",                       // regex
+                                        fld.AtrField,             // attribut field
+                                        fld.AtrProtect            // attribut protect field
+                                        )
+    ) catch unreachable ;
+  
+  Panel.field.append(fld.newFieldString("NOM2",6,2,
+                                        dds.REFTYP.TEXT_FREE,
+                                        30,                       // width
+                                        "my name",                // text
+                                        false,                    // empty
+                                        "required",               // error msg
+                                        "please enter your name", // help
+                                        "",                       // regex
+                                        fld.AtrField,             // attribut field
+                                        fld.AtrProtect            // attribut protect field
+                                        )
+    ) catch unreachable ;
+  
+
+
   //-------------------------------------------------
   // button
   // F.. , Sow/hiden, Attribut,
   // Text, Attribut text,
   // Chek value field input
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F1),
+                        kbd.F1,
                         true, // show
                         btn.AtrButton,
                         "Help Jean-Pierre",
@@ -87,7 +120,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
 
   Panel.button.append(btn.newButton(
-                      kbd.str(kbd.F3),
+                      kbd.F3,
                       true, // show
                       btn.AtrButton,
                       "Exit",
@@ -97,7 +130,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
 
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F7),
+                        kbd.F7,
                         true, // show
                         btn.AtrButton,
                         "Test menu",
@@ -107,7 +140,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
 
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F8),
+                        kbd.F8,
                         true, // show
                         btn.AtrButton,
                         "Test Grid",
@@ -117,7 +150,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
 
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F9),
+                        kbd.F9,
                         true, // show
                         btn.AtrButton,
                         "Test Combo",
@@ -127,10 +160,20 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
 
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F12),
+                        kbd.F12,
                         true, // show
                         btn.AtrButton,
                         "ReDisplay",
+                        btn.AtrTitle,
+                        true //check
+                        )
+    ) catch unreachable;
+
+  Panel.button.append(btn.newButton(
+                        kbd.F23,
+                        true, // show
+                        btn.AtrButton,
+                        "Delete label",
                         btn.AtrTitle,
                         true //check
                         )
@@ -205,7 +248,7 @@ pub fn Panel_Fmt02() pnl.PANEL {
 
 
   Panel.button.append(btn.newButton(
-                        kbd.str(kbd.F12),
+                        kbd.F12,
                         true, // show
                         btn.AtrButton,
                         "Return",
@@ -226,7 +269,7 @@ fn setID( lineID : usize ) usize {
   return lineID;
 }
 
-fn tstCombo( fld : [] const u8) []const u8 {
+fn tstCombo( vfld : [] const u8) []const u8 {
   var cellPos:usize = 0;
    
   var Xcombo = grd.initGrid(
@@ -249,17 +292,17 @@ fn tstCombo( fld : [] const u8) []const u8 {
   grd.addRows(&Xcombo , &.{"Amis"}); 
   grd.addRows(&Xcombo , &.{"Professionel"});
 
-  if (std.mem.eql(u8,fld,"---") == true)      cellPos = 0;
-  if (std.mem.eql(u8,fld,"Famille") == true)  cellPos = 1;
-  if (std.mem.eql(u8,fld,"Amis") == true)     cellPos = 2;
-  if (std.mem.eql(u8,fld,"Professionel") == true) cellPos = 3;
+  if (std.mem.eql(u8,vfld,"---") == true)      cellPos = 0;
+  if (std.mem.eql(u8,vfld,"Famille") == true)  cellPos = 1;
+  if (std.mem.eql(u8,vfld,"Amis") == true)     cellPos = 2;
+  if (std.mem.eql(u8,vfld,"Professionel") == true) cellPos = 3;
 
   var Gkey :grd.GridSelect = undefined ;
 
   Gkey =grd.ioCombo(&Xcombo,cellPos);
-  std.debug.print("key:{} \r\n",.{Gkey.Key});
-  if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[0]})
-  else return "";
+  //std.debug.print("key:{} \r\n",.{Gkey.Key});
+  //if ( Gkey.Key != kbd.esc ) std.debug.print("buf:{s} \r\n",.{Gkey.Buf.items[0]})
+  if ( Gkey.Key == kbd.esc )  return "";
   return Gkey.Buf.items[0] ;
 }
 
@@ -309,7 +352,7 @@ pub fn main() !void {
 
       .F8 => {
 
-        if (grd.counColumns(&pFmt01.grid.items[0]) == 0) {
+        if (grd.countColumns(&pFmt01.grid.items[0]) == 0) {
           var Cell = std.ArrayList(grd.CELL).init(allocator);
           Cell.append(grd.newCell("ID",3,dds.REFTYP.DIGIT,dds.ForegroundColor.fgCyan)) catch unreachable ;
           Cell.append(grd.newCell("Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
@@ -346,12 +389,32 @@ pub fn main() !void {
         },
 
       .F9 => {
-        var fld : [] const u8 = "Professionel";
-        fld = tstCombo(fld) ;
+        var vfld : [] const u8 = "Professionel";
+        vfld = tstCombo(vfld) ;
+        std.debug.print("buf:>{s}< \r\n",.{vfld});
       },
 
-      .F12 => {
-        pnl.printPanel(pFmt01); 
+      .F12 => { 
+        //var i = fld.getIndex(pFmt01 , "NOMX" ) catch |err| {dsperr.errorForms(err); return;};
+        var i = fld.getIndex(pFmt01 , "NOM2" ) catch |err| {dsperr.errorForms(err); return;};
+        fld.setProtect(pFmt01,i, true);
+        fld.printField(pFmt01,pFmt01.field.items[i]);
+        fld.displayField(pFmt01,pFmt01.field.items[i]);
+        _= kbd.getKEY();
+        fld.setProtect(pFmt01,i, false);
+        fld.setErr(pFmt01,i,true);
+        fld.setText(pFmt01,i,"123456789012345678901234567890");
+        fld.printField(pFmt01,pFmt01.field.items[i]);
+        fld.displayField(pFmt01,pFmt01.field.items[i]);
+        _= kbd.getKEY();
+        fld.setErr(pFmt01,i,false);
+        pnl.printPanel(pFmt01);
+
+      },
+      .F23 => {
+        var i = fld.getIndex(pFmt01 , "NOM" ) catch |err| {dsperr.errorForms(err); return;};
+        fld.dltRows(&pFmt01,i);
+        pnl.printPanel(pFmt01);
       },
       else => {},
     }

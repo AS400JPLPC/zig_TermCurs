@@ -15,13 +15,58 @@ const io = std.io;
 const allocator = std.heap.page_allocator;
 
 /// Errors that may occur when using String
-const ErrForms = error{
+pub const ErrForms = error{
         Invalide_Panel,
         Invalide_Menu,
         Invalide_Grid,
         Invalide_Grid_Buf,
-    };
 
+        btn_getIndex_Key_Label_Invalide,
+        btn_getName_Index_invalide,
+        btn_getKey_Index_invalide,
+        btn_getShow_Index_invalide,
+        btn_getText_Index_invalide,
+        btn_getCheck_Index_invalide,
+        btn_getActif_Index_invalide,
+
+        lbl_getIndex_Name_Label_Invalide,
+        lbl_getName_Index_invalide,
+        lbl_getPosx_Index_invalide,
+        lbl_getPosy_Index_invalide,
+        lbl_getText_Index_invalide,
+        lbl_getActif_Index_invalide,
+ 
+        fld_getIndex_Name_Field_Invalide,
+        fld_getName_Index_invalide,
+        fld_getPosx_Index_invalide,
+        fld_getPosy_Index_invalide,
+        fld_getRefType_Index_invalide,
+        fld_getWidth_Index_invalide,
+        fld_getScal_Index_invalide,
+        fld_getNbrCar_Index_invalide,
+        fld_getEmpty_Index_invalide,
+        fld_getProtect_Index_invalide,
+        fld_getPading_Index_invalide,
+        fld_getEdtcar_Index_invalide,
+        fld_getRegex_Index_invalide,
+        fld_getErrMsg_Index_invalide,
+        fld_getHelp_Index_invalide,
+        fld_getText_Index_invalide,
+        fld_getSwitch_Index_invalide,
+        fld_getErr_Index_invalide,
+        fld_getProcess_Index_invalide,
+        fld_getAttribut_Index_invalide,
+        fld_getAtrProtect_Index_invalide,
+        fld_getActif_Index_invalide,
+
+    };
+    
+pub const  dsperr = struct {    
+  pub fn errorForms(errpgm :anyerror ) void { 
+    std.debug.print("Caught error: {any} ", .{ errpgm }); 
+    _= kbd.getKEY();  
+  }
+};
 
 const TERMINAL_CHAR = struct {
   ch :   [] const u8,
@@ -100,8 +145,49 @@ pub const  lbl = struct {
         return xlabel;
   }
 
-  pub fn getName(vpnl:pnl.PANEL , n: dds.index) []u8 {
-    return vpnl.label.items[n].name;
+  pub fn getIndex(vpnl:pnl.PANEL , name: [] const u8 )  ErrForms ! usize {
+    for (vpnl.label.items) |lblprt , i| {
+      if (std.mem.eql(u8, lblprt.name, name)) return i;
+    }
+    return ErrForms.fld_getIndex_Name_Field_Invalide;
+  }
+
+
+  pub fn getName(vpnl:pnl.PANEL , n: usize) ErrForms ! [] const u8 {
+    if ( n < vpnl.label.items.len) return vpnl.label.items[n].name;
+    return ErrForms.lbl_getName_Index_invalide ;
+
+  }
+  pub fn getPosx(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.label.items.len) return vpnl.label.items[n].posx;
+    return ErrForms.lbl_getPosx_Index_invalide ;
+  }
+  pub fn getPosy(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.label.items.len) return vpnl.label.items[n].posy;
+    return ErrForms.lbl_getPosy_Index_invalide ;
+  }
+  pub fn getText(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.label.items.len) return vpnl.label.items[n].text;
+    return ErrForms.lbl_getText_Index_invalide ;
+  }
+  pub fn getActif(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.label.items.len) return vpnl.label.items[n].actif;
+    return ErrForms.lbl_getActif_Index_invalide ;
+  }
+
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.label.items.len) return;
+    vpnl.label.items[n].text = val;
+  }
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.label.items.len) return;
+    vpnl.label.items[n].actif = val;
+  }
+
+
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
+    if ( n > vpnl.label.items.len) return;
+    _= vpnl.label.orderedRemove(n);
   }
 
   pub fn printLabel(vpnl: pnl.PANEL, vlbl : LABEL ) void {
@@ -123,6 +209,22 @@ pub const  lbl = struct {
       }
       n += 1;
     }
+  }
+
+  pub fn displayLabel(vpnl: pnl.PANEL, vlbl : LABEL )  void {
+    // display matrice PANEL
+    if (vpnl.actif == false ) return ;
+    if (vlbl.actif == false ) return ;
+      var x :usize = vlbl.posx;
+      var y :usize = vlbl.posy;
+      var vlen = utl.nbrCharStr(vlbl);
+      var n :usize = 0;
+      var npos :usize = (vpnl.cols * vlbl.posx) + vpnl.posy + 1 ;
+      while (n < vlen) : (n += 1) {
+        term.gotoXY(x + vpnl.posx   , y + vpnl.posy + n  );
+        term.writeStyled(vpnl.buf.items[npos].ch,vpnl.buf.items[npos].attribut);
+        npos += 1;
+      }
   }
 };
 
@@ -148,7 +250,7 @@ pub const frm = struct {
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgWhite,
-      .foregr = dds.ForegroundColor.fgBlack
+      .foregr = dds.ForegroundColor.fgBlue
   };
 
 
@@ -325,14 +427,15 @@ pub const btn = struct{
                     @enumToInt(dds.Style.styleUnderscore),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgCyan
+      .foregr = dds.ForegroundColor.fgdCyan,
   };
 
 
 
   // define BUTTON
   pub const BUTTON = struct {
-    key : [] const u8,
+    name: [] const u8,
+    key : kbd,
     show: bool,
     attribut:dds.ZONATRB,
     title: []const u8,
@@ -343,7 +446,7 @@ pub const btn = struct{
 
   // func BUTTON
   pub fn newButton(
-              vkey : [] const u8,
+              vkey : kbd,
               vshow : bool,
               vattribut : dds.ZONATRB,
               vtitle: [] const u8,
@@ -351,7 +454,8 @@ pub const btn = struct{
               vcheck:bool) BUTTON {
 
         const xbutton = BUTTON {
-            .key = vkey,
+            .name = kbd.str(vkey),
+            .key  = vkey,
             .show = vshow,
             .attribut = vattribut,
             .title = vtitle,
@@ -363,6 +467,64 @@ pub const btn = struct{
         return xbutton;
   }
 
+  pub fn getIndex(vpnl:pnl.PANEL , key: kbd  )  ErrForms ! usize {
+    for (vpnl.button.items) |btnprt , i| {
+      if (btnprt.button.key == key) return i;
+    }
+    return ErrForms.btn_getIndex_Key_Field_Invalide;
+  }
+  pub fn getName(vpnl:pnl.PANEL , n: usize) ErrForms ! [] const u8 {
+    if ( n < vpnl.button.items.len) return vpnl.label.items[n].name;
+    return ErrForms.btn_getName_Index_invalide ;
+
+  }
+  pub fn getKey(vpnl:pnl.PANEL , n: usize) ErrForms ! kbd {
+    if ( n < vpnl.button.items.len) return vpnl.label.items[n].key;
+    return ErrForms.btn_getKey_Index_invalide ;
+
+  }
+  pub fn getShow(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.button.items.len) return vpnl.button.items[n].show;
+    return ErrForms.btn_getShow_Index_invalide ;
+  }
+  pub fn getText(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.button.items.len) return vpnl.button.items[n].text;
+    return ErrForms.btn_getText_Index_invalide ;
+  }
+  pub fn getCheck(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.button.items.len) return vpnl.button.items[n].check;
+    return ErrForms.btn_getCheck_Index_invalide ;
+  }
+  pub fn getActif(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.button.items.len) return vpnl.button.items[n].actif;
+    return ErrForms.btn_getActif_Index_invalide ;
+  }
+
+
+  pub fn setShow(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.button.items.len) return;
+    vpnl.button.items[n].show = val;
+  }
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.button.items.len) return;
+    vpnl.label.items[n].text = val;
+  }
+  pub fn setCheck(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.button.items.len) return;
+    vpnl.button.items[n].check = val;
+  }
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.button.items.len) return;
+    vpnl.button.items[n].actif = val;
+  }
+
+
+
+
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
+    if ( n > vpnl.button.items.len) return;
+    _= vpnl.button.orderedRemove(n);
+  }
 
   pub fn printButton(vpnl: pnl.PANEL) void {
     // assigne LABEL to matrice for display
@@ -387,7 +549,7 @@ pub const btn = struct{
       if (button.show == true) {
 
         // text Function KEY
-        var iter = utl.iteratStr.iterator(button.key);
+        var iter = utl.iteratStr.iterator(button.name);
         while (iter.next()) |ch| {
           if (button.actif == true) {
             vpnl.buf.items[n].ch = ch ;
@@ -520,6 +682,11 @@ pub const  mnu = struct {
         }
 
     return xmenu;
+  }
+
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
+    if ( n > vpnl.menu.items.len) return;
+    _= vpnl.menu.orderedRemove(n);
   }
 
   // print Menu
@@ -773,7 +940,6 @@ pub const  mnu = struct {
 // PadingCell()
 // setPageGrid()
 // initGrid()
-// setActif()
 // getLenHeaders()
 // countColumns()
 // countRows()
@@ -783,18 +949,20 @@ pub const  mnu = struct {
 // setCellEditCar()
 // getcellLen()
 // getHeadersText()
+// getHeadersPosy()
 // getHeadersType()
 // getHeadersCar()
-//
 // getRowsText()
+
 // addRows()
-// dltRows()   No test
+// dltRows()   
 // resetRows()
-// resetGrid() No test
+// resetGrid() 
 // GridBox()
 // printGridHeader()
 // printGridRows()
 // ioGrid()
+// ioCombo()
 // ----------------
 // defined GRID
 
@@ -994,7 +1162,7 @@ pub const  grd = struct {
   }
 
 
-  pub fn counColumns(self :*GRID) usize {
+  pub fn countColumns(self :*GRID) usize {
     return self.headers.items.len;
   }
 
@@ -1031,6 +1199,15 @@ pub const  grd = struct {
     var vAtrCell = AtrCell ;
 
     switch(TextColor){
+      .fgdBlack   =>  vAtrCell.foregr = dds.ForegroundColor.fgdBlack,
+      .fgdRed     =>  vAtrCell.foregr = dds.ForegroundColor.fgdRed,
+      .fgdGreen   =>  vAtrCell.foregr = dds.ForegroundColor.fgdGreen,
+      .fgdYellow  =>  vAtrCell.foregr = dds.ForegroundColor.fgdYellow,
+      .fgdBlue    =>  vAtrCell.foregr = dds.ForegroundColor.fgdBlue,
+      .fgdMagenta =>  vAtrCell.foregr = dds.ForegroundColor.fgdMagenta,
+      .fgdCyan    =>  vAtrCell.foregr = dds.ForegroundColor.fgdCyan,
+      .fgdWhite   =>  vAtrCell.foregr = dds.ForegroundColor.fgdWhite,
+    
       .fgBlack   =>  vAtrCell.foregr = dds.ForegroundColor.fgBlack,
       .fgRed     =>  vAtrCell.foregr = dds.ForegroundColor.fgRed,
       .fgGreen   =>  vAtrCell.foregr = dds.ForegroundColor.fgGreen,
@@ -1038,7 +1215,7 @@ pub const  grd = struct {
       .fgBlue    =>  vAtrCell.foregr = dds.ForegroundColor.fgBlue,
       .fgMagenta =>  vAtrCell.foregr = dds.ForegroundColor.fgMagenta,
       .fgCyan    =>  vAtrCell.foregr = dds.ForegroundColor.fgCyan,
-      .fgWhite   =>  vAtrCell.foregr = dds.ForegroundColor.fgWhite
+      .fgWhite   =>  vAtrCell.foregr = dds.ForegroundColor.fgWhite   
     }
     return vAtrCell;
   }
@@ -1329,7 +1506,7 @@ pub const  grd = struct {
     var x : usize = 0;
     var y : usize = 0;
     var h : usize = 0;
-    var nColumns : usize = counColumns(self) ;
+    var nColumns : usize = countColumns(self) ;
     var start : usize = 0 ;
     var l : usize = 0;
     var buf : [] const u8 = "";
@@ -1621,6 +1798,313 @@ pub const  grd = struct {
 
 };
 
+
+// defined INPUT_FIELD
+pub const  fld = struct {
+
+  // define attribut default Fiel
+  pub const AtrField : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgWhite,
+      .foregr = dds.ForegroundColor.fgBlack
+  };
+
+  // define attribut default Field protect
+  pub const AtrProtect : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleItalic),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgYellow,
+  };
+
+  // define attribut default Fiel
+  pub const AtrErr : dds.ZONATRB = .{
+      .styled=[_]u32{@enumToInt(dds.Style.styleDim),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle),
+                    @enumToInt(dds.Style.notStyle)},
+      .backgr = dds.BackgroundColor.bgWhite,
+      .foregr = dds.ForegroundColor.fgRed
+  };
+
+  /// define FIELD
+  pub const FIELD = struct {
+    name :  []const u8,
+    posx:   usize,
+    posy:   usize,
+    attribut:dds.ZONATRB,
+    atrProtect:dds.ZONATRB,
+    reftyp: dds.REFTYP,
+    width:  usize,
+    scal:   usize,
+    nbrcar: usize,        // nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =  ALPA..DIGIT..
+
+    empty: bool,          // EMPTY or FULL
+    protect: bool,        // only display
+
+    pading: bool,         // pading blank
+    edtcar: []const u8,   // edtcar for monnaie		€ $ ¥ ₪ £ or %
+
+    regex: []const u8,    //contrôle regex
+    errmsg: []const u8,   //message this field
+
+    help: []const u8,     //help this field
+
+    text: []const u8,
+    zwitch: bool,         // CTRUE CFALSE
+
+    process: []const u8,  //name proc
+    err: bool,            //force error
+    actif:bool,
+  };
+
+
+  pub fn newFieldString(vname: [] const u8,
+                    vposx: usize, vposy: usize,
+                    vreftyp: dds.REFTYP,
+                    vwidth:  usize,
+                    vtext: []const u8,
+                    vempty: bool,
+                    verrmsg: []const u8,
+                    vhelp: []const u8,
+                    vregex: []const u8,
+                    vattribut: dds.ZONATRB,
+                    vatrProtect: dds.ZONATRB) FIELD {
+
+     var xfield = FIELD {   
+        .name   = vname,
+        .posx   = vposx,
+        .posy   = vposy,
+        .reftyp = vreftyp,
+        .width  = vwidth,
+        .scal   = 0,
+        .nbrcar = vwidth,
+        .empty  = vempty,
+        .protect = false,
+        .pading  = true,
+        .edtcar ="",
+        .regex  = vregex,
+        .errmsg = verrmsg,
+        .help   = vhelp,
+        .text   = vtext,
+        .zwitch = false,
+        .err    = false,
+        .process  ="",
+        .attribut  = vattribut,
+        .atrProtect = vatrProtect,
+        .actif  = true
+     };
+
+    return xfield;
+
+  }
+
+  pub fn getIndex(vpnl:pnl.PANEL , name: [] const u8 )  ErrForms ! usize {
+    for (vpnl.field.items) |fldprt , i| {
+      if (std.mem.eql(u8, fldprt.name, name)) return i;
+    }
+    return ErrForms.fld_getIndex_Name_Field_Invalide;
+  }
+
+  pub fn getName(vpnl:pnl.PANEL , n: usize) ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].name;
+    return ErrForms.fld_getName_Index_invalide ;
+
+  }
+  pub fn getPosx(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].posx;
+    return ErrForms.fld_getPosx_Index_invalide ;
+  }
+  pub fn getPosy(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].posy;
+    return ErrForms.fld_getPosy_Index_invalide ;
+  }
+  pub fn getRefType(vpnl:pnl.PANEL , n: usize)  ErrForms ! dds.REFTYP {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].reftyp;
+    return ErrForms.fld_getRefType_Index_invalide ;
+  }
+  pub fn getWidth(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].width;
+    return ErrForms.fld_getWidth_Index_invalide ;
+  }
+  pub fn getScal(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].scal;
+    return ErrForms.fld_getScal_Index_invalide ;
+  }
+  pub fn getNbrCar(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].nbrcar;
+    return ErrForms.fld_getNbrCar_Index_invalide ;
+  }
+  pub fn getEmpty(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].empty;
+    return ErrForms.fld_getEmpty_Index_invalide ;
+  }
+  pub fn getProtect(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].protect;
+    return ErrForms.fld_getProtect_Index_invalide ;
+  }
+  pub fn getPading(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].pading;
+    return ErrForms.fld_getPading_Index_invalide ;
+  }
+  pub fn getEdtcar(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].edtcar;
+    return ErrForms.fld_getEdtcar_Index_invalide ;
+  }
+  pub fn getRegex(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].regex;
+    return ErrForms.fld_getRegex_Index_invalide ;
+  }
+  pub fn getErrMsg(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].errmsg;
+    return ErrForms.fld_getErrMsg_Index_invalide ;
+  }
+  pub fn getHelp(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].help;
+    return ErrForms.fld_getHelp_Index_invalide ;
+  }
+  pub fn getText(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].text;
+    return ErrForms.fld_getText_Index_invalide ;
+  }
+  pub fn getSwitch(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].zwitch;
+    return ErrForms.fld_getSwitch_Index_invalide ;
+  }
+  pub fn getErr(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].err;
+    return ErrForms.fld_getErr_Index_invalide ;
+  }
+  pub fn getProcess(vpnl:pnl.PANEL , n: usize)  ErrForms ! [] const u8 {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].process;
+    return ErrForms.fld_getProcess_Index_invalide ;
+  }
+  pub fn getAttribut(vpnl:pnl.PANEL , n: usize)  ErrForms ! dds.ZONATRB {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].atribut;
+    return ErrForms.fld_getAttribut_Index_invalide ;
+  }
+  pub fn getAtrProtect(vpnl:pnl.PANEL , n: usize)  ErrForms ! dds.ZONATRB {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].atrProtect;
+    return ErrForms.fld_AtrProtect_Index_invalide ;
+  }
+  pub fn getActif(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].actif;
+    return ErrForms.fld_getActif_Index_invalide ;
+  }
+
+
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].text = val;
+  }
+  pub fn setSwitch(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].zwitch = val;
+    vpnl.field.items[n].text = utl.boolToSbool(val);
+  }
+  pub fn setProtect(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].protect = val;
+  }
+  pub fn setEdtcar(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].edtcar = val;
+  }
+  pub fn setRegex(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].reftyp = val;
+  }
+  pub fn setErr(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].err = val;
+  }
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].actif = val;
+  }
+
+
+  // clear value ALL FIELD
+  pub fn clearText(vpnl: pnl.PANEL) void {
+    for (vpnl.field.items) |_ , n| {
+      vpnl.field.items[n].text = "";
+      vpnl.field.items[n].zwitch = false;
+    }
+  }
+  pub fn clearField(vpnl:pnl.PANEL , n: usize,)  void {
+    if ( n > vpnl.field.items.len) return;
+    vpnl.field.items[n].text = "";
+    vpnl.field.items[n].zwitch = false;
+  }
+
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
+    if ( n > vpnl.field.items.len) return;
+    _= vpnl.field.orderedRemove(n);
+  }
+
+
+
+
+  pub fn printField(vpnl: pnl.PANEL, vfld : FIELD ) void {
+    // assigne FIELD to matrice for display
+    var npos = vpnl.cols * vfld.posx;
+    var n: usize  = npos + vfld.posy;
+    var nn: usize = 0;
+    while (nn < vfld.width) : (nn += 1 ) {
+      if (vfld.actif == true) {
+        vpnl.buf.items[n].ch = " " ;
+        if (vfld.protect == false) vpnl.buf.items[n].attribut = vfld.attribut
+        else vpnl.buf.items[n].attribut  = vpnl.attribut;
+        vpnl.buf.items[n].on = true;
+      }
+      else {
+        vpnl.buf.items[n].ch = " ";
+        vpnl.buf.items[n].attribut  = vpnl.attribut;
+        vpnl.buf.items[n].on = false;
+      }
+      n += 1;
+    }
+
+    // The err field takes precedence, followed by protection, followed by the base attribute
+    n =  npos + vfld.posy;
+    var iter = utl.iteratStr.iterator(vfld.text);
+    while (iter.next()) |ch| {
+      if (vfld.actif == true ) {
+        vpnl.buf.items[n].ch = ch ;
+        if (vfld.err == true) vpnl.buf.items[n].attribut  = AtrErr
+        else if (vfld.protect == true) vpnl.buf.items[n].attribut  = vfld.atrProtect
+        else  vpnl.buf.items[n].attribut = vfld.attribut;
+        vpnl.buf.items[n].on = true;
+      }
+      n += 1;
+    }
+  }
+
+  pub fn displayField(vpnl: pnl.PANEL, vfld : FIELD )  void {
+    // display matrice PANEL
+    if (vpnl.actif == false ) return ;
+    if (vfld.actif == false ) return ;
+      var x :usize = vfld.posx;
+      var y :usize = vfld.posy;
+      var n :usize = 0;
+      var npos :usize = (vpnl.cols * vfld.posx) + vpnl.posy + 1 ;
+      while (n < vfld.width) : (n += 1) {
+        term.gotoXY(x + vpnl.posx   , y + vpnl.posy + n  );
+        term.writeStyled(vpnl.buf.items[npos].ch,vpnl.buf.items[npos].attribut);
+        npos += 1;
+      }
+  }
+
+
+
+};
+
+
 // defined Panel
 pub const  pnl = struct {
 
@@ -1663,6 +2147,8 @@ pub const  pnl = struct {
 
     grid: std.ArrayList(grd.GRID),
 
+    field: std.ArrayList(fld.FIELD),
+
     // double buffer screen
     buf:std.ArrayList(TERMINAL_CHAR),
 
@@ -1697,6 +2183,7 @@ pub const  pnl = struct {
           .button = std.ArrayList(btn.BUTTON).init(allocator),
           .menu   = std.ArrayList(mnu.MENU).init(allocator),
           .grid   = std.ArrayList(grd.GRID).init(allocator),
+          .field  = std.ArrayList(fld.FIELD).init(allocator),
           .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
       };
 
@@ -1830,6 +2317,11 @@ pub const  pnl = struct {
       if (lblprt.actif) lbl.printLabel(vpnl, lblprt);
     }
 
+    // FIELD
+    for (vpnl.field.items) |fldprt| {
+      if (fldprt.actif) fld.printField(vpnl, fldprt);
+    }
+
     // BUTTON
     if (vpnl.button.items.len > 0) {
 
@@ -1854,7 +2346,7 @@ test "testforms" {
   //term.writeStyled(xlabel.text,xlabel.attribut);
 
   const xbutton = btn.newButton(
-                      kbd.str(kbd.F1),
+                      kbd.F1,
                       true, // show
                       btn.AtrButton,
                       "Help Jean-Pierre",

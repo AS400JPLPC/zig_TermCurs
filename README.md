@@ -118,7 +118,7 @@ modification from :<BR />
 &rarr;&nbsp; 2022-12-24  GRID cursor fix<BR />
 <BR />
 
-<BR />
+BR />
 →  2022-12-25  grid ioCombo fix scrool <BR />
 →  2022-12-25  terminal assignment test<BR />
 →  2022-12-26  Update cursed <BR />
@@ -128,12 +128,17 @@ modification from :<BR />
 <BR />
 →  2022-12-26  <u>FIX Solving problem TTY Correct TERMINAL access</u> <BR />
 <BR />
-→  2022-12-27  Color line grid fix
-
-<BR />
+→  2022-12-27  Color line grid fix<BR />
 
 ![](assets/20221227_135950_Exemple.png)
 <BR />
+→  2023-01-02  Keyboard input preparation (FIELD) <BR />
+→  2023-01-02  extend label/menu<BR />
+→  2023-01-02  creat field<BR />
+→  2023-01-02  Introduction catch and return errorForms<BR />
+
+
+![](assets/20230102_235321_errorFormspng)
 
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; New methodology for clear compile.sh<BR />

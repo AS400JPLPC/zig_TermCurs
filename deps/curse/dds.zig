@@ -12,9 +12,17 @@ pub const  Style = enum (u8)  {
     styleCrossed       // strikethrough
 };
 
-// def standard color
+// def standard color fgd dull color  fg higth color
 pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
-    fgBlack = 90,          // black
+    fgdBlack = 30,          // black
+    fgdRed ,               // red
+    fgdGreen,              // green
+    fgdYellow,             // yellow
+    fgdBlue,               // blue
+    fgdMagenta,            // magenta
+    fgdCyan,               // cyan
+    fgdWhite,              // white
+    fgBlack = 90,         // black
     fgRed ,               // red
     fgGreen,              // green
     fgYellow,             // yellow
@@ -34,6 +42,8 @@ pub const  BackgroundColor = enum (u8)  { // terminal's background colors
     bgCyan,               // cyan
     bgWhite               // white
 };
+
+
 
 // attribut standard
 pub const ZONATRB = struct {

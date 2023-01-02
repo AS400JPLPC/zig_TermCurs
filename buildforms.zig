@@ -19,14 +19,16 @@ pub fn build(b: *std.build.Builder) void {
     forms.setBuildMode(mode);
     forms.install();
 
+
     const run_cmd = forms.run();
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
-
-    const run_step = b.step("testforms", "Run the app");
+    
+    const run_step = b.step("testforms", "Run");
     run_step.dependOn(&run_cmd.step);
+
 
 
 }
