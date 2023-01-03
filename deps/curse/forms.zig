@@ -184,11 +184,20 @@ pub const  lbl = struct {
     vpnl.label.items[n].actif = val;
   }
 
-
   pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
     if ( n > vpnl.label.items.len) return;
     _= vpnl.label.orderedRemove(n);
   }
+
+  // update Label/Matrix
+  pub fn updateText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
+    if ( n > vpnl.label.items.len) return;
+    clsLabel(vpnl, vpnl.label.items[n]);
+    vpnl.label.items[n].text = val;
+    printLabel(vpnl, vpnl.label.items[n]);
+    displayLabel(vpnl, vpnl.label.items[n]);
+  }
+
 
   pub fn printLabel(vpnl: pnl.PANEL, vlbl : LABEL ) void {
     // assigne LABEL to matrice for display
@@ -203,21 +212,42 @@ pub const  lbl = struct {
         vpnl.buf.items[n].on = true;
       }
       else {
-        vpnl.buf.items[n].ch = " ";
+        vpnl.buf.items[n].ch = "";
         vpnl.buf.items[n].attribut  = vpnl.attribut;
         vpnl.buf.items[n].on = false;
       }
       n += 1;
     }
   }
+  // matrix cleaning from label
+  // reserved function clsLabel/displayLabel
 
-  pub fn displayLabel(vpnl: pnl.PANEL, vlbl : LABEL )  void {
+  fn clsLabel(vpnl: pnl.PANEL, vlbl : LABEL )  void {
     // display matrice PANEL
     if (vpnl.actif == false ) return ;
     if (vlbl.actif == false ) return ;
       var x :usize = vlbl.posx;
       var y :usize = vlbl.posy;
-      var vlen = utl.nbrCharStr(vlbl);
+      var vlen = utl.nbrCharStr(vlbl.text);
+      var n :usize = 0;
+      var npos :usize = (vpnl.cols * vlbl.posx) + vpnl.posy + 1 ;
+      while (n < vlen) : (n += 1) {
+        vpnl.buf.items[npos].ch = " ";
+        vpnl.buf.items[npos].attribut  = vpnl.attribut;
+        vpnl.buf.items[npos].on = false;
+        term.gotoXY(x + vpnl.posx   , y + vpnl.posy + n  );
+        term.writeStyled(vpnl.buf.items[npos].ch,vpnl.buf.items[npos].attribut);
+        npos += 1;
+      }
+  }
+
+  fn displayLabel(vpnl: pnl.PANEL, vlbl : LABEL )  void {
+    // display matrice PANEL
+    if (vpnl.actif == false ) return ;
+    if (vlbl.actif == false ) return ;
+      var x :usize = vlbl.posx;
+      var y :usize = vlbl.posy;
+      var vlen = utl.nbrCharStr(vlbl.text);
       var n :usize = 0;
       var npos :usize = (vpnl.cols * vlbl.posx) + vpnl.posy + 1 ;
       while (n < vlen) : (n += 1) {
@@ -2063,7 +2093,7 @@ pub const  fld = struct {
         vpnl.buf.items[n].on = true;
       }
       else {
-        vpnl.buf.items[n].ch = " ";
+        vpnl.buf.items[n].ch = "";
         vpnl.buf.items[n].attribut  = vpnl.attribut;
         vpnl.buf.items[n].on = false;
       }

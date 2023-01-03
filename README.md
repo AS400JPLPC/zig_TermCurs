@@ -130,15 +130,18 @@ BR />
 <BR />
 →  2022-12-27  Color line grid fix<BR />
 
-![](assets/20221227_135950_Exemple.png)
-<BR />
+![](assets/20221227_135950_Exemple.png)<BR />
 →  2023-01-02  Keyboard input preparation (FIELD) <BR />
 →  2023-01-02  extend label/menu<BR />
 →  2023-01-02  creat field<BR />
 →  2023-01-02  Introduction catch and return errorForms<BR />
 
 
-![](assets/20230102_235321_errorFormspng)
+![](assets/20230102_235321_errorFormspng)<BR /><BR /> <BR />
+
+→  2023-01-03  extend attribut ForegroundColor <BR />
+→  2023-01-03  add updateLabel()   Matrix and label update<BR />
+
 
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; New methodology for clear compile.sh<BR />
@@ -182,6 +185,9 @@ pub const AtrLabel : stl.ZONATRB = .{<BR />
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig<BR />
 &rarr;&nbsp; fram / panel / label /button / Menu / Grid OK <BR />
+&rarr;&nbsp; Preparation of "Field" processing as well as keyboard input.
+
+I'm looking to improve error trapping when changing values, and overall consistency.<BR />
 
 <u>-------TESTING------------------------------------</u><BR />
 &rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <BR />

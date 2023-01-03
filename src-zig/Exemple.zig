@@ -408,6 +408,11 @@ pub fn main() !void {
         fld.displayField(pFmt01,pFmt01.field.items[i]);
         _= kbd.getKEY();
         fld.setErr(pFmt01,i,false);
+        i = lbl.getIndex(pFmt01,"Name-2") catch |err| {dsperr.errorForms(err); return;};
+        lbl.updateText(pFmt01,i,"Ma petite Marie");
+        _= kbd.getKEY();
+        lbl.updateText(pFmt01,i,"Marie");
+        _= kbd.getKEY();     
         pnl.printPanel(pFmt01);
 
       },
