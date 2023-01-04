@@ -146,7 +146,7 @@ BR />
 
 <u>---**Very important modification of the project structure to generate the documentation**---</u><BR />
 
-→  2023-01-04  use zig 0.10.0 ... last dev.1183 zig tetsting DOCS
+→  2023-01-04  use zig 0.10.0 ... last dev.1183 zig tetsting DOCS<BR />
 →  2023-01-04  Restructuring of the project to have the possibility of doing documentation with the zig build command.... <BR />
 →  2023-01-05  update compil.sh<BR />
 →  2023-01-05  update task.json<BR />
