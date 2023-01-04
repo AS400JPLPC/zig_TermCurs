@@ -8,9 +8,7 @@ terminal access function<br />
 **os linux**
 <u>Normally should work POSIX</u><br />
 
-
 <u>---2023-01-04  **Very important modification of the project structure to generate the documentation**---</u><BR />
-
 
 </u><br />
 
@@ -147,12 +145,14 @@ BR />
 →  2023-01-03  add updateLabel()   Matrix and label update<BR />
 
 <u>---**Very important modification of the project structure to generate the documentation**---</u><BR />
+
+→  2023-01-04  use zig 0.10.0 ... last dev.1183 zig tetsting DOCS
 →  2023-01-04  Restructuring of the project to have the possibility of doing documentation with the zig build command.... <BR />
-→  2023-01-04  update compil.sh<BR />
-→  2023-01-04  update task.json<BR />
-→  2023-01-04  update buildExemple.zig introduction docs<BR />
-→  2023-01-04  update *all .zig* for @import<BR />
-→  2023-01-04  document management<BR />
+→  2023-01-05  update compil.sh<BR />
+→  2023-01-05  update task.json<BR />
+→  2023-01-05  update buildExemple.zig introduction docs<BR />
+→  2023-01-05  update *all .zig* for @import<BR />
+→  2023-01-05  document management<BR />
 [READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Exemple/index.html)<BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />
