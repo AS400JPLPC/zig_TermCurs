@@ -4,31 +4,31 @@
 
 const std = @import("std");
 
-const dds = @import("dds");
+const dds = @import("deps/curse/dds.zig");
 
 // terminal Fonction
-const term = @import("cursed");
+const term = @import("deps/curse/cursed.zig");
 
 // keyboard
-const kbd = @import("cursed").kbd;
+const kbd = @import("deps/curse/cursed.zig").kbd;
 
 
 // error
-const dsperr = @import("forms").dsperr;
+const dsperr = @import("deps/curse/forms.zig").dsperr;
 // frame
-const frm = @import("forms").frm;
+const frm = @import("deps/curse/forms.zig").frm;
 // panel
-const pnl = @import("forms").pnl;
+const pnl = @import("deps/curse/forms.zig").pnl;
 // button
-const btn = @import("forms").btn;
+const btn = @import("deps/curse/forms.zig").btn;
 // label
-const lbl = @import("forms").lbl;
+const lbl = @import("deps/curse/forms.zig").lbl;
 // menu
-const mnu = @import("forms").mnu;
+const mnu = @import("deps/curse/forms.zig").mnu;
 // grid
-const grd = @import("forms").grd;
+const grd = @import("deps/curse/forms.zig").grd;
 // flied
-const fld = @import("forms").fld;
+const fld = @import("deps/curse/forms.zig").fld;
 
 
 const allocator = std.heap.page_allocator;

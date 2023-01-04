@@ -7,7 +7,12 @@ terminal access function<br />
 
 **os linux**
 <u>Normally should work POSIX</u><br />
-<u>Keyboard management and respect for the terminal philosophy</u><br />
+
+
+<u>---2023-01-04  **Very important modification of the project structure to generate the documentation**---</u><BR />
+
+
+</u><br />
 
 Resumption of the project https://github.com/xyaman/mibu
 
@@ -136,12 +141,18 @@ BR />
 →  2023-01-02  creat field<BR />
 →  2023-01-02  Introduction catch and return errorForms<BR />
 
-
 ![](assets/20230102_235321_errorFormspng)<BR /><BR /> <BR />
 
 →  2023-01-03  extend attribut ForegroundColor <BR />
 →  2023-01-03  add updateLabel()   Matrix and label update<BR />
 
+<u>---**Very important modification of the project structure to generate the documentation**---</u><BR />
+→  2023-01-04  Restructuring of the project to have the possibility of doing documentation with the zig build command.... <BR />
+→  2023-01-04  update compil.sh<BR />
+→  2023-01-04  update task.json<BR />
+→  2023-01-04  update buildExemple.zig introduction docs<BR />
+→  2023-01-04  update *all .zig* des @import<BR />
+→  2023-01-04  document management<BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; New methodology for clear compile.sh<BR />

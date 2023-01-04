@@ -2,135 +2,115 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title>- no title specified</title>
-	<meta name="generator" content="LibreOffice 7.3.5.2 (Linux)"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.4.3.2 (Linux)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2022-09-26T19:24:22.594547752"/>
-	<meta name="DCTERMS.language" content="en-US"/>
-	<meta name="DCTERMS.modified" content="2022-09-26T19:01:38.127522334"/>
-	<meta name="DCTERMS.source" content="http://xml.openoffice.org/odf2xhtml"/>
-	<meta name="DCTERMS.title" content=""/>
-	<meta name="xsl:vendor" content="libxslt"/>
-	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2023-01-04T23:36:53.510612810"/>
 	<style type="text/css">
-		@page { size: 21.59cm 27.94cm; margin-left: 2cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm }
-		p { color: #000000; line-height: 115%; margin-left: 2cm; margin-right: 2cm; margin-bottom: 0.25cm; background: transparent; background: transparent }
-		a:link { color: #000080; so-language: zxx; text-decoration: underline }
-		a:visited { color: #800000; so-language: zxx; text-decoration: underline }
+		@page { size: 21.59cm 27.94cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		pre { font-family: "Liberation Mono", monospace; font-size: 10pt; background: transparent }
 	</style>
 </head>
-<body lang="fr-FR" text="#000000" link="#000080" vlink="#800000" dir="ltr"><p>
-&nbsp;</p>
-<p>BONJOUR,</p>
-<p><i><u>Quelques recommandations.</u></i></p>
-<p>installer ZIG &nbsp;sur votre system avec le manager de logiciel 
-</p>
-<p>&nbsp;</p>
-<p>installer le serveur LSP de zig, &nbsp;facilite le développement
-&nbsp;implicite lors de gros développement &nbsp;</p>
-<p>&nbsp;</p>
-<p>https://github.com/zigtools/zls</p>
-<p>&nbsp;</p>
-<p><span style="background: #dddddd">mkdir $HOME/zls &amp;&amp; cd
-$HOME/zls &amp;&amp; curl -L</span> <a href="https://github.com/zigtools/zls/releases/download/0.9.0/x86_64-linux.tar.xz%20%7C%20tar%20-xJ%20--strip-components=1%20-C">zigtools/zls/</a>
-.</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><span style="background: #ffff38">extension dans VSCODE</span>:</p>
-<p>&nbsp;</p>
-<p>installer l’extension de coloration intelligent pour zig</p>
-<p><font color="#ff4000">vscode-zig </font>
-</p>
-<p>&nbsp;</p>
-<p>&nbsp;<font color="#ff4000">Zig Langage Server</font></p>
-<p><a href="https://marketplace.visualstudio.com/items?itemName=AugusteRame.zls-vscode">LSP
-ZIG</a></p>
-<p>&nbsp;</p>
-<p>vous devez impérativement mettre dans :</p>
-<p>zls:Zig_exe-path &nbsp; le chemin complet avec le binaire &nbsp;de
-zls&nbsp; 
-</p>
-<p>&nbsp;</p>
-<p>il va inclure le zls (binaire) et mettre en route le serveur zig</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><font color="#ff4000">vscode-task-manager</font></p>
-<p>&nbsp;</p>
-<p>pour paramétrer des commandes bash ou shell</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><span style="background: #ffff6d">architecture de projet Zig </span>
-</p>
-<p>&nbsp;</p>
-<p>pour simplifier la vie</p>
-<p>&nbsp;</p>
-<p>dir ZIG-Projet ---&gt; exemple:</p>
-<p>&nbsp;</p>
-<p>folder-&gt;Zterm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// folder
-projet</p>
-<p>&nbsp;folder-&gt; deps 
-</p>
-<p>&nbsp;&nbsp;floder-&gt;curse:</p>
-<p>&nbsp;&nbsp;&nbsp; module--&gt;curse.zig&nbsp;&nbsp;// traitement
-de base du terminal &nbsp;le cureur init-terminal la souris &nbsp;la
-couleur write-styled &nbsp;get-keyboard</p>
-<p>&nbsp;&nbsp;&nbsp; module--&gt;dds.zig&nbsp;&nbsp;// pot commun de
-défition pour différent module ou fonction</p>
-<p>&nbsp;&nbsp;&nbsp; module--&gt;forms.zig&nbsp;&nbsp;// label
-textfield menu grid button panel etc. 
-</p>
-<p>&nbsp;folder-&gt;src_c</p>
-<p>&nbsp;folder-&gt;src_zig</p>
-<p>&nbsp;&nbsp;&nbsp;code.zig // test cursed and forms</p>
-<p>&nbsp;folder-&gt;src-out</p>
-<p>&nbsp;&nbsp;folder-&gt; bin</p>
-<p>&nbsp;&nbsp;folder-&gt; lib</p>
-<p>&nbsp;</p>
-<p>&nbsp;folder-&gt;zig-cache &nbsp;// celui-ci peut ce trouver dans
-aussi dans le folder curse lorsque vous faite des tests ou compiles</p>
-<p>&nbsp;</p>
-<p>&nbsp;file-&gt;makefile &nbsp;&nbsp;// pour compiler les fichiers
-c/c++ &nbsp;ex: un terminal avec libvte 
-</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><i>Différentes</i> <i>fonctions</i> dans .vscode</p>
-<p>&nbsp;</p>
-<p>clearcache.sh --&gt; pour zig 
-</p>
-<p>&nbsp;</p>
-<p>clearVscCodium.sh</p>
-<p>&nbsp;</p>
-<p>compile.sh&nbsp;&nbsp;&nbsp;&nbsp;// ZIG compile de différente
-façon et déplace le binaire dans le folder-Projet</p>
-<p>&nbsp;</p>
-<p>compileCPP.sh&nbsp;&nbsp;&nbsp;// compile source C/C++</p>
-<p>&nbsp;</p>
-<p>compilelib.sh&nbsp;&nbsp;&nbsp;// ZIG complie lib 
-</p>
-<p>&nbsp;</p>
-<p>task.json&nbsp;&nbsp;&nbsp;&nbsp;// commande pour les *.sh &nbsp;ex:</p>
-<p>&nbsp;</p>
-<p>zig_DEBUG&nbsp;&nbsp;&nbsp;&nbsp;// debug</p>
-<p>zig_FAST&nbsp;&nbsp;&nbsp;&nbsp;// optimisé et securisé</p>
-<p>zig_PROD&nbsp;&nbsp;&nbsp;&nbsp;// optimisé maximun &nbsp; (
-option smal zig ) quand tout est testé</p>
-<p>&nbsp;</p>
-<p>ZIG_TEST&nbsp;&nbsp;&nbsp;&nbsp;// permet d'utiliser l'option test
-de zig</p>
-<p>&nbsp;</p>
-<p>z-terminal&nbsp;&nbsp;&nbsp;&nbsp;// ouvre un terminal dans votre
-projet</p>
-<p>&nbsp;</p>
-<p>a-GTKVTE&nbsp;&nbsp;&nbsp;&nbsp;// appel le programme Term avec
-comme argument un programme &nbsp; ex:./Term &nbsp;./Tcursed</p>
-<p>&nbsp;</p>
-<p>j'ai laissé les outils glade et grep &nbsp;cela peut-etre utile
-pour vous. 
-</p>
-<p>&nbsp;</p>
+<body lang="fr-FR" link="#000080" vlink="#800000" dir="ltr"><pre>
+
+
+
+
+installer zig  sur votre system avec le manager de logiciel 
+
+installer le serveur LSP de zig  facilite le développement  implicite lors de gros développement  
+
+https://github.com/zigtools/zls
+
+git clone --recurse-submodules https://github.com/zigtools/zls
+cd zls
+zig build -Drelease-safe
+
+ouvre un folder .zls 
+
+mettre le bin dans .zls
+
+
+extension dans VSCODE:
+
+installer l’extension de coloration intelligent pour zig
+vscode-zig 
+
+
+https://marketplace.visualstudio.com/items?itemName=AugusteRame.zls-vscode
+
+Zig Langage Server
+
+vous devez impérativement mettre dans :
+zls:Zig_exe-path   le chemin complet avec le binaire  de zls 
+
+il va inclure le zls (binaire) et mettre en route le serveur zig
+ 
+
+
+vscode-task-manager
+
+pour paramétrer des commandes bash ou shell
+
+
+architecture de projet Zig 
+
+pour simplifier la vie
+
+dir ZIG-Projet ---&gt; exemple:
+
+folder-&gt;Zterm						// folder projet
+
+	folder-&gt;src_c
+	folder-&gt;src_zig
+			Exemple.zig // test cursed
+			folder-&gt; deps 
+				 floder-&gt;curse:
+				 module--&gt;curse.zig		// traitement de base du terminal  le cureur init-terminal la souris  la couleur write-styled  get-keyboard
+				 module--&gt;dds.zig		// pot commun de défition pour différent module ou fonction
+				 module--&gt;forms.zig		// label textfield menu grid button panel etc. 
+			folder-&gt;src-out
+				folder-&gt; bin
+				folder-&gt; lib
+
+			folder-&gt;zig-cache 	// celui-ci peut ce trouver dans aussi dans le folder curse lorsque vous faite des tests ou compiles
+
+	file-&gt;makefile 		// pour compiler les fichiers c/c++  ex: un terminal avec libvte 
+
+
+
+
+différent fonction dans .vscode
+
+clearprojet.sh --&gt; pour zig 
+
+clearVscCodium.sh
+
+compile.sh				// ZIG compile de différente façon et déplace le binaire dans le folder-Projet
+
+compileCPP.sh				// compile source C/C++
+
+
+task.json				// commande pour les *.sh  ex:
+
+zig_DEBUG				// debug
+zig_FAST				// optimisé et securisé
+zig_PROD				// optimisé maximun   ( option smal zig ) quand tout est testé
+
+ZIG_TEST				// permet d'utiliser l'option test de zig
+
+zig_DOCS				// debuggénération documentation
+z-terminal				// ouvre un terminal dans votre projet
+
+a-GTKVTE				// appel le programme Term avec comme argument un programme   ex:./Term  ./Tcursed
+
+j'ai laissé les outils glade et grep  cela peut-etre utile pour vous. 
+
+
+
+
+
+</pre>
 </body>
 </html>
