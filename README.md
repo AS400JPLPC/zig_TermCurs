@@ -153,6 +153,7 @@ BR />
 →  2023-01-04  update buildExemple.zig introduction docs<BR />
 →  2023-01-04  update *all .zig* for @import<BR />
 →  2023-01-04  document management<BR />
+[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Exemple/index.html)<BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />
 &rarr;&nbsp; New methodology for clear compile.sh<BR />
