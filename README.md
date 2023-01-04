@@ -151,7 +151,7 @@ BR />
 →  2023-01-04  update compil.sh<BR />
 →  2023-01-04  update task.json<BR />
 →  2023-01-04  update buildExemple.zig introduction docs<BR />
-→  2023-01-04  update *all .zig* des @import<BR />
+→  2023-01-04  update *all .zig* for @import<BR />
 →  2023-01-04  document management<BR />
 
 <u>---.VSCODE-------------------------------------------</u><BR />

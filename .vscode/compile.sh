@@ -39,13 +39,19 @@ projet_bin=${projet_src%.*}
 
 lib_projet="$(cut -c 1-$rlen <<< $projet_lib)"
 
-folder_bin=$lib_projet"zig-out/bin/"$projet_bin
 
-folder_cache=$lib_projet"zig-cache"
+folder_cache=$projet_lib"/zig-cache"
+folder_out=$projet_lib"/zig-out"
 
-folder_cachetest=$lib_projet$folder_src"/zig-cache"
+folder_bin=$projet_lib"/zig-out/bin/"$projet_bin
 
-tested="test"$projet_bin
+folder_docs=$lib_projet"docs"
+
+
+tested="Projet:"$projet_bin
+
+
+#echo -en $projet_lib\\n
 
 #echo -en $folder_bin\\n
 #echo -en $lib_projet\\n
@@ -53,22 +59,25 @@ tested="test"$projet_bin
 #echo -en $folder_src\\n
 #echo -en $projet_typ\\n
 #echo -en $projet_bin\\n
-#echo -en $folder_cachetest\\n
+#echo -en $folder_cache\\n
+#echo -en $folder_docs\\n
 
 echo -en $tested\\n
 
 #-------------------------------------------------------------------
 # clean
 #-------------------------------------------------------------------
-if test -d $folder_cache ; then
-	rm -r $folder_cache
-fi
+
 if test -f $projet_bin ; then
 	rm -r $projet_bin
 fi
 
-if test -d $folder_cachetest ; then
-	rm -r $folder_cachetest
+if test -d $folder_cache ; then
+	rm -r $folder_cache
+fi
+
+if test -d $folder_out ; then
+	rm -r $folder_out
 fi
 
 
@@ -83,25 +92,38 @@ fi
 if [ "$mode" == "DEBUG" ] ; then
 	if [ "$projet_typ" == "ALL" ] ; then
 		( set -x ; \
-					zig build --build-file $lib_projet"build"$projet_src ;\
+					zig build --build-file $projet_lib"/build"$projet_src;\
 		)
 	else
 		(set -x ; \
-					zig test  $lib_projet$folder_src"/"$projet_src ;\
+					zig test  $projet_lib"/"$projet_src ;\
 		)
 	fi
 fi
 
 if [ "$mode" == "PROD" ] ; then
 	( set -x ; \
-				zig build -Drelease-small=true --build-file $lib_projet"build"$projet_src ;\
+				zig build -Drelease-small=true --build-file $projet_lib"/build"$projet_src ;\
 	)
 fi
 
 if [ "$mode" == "FAST" ] ; then
 	( set -x ; \
-				zig build -Drelease-fast=true --build-file $lib_projet"build"$projet_src ;\
+				zig build -Drelease-fast=true --build-file $projet_lib"/build"$projet_src ;\
 	)
+fi
+
+if [ "$mode" == "DOCS" ] ; then
+
+		if test -d "docs_"$projet_bin ; then
+			rm -r "docs_"$projet_bin  
+		fi
+	( set -x ; \
+				zig build docs --build-file $projet_lib"/build"$projet_src ;\
+				mv $folder_docs  "docs_"$projet_bin\
+	)
+
+
 fi
 
 #-------------------------------------------------------------------
@@ -119,6 +141,8 @@ fi
 		if test -d $folder_cache ; then
 		rm -r $folder_cache
 		fi
+		if test -d $folder_out ; then
+		rm -r $folder_out
+		fi
 	fi
-
 exit

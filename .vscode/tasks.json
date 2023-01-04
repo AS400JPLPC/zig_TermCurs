@@ -15,6 +15,17 @@
       }
     },
     {
+      "label": "Zig_DOCS",
+      "type": "shell",
+      "command": "./.vscode/compile.sh DOCS ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "clear": true
+      }
+    },
+    {
       "label": "Zig_PROD",
       "type": "shell",
       "command": "./.vscode/compile.sh PROD ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
@@ -40,28 +51,6 @@
       "label": "Zig_TESTED",
       "type": "shell",
       "command": "./.vscode/compile.sh DEBUG TESTED ${fileBasename} ${fileDirname} ${relativeFileDirname}",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "clear": true
-      }
-    },
-    {
-      "label": "lib-Zig_PROD",
-      "type": "shell",
-      "command": "./.vscode/compilelib.sh PROD ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "clear": true
-      }
-    },
-    {
-      "label": "lib-Zig_FAST",
-      "type": "shell",
-      "command": "./.vscode/compilelib.sh FAST ALL ${fileBasename} ${fileDirname} ${relativeFileDirname}",
       "presentation": {
         "echo": true,
         "reveal": "always",
