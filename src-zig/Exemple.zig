@@ -285,7 +285,7 @@ fn tstCombo( vfld : [] const u8) []const u8 {
 
   var Cell = std.ArrayList(grd.CELL).init(allocator);
   Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
-  grd.setHeaders(&Xcombo, Cell) catch unreachable ;
+  grd.setHeaders(&Xcombo, Cell) ;
 
   grd.addRows(&Xcombo , &.{"---"});
   grd.addRows(&Xcombo , &.{"Famille"});        
@@ -360,7 +360,7 @@ pub fn main() !void {
           Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
           grd.setCellEditCar(&Cell.items[3],"€");
           Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) catch unreachable ;
-          grd.setHeaders(&pFmt01.grid.items[0], Cell) catch unreachable ;
+          grd.setHeaders(&pFmt01.grid.items[0], Cell);
           grd.printGridHeader(&pFmt01.grid.items[0]);
         }
 
@@ -379,7 +379,7 @@ pub fn main() !void {
           grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","100,00","0"});
           grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100,00","0"});
 
-          grd.dltRows(&pFmt01.grid.items[0] , 5);
+          grd.dltRows(&pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};
           var Gkey :grd.GridSelect = undefined ;
 
           Gkey =grd.ioGrid(&pFmt01.grid.items[0]);
@@ -397,28 +397,28 @@ pub fn main() !void {
       .F12 => { 
         //var i = fld.getIndex(pFmt01 , "NOMX" ) catch |err| {dsperr.errorForms(err); return;};
         var i = fld.getIndex(pFmt01 , "NOM2" ) catch |err| {dsperr.errorForms(err); return;};
-        fld.setProtect(pFmt01,i, true);
+        fld.setProtect(pFmt01,i, true) catch |err| {dsperr.errorForms(err); return;};
         fld.printField(pFmt01,pFmt01.field.items[i]);
         fld.displayField(pFmt01,pFmt01.field.items[i]);
         _= kbd.getKEY();
-        fld.setProtect(pFmt01,i, false);
-        fld.setErr(pFmt01,i,true);
-        fld.setText(pFmt01,i,"123456789012345678901234567890");
+        fld.setProtect(pFmt01,i, false) catch |err| {dsperr.errorForms(err); return;};
+        fld.setErr(pFmt01,i,true) catch |err| {dsperr.errorForms(err); return;};
+        fld.setText(pFmt01,i,"123456789012345678901234567890") catch |err| {dsperr.errorForms(err); return;};
         fld.printField(pFmt01,pFmt01.field.items[i]);
         fld.displayField(pFmt01,pFmt01.field.items[i]);
         _= kbd.getKEY();
-        fld.setErr(pFmt01,i,false);
+        fld.setErr(pFmt01,i,false) catch |err| {dsperr.errorForms(err); return;};
         i = lbl.getIndex(pFmt01,"Name-2") catch |err| {dsperr.errorForms(err); return;};
-        lbl.updateText(pFmt01,i,"Ma petite Marie");
+        lbl.updateText(pFmt01,i,"Ma petite Marie") catch |err| {dsperr.errorForms(err); return;};
         _= kbd.getKEY();
-        lbl.updateText(pFmt01,i,"Marie");
+        lbl.updateText(pFmt01,i,"Marie") catch |err| {dsperr.errorForms(err); return;};
         _= kbd.getKEY();     
         pnl.printPanel(pFmt01);
 
       },
       .F23 => {
         var i = fld.getIndex(pFmt01 , "NOM" ) catch |err| {dsperr.errorForms(err); return;};
-        fld.dltRows(&pFmt01,i);
+        fld.dltRows(&pFmt01,i) catch |err| {dsperr.errorForms(err); return;};
         pnl.printPanel(pFmt01);
       },
       else => {},

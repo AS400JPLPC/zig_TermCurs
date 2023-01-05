@@ -16,10 +16,25 @@ const allocator = std.heap.page_allocator;
 
 /// Errors that may occur when using String
 pub const ErrForms = error{
+        Invalide_append,
         Invalide_Panel,
         Invalide_Menu,
         Invalide_Grid,
         Invalide_Grid_Buf,
+        grd_dltRows_Index_invalide,
+
+        lbl_getIndex_Name_Label_Invalide,
+        lbl_getName_Index_invalide,
+        lbl_getPosx_Index_invalide,
+        lbl_getPosy_Index_invalide,
+        lbl_getText_Index_invalide,
+        lbl_getActif_Index_invalide,
+ 
+        lbl_setText_Index_invalide,
+        lbl_setActif_Index_invalide,
+        lbl_updateText_Index_invalide,
+
+        lbl_dltRows_Index_invalide,
 
         btn_getIndex_Key_Label_Invalide,
         btn_getName_Index_invalide,
@@ -29,13 +44,17 @@ pub const ErrForms = error{
         btn_getCheck_Index_invalide,
         btn_getActif_Index_invalide,
 
-        lbl_getIndex_Name_Label_Invalide,
-        lbl_getName_Index_invalide,
-        lbl_getPosx_Index_invalide,
-        lbl_getPosy_Index_invalide,
-        lbl_getText_Index_invalide,
-        lbl_getActif_Index_invalide,
- 
+        btn_setShow_Index_invalide,
+        btn_setText_Index_invalide,
+        btn_setCheck_Index_invalide,  
+        btn_setActif_Index_invalide,
+
+
+        btn_dltRows_Index_invalide,
+
+        mnu_dltRows_Index_invalide,
+
+
         fld_getIndex_Name_Field_Invalide,
         fld_getName_Index_invalide,
         fld_getPosx_Index_invalide,
@@ -59,6 +78,15 @@ pub const ErrForms = error{
         fld_getAtrProtect_Index_invalide,
         fld_getActif_Index_invalide,
 
+        fld_setText_Index_invalide,
+        fld_setSwitch_Index_invalide,
+        fld_setProtect_Index_invalide,
+        fld_setEdtcar_Index_invalide,
+        fld_setRegex_Index_invalide,
+        fld_setErr_Index_invalide,
+        fld_setActif_Index_invalide,
+
+        fld_dltRows_Index_invalide
     };
     
 pub const  dsperr = struct {    
@@ -175,27 +203,28 @@ pub const  lbl = struct {
     return ErrForms.lbl_getActif_Index_invalide ;
   }
 
-  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.label.items.len) return;
-    vpnl.label.items[n].text = val;
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
+    if ( n < vpnl.label.items.len)  vpnl.label.items[n].text = val
+    else return ErrForms.lbl_setText_Index_invalide;
   }
-  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.label.items.len) return;
-    vpnl.label.items[n].actif = val;
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool) ErrForms ! void {
+    if ( n < vpnl.label.items.len) vpnl.label.items[n].actif = val
+    else return ErrForms.lbl_setActif_Index_invalide;
   }
 
-  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
-    if ( n > vpnl.label.items.len) return;
-    _= vpnl.label.orderedRemove(n);
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize ) ErrForms ! void {
+    if ( n < vpnl.label.items.len)  _= vpnl.label.orderedRemove(n)
+    else return ErrForms.lbl_dltRows_Index_invalide;
   }
 
   // update Label/Matrix
-  pub fn updateText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.label.items.len) return;
-    clsLabel(vpnl, vpnl.label.items[n]);
-    vpnl.label.items[n].text = val;
-    printLabel(vpnl, vpnl.label.items[n]);
-    displayLabel(vpnl, vpnl.label.items[n]);
+  pub fn updateText(vpnl:pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
+    if ( n < vpnl.label.items.len) {
+      clsLabel(vpnl, vpnl.label.items[n]);
+      vpnl.label.items[n].text = val;
+      printLabel(vpnl, vpnl.label.items[n]);
+      displayLabel(vpnl, vpnl.label.items[n]);
+    } else return ErrForms.lbl_updateText_Index_invalide;
   }
 
 
@@ -497,7 +526,7 @@ pub const btn = struct{
         return xbutton;
   }
 
-  pub fn getIndex(vpnl:pnl.PANEL , key: kbd  )  ErrForms ! usize {
+  pub fn getIndex(vpnl:pnl.PANEL , key: kbd  ) ErrForms ! usize {
     for (vpnl.button.items) |btnprt , i| {
       if (btnprt.button.key == key) return i;
     }
@@ -513,48 +542,50 @@ pub const btn = struct{
     return ErrForms.btn_getKey_Index_invalide ;
 
   }
-  pub fn getShow(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+  pub fn getShow(vpnl:pnl.PANEL , n: usize) ErrForms ! bool {
     if ( n < vpnl.button.items.len) return vpnl.button.items[n].show;
     return ErrForms.btn_getShow_Index_invalide ;
   }
-  pub fn getText(vpnl:pnl.PANEL , n: usize)  ErrForms ! usize {
+  pub fn getText(vpnl:pnl.PANEL , n: usize) ErrForms ! usize {
     if ( n < vpnl.button.items.len) return vpnl.button.items[n].text;
     return ErrForms.btn_getText_Index_invalide ;
   }
-  pub fn getCheck(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+  pub fn getCheck(vpnl:pnl.PANEL , n: usize) ErrForms ! bool {
     if ( n < vpnl.button.items.len) return vpnl.button.items[n].check;
     return ErrForms.btn_getCheck_Index_invalide ;
   }
-  pub fn getActif(vpnl:pnl.PANEL , n: usize)  ErrForms ! bool {
+  pub fn getActif(vpnl:pnl.PANEL , n: usize) ErrForms ! bool {
     if ( n < vpnl.button.items.len) return vpnl.button.items[n].actif;
     return ErrForms.btn_getActif_Index_invalide ;
   }
 
 
-  pub fn setShow(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.button.items.len) return;
-    vpnl.button.items[n].show = val;
+  pub fn setShow(vpnl:pnl.PANEL , n: usize, val :bool) ErrForms ! void {
+    if ( n < vpnl.button.items.len)  vpnl.button.items[n].show = val
+    else return ErrForms.btn_setShow_Index_invalide ;
   }
-  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.button.items.len) return;
-    vpnl.label.items[n].text = val;
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
+    if ( n < vpnl.button.items.len) vpnl.label.items[n].text = val
+    else return ErrForms.btn_setText_Index_invalide ;
   }
-  pub fn setCheck(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.button.items.len) return;
-    vpnl.button.items[n].check = val;
+  pub fn setCheck(vpnl:pnl.PANEL , n: usize, val :bool) ErrForms ! void {
+    if ( n < vpnl.button.items.len) vpnl.button.items[n].check = val
+    else return ErrForms.btn_setCheck_Index_invalide ;
   }
-  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.button.items.len) return;
-    vpnl.button.items[n].actif = val;
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool) ErrForms ! void {
+    if ( n < vpnl.button.items.len) vpnl.button.items[n].actif = val
+    else return ErrForms.btn_setActif_Index_invalide ;
   }
 
 
 
 
-  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
-    if ( n > vpnl.button.items.len) return;
-    _= vpnl.button.orderedRemove(n);
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize ) ErrForms ! void {
+    if ( n < vpnl.button.items.len) _= vpnl.button.orderedRemove(n)
+    else return ErrForms.btn_dltRows_Index_invalide ;
   }
+
+
 
   pub fn printButton(vpnl: pnl.PANEL) void {
     // assigne LABEL to matrice for display
@@ -714,10 +745,11 @@ pub const  mnu = struct {
     return xmenu;
   }
 
-  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
-    if ( n > vpnl.menu.items.len) return;
-    _= vpnl.menu.orderedRemove(n);
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize ) ErrForms ! void {
+    if ( n < vpnl.button.items.len) _= vpnl.menu.orderedRemove(n)
+    else return ErrForms.mnu_dltRows_Index_invalide ;
   }
+
 
   // print Menu
   fn printMenu(vpnl: pnl.PANEL, vmnu: MENU) void {
@@ -1200,11 +1232,14 @@ pub const  grd = struct {
     return self.data.len;
   }
 
-  pub fn setHeaders(self : *GRID, vCell: std.ArrayList(CELL)) ! void  {
+  pub fn setHeaders(self : *GRID, vCell: std.ArrayList(CELL)) void  {
     self.cols = 0;
     for (vCell.items) |xcell| {
       self.cols += 1;
-      self.headers.append(xcell) catch {unreachable;} ;
+      self.headers.append(xcell) catch   {
+                                      std.debug.print("append header err={}\n", .{ErrForms.Invalide_append});
+                                       _= kbd.getKEY();
+                                    }; 
     }
 
     // this.lines + 2 = cadre + header    cols + separator
@@ -1217,7 +1252,10 @@ pub const  grd = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        self.buf.append(doublebuffer) catch {return ErrForms.Invalide_Grid_Buf;};
+        self.buf.append(doublebuffer) catch {
+                std.debug.print("setHeader doubleBuffererr={}\n", .{ErrForms.Invalide_Grid_Buf});
+                 _= kbd.getKEY();
+                };
         i -=1 ;
     }
 
@@ -1319,9 +1357,12 @@ pub const  grd = struct {
     setPageGrid(self) ;
   }
 
-  pub fn dltRows(self: *GRID,  r :usize )  void {
-    self.data.orderedRemove(r);
-    setPageGrid(self) ;
+  pub fn dltRows(self: *GRID,  r :usize )  ErrForms ! void {
+    if ( r < self.data.len )  {
+      self.data.orderedRemove(r);
+      setPageGrid(self) ;
+    }
+    else return ErrForms.grd_dltRows_Index_invalide;
   }
 
 
@@ -2028,34 +2069,42 @@ pub const  fld = struct {
   }
 
 
-  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].text = val;
+  pub fn setText(vpnl:pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
+    if ( n < vpnl.field.items.len) vpnl.field.items[n].text = val
+    else return ErrForms.fld_setText_Index_invalide;
   }
-  pub fn setSwitch(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].zwitch = val;
-    vpnl.field.items[n].text = utl.boolToSbool(val);
+  pub fn setSwitch(vpnl:pnl.PANEL , n: usize, val :bool)  ErrForms ! void {
+    if ( n < vpnl.field.items.len) {
+      vpnl.field.items[n].zwitch = val;
+      vpnl.field.items[n].text = utl.boolToSbool(val);
+    }
+    else return ErrForms.fld_setSwitch_Index_invalide;
+
   }
-  pub fn setProtect(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].protect = val;
+  pub fn setProtect(vpnl:pnl.PANEL , n: usize, val :bool)  ErrForms ! void {
+    if ( n < vpnl.field.items.len)  vpnl.field.items[n].protect = val
+    else return ErrForms.fld_setProtect_Index_invalide;
   }
-  pub fn setEdtcar(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].edtcar = val;
+  pub fn setEdtcar(vpnl:pnl.PANEL , n: usize, val:[] const u8)  ErrForms ! void {
+    if ( n < vpnl.field.items.len) vpnl.field.items[n].edtcar = val
+    else return ErrForms.fld_setEdtcar_Index_invalide;
   }
-  pub fn setRegex(vpnl:pnl.PANEL , n: usize, val:[] const u8)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].reftyp = val;
+  pub fn setRegex(vpnl:pnl.PANEL , n: usize, val:[] const u8)  ErrForms ! void {
+    if ( n < vpnl.field.items.len) vpnl.field.items[n].reftyp = val
+    else return ErrForms.fld_setRegex_Index_invalide;
   }
-  pub fn setErr(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].err = val;
+  pub fn setErr(vpnl:pnl.PANEL , n: usize, val :bool)  ErrForms ! void {
+    if ( n < vpnl.field.items.len) vpnl.field.items[n].err = val
+    else return ErrForms.fld_setErr_Index_invalide;
   }
-  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  void {
-    if ( n > vpnl.field.items.len) return;
-    vpnl.field.items[n].actif = val;
+  pub fn setActif(vpnl:pnl.PANEL , n: usize, val :bool)  ErrForms ! void {
+    if ( n < vpnl.field.items.len) vpnl.field.items[n].actif = val
+    else return ErrForms.fld_setActif_Index_invalide;
+  }
+
+  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize ) ErrForms ! void {
+    if ( n < vpnl.field.items.len)  _= vpnl.field.orderedRemove(n)
+    else return ErrForms.fld_dltRows_Index_invalide;
   }
 
 
@@ -2070,11 +2119,6 @@ pub const  fld = struct {
     if ( n > vpnl.field.items.len) return;
     vpnl.field.items[n].text = "";
     vpnl.field.items[n].zwitch = false;
-  }
-
-  pub fn dltRows(vpnl:*pnl.PANEL,  n :usize )  void {
-    if ( n > vpnl.field.items.len) return;
-    _= vpnl.field.orderedRemove(n);
   }
 
 
@@ -2407,7 +2451,7 @@ test "testforms" {
   //Cell.append(grd.newCell("prix",8,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
   // setCellEditCar(g_prix,"€")
   Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgWhite)) catch unreachable ;
-  grd.setHeaders(&panel.grid.items[0], Cell) catch unreachable ;
+  grd.setHeaders(&panel.grid.items[0], Cell) ;
   grd.printGridHeader(&panel.grid.items[0]);
   //std.debug.print("len haeder:{}",.{grd.getLenHeaders(&panel.grid.items[0])});
   
@@ -2424,6 +2468,9 @@ test "testforms" {
   grd.addRows(&panel.grid.items[0] , &.{"10", "Bleu10", "poisson","0"});
   grd.addRows(&panel.grid.items[0] , &.{"11", "Bleu11", "poisson","0"});
 
+
+  grd.dltRows(&panel.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};
+          
   var Gkey :grd.GridSelect = undefined ;
 
   Gkey =grd.ioCombo(&panel.grid.items[0],3);

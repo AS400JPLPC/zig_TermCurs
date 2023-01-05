@@ -475,7 +475,7 @@
 <span class="line" id="L285"></span>
 <span class="line" id="L286">  <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
 <span class="line" id="L287">  Cell.append(grd.newCell(<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L288">  grd.setHeaders(&amp;Xcombo, Cell) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L288">  grd.setHeaders(&amp;Xcombo, Cell) ;</span>
 <span class="line" id="L289"></span>
 <span class="line" id="L290">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
 <span class="line" id="L291">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Famille&quot;</span>});        </span>
@@ -557,7 +557,7 @@
 <span class="line" id="L360">          Cell.append(grd.newCell(<span class="tok-str">&quot;prix&quot;</span>,<span class="tok-number">8</span>,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
 <span class="line" id="L361">          grd.setCellEditCar(&amp;Cell.items[<span class="tok-number">3</span>],<span class="tok-str">&quot;€&quot;</span>);</span>
 <span class="line" id="L362">          Cell.append(grd.newCell(<span class="tok-str">&quot;HS&quot;</span>,<span class="tok-number">1</span>,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L363">          grd.setHeaders(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], Cell) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L363">          grd.setHeaders(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], Cell);</span>
 <span class="line" id="L364">          grd.printGridHeader(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
 <span class="line" id="L365">        }</span>
 <span class="line" id="L366"></span>
@@ -576,7 +576,7 @@
 <span class="line" id="L379">          grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
 <span class="line" id="L380">          grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
 <span class="line" id="L381"></span>
-<span class="line" id="L382">          grd.dltRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , <span class="tok-number">5</span>);</span>
+<span class="line" id="L382">          grd.dltRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , <span class="tok-number">5</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L383">          <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
 <span class="line" id="L384"></span>
 <span class="line" id="L385">          Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
@@ -595,28 +595,28 @@
 <span class="line" id="L398">        <span class="tok-comment">//var i = fld.getIndex(pFmt01 , &quot;NOMX&quot; ) catch |err| {dsperr.errorForms(err); return;};</span>
 </span>
 <span class="line" id="L399">        <span class="tok-kw">var</span> i = fld.getIndex(pFmt01 , <span class="tok-str">&quot;NOM2&quot;</span> ) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
-<span class="line" id="L400">        fld.setProtect(pFmt01,i, <span class="tok-null">true</span>);</span>
+<span class="line" id="L400">        fld.setProtect(pFmt01,i, <span class="tok-null">true</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L401">        fld.printField(pFmt01,pFmt01.field.items[i]);</span>
 <span class="line" id="L402">        fld.displayField(pFmt01,pFmt01.field.items[i]);</span>
 <span class="line" id="L403">        _= kbd.getKEY();</span>
-<span class="line" id="L404">        fld.setProtect(pFmt01,i, <span class="tok-null">false</span>);</span>
-<span class="line" id="L405">        fld.setErr(pFmt01,i,<span class="tok-null">true</span>);</span>
-<span class="line" id="L406">        fld.setText(pFmt01,i,<span class="tok-str">&quot;123456789012345678901234567890&quot;</span>);</span>
+<span class="line" id="L404">        fld.setProtect(pFmt01,i, <span class="tok-null">false</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
+<span class="line" id="L405">        fld.setErr(pFmt01,i,<span class="tok-null">true</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
+<span class="line" id="L406">        fld.setText(pFmt01,i,<span class="tok-str">&quot;123456789012345678901234567890&quot;</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L407">        fld.printField(pFmt01,pFmt01.field.items[i]);</span>
 <span class="line" id="L408">        fld.displayField(pFmt01,pFmt01.field.items[i]);</span>
 <span class="line" id="L409">        _= kbd.getKEY();</span>
-<span class="line" id="L410">        fld.setErr(pFmt01,i,<span class="tok-null">false</span>);</span>
+<span class="line" id="L410">        fld.setErr(pFmt01,i,<span class="tok-null">false</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L411">        i = lbl.getIndex(pFmt01,<span class="tok-str">&quot;Name-2&quot;</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
-<span class="line" id="L412">        lbl.updateText(pFmt01,i,<span class="tok-str">&quot;Ma petite Marie&quot;</span>);</span>
+<span class="line" id="L412">        lbl.updateText(pFmt01,i,<span class="tok-str">&quot;Ma petite Marie&quot;</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L413">        _= kbd.getKEY();</span>
-<span class="line" id="L414">        lbl.updateText(pFmt01,i,<span class="tok-str">&quot;Marie&quot;</span>);</span>
+<span class="line" id="L414">        lbl.updateText(pFmt01,i,<span class="tok-str">&quot;Marie&quot;</span>) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L415">        _= kbd.getKEY();     </span>
 <span class="line" id="L416">        pnl.printPanel(pFmt01);</span>
 <span class="line" id="L417"></span>
 <span class="line" id="L418">      },</span>
 <span class="line" id="L419">      .F23 =&gt; {</span>
 <span class="line" id="L420">        <span class="tok-kw">var</span> i = fld.getIndex(pFmt01 , <span class="tok-str">&quot;NOM&quot;</span> ) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
-<span class="line" id="L421">        fld.dltRows(&amp;pFmt01,i);</span>
+<span class="line" id="L421">        fld.dltRows(&amp;pFmt01,i) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
 <span class="line" id="L422">        pnl.printPanel(pFmt01);</span>
 <span class="line" id="L423">      },</span>
 <span class="line" id="L424">      <span class="tok-kw">else</span> =&gt; {},</span>

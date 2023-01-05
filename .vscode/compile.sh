@@ -59,7 +59,7 @@ tested="Projet:"$projet_bin
 #echo -en $folder_src\\n
 #echo -en $projet_typ\\n
 #echo -en $projet_bin\\n
-#echo -en $folder_cache\\n
+echo -en $folder_cache\\n
 #echo -en $folder_docs\\n
 
 echo -en $tested\\n
@@ -120,7 +120,8 @@ if [ "$mode" == "DOCS" ] ; then
 		fi
 	( set -x ; \
 				zig build docs --build-file $projet_lib"/build"$projet_src ;\
-				mv $folder_docs  "docs_"$projet_bin\
+				mv $folder_docs  "docs_"$projet_bin;\
+				rm -r $folder_cache;\
 	)
 
 
@@ -138,6 +139,7 @@ fi
 		ls -lrtsh $folder_bin | cut -d " " -f6
 
 		mv $folder_bin $lib_projet
+
 		if test -d $folder_cache ; then
 		rm -r $folder_cache
 		fi
