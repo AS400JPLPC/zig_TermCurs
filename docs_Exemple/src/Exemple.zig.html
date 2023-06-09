@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Exemple.zig - source view</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAgklEQVR4AWMYWuD7EllJIM4G4g4g5oIJ/odhOJ8wToOxSTXgNxDHoeiBMfA4+wGShjyYOCkG/IGqWQziEzYAoUAeiF9D5U+DxEg14DRU7jWIT5IBIOdCxf+A+CQZAAoopEB7QJwBCBwHiip8UYmRdrAlDpIMgApwQZNnNii5Dq0MBgCxxycBnwEd+wAAAABJRU5ErkJggg=="/>
+    <style>
+      body{
+        font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      pre > code {
+        display: block;
+        overflow: auto;
+        line-height: normal;
+        margin: 0em;
+      }
+      .tok-kw {
+          color: #333;
+          font-weight: bold;
+      }
+      .tok-str {
+          color: #d14;
+      }
+      .tok-builtin {
+          color: #005C7A;
+      }
+      .tok-comment {
+          color: #545454;
+          font-style: italic;
+      }
+      .tok-fn {
+          color: #900;
+          font-weight: bold;
+      }
+      .tok-null {
+          color: #005C5C;
+      }
+      .tok-number {
+          color: #005C5C;
+      }
+      .tok-type {
+          color: #458;
+          font-weight: bold;
+      }
+      pre {
+        counter-reset: line;
+      }
+      pre .line:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        padding-right: 1em;
+        width: 2em;
+        text-align: right;
+        color: #999;
+      }
+      
+      .line {
+        width: 100%;
+        display: inline-block;
+      }
+      .line:target {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        background: #fafafa;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body{
+            background:#222;
+            color: #ccc;
+        }
+        pre > code {
+            color: #ccc;
+            background: #222;
+            border: unset;
+        }
+        .line:target {
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #444;
+            background: #333;
+        }
+        .tok-kw {
+            color: #eee;
+        }
+        .tok-str {
+            color: #2e5;
+        }
+        .tok-builtin {
+            color: #ff894c;
+        }
+        .tok-comment {
+            color: #aa7;
+        }
+        .tok-fn {
+            color: #B1A0F8;
+        }
+        .tok-null {
+            color: #ff8080;
+        }
+        .tok-number {
+            color: #ff8080;
+        }
+        .tok-type {
+            color: #68f;
+        }
+      }
+    </style>
+</head>
+<body>
+<pre><code><span class="line" id="L1"><span class="tok-kw">const</span> std = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>);</span>
+<span class="line" id="L2"></span>
+<span class="line" id="L3"><span class="tok-kw">const</span> dds = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/dds.zig&quot;</span>);</span>
+<span class="line" id="L4"></span>
+<span class="line" id="L5"><span class="tok-comment">// terminal Fonction</span>
+</span>
+<span class="line" id="L6"><span class="tok-kw">const</span> term = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/cursed.zig&quot;</span>);</span>
+<span class="line" id="L7"><span class="tok-comment">// keyboard</span>
+</span>
+<span class="line" id="L8"><span class="tok-kw">const</span> kbd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/cursed.zig&quot;</span>).kbd;</span>
+<span class="line" id="L9"></span>
+<span class="line" id="L10"><span class="tok-comment">// error</span>
+</span>
+<span class="line" id="L11"><span class="tok-kw">const</span> dsperr = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).dsperr;</span>
+<span class="line" id="L12"><span class="tok-comment">// frame</span>
+</span>
+<span class="line" id="L13"><span class="tok-kw">const</span> frm = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).frm;</span>
+<span class="line" id="L14"><span class="tok-comment">// panel</span>
+</span>
+<span class="line" id="L15"><span class="tok-kw">const</span> pnl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).pnl;</span>
+<span class="line" id="L16"><span class="tok-comment">// button</span>
+</span>
+<span class="line" id="L17"><span class="tok-kw">const</span> btn = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).btn;</span>
+<span class="line" id="L18"><span class="tok-comment">// label</span>
+</span>
+<span class="line" id="L19"><span class="tok-kw">const</span> lbl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).lbl;</span>
+<span class="line" id="L20"><span class="tok-comment">// menu</span>
+</span>
+<span class="line" id="L21"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).mnu;</span>
+<span class="line" id="L22"><span class="tok-comment">// grid</span>
+</span>
+<span class="line" id="L23"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).grd;</span>
+<span class="line" id="L24"><span class="tok-comment">// flied</span>
+</span>
+<span class="line" id="L25"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).fld;</span>
+<span class="line" id="L26"><span class="tok-comment">// line horizontal</span>
+</span>
+<span class="line" id="L27"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).lnh;</span>
+<span class="line" id="L28"><span class="tok-comment">// line vertival</span>
+</span>
+<span class="line" id="L29"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/forms.zig&quot;</span>).lnv;</span>
+<span class="line" id="L30"></span>
+<span class="line" id="L31"><span class="tok-comment">// tools utility</span>
+</span>
+<span class="line" id="L32"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/utils.zig&quot;</span>);</span>
+<span class="line" id="L33"></span>
+<span class="line" id="L34"><span class="tok-comment">// tools regex</span>
+</span>
+<span class="line" id="L35"><span class="tok-kw">const</span> reg = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;deps/curse/match.zig&quot;</span>);</span>
+<span class="line" id="L36"></span>
+<span class="line" id="L37"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L38"></span>
+<span class="line" id="L39"><span class="tok-comment">/// ---------------------------------------------------</span></span>
+<span class="line" id="L40"><span class="tok-comment">/// Exemple defined Panel Label Field Button Menu Grid</span></span>
+<span class="line" id="L41"><span class="tok-comment">/// ---------------------------------------------------</span></span>
+<span class="line" id="L42"></span>
+<span class="line" id="L43"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">Panel_Fmt01</span>() pnl.PANEL {</span>
+<span class="line" id="L44"></span>
+<span class="line" id="L45">  <span class="tok-comment">//-------------------------------------------------</span>
+</span>
+<span class="line" id="L46">  <span class="tok-comment">// Panel</span>
+</span>
+<span class="line" id="L47">  <span class="tok-comment">// Name Panel, Pos X, Pos Y,</span>
+</span>
+<span class="line" id="L48">  <span class="tok-comment">// nbr Lines, nbr columns</span>
+</span>
+<span class="line" id="L49">  <span class="tok-comment">// Attribut Panel</span>
+</span>
+<span class="line" id="L50">  <span class="tok-comment">// Type frame, Attribut frame</span>
+</span>
+<span class="line" id="L51">  <span class="tok-comment">// Title Panel, Attribut Title</span>
+</span>
+<span class="line" id="L52">  <span class="tok-kw">var</span> Panel = pnl.initPanel(<span class="tok-str">&quot;Fmt01&quot;</span>,</span>
+<span class="line" id="L53">                  <span class="tok-number">1</span>, <span class="tok-number">1</span>,</span>
+<span class="line" id="L54">                  <span class="tok-number">32</span>,</span>
+<span class="line" id="L55">                  <span class="tok-number">132</span>,</span>
+<span class="line" id="L56">                  dds.CADRE.line1,</span>
+<span class="line" id="L57">                  <span class="tok-str">&quot;TITLE&quot;</span>);</span>
+<span class="line" id="L58"></span>
+<span class="line" id="L59">  <span class="tok-comment">//-------------------------------------------------</span>
+</span>
+<span class="line" id="L60">  <span class="tok-comment">// Label</span>
+</span>
+<span class="line" id="L61">  <span class="tok-comment">// Name , pos X, pos Y,</span>
+</span>
+<span class="line" id="L62">  <span class="tok-comment">// Text , Attribut Text</span>
+</span>
+<span class="line" id="L63">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;free&quot;</span>,<span class="tok-number">2</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Free...................:&quot;</span>)</span>
+<span class="line" id="L64">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L65"></span>
+<span class="line" id="L66">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;full&quot;</span>,<span class="tok-number">3</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Full.....protect.......:&quot;</span>)</span>
+<span class="line" id="L67">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L68">  </span>
+<span class="line" id="L69">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;cb01&quot;</span>,<span class="tok-number">3</span>,<span class="tok-number">62</span>,<span class="tok-str">&quot;Fonction 01..:&quot;</span>)</span>
+<span class="line" id="L70">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L71"></span>
+<span class="line" id="L72">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;cb02&quot;</span>,<span class="tok-number">4</span>,<span class="tok-number">62</span>,<span class="tok-str">&quot;Fonction 02..:&quot;</span>)</span>
+<span class="line" id="L73">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L74"></span>
+<span class="line" id="L75">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;alpha&quot;</span>,<span class="tok-number">5</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Alpha..................:&quot;</span>)</span>
+<span class="line" id="L76">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L77"></span>
+<span class="line" id="L78">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;alphaupper&quot;</span>,<span class="tok-number">6</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Alpha-Uppercase........:&quot;</span>)</span>
+<span class="line" id="L79">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L80"></span>
+<span class="line" id="L81">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;alphanumeric&quot;</span>,<span class="tok-number">7</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Alpha-Numeric..........:&quot;</span>)</span>
+<span class="line" id="L82">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L83"></span>
+<span class="line" id="L84">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;alphanumericupper&quot;</span>,<span class="tok-number">8</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Alpha-Numeric-Upercase.:&quot;</span>)</span>
+<span class="line" id="L85">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L86"></span>
+<span class="line" id="L87">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;password&quot;</span>,<span class="tok-number">10</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Password...............:&quot;</span>)</span>
+<span class="line" id="L88">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L89"></span>
+<span class="line" id="L90">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;yesno&quot;</span>,<span class="tok-number">11</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Yes or No..............:&quot;</span>)</span>
+<span class="line" id="L91">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L92"></span>
+<span class="line" id="L93">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;udigit&quot;</span>,<span class="tok-number">13</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Unsigned.Digit.........:&quot;</span>)</span>
+<span class="line" id="L94">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;  </span>
+<span class="line" id="L95"></span>
+<span class="line" id="L96">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;digit&quot;</span>,<span class="tok-number">14</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-signed.Digit...........:&quot;</span>)</span>
+<span class="line" id="L97">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ; </span>
+<span class="line" id="L98"></span>
+<span class="line" id="L99">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;udecimal&quot;</span>,<span class="tok-number">15</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-unsigned.Ddecimal......:&quot;</span>)</span>
+<span class="line" id="L100">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ; </span>
+<span class="line" id="L101"></span>
+<span class="line" id="L102">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;decimal&quot;</span>,<span class="tok-number">16</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-signed.Ddecimal........:&quot;</span>)</span>
+<span class="line" id="L103">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L104"></span>
+<span class="line" id="L105">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;dateiso&quot;</span>,<span class="tok-number">18</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Date-ISO...............:&quot;</span>)</span>
+<span class="line" id="L106">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L107"></span>
+<span class="line" id="L108">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;datefr&quot;</span>,<span class="tok-number">19</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Date-FR................:&quot;</span>)</span>
+<span class="line" id="L109">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;   </span>
+<span class="line" id="L110"></span>
+<span class="line" id="L111">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;dateus&quot;</span>,<span class="tok-number">20</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Date-US................:&quot;</span>)</span>
+<span class="line" id="L112">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L113"></span>
+<span class="line" id="L114">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;telephone&quot;</span>,<span class="tok-number">22</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Telephone..US..........:&quot;</span>)</span>
+<span class="line" id="L115">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L116"></span>
+<span class="line" id="L117">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;telephone2&quot;</span>,<span class="tok-number">24</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Telephone..Standard....:&quot;</span>)</span>
+<span class="line" id="L118">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L119"></span>
+<span class="line" id="L120">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;mail&quot;</span>,<span class="tok-number">26</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Mail...................:&quot;</span>)</span>
+<span class="line" id="L121">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>; </span>
+<span class="line" id="L122"></span>
+<span class="line" id="L123">  Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;switch&quot;</span>,<span class="tok-number">28</span>,<span class="tok-number">2</span>,<span class="tok-str">&quot;Text-Switch.................:&quot;</span>,)</span>
+<span class="line" id="L124">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>; </span>
+<span class="line" id="L125"></span>
+<span class="line" id="L126">  Panel.label.append(lbl.newTitle(<span class="tok-str">&quot;TITLE&quot;</span>,<span class="tok-number">29</span>,<span class="tok-number">70</span>,<span class="tok-str">&quot;Title ex : FACTURE&quot;</span>,)</span>
+<span class="line" id="L127">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>; </span>
+<span class="line" id="L128"></span>
+<span class="line" id="L129">  <span class="tok-comment">//example: option specific</span>
+</span>
+<span class="line" id="L130">  Panel.label.items[<span class="tok-number">1</span>].attribut.styled[<span class="tok-number">0</span>] = <span class="tok-builtin">@enumToInt</span>(dds.Style.styleItalic);</span>
+<span class="line" id="L131">  Panel.label.items[<span class="tok-number">1</span>].attribut.styled[<span class="tok-number">1</span>] = <span class="tok-builtin">@enumToInt</span>(dds.Style.notStyle);</span>
+<span class="line" id="L132"></span>
+<span class="line" id="L133"></span>
+<span class="line" id="L134"> <span class="tok-comment">// Field </span>
+</span>
+<span class="line" id="L135"></span>
+<span class="line" id="L136">    </span>
+<span class="line" id="L137">  Panel.field.append(fld.newFieldTextFree(<span class="tok-str">&quot;free&quot;</span>,<span class="tok-number">2</span>,<span class="tok-number">32</span>,            <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L138">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L139">                                        <span class="tok-str">&quot;free&quot;</span>,                   <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L140">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L141">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L142">                                        <span class="tok-str">&quot;please enter text&quot;</span>,      <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L143">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L144">                                        )</span>
+<span class="line" id="L145">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L146"></span>
+<span class="line" id="L147">  Panel.field.append(fld.newFieldTextFull(<span class="tok-str">&quot;full&quot;</span>,<span class="tok-number">3</span>,<span class="tok-number">32</span>,            <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L148">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L149">                                        <span class="tok-str">&quot;full&quot;</span>,                   <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L150">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L151">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L152">                                        <span class="tok-str">&quot;please enter text&quot;</span>,      <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L153">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L154">                                        )</span>
+<span class="line" id="L155">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L156"></span>
+<span class="line" id="L157">  fld.setProtect(&amp;Panel,<span class="tok-number">1</span>,<span class="tok-null">true</span>) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L158"></span>
+<span class="line" id="L159">  Panel.field.append(fld.newFieldAlpha(<span class="tok-str">&quot;alpha&quot;</span>,<span class="tok-number">5</span>,<span class="tok-number">32</span>,              <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L160">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L161">                                        <span class="tok-str">&quot;abcd&quot;</span>,                   <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L162">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L163">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L164">                                        <span class="tok-str">&quot;please enter text Alpha&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L165">                                        <span class="tok-str">&quot;^[a-zA-Z]{1,}$&quot;</span>,         <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L166">                                        )</span>
+<span class="line" id="L167">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L168"></span>
+<span class="line" id="L169">  Panel.field.append(fld.newFieldAlphaUpper(<span class="tok-str">&quot;alphaU&quot;</span>,<span class="tok-number">6</span>,<span class="tok-number">32</span>,        <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L170">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L171">                                        <span class="tok-str">&quot;ABCD&quot;</span>,                   <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L172">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L173">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L174">                                        <span class="tok-str">&quot;please enter text Alpha Uppercase&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L175">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L176">                                        )</span>
+<span class="line" id="L177">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L178"></span>
+<span class="line" id="L179">  Panel.field.append(fld.newFieldAlphaNumeric(<span class="tok-str">&quot;alphaN&quot;</span>,<span class="tok-number">7</span>,<span class="tok-number">32</span>,      <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L180">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L181">                                        <span class="tok-str">&quot;abcd12345&quot;</span>,              <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L182">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L183">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L184">                                        <span class="tok-str">&quot;please enter text Alpha Numéric&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L185">                                        <span class="tok-str">&quot;^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L186">                                        )</span>
+<span class="line" id="L187">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L188"></span>
+<span class="line" id="L189">  Panel.field.append(fld.newFieldAlphaNumericUpper(<span class="tok-str">&quot;alphaNU&quot;</span>,<span class="tok-number">8</span>,<span class="tok-number">32</span>, <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L190">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L191">                                        <span class="tok-str">&quot;ABCD12345&quot;</span>,              <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L192">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L193">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L194">                                        <span class="tok-str">&quot;please enter text Alpha Numéric&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L195">                                        <span class="tok-str">&quot;^[A-Z]{1,1}[A-Z0-9]{0,}&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L196">                                        )</span>
+<span class="line" id="L197">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L198"></span>
+<span class="line" id="L199">  Panel.field.append(fld.newFieldPassword(<span class="tok-str">&quot;password&quot;</span>,<span class="tok-number">10</span>,<span class="tok-number">32</span>,        <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L200">                                        <span class="tok-number">30</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L201">                                        <span class="tok-str">&quot;SECRET&quot;</span>,                 <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L202">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L203">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L204">                                        <span class="tok-str">&quot;please enter text Alpha Numéric&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L205">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex</span>
+</span>
+<span class="line" id="L206">                                        )</span>
+<span class="line" id="L207">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L208"></span>
+<span class="line" id="L209">  Panel.field.append(fld.newFieldYesNo(<span class="tok-str">&quot;yesno&quot;</span>,<span class="tok-number">11</span>,<span class="tok-number">32</span>,             <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L210">                                        <span class="tok-str">&quot;N&quot;</span>,                      <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L211">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L212">                                        <span class="tok-str">&quot;required Y or N&quot;</span>,        <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L213">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default &quot;to validate Y or N &quot;</span>
+</span>
+<span class="line" id="L214">                                        )</span>
+<span class="line" id="L215">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L216"></span>
+<span class="line" id="L217">  Panel.field.append(fld.newFieldUDigit(<span class="tok-str">&quot;udigit&quot;</span>,<span class="tok-number">13</span>,<span class="tok-number">32</span>,           <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L218">                                        <span class="tok-number">5</span>,                        <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L219">                                        <span class="tok-str">&quot;00102&quot;</span>,                  <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L220">                                        <span class="tok-null">false</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L221">                                        <span class="tok-str">&quot;Invalide value&quot;</span>,         <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L222">                                        <span class="tok-str">&quot;value numéric not signed&quot;</span>,<span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L223">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex default standard</span>
+</span>
+<span class="line" id="L224">                                        )</span>
+<span class="line" id="L225">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L226"></span>
+<span class="line" id="L227">  Panel.field.append(fld.newFieldDigit(<span class="tok-str">&quot;digit&quot;</span>,<span class="tok-number">14</span>,<span class="tok-number">32</span>,            <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L228">                                        <span class="tok-number">5</span>,                        <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L229">                                        <span class="tok-str">&quot;+00102&quot;</span>,                 <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L230">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L231">                                        <span class="tok-str">&quot;Invalide value&quot;</span>,         <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L232">                                        <span class="tok-str">&quot;value numéric signed&quot;</span>,   <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L233">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex default standard</span>
+</span>
+<span class="line" id="L234">                                        )</span>
+<span class="line" id="L235">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L236"></span>
+<span class="line" id="L237">  Panel.field.append(fld.newFieldUDecimal(<span class="tok-str">&quot;udecimal&quot;</span>,<span class="tok-number">15</span>,<span class="tok-number">32</span>,       <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L238">                                        <span class="tok-number">10</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L239">                                        <span class="tok-number">2</span>,                        <span class="tok-comment">// scal</span>
+</span>
+<span class="line" id="L240">                                        <span class="tok-str">&quot;001.02&quot;</span>,                 <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L241">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L242">                                        <span class="tok-str">&quot;Invalide value&quot;</span>,         <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L243">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L244">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex default standard</span>
+</span>
+<span class="line" id="L245">                                        )</span>
+<span class="line" id="L246">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L247"></span>
+<span class="line" id="L248">  Panel.field.append(fld.newFieldDecimal(<span class="tok-str">&quot;decimal&quot;</span>,<span class="tok-number">16</span>,<span class="tok-number">32</span>,         <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L249">                                        <span class="tok-number">10</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L250">                                        <span class="tok-number">2</span>,                        <span class="tok-comment">// scal</span>
+</span>
+<span class="line" id="L251">                                        <span class="tok-str">&quot;+001.02&quot;</span>,                <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L252">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L253">                                        <span class="tok-str">&quot;Invalide value&quot;</span>,         <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L254">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L255">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// regex default standard</span>
+</span>
+<span class="line" id="L256">                                        )</span>
+<span class="line" id="L257">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L258">  </span>
+<span class="line" id="L259">  Panel.field.append(fld.newFieldDateISO(<span class="tok-str">&quot;dateiso&quot;</span>,<span class="tok-number">18</span>,<span class="tok-number">32</span>,         <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L260">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L261">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L262">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L263">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L264">                                        )</span>
+<span class="line" id="L265">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L266">  </span>
+<span class="line" id="L267">  Panel.field.append(fld.newFieldDateFR(<span class="tok-str">&quot;datefr&quot;</span>,<span class="tok-number">19</span>,<span class="tok-number">32</span>,           <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L268">                                        <span class="tok-str">&quot;12/10/1951&quot;</span>,             <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L269">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L270">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L271">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L272">                                        )</span>
+<span class="line" id="L273">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L274">  </span>
+<span class="line" id="L275">  Panel.field.append(fld.newFieldDateUS(<span class="tok-str">&quot;dateus&quot;</span>,<span class="tok-number">20</span>,<span class="tok-number">32</span>,           <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L276">                                        <span class="tok-str">&quot;07/04/1776&quot;</span>,             <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L277">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L278">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L279">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L280">                                        )</span>
+<span class="line" id="L281">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L282">  </span>
+<span class="line" id="L283">  Panel.field.append(fld.newFieldTelephone(<span class="tok-str">&quot;telephone&quot;</span>,<span class="tok-number">22</span>,<span class="tok-number">32</span>,     <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L284">                                        <span class="tok-number">25</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L285">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L286">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L287">                                        <span class="tok-str">&quot;required or invalide&quot;</span>,   <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L288">                                        <span class="tok-str">&quot;ex:+(001)456.123.789&quot;</span>,   <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L289">             <span class="tok-str">&quot;^[+]{1,1}[(]([0-9]{3,3})[)]([-. ]?[0-9]{3}){2,4}$&quot;</span>,   <span class="tok-comment">// regex US default standard</span>
+</span>
+<span class="line" id="L290">                                        )</span>
+<span class="line" id="L291">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L292"></span>
+<span class="line" id="L293">  Panel.field.append(fld.newFieldTelephone(<span class="tok-str">&quot;telephone2&quot;</span>,<span class="tok-number">24</span>,<span class="tok-number">32</span>,     <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L294">                                        <span class="tok-number">25</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L295">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L296">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L297">                                        <span class="tok-str">&quot;required or invalide&quot;</span>,   <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L298">                                        <span class="tok-str">&quot;ex:+(33)6.12.34.56.78&quot;</span>,  <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L299"><span class="tok-str">&quot;^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$&quot;</span>   <span class="tok-comment">// regex default standard fr</span>
+</span>
+<span class="line" id="L300">                                        )</span>
+<span class="line" id="L301">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L302">  </span>
+<span class="line" id="L303">  Panel.field.append(fld.newFieldMail(<span class="tok-str">&quot;mail&quot;</span>,<span class="tok-number">26</span>,<span class="tok-number">32</span>,               <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L304">                                        <span class="tok-number">100</span>,                      <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L305">                                        <span class="tok-str">&quot;gloups@gmail;.com&quot;</span>,      <span class="tok-comment">// text  error</span>
+</span>
+<span class="line" id="L306">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L307">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L308">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help default</span>
+</span>
+<span class="line" id="L309">                                        )</span>
+<span class="line" id="L310">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L311">  </span>
+<span class="line" id="L312">  Panel.field.append(fld.newFieldSwitch(<span class="tok-str">&quot;Switch&quot;</span>,<span class="tok-number">28</span>,<span class="tok-number">32</span>,             <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L313">                                        <span class="tok-null">false</span>,                    <span class="tok-comment">// switch</span>
+</span>
+<span class="line" id="L314">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L315">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L316">                                        )</span>
+<span class="line" id="L317">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L318"></span>
+<span class="line" id="L319">   Panel.field.append(fld.newFieldFunc(<span class="tok-str">&quot;cb01&quot;</span>,<span class="tok-number">3</span>,<span class="tok-number">76</span>,              <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L320">                                        <span class="tok-number">20</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L321">                                        <span class="tok-str">&quot;Amis&quot;</span>,                   <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L322">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L323">                                        <span class="tok-str">&quot;comboFn01&quot;</span>,              <span class="tok-comment">// Process for FUNC </span>
+</span>
+<span class="line" id="L324">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L325">                                        <span class="tok-str">&quot;select combo&quot;</span>,           <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L326">                                        )</span>
+<span class="line" id="L327">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L328"></span>
+<span class="line" id="L329">    Panel.field.append(fld.newFieldFunc(<span class="tok-str">&quot;cb02&quot;</span>,<span class="tok-number">4</span>,<span class="tok-number">76</span>,              <span class="tok-comment">// Name , posx posy</span>
+</span>
+<span class="line" id="L330">                                        <span class="tok-number">20</span>,                       <span class="tok-comment">// width</span>
+</span>
+<span class="line" id="L331">                                        <span class="tok-str">&quot;&quot;</span>,                       <span class="tok-comment">// text</span>
+</span>
+<span class="line" id="L332">                                        <span class="tok-null">true</span>,                     <span class="tok-comment">// tofill</span>
+</span>
+<span class="line" id="L333">                                        <span class="tok-str">&quot;comboFn02&quot;</span>,              <span class="tok-comment">// Process for FUNC </span>
+</span>
+<span class="line" id="L334">                                        <span class="tok-str">&quot;required&quot;</span>,               <span class="tok-comment">// error msg</span>
+</span>
+<span class="line" id="L335">                                        <span class="tok-str">&quot;select combo&quot;</span>,           <span class="tok-comment">// help</span>
+</span>
+<span class="line" id="L336">                                        )</span>
+<span class="line" id="L337">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L338"></span>
+<span class="line" id="L339">  <span class="tok-comment">//-------------------------------------------------</span>
+</span>
+<span class="line" id="L340">  <span class="tok-comment">//the menu is not double buffered it is not a Panel</span>
+</span>
+<span class="line" id="L341"></span>
+<span class="line" id="L342">  Panel.menu.append(mnu.newMenu(</span>
+<span class="line" id="L343">                      <span class="tok-str">&quot;Menu01&quot;</span>,               <span class="tok-comment">// name</span>
+</span>
+<span class="line" id="L344">                      <span class="tok-number">2</span>, <span class="tok-number">2</span>,                   <span class="tok-comment">// posx, posy  </span>
+</span>
+<span class="line" id="L345">                      dds.CADRE.line1,        <span class="tok-comment">// type line fram</span>
+</span>
+<span class="line" id="L346">                      dds.MNUVH.vertical,     <span class="tok-comment">// type menu vertical / horizontal</span>
+</span>
+<span class="line" id="L347">                      &amp;.{<span class="tok-str">&quot;Open..&quot;</span>,            <span class="tok-comment">// item</span>
+</span>
+<span class="line" id="L348">                      <span class="tok-str">&quot;List..&quot;</span>,</span>
+<span class="line" id="L349">                      <span class="tok-str">&quot;View..&quot;</span>,</span>
+<span class="line" id="L350">                      <span class="tok-str">&quot;Delete&quot;</span>,</span>
+<span class="line" id="L351">                      <span class="tok-str">&quot;New..&quot;</span>,</span>
+<span class="line" id="L352">                      <span class="tok-str">&quot;Src...&quot;</span>,</span>
+<span class="line" id="L353">                      <span class="tok-str">&quot;Exit..&quot;</span>}</span>
+<span class="line" id="L354">                      )) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L355"></span>
+<span class="line" id="L356">  <span class="tok-comment">// Grid ---------------------------------------------------------------</span>
+</span>
+<span class="line" id="L357">  Panel.grid.append(grd.initGrid(</span>
+<span class="line" id="L358">                  <span class="tok-str">&quot;Grid01&quot;</span>,                   <span class="tok-comment">// Name</span>
+</span>
+<span class="line" id="L359">                  <span class="tok-number">20</span>, <span class="tok-number">62</span>,                     <span class="tok-comment">// posx, posy</span>
+</span>
+<span class="line" id="L360">                  <span class="tok-number">7</span>,                          <span class="tok-comment">// numbers lines</span>
+</span>
+<span class="line" id="L361">                  grd.gridStyle,              <span class="tok-comment">// separator | or  space</span>
+</span>
+<span class="line" id="L362">                  dds.CADRE.line1,            <span class="tok-comment">// type line  1,2</span>
+</span>
+<span class="line" id="L363">                  )) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L364"></span>
+<span class="line" id="L365">  <span class="tok-comment">// button--------------------------------------------------</span>
+</span>
+<span class="line" id="L366">  Panel.button.append(btn.newButton(</span>
+<span class="line" id="L367">                        kbd.F3,                 <span class="tok-comment">// function</span>
+</span>
+<span class="line" id="L368">                        <span class="tok-null">true</span>,                   <span class="tok-comment">// show </span>
+</span>
+<span class="line" id="L369">                        <span class="tok-null">false</span>,                  <span class="tok-comment">// check field</span>
+</span>
+<span class="line" id="L370">                        <span class="tok-str">&quot;Exit&quot;</span>                  <span class="tok-comment">// title</span>
+</span>
+<span class="line" id="L371">                        )</span>
+<span class="line" id="L372">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L373"></span>
+<span class="line" id="L374">  Panel.button.append(btn.newButton(</span>
+<span class="line" id="L375">                        kbd.F2,                 <span class="tok-comment">// function</span>
+</span>
+<span class="line" id="L376">                        <span class="tok-null">true</span>,                   <span class="tok-comment">// show</span>
+</span>
+<span class="line" id="L377">                        <span class="tok-null">true</span>,                   <span class="tok-comment">// check field</span>
+</span>
+<span class="line" id="L378">                        <span class="tok-str">&quot;test&quot;</span>                  <span class="tok-comment">// title </span>
+</span>
+<span class="line" id="L379">                        )</span>
+<span class="line" id="L380">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L381"></span>
+<span class="line" id="L382">  Panel.button.append(btn.newButton(</span>
+<span class="line" id="L383">                        kbd.F5,                 <span class="tok-comment">// function</span>
+</span>
+<span class="line" id="L384">                        <span class="tok-null">true</span>,                   <span class="tok-comment">// show</span>
+</span>
+<span class="line" id="L385">                        <span class="tok-null">false</span>,                  <span class="tok-comment">// check field</span>
+</span>
+<span class="line" id="L386">                        <span class="tok-str">&quot;Menu&quot;</span>                  <span class="tok-comment">// title </span>
+</span>
+<span class="line" id="L387">                        )</span>
+<span class="line" id="L388">    ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L389"></span>
+<span class="line" id="L390">  Panel.button.append(btn.newButton(</span>
+<span class="line" id="L391">                          kbd.F8,                 <span class="tok-comment">// function</span>
+</span>
+<span class="line" id="L392">                          <span class="tok-null">true</span>,                   <span class="tok-comment">// show </span>
+</span>
+<span class="line" id="L393">                          <span class="tok-null">false</span>,                  <span class="tok-comment">// check control to Field </span>
+</span>
+<span class="line" id="L394">                          <span class="tok-str">&quot;Grid&quot;</span>                  <span class="tok-comment">// title</span>
+</span>
+<span class="line" id="L395">                          )</span>
+<span class="line" id="L396">      ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L397"></span>
+<span class="line" id="L398">    <span class="tok-kw">return</span> Panel;</span>
+<span class="line" id="L399">}</span>
+<span class="line" id="L400"></span>
+<span class="line" id="L401"></span>
+<span class="line" id="L402"><span class="tok-comment">// combo-------------------------------------</span>
+</span>
+<span class="line" id="L403"><span class="tok-kw">fn</span> <span class="tok-fn">comboFn01</span>( vpnl : *pnl.PANEL , vfld :* fld.FIELD) <span class="tok-type">void</span> {</span>
+<span class="line" id="L404">  <span class="tok-kw">var</span> cellPos:<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L405"></span>
+<span class="line" id="L406">  <span class="tok-kw">var</span> Xcombo = grd.initGrid(</span>
+<span class="line" id="L407">                  <span class="tok-str">&quot;Combo01&quot;</span>,</span>
+<span class="line" id="L408">                  <span class="tok-number">4</span>, <span class="tok-number">76</span>,</span>
+<span class="line" id="L409">                  <span class="tok-number">3</span> ,  </span>
+<span class="line" id="L410">                  grd.gridStyle,</span>
+<span class="line" id="L411">                  dds.CADRE.line1,</span>
+<span class="line" id="L412">                  )  ;</span>
+<span class="line" id="L413"></span>
+<span class="line" id="L414">  <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
+<span class="line" id="L415">  Cell.append(grd.newCell(<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L416">  grd.setHeaders(&amp;Xcombo, Cell) ;</span>
+<span class="line" id="L417"></span>
+<span class="line" id="L418">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
+<span class="line" id="L419">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Famille&quot;</span>});        </span>
+<span class="line" id="L420">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Amis&quot;</span>}); </span>
+<span class="line" id="L421">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Professionel&quot;</span>});</span>
+<span class="line" id="L422">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Docteur&quot;</span>});</span>
+<span class="line" id="L423"></span>
+<span class="line" id="L424">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
+<span class="line" id="L425">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Famille&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
+<span class="line" id="L426">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Amis&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
+<span class="line" id="L427">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Professionel&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">3</span>;</span>
+<span class="line" id="L428">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Docteur&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">4</span>;</span>
+<span class="line" id="L429"></span>
+<span class="line" id="L430">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L431"></span>
+<span class="line" id="L432">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
+<span class="line" id="L433"></span>
+<span class="line" id="L434">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
+<span class="line" id="L435">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L436">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
+<span class="line" id="L437">  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L438">}</span>
+<span class="line" id="L439"></span>
+<span class="line" id="L440"><span class="tok-kw">fn</span> <span class="tok-fn">comboFn02</span>( vpnl : *pnl.PANEL , vfld :* fld.FIELD) <span class="tok-type">void</span> {</span>
+<span class="line" id="L441">  <span class="tok-kw">var</span> cellPos:<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L442">  </span>
+<span class="line" id="L443">  <span class="tok-kw">var</span> Xcombo = grd.initGrid(</span>
+<span class="line" id="L444">                  <span class="tok-str">&quot;Combo02&quot;</span>,</span>
+<span class="line" id="L445">                  <span class="tok-number">5</span>, <span class="tok-number">76</span>,</span>
+<span class="line" id="L446">                  <span class="tok-number">4</span> ,  </span>
+<span class="line" id="L447">                  grd.gridStyle,</span>
+<span class="line" id="L448">                  dds.CADRE.line1,</span>
+<span class="line" id="L449">                  )  ;</span>
+<span class="line" id="L450"></span>
+<span class="line" id="L451">  <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
+<span class="line" id="L452">  Cell.append(grd.newCell(<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L453">  grd.setHeaders(&amp;Xcombo, Cell) ;</span>
+<span class="line" id="L454"></span>
+<span class="line" id="L455">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
+<span class="line" id="L456">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Informaticien&quot;</span>});        </span>
+<span class="line" id="L457">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;sportif&quot;</span>}); </span>
+<span class="line" id="L458"></span>
+<span class="line" id="L459">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
+<span class="line" id="L460">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Informaticien&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
+<span class="line" id="L461">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;sportif&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
+<span class="line" id="L462"></span>
+<span class="line" id="L463"></span>
+<span class="line" id="L464">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L465"></span>
+<span class="line" id="L466">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
+<span class="line" id="L467"></span>
+<span class="line" id="L468">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
+<span class="line" id="L469">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L470">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
+<span class="line" id="L471">  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L472">}</span>
+<span class="line" id="L473"></span>
+<span class="line" id="L474"><span class="tok-comment">/// run emun Function ex: combo</span></span>
+<span class="line" id="L475"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FnEnum = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L476">  comboFn01,</span>
+<span class="line" id="L477">  comboFn02,</span>
+<span class="line" id="L478">  none,</span>
+<span class="line" id="L479"></span>
+<span class="line" id="L480">  <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(self: FnEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) <span class="tok-type">void</span>  {</span>
+<span class="line" id="L481">      <span class="tok-kw">switch</span> (self) {</span>
+<span class="line" id="L482">          .comboFn01 =&gt; comboFn01(vpnl,vfld),</span>
+<span class="line" id="L483">          .comboFn02 =&gt; comboFn02(vpnl,vfld),</span>
+<span class="line" id="L484">          <span class="tok-kw">else</span> =&gt; dsperr.errorForms( <span class="tok-kw">error</span>.main_function_Enum_invalide),</span>
+<span class="line" id="L485">      }</span>
+<span class="line" id="L486">  }</span>
+<span class="line" id="L487"></span>
+<span class="line" id="L488">  <span class="tok-kw">fn</span> <span class="tok-fn">searchFn</span> ( vtext: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> ) FnEnum {</span>
+<span class="line" id="L489">    <span class="tok-kw">var</span> i   :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L490">    <span class="tok-kw">var</span> max :<span class="tok-type">usize</span> = <span class="tok-builtin">@enumToInt</span>(FnEnum.none) ;</span>
+<span class="line" id="L491">      <span class="tok-kw">while</span>( i &lt; max ) : (i += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L492">        <span class="tok-kw">if</span> ( std.mem.eql(<span class="tok-type">u8</span>, <span class="tok-builtin">@tagName</span>(<span class="tok-builtin">@intToEnum</span>(FnEnum,i)), vtext)) <span class="tok-kw">return</span> <span class="tok-builtin">@intToEnum</span>(FnEnum,i);</span>
+<span class="line" id="L493">      }</span>
+<span class="line" id="L494">      <span class="tok-kw">return</span> FnEnum.none;</span>
+<span class="line" id="L495"></span>
+<span class="line" id="L496">    }</span>
+<span class="line" id="L497">};</span>
+<span class="line" id="L498"><span class="tok-kw">var</span> callFunc: FnEnum = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L499"></span>
+<span class="line" id="L500"></span>
+<span class="line" id="L501"><span class="tok-comment">//test ---------- pas de sortie output</span>
+</span>
+<span class="line" id="L502"></span>
+<span class="line" id="L503"><span class="tok-kw">test</span> <span class="tok-str">&quot;test&quot;</span> {</span>
+<span class="line" id="L504">  <span class="tok-kw">var</span> infox : []<span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L505">  infox = utl.concatStr(<span class="tok-str">&quot;Info : &quot;</span>, infox );</span>
+<span class="line" id="L506">  std.debug.print(<span class="tok-str">&quot;{s}&quot;</span>,.{infox});</span>
+<span class="line" id="L507">}</span>
+<span class="line" id="L508"></span>
+<span class="line" id="L509"></span>
+<span class="line" id="L510"><span class="tok-comment">// main----------------------------------</span>
+</span>
+<span class="line" id="L511"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">main</span>() !<span class="tok-type">void</span> {</span>
+<span class="line" id="L512"></span>
+<span class="line" id="L513">  <span class="tok-comment">// open terminal and config and offMouse , cursHide-&gt;(cursor hide)</span>
+</span>
+<span class="line" id="L514">  term.enableRawMode();</span>
+<span class="line" id="L515">  <span class="tok-kw">defer</span> term.disableRawMode() ;</span>
+<span class="line" id="L516">  </span>
+<span class="line" id="L517"></span>
+<span class="line" id="L518">  <span class="tok-comment">// define Panel</span>
+</span>
+<span class="line" id="L519">  <span class="tok-kw">var</span> pFmt01 = Panel_Fmt01();</span>
+<span class="line" id="L520"></span>
+<span class="line" id="L521"></span>
+<span class="line" id="L522">  <span class="tok-comment">// defines the receiving structure of the keyboard</span>
+</span>
+<span class="line" id="L523">  <span class="tok-kw">var</span> Tkey : term.Keyboard = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L524"></span>
+<span class="line" id="L525">  <span class="tok-comment">// work Panel-01</span>
+</span>
+<span class="line" id="L526">  term.resizeTerm(pFmt01.lines,pFmt01.cols);</span>
+<span class="line" id="L527"></span>
+<span class="line" id="L528">  <span class="tok-comment">//pnl.printPanel(&amp;pFmt01);</span>
+</span>
+<span class="line" id="L529">  <span class="tok-comment">//Tkey.Key = kbd.F2;</span>
+</span>
+<span class="line" id="L530">  </span>
+<span class="line" id="L531">  <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L532">    </span>
+<span class="line" id="L533"></span>
+<span class="line" id="L534">    <span class="tok-comment">//Tkey = kbd.getKEY();</span>
+</span>
+<span class="line" id="L535"></span>
+<span class="line" id="L536">    Tkey.Key = pnl.ioPanel(&amp;pFmt01);</span>
+<span class="line" id="L537">    <span class="tok-kw">switch</span> (Tkey.Key) {</span>
+<span class="line" id="L538"></span>
+<span class="line" id="L539">      .func =&gt; {</span>
+<span class="line" id="L540">        callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); <span class="tok-comment">// User clicks &quot;increment&quot;</span>
+</span>
+<span class="line" id="L541">        callFunc.run(&amp;pFmt01, &amp;pFmt01.field.items[pFmt01.idxfld]);</span>
+<span class="line" id="L542">      },</span>
+<span class="line" id="L543"></span>
+<span class="line" id="L544">      .F2 =&gt; {</span>
+<span class="line" id="L545">          <span class="tok-comment">// test control chek field</span>
+</span>
+<span class="line" id="L546">          pnl.msgErr(&amp;pFmt01,<span class="tok-str">&quot;le test de la saisie est OK&quot;</span>);</span>
+<span class="line" id="L547">        },</span>
+<span class="line" id="L548">      .F5 =&gt; {</span>
+<span class="line" id="L549">          <span class="tok-kw">var</span> nitem = mnu.ioMenu(&amp;pFmt01,pFmt01.menu.items[<span class="tok-number">0</span>],<span class="tok-number">0</span>);</span>
+<span class="line" id="L550">          mnu.rstPanel(&amp;pFmt01.menu.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
+<span class="line" id="L551">          std.debug.print(<span class="tok-str">&quot;n°item {}&quot;</span>,.{nitem});</span>
+<span class="line" id="L552">        },</span>
+<span class="line" id="L553">      .F8 =&gt; {</span>
+<span class="line" id="L554"></span>
+<span class="line" id="L555">        <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L556">        <span class="tok-kw">if</span> (grd.countColumns(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]) == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L557">          <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
+<span class="line" id="L558">          Cell.append(grd.newCell(<span class="tok-str">&quot;ID&quot;</span>,<span class="tok-number">2</span>,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L559">          Cell.append(grd.newCell(<span class="tok-str">&quot;Name&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L560">          Cell.append(grd.newCell(<span class="tok-str">&quot;animal&quot;</span>,<span class="tok-number">20</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L561">          Cell.append(grd.newCell(<span class="tok-str">&quot;prix&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L562">          grd.setCellEditCar(&amp;Cell.items[<span class="tok-number">3</span>],<span class="tok-str">&quot;€&quot;</span>);</span>
+<span class="line" id="L563">          Cell.append(grd.newCell(<span class="tok-str">&quot;HS&quot;</span>,<span class="tok-number">1</span>,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L564">          Cell.append(grd.newCell(<span class="tok-str">&quot;Password&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L565">          grd.setHeaders(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], Cell);</span>
+<span class="line" id="L566">          grd.printGridHeader(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L567">        }</span>
+<span class="line" id="L568"></span>
+<span class="line" id="L569"></span>
+<span class="line" id="L570">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L571"></span>
+<span class="line" id="L572">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;+1000.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L573">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;2&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;-1001.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac2&quot;</span>});</span>
+<span class="line" id="L574">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;3&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac3&quot;</span>});</span>
+<span class="line" id="L575">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;4&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L576">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;5&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L577">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;6&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L578">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;7&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L579">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;8&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L580">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;9&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L581">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L582">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L583"></span>
+<span class="line" id="L584">        <span class="tok-comment">//grd.dltRows(&amp;pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};</span>
+</span>
+<span class="line" id="L585"></span>
+<span class="line" id="L586"></span>
+<span class="line" id="L587">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
+<span class="line" id="L588"></span>
+<span class="line" id="L589">        <span class="tok-kw">if</span> ( Gkey.Key == kbd.enter <span class="tok-kw">and</span> pFmt01.idxfld == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L590">          fld.setText(&amp;pFmt01,<span class="tok-number">0</span>,Gkey.Buf.items[<span class="tok-number">2</span>]) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
+<span class="line" id="L591">        }</span>
+<span class="line" id="L592"></span>
+<span class="line" id="L593">        <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageDown) {</span>
+<span class="line" id="L594">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L595">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;12&quot;</span>, <span class="tok-str">&quot;Bleu12&quot;</span>, <span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L596">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;13&quot;</span>, <span class="tok-str">&quot;Bleu13&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L597">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;14&quot;</span>, <span class="tok-str">&quot;Bleu14&quot;</span>, <span class="tok-str">&quot;Vache&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L598">        <span class="tok-comment">// test display pageDown</span>
+</span>
+<span class="line" id="L599">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
+<span class="line" id="L600">          <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageUp) {</span>
+<span class="line" id="L601">            grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L602">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;01&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1000,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L603">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;02&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;1001,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L604">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;03&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L605">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;04&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L606">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;05&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L607">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;06&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L608">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;07&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L609">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;08&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L610">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;09&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L611">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L612">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L613">            <span class="tok-comment">// test display pageUp</span>
+</span>
+<span class="line" id="L614">            Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">false</span>);</span>
+<span class="line" id="L615">          }</span>
+<span class="line" id="L616">        }</span>
+<span class="line" id="L617">        grd.rstPanel(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
+<span class="line" id="L618">      },</span>
+<span class="line" id="L619">      .F23 =&gt; {     </span>
+<span class="line" id="L620">        pnl.printPanel(&amp;pFmt01);</span>
+<span class="line" id="L621">      },</span>
+<span class="line" id="L622">      <span class="tok-kw">else</span> =&gt; {},</span>
+<span class="line" id="L623">    }</span>
+<span class="line" id="L624">    <span class="tok-kw">if</span> (Tkey.Key == kbd.F3) <span class="tok-kw">break</span>; <span class="tok-comment">// end work</span>
+</span>
+<span class="line" id="L625">  }</span>
+<span class="line" id="L626"></span>
+<span class="line" id="L627"></span>
+<span class="line" id="L628">}</span>
+</code></pre></body>
+</html>
