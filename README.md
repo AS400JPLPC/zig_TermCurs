@@ -8,7 +8,7 @@ terminal access function <br />
 *look at the bottom of the testing page* <br />
 
 **os linux**
-<u>Normally should work POSIX  </u><br />
+<u>Normally should work POSIX</u><br />
 <br />
 **the termcurs library, does what ncurse does (hopefully).<br />
 it manages the interface between the terminal and the user.<br />
