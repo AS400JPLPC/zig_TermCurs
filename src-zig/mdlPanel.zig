@@ -1243,10 +1243,18 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
     Gkey =grd.ioCombo(&Xcombo,cellPos);
     if ( Gkey.Key == kbd.enter ) {
       grd.rstPanel(&Xcombo, frompnl);
+      Cell.clearRetainingCapacity();
+      Xcombo.buf.clearRetainingCapacity();
+      grd.resetRows(&Xcombo);
+      Xcombo.headers.clearRetainingCapacity();
       return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable ;
     }
     if ( Gkey.Key == kbd.esc ) {
       grd.rstPanel(&Xcombo, frompnl);
+      Cell.clearRetainingCapacity();
+      Xcombo.buf.clearRetainingCapacity();
+      grd.resetRows(&Xcombo);
+      Xcombo.headers.clearRetainingCapacity();
       return 999;
     }
   }
@@ -1572,7 +1580,18 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
         else  pnl.msgErr(&pFmt01,"You are in creation mode Bad F10");
       },
 
-      .F12 => return  ,
+      .F12 => {
+          pFmt01.label.clearRetainingCapacity();
+          pFmt01.field.clearRetainingCapacity();
+          pFmt01.button.clearRetainingCapacity();
+          pFmt01.menu.clearRetainingCapacity();
+          pFmt01.grid.clearRetainingCapacity();
+          pFmt01.lineh.clearRetainingCapacity();
+          pFmt01.linev.clearRetainingCapacity();
+          pFmt01.buf.clearRetainingCapacity(); 
+          NPANEL.clearRetainingCapacity();
+          return ; 
+      },
 
       else => {}
     }
@@ -1688,7 +1707,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),             // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;
@@ -1713,7 +1732,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;
@@ -1740,7 +1759,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;
@@ -1777,7 +1796,7 @@ fn updPanel( src: *pnl.PANEL, dst: *pnl.PANEL )  !void {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),             // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;
@@ -1800,7 +1819,7 @@ fn updPanel( src: *pnl.PANEL, dst: *pnl.PANEL )  !void {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;
@@ -1826,7 +1845,7 @@ fn updPanel( src: *pnl.PANEL, dst: *pnl.PANEL )  !void {
       panel.button.append(btn.newButton(
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
-                      src.field.items[show].zwitch,   // check field
+                      src.field.items[check].zwitch,   // check field
                       src.field.items[title].text,    // title 
                         )
                     ) catch unreachable ;

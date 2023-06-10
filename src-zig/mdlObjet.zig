@@ -36,7 +36,7 @@ const reg = @import("deps/curse/match.zig");
 
 const allocator = std.heap.page_allocator;
 
-var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
+
 var numPanel: usize = undefined;
 
 pub const ErrMain = error{
@@ -48,326 +48,7 @@ pub const ErrMain = error{
     main_NPANEL_invalide,
 };
 
-const lp01 = enum {
-    F_shw,
-    F_chk,
-    F_txt,
-    alt_shw,
-    alt_chk,
-    alt_txt,
-    ctrl_shw,
-    ctrl_chk,
-    ctrl_txt,
-    lnh1,
-    lnv1,
-    lnv2,
-};
-// field panel pFmt01
-const fp01 = enum(u9) {
-    name = 0,
-    posx,
-    posy,
-    lines,
-    cols,
-    cadre,
-    title,
-    // field function F01..F24
 
-    F1,
-    F1_shw,
-    F1_chk,
-    F1_txt,
-    F2,
-    F2_shw,
-    F2_chk,
-    F2_txt,
-    F3,
-    F3_shw,
-    F3_chk,
-    F3_txt,
-    F4,
-    F4_shw,
-    F4_chk,
-    F4_txt,
-    F5,
-    F5_shw,
-    F5_chk,
-    F5_txt,
-    F6,
-    F6_shw,
-    F6_chk,
-    F6_txt,
-    F7,
-    F7_shw,
-    F7_chk,
-    F7_txt,
-    F8,
-    F8_shw,
-    F8_chk,
-    F8_txt,
-    F9,
-    F9_shw,
-    F9_chk,
-    F9_txt,
-    F10,
-    F10_shw,
-    F10_chk,
-    F10_txt,
-    F11,
-    F11_shw,
-    F11_chk,
-    F11_txt,
-    F12,
-    F12_shw,
-    F12_chk,
-    F12_txt,
-    F13,
-    F13_shw,
-    F13_chk,
-    F13_txt,
-    F14,
-    F14_shw,
-    F14_chk,
-    F14_txt,
-    F15,
-    F15_shw,
-    F15_chk,
-    F15_txt,
-    F16,
-    F16_shw,
-    F16_chk,
-    F16_txt,
-    F17,
-    F17_shw,
-    F17_chk,
-    F17_txt,
-    F18,
-    F18_shw,
-    F18_chk,
-    F18_txt,
-    F19,
-    F19_shw,
-    F19_chk,
-    F19_txt,
-    F20,
-    F20_shw,
-    F20_chk,
-    F20_txt,
-    F21,
-    F21_shw,
-    F21_chk,
-    F21_txt,
-    F22,
-    F22_shw,
-    F22_chk,
-    F22_txt,
-    // field function altA..altZ
-
-    altA,
-    altA_shw,
-    altA_chk,
-    altA_txt,
-    altB,
-    altB_shw,
-    altB_chk,
-    altB_txt,
-    altC,
-    altC_shw,
-    altC_chk,
-    altC_txt,
-    altD,
-    altD_shw,
-    altD_chk,
-    altD_txt,
-    altE,
-    altE_shw,
-    altE_chk,
-    altE_txt,
-    altF,
-    altF_shw,
-    altF_chk,
-    altF_txt,
-    altG,
-    altG_shw,
-    altG_chk,
-    altG_txt,
-    altH,
-    altH_shw,
-    altH_chk,
-    altH_txt,
-    altI,
-    altI_shw,
-    altI_chk,
-    altI_txt,
-    altJ,
-    altJ_shw,
-    altJ_chk,
-    altJ_txt,
-    altK,
-    altK_shw,
-    altK_chk,
-    altK_txt,
-    altL,
-    altL_shw,
-    altL_chk,
-    altL_txt,
-    altM,
-    altM_shw,
-    altM_chk,
-    altM_txt,
-    altN,
-    altN_shw,
-    altN_chk,
-    altN_txt,
-    altO,
-    altO_shw,
-    altO_chk,
-    altO_txt,
-    altP,
-    altP_shw,
-    altP_chk,
-    altP_txt,
-    altQ,
-    altQ_shw,
-    altQ_chk,
-    altQ_txt,
-    altR,
-    altR_shw,
-    altR_chk,
-    altR_txt,
-    altS,
-    altS_shw,
-    altS_chk,
-    altS_txt,
-    altT,
-    altT_shw,
-    altT_chk,
-    altT_txt,
-    altU,
-    altU_shw,
-    altU_chk,
-    altU_txt,
-    altV,
-    altV_shw,
-    altV_chk,
-    altV_txt,
-    altW,
-    altW_shw,
-    altW_chk,
-    altW_txt,
-    altX,
-    altX_shw,
-    altX_chk,
-    altX_txt,
-    altY,
-    altY_shw,
-    altY_chk,
-    altY_txt,
-    altZ,
-    altZ_shw,
-    altZ_chk,
-    altZ_txt,
-
-    // field function ctrlA..ctrlZ
-
-    ctrlA,
-    ctrlA_shw,
-    ctrlA_chk,
-    ctrlA_txt,
-    ctrlB,
-    ctrlB_shw,
-    ctrlB_chk,
-    ctrlB_txt,
-    ctrlC,
-    ctrlC_shw,
-    ctrlC_chk,
-    ctrlC_txt,
-    ctrlD,
-    ctrlD_shw,
-    ctrlD_chk,
-    ctrlD_txt,
-    ctrlE,
-    ctrlE_shw,
-    ctrlE_chk,
-    ctrlE_txt,
-    ctrlF,
-    ctrlF_shw,
-    ctrlF_chk,
-    ctrlF_txt,
-    ctrlI_shw,
-    ctrlI_chk,
-    ctrlI_txt,
-    ctrlJ,
-    ctrlJ_shw,
-    ctrlJ_chk,
-    ctrlJ_txt,
-    ctrlK,
-    ctrlK_shw,
-    ctrlK_chk,
-    ctrlK_txt,
-    ctrlL,
-    ctrlL_shw,
-    ctrlL_chk,
-    ctrlL_txt,
-    ctrlM,
-    ctrlM_shw,
-    ctrlM_chk,
-    ctrlM_txt,
-    ctrlN,
-    ctrlN_shw,
-    ctrlN_chk,
-    ctrlN_txt,
-    ctrlO,
-    ctrlO_shw,
-    ctrlO_chk,
-    ctrlO_txt,
-    ctrlP,
-    ctrlP_shw,
-    ctrlP_chk,
-    ctrlP_txt,
-    ctrlQ,
-    ctrlQ_shw,
-    ctrlQ_chk,
-    ctrlQ_txt,
-    ctrlR,
-    ctrlR_shw,
-    ctrlR_chk,
-    ctrlR_txt,
-    ctrlS,
-    ctrlS_shw,
-    ctrlS_chk,
-    ctrlS_txt,
-    ctrlT,
-    ctrlT_shw,
-    ctrlT_chk,
-    ctrlT_txt,
-    ctrlU,
-    ctrlU_shw,
-    ctrlU_chk,
-    ctrlU_txt,
-    ctrlV,
-    ctrlV_shw,
-    ctrlV_chk,
-    ctrlV_txt,
-    ctrlW,
-    ctrlW_shw,
-    ctrlW_chk,
-    ctrlW_txt,
-    ctrlX,
-    ctrlX_shw,
-    ctrlX_chk,
-    ctrlX_txt,
-    ctrlY,
-    ctrlY_shw,
-    ctrlY_chk,
-    ctrlY_txt,
-    ctrlZ,
-    ctrlZ_shw,
-    ctrlZ_chk,
-    ctrlZ_txt,
-};
-
-pub const FPANEL = struct { name: []const u8, posx: usize, posy: usize, lines: usize, cols: usize, cadre: dds.CADRE, title: []const u8, button: std.ArrayList(btn.BUTTON) };
 
 pub fn Panel_Fmt01() pnl.PANEL {
     var Panel = pnl.initPanel("FRAM01", 1, 1, 42, 158, dds.CADRE.line1, "Def.Objet");
@@ -444,10 +125,19 @@ pub fn qryPanel(vpnl: std.ArrayList(pnl.PANEL), frompnl: *pnl.PANEL) usize {
         Gkey = grd.ioCombo(&Xcombo, cellPos);
         if (Gkey.Key == kbd.enter) {
             grd.rstPanel(&Xcombo, frompnl);
+            Cell.deinit();
+            Xcombo.buf.deinit();
+            grd.resetRows(&Xcombo);
+            Xcombo.headers.deinit();
+
             return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
         }
         if (Gkey.Key == kbd.esc) {
             grd.rstPanel(&Xcombo, frompnl);
+            Cell.deinit();
+            Xcombo.buf.deinit();
+            grd.resetRows(&Xcombo);
+            Xcombo.headers.deinit();
             return 999;
         }
     }
@@ -455,6 +145,7 @@ pub fn qryPanel(vpnl: std.ArrayList(pnl.PANEL), frompnl: *pnl.PANEL) usize {
 
 // end desription Function
 //=================================================
+
 
 var maxY: usize = 0;
 var maxX: usize = 0;
@@ -467,12 +158,11 @@ var Y: usize = 0;
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     term.cls();
     var pFmt01 = Panel_Fmt01();
+    var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
     // defines the receiving structure of the keyboard
     var Tkey: term.Keyboard = undefined;
 
     pnl.clearPanel(&pFmt01);
-    // testing
-    //loadPanel(&pFmt01, &pFmt01);
     NPANEL.clearRetainingCapacity();
     for (XPANEL.items) |p| {
         NPANEL.append(p) catch dsperr.errorForms(ErrMain.main_run_EnumTask_invalide);
@@ -505,10 +195,30 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
         switch (Tkey.Key) {
             .F10 =>  {
-                XPANEL.items[numPanel].label = pFmt01.label; 
+                XPANEL.items[numPanel].label = pFmt01.label;
+                pFmt01.label.clearRetainingCapacity();
+                pFmt01.field.clearRetainingCapacity();
+                pFmt01.button.clearRetainingCapacity();
+                pFmt01.menu.clearRetainingCapacity();
+                pFmt01.grid.clearRetainingCapacity();
+                pFmt01.lineh.clearRetainingCapacity();
+                pFmt01.linev.clearRetainingCapacity();
+                pFmt01.buf.clearRetainingCapacity();
+                NPANEL.clearRetainingCapacity();
                 return;
             },
-            .F12 =>  return,
+            .F12 => {
+                pFmt01.label.clearRetainingCapacity();
+                pFmt01.field.clearRetainingCapacity();
+                pFmt01.button.clearRetainingCapacity();
+                pFmt01.menu.clearRetainingCapacity();
+                pFmt01.grid.clearRetainingCapacity();
+                pFmt01.lineh.clearRetainingCapacity();
+                pFmt01.linev.clearRetainingCapacity();
+                pFmt01.buf.clearRetainingCapacity();
+                NPANEL.clearRetainingCapacity();
+                return ; 
+            } ,
             .altT => {
                 term.getCursor(); 
                 if (term.posCurs.x < minX or term.posCurs.x > maxX or

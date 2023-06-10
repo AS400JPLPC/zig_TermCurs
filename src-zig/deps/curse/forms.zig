@@ -946,7 +946,7 @@ pub const  mnu = struct {
   // nbr espace intercaler
   pub var  mnuspc : usize =3 ;
 
-  // define attribut default MENU
+  // define attribut default CADRE
   pub var AtrMnu : dds.ZONATRB = .{
     .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.notStyle),
@@ -2302,14 +2302,15 @@ pub const  fld = struct {
 
   // define attribut default Fiel
   pub var AtrField : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBold),
+      .styled=[_]u32{@enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgdWhite
+      .foregr = dds.ForegroundColor.fgWhite
   };
 
+  // field not input
   pub var AtrNil : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.styleDim),
                     @enumToInt(dds.Style.notStyle),
@@ -2321,12 +2322,12 @@ pub const  fld = struct {
 
   // define attribut default func ioField
   pub var AtrIO : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.styleBold),
+      .styled=[_]u32{@enumToInt(dds.Style.styleReverse),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
-      .backgr = dds.BackgroundColor.bgCyan,
-      .foregr = dds.ForegroundColor.fgdBlack
+      .backgr = dds.BackgroundColor.bgBlack,
+      .foregr = dds.ForegroundColor.fgWhite,
   };
 
   // define attribut default Field protect
@@ -2345,7 +2346,7 @@ pub const  fld = struct {
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgYellow,
+      .foregr = dds.ForegroundColor.fgCyan,
   };
 
 
@@ -3679,8 +3680,14 @@ pub const  fld = struct {
           },
           .end => {
             tampon  = utl.listToStr(e_FIELD);
-            e_count = utl.trimStr(tampon).len - 1;
-            e_curs  = e_posy + utl.trimStr(tampon).len - 1;
+            if ( utl.trimStr(tampon).len > 0) {
+              e_count = utl.trimStr(tampon).len - 1;
+              e_curs  = e_posy + utl.trimStr(tampon).len - 1;
+            }
+            else {
+              e_count = 0 ;
+              e_curs  = e_posy;
+            }
           },
           .right , .tab  => {
             if ( e_count < e_nbrcar - 1 and !isSpace(e_FIELD.items[0])) {
@@ -4194,7 +4201,6 @@ pub const  pnl = struct {
       return panel ;
   }
 
-
   pub fn getName(vpnl: *PANEL)  [] const u8 {
     return vpnl.name;
   }
@@ -4248,11 +4254,11 @@ pub const  pnl = struct {
 
   // clear matrix
   pub fn clsPanel( vpnl : *PANEL) void {
-    var x :usize = 1;
+    var x :usize = 0;
     var y :usize = 0;
     var n :usize = 0;
 
-    while (x <= vpnl.lines) : (x += 1) {
+    while (x < vpnl.lines) : (x += 1) {
         y = 1;
         while (y <= vpnl.cols) : (y += 1) {
           vpnl.buf.items[n].ch = " ";
