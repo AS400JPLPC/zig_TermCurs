@@ -14,10 +14,13 @@ const io = std.io;
 /// FORMS
 ///-------------------------------
 
-const allocator = std.heap.page_allocator;
+// const allocator = std.heap.page_allocator;
 
 // function special for developpeur
 fn mydebeug(vline : usize, buf: [] const u8) void {
+  
+  const allocator = std.heap.page_allocator;
+
   const AtrDebug : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
@@ -36,7 +39,7 @@ fn mydebeug(vline : usize, buf: [] const u8) void {
 }
 
 
-
+  
 
 // function special for developpeur
 // activat fld.myMouse = true
@@ -51,6 +54,7 @@ pub fn mMouseXY(vpnl : *pnl.PANEL) void {
       .foregr = dds.ForegroundColor.fgRed,
   };
 
+  const allocator = std.heap.page_allocator;
 
   var msg =std.fmt.allocPrint(allocator,"{d:0>2}/{d:0>3}",.{term.MouseInfo.x,term.MouseInfo.y}) catch unreachable;
   term.gotoXY(vpnl.posx + vpnl.lines - 1  , (vpnl.posy + vpnl.cols - 1) - 7);
@@ -74,7 +78,7 @@ pub const ErrForms = error{
         lbl_getPosy_Index_invalide,
         lbl_getText_Index_invalide,
         lbl_getActif_Index_invalide,
- 
+
         lbl_setText_Index_invalide,
         lbl_setActif_Index_invalide,
         lbl_updateText_Index_invalide,
@@ -157,6 +161,9 @@ pub const  dsperr = struct {
         .foregr = dds.ForegroundColor.fgYellow,
     };
     const xSize = term.getSize() catch unreachable;
+
+    const allocator = std.heap.page_allocator;
+
     var msgerr:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) catch unreachable; 
     var x: usize  = xSize.height - 1 ;
     var y: usize  = 2; 
@@ -1384,6 +1391,9 @@ pub const  mnu = struct {
 // defined GRID
 
 pub const  grd = struct {
+      
+    const allocator = std.heap.page_allocator;
+
 
   // define attribut default GRID
   pub var AtrGrid : dds.ZONATRB = .{
@@ -1757,7 +1767,7 @@ pub const  grd = struct {
     self.cols  = 0;
     self.separator = "";
     self.pageRows = 0;
-    self.data.deinit();
+    self.data.deinit(allocator);
     self.headers.deinit();
     self.lignes  = 0;
     self.pages  = 0;
@@ -2299,6 +2309,8 @@ pub const  grd = struct {
 
 // defined INPUT_FIELD
 pub const  fld = struct {
+      
+  const allocator = std.heap.page_allocator;
 
   // define attribut default Fiel
   pub var AtrField : dds.ZONATRB = .{
@@ -3365,8 +3377,8 @@ pub const  fld = struct {
   //----------------------------------------------------==
 
   var e_FIELD : std.ArrayList([] const u8) = undefined;
-  var e_switch: bool = false;
 
+  var e_switch: bool = false;
 
   fn nbrCarField() usize {
     var wl : usize =0;
@@ -3385,6 +3397,7 @@ pub const  fld = struct {
     
     var x_FIELD : std.ArrayList([] const u8) = undefined;
     x_FIELD = std.ArrayList([] const u8).init(allocator);
+    defer x_FIELD.clearAndFree();
     var idx : usize = 0 ;
     for ( e_FIELD.items) |ch | {
       if ( n != idx) x_FIELD.append(ch) catch unreachable ;
@@ -3580,7 +3593,7 @@ pub const  fld = struct {
 
     e_FIELD = std.ArrayList([] const u8).init(allocator);
     e_switch = vfld.zwitch;
-    defer e_FIELD.deinit();
+    defer e_FIELD.clearAndFree();
     const e_reftyp = vfld.reftyp;
 
     var tampon: [] const u8 = undefined;
@@ -4055,6 +4068,8 @@ pub const  fld = struct {
 
 // defined Panel
 pub const  pnl = struct {
+    
+  const allocator = std.heap.page_allocator;
 
   // define attribut default PANEL
   pub var AtrPanel : dds.ZONATRB = .{

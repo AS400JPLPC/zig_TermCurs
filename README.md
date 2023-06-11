@@ -8,7 +8,7 @@ terminal access function <br />
 *look at the bottom of the testing page* <br />
 
 **os linux**
-<u>Normally should work POSIX</u><br />
+<u>Normally should work POSIX </u><br />
 <br />
 **the termcurs library, does what ncurse does (hopefully).<br />
 it manages the interface between the terminal and the user.<br />
@@ -255,9 +255,8 @@ modification from :<BR />
 -  2023-06-05  See example image below <br />
 <br /> 
 -  2023-06-09  Adjustment and synchronization between the matrix and the management of the x-y positioning... (there was a discrepancy because of the zero table)<br />
--  2023-06-09  problème GIT br />
 <br />
-
+-  2023-06-10  recherche optimisation et beug  <br />
 <BR/>
 
 

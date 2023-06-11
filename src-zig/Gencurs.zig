@@ -51,14 +51,11 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 //================================
 // defined var global
 
-var nbrpanel  : usize = 0;
-var panelWork : usize = 0;
 var base = std.ArrayList(pnl.PANEL).init(allocator);
-var detail = pnl.PANEL;
 var Tkey : term.Keyboard = undefined ;
 var nPnl : usize  = 0;
 var nopt : usize  = 0;
-var nchx : usize  = 0;
+
 
 const choix = enum {
   panel,

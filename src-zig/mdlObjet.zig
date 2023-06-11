@@ -40,30 +40,15 @@ const allocator = std.heap.page_allocator;
 var numPanel: usize = undefined;
 
 pub const ErrMain = error{
-    main_append_NPANEL_invalide,
+    main_append_XPANEL_invalide,
     main_run_EnumFunc_invalide,
     main_run_EnumTask_invalide,
     main_loadPanel_allocPrint_invalide,
     main_updatePanel_allocPrint_invalide,
-    main_NPANEL_invalide,
+    main_XPANEL_invalide,
 };
 
 
-
-pub fn Panel_Fmt01() pnl.PANEL {
-    var Panel = pnl.initPanel("FRAM01", 1, 1, 42, 158, dds.CADRE.line1, "Def.Objet");
-
-    Panel.menu.append(mnu.newMenu("cadre", // name
-        8, 12, // posx, posy
-        dds.CADRE.line1, // type line fram
-        dds.MNUVH.vertical, // type menu vertical / horizontal
-        &.{ // item
-        "Noline",
-        "Line 1",
-        "Line 2",
-    })) catch unreachable;
-    return Panel;
-}
 
 // function special for developpeur
 // activat onMouse
@@ -97,7 +82,7 @@ fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize) void {
 //=================================================
 // description Function
 // choix work panel
-pub fn qryPanel(vpnl: std.ArrayList(pnl.PANEL), frompnl: *pnl.PANEL) usize {
+pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
     var cellPos: usize = 0;
     var Xcombo = grd.initGrid(
         "qryPanel",
@@ -124,20 +109,18 @@ pub fn qryPanel(vpnl: std.ArrayList(pnl.PANEL), frompnl: *pnl.PANEL) usize {
     while (true) {
         Gkey = grd.ioCombo(&Xcombo, cellPos);
         if (Gkey.Key == kbd.enter) {
-            grd.rstPanel(&Xcombo, frompnl);
-            Cell.deinit();
-            Xcombo.buf.deinit();
-            grd.resetRows(&Xcombo);
-            Xcombo.headers.deinit();
+            //grd.rstPanel(&Xcombo, frompnl);
+            Cell.clearAndFree();
+            Xcombo.buf.clearAndFree();
+            grd.resetGrid(&Xcombo);
 
             return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
         }
         if (Gkey.Key == kbd.esc) {
-            grd.rstPanel(&Xcombo, frompnl);
-            Cell.deinit();
-            Xcombo.buf.deinit();
-            grd.resetRows(&Xcombo);
-            Xcombo.headers.deinit();
+            //grd.rstPanel(&Xcombo, frompnl);
+            Cell.clearAndFree();
+            Xcombo.buf.clearAndFree();
+            grd.resetGrid(&Xcombo);
             return 999;
         }
     }
@@ -157,22 +140,50 @@ var Y: usize = 0;
 //pub fn main() !void {
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     term.cls();
-    var pFmt01 = Panel_Fmt01();
-    var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
+
     // defines the receiving structure of the keyboard
     var Tkey: term.Keyboard = undefined;
 
-    pnl.clearPanel(&pFmt01);
-    NPANEL.clearRetainingCapacity();
-    for (XPANEL.items) |p| {
-        NPANEL.append(p) catch dsperr.errorForms(ErrMain.main_run_EnumTask_invalide);
-    }
 
-    numPanel = qryPanel(NPANEL, &pFmt01);
 
+    numPanel = qryPanel(XPANEL);
+    term.cls();
     if (numPanel == 999) return;
 
-    pFmt01 = NPANEL.items[numPanel];
+
+    var pFmt01 = pnl.initPanel("FRAM01",
+                  XPANEL.items[numPanel].posx,
+                  XPANEL.items[numPanel].posy,
+                  XPANEL.items[numPanel].lines,
+                  XPANEL.items[numPanel].cols,
+                  XPANEL.items[numPanel].frame.cadre,
+                  XPANEL.items[numPanel].frame.title);
+                  
+                  
+
+
+    for (XPANEL.items[numPanel].button.items) |p| {
+    pFmt01.button.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].label.items) |p| {
+    pFmt01.label.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].field.items) |p| {
+    pFmt01.field.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].linev.items) |p| {
+    pFmt01.linev.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].lineh.items) |p| {
+    pFmt01.lineh.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].grid.items) |p| {
+    pFmt01.grid.append(p) catch unreachable ;
+    }
+    for (XPANEL.items[numPanel].menu.items) |p| {
+    pFmt01.menu.append(p) catch unreachable ;
+    }
+
 
     pnl.printPanel(&pFmt01);
 
@@ -195,28 +206,30 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
         switch (Tkey.Key) {
             .F10 =>  {
-                XPANEL.items[numPanel].label = pFmt01.label;
-                pFmt01.label.clearRetainingCapacity();
-                pFmt01.field.clearRetainingCapacity();
-                pFmt01.button.clearRetainingCapacity();
-                pFmt01.menu.clearRetainingCapacity();
-                pFmt01.grid.clearRetainingCapacity();
-                pFmt01.lineh.clearRetainingCapacity();
-                pFmt01.linev.clearRetainingCapacity();
-                pFmt01.buf.clearRetainingCapacity();
-                NPANEL.clearRetainingCapacity();
+                XPANEL.items[numPanel].label.clearRetainingCapacity(); 
+                for (pFmt01.label.items) |p| {
+                XPANEL.items[numPanel].label.append(p) catch unreachable ;
+                }
+
+                pFmt01.label.clearAndFree();
+                pFmt01.field.clearAndFree();
+                pFmt01.button.clearAndFree();
+                pFmt01.menu.clearAndFree();
+                pFmt01.grid.clearAndFree();
+                pFmt01.lineh.clearAndFree();
+                pFmt01.linev.clearAndFree();
+                pFmt01.buf.clearAndFree();
                 return;
             },
             .F12 => {
-                pFmt01.label.clearRetainingCapacity();
-                pFmt01.field.clearRetainingCapacity();
-                pFmt01.button.clearRetainingCapacity();
-                pFmt01.menu.clearRetainingCapacity();
-                pFmt01.grid.clearRetainingCapacity();
-                pFmt01.lineh.clearRetainingCapacity();
-                pFmt01.linev.clearRetainingCapacity();
-                pFmt01.buf.clearRetainingCapacity();
-                NPANEL.clearRetainingCapacity();
+                pFmt01.label.clearAndFree();
+                pFmt01.field.clearAndFree();
+                pFmt01.button.clearAndFree();
+                pFmt01.menu.clearAndFree();
+                pFmt01.grid.clearAndFree();
+                pFmt01.lineh.clearAndFree();
+                pFmt01.linev.clearAndFree();
+                pFmt01.buf.clearAndFree();
                 return ; 
             } ,
             .altT => {

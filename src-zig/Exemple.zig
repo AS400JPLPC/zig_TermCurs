@@ -430,9 +430,10 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   var Gkey :grd.GridSelect = undefined ;
 
   Gkey =grd.ioCombo(&Xcombo,cellPos);
-
   grd.rstPanel(&Xcombo, vpnl);
-  if ( Gkey.Key == kbd.esc )  return ;
+
+
+  if ( Gkey.Key == kbd.esc )   return ; 
   vfld.text = Gkey.Buf.items[0];
   return ;
 }
@@ -464,8 +465,8 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   var Gkey :grd.GridSelect = undefined ;
 
   Gkey =grd.ioCombo(&Xcombo,cellPos);
-
   grd.rstPanel(&Xcombo, vpnl);
+
   if ( Gkey.Key == kbd.esc )  return ;
   vfld.text = Gkey.Buf.items[0];
   return ;

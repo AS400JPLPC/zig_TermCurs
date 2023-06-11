@@ -9,6 +9,7 @@ const kbd = @import("deps/curse/cursed.zig").kbd;
 
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
+
 // frame
 const frm = @import("deps/curse/forms.zig").frm;
 // panel
@@ -23,11 +24,10 @@ const mnu = @import("deps/curse/forms.zig").mnu;
 const grd = @import("deps/curse/forms.zig").grd;
 // flied
 const fld = @import("deps/curse/forms.zig").fld;
-/// line horizontal
+// line horizontal
 const lnh = @import("deps/curse/forms.zig").lnh;
 // line vertival
 const lnv = @import("deps/curse/forms.zig").lnv;
-
 
 // tools utility
 const utl = @import("deps/curse/utils.zig");
@@ -42,7 +42,8 @@ const reg = @import("deps/curse/match.zig");
 const allocator = std.heap.page_allocator;
 
 
-var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
+
+
 var numPanel : usize = undefined ;
 
 pub const ErrMain = error{
@@ -498,7 +499,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                 "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
   fld.setTask(&Panel,@enumToInt(fp01.cols),"fnCheckCols") catch unreachable ;                                      
 
-  Panel.field.append(fld.newFieldFunc(@tagName(fp01.cadre),7,12,1,"",true,"fnCadre",
+  Panel.field.append(fld.newFieldFunc(@tagName(fp01.cadre),7,12,1,"",true,"fnBorder",
                 "required","please choose the type of frame")) catch unreachable ;
   fld.setTask(&Panel,@enumToInt(fp01.cadre),"fnCheckCadre") catch unreachable ; 
 
@@ -730,7 +731,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F24_txt) ,37,22,15,"",false,
                     "required","please enter text fonction ","")) catch unreachable ;
 
-  Panel.linev.append(lnv.newLine(@tagName(lp01.lnv1)   ,12,39,26,dds.LINE.line1) ) catch unreachable ;
+  Panel.linev.append(lnv.newLine(@tagName(lp01.lnv1)   ,11,39,26,dds.LINE.line1) ) catch unreachable ;
 
   Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_shw) ,11,50  ,"show"))   catch unreachable ; 
   Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_chk) ,11,56  ,"check"))  catch unreachable ; 
@@ -974,7 +975,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                     "required","please enter text fonction ","")) catch unreachable ;
 
 
-  Panel.linev.append(lnv.newLine(@tagName(lp01.lnv2)   ,12,79,26,dds.LINE.line1) ) catch unreachable ;
+  Panel.linev.append(lnv.newLine(@tagName(lp01.lnv2)   ,11,79,26,dds.LINE.line1) ) catch unreachable ;
 
   Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_shw) ,11,91  ,"show"))   catch unreachable ; 
   Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_chk) ,11,97  ,"check"))  catch unreachable ; 
@@ -1243,18 +1244,16 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
     Gkey =grd.ioCombo(&Xcombo,cellPos);
     if ( Gkey.Key == kbd.enter ) {
       grd.rstPanel(&Xcombo, frompnl);
-      Cell.clearRetainingCapacity();
-      Xcombo.buf.clearRetainingCapacity();
-      grd.resetRows(&Xcombo);
-      Xcombo.headers.clearRetainingCapacity();
+      Cell.clearAndFree();
+      Xcombo.buf.clearAndFree();
+      grd.resetGrid(&Xcombo);
       return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable ;
     }
     if ( Gkey.Key == kbd.esc ) {
       grd.rstPanel(&Xcombo, frompnl);
-      Cell.clearRetainingCapacity();
-      Xcombo.buf.clearRetainingCapacity();
-      grd.resetRows(&Xcombo);
-      Xcombo.headers.clearRetainingCapacity();
+      Cell.clearAndFree();
+      Xcombo.buf.clearAndFree();
+      grd.resetGrid(&Xcombo);
       return 999;
     }
   }
@@ -1265,7 +1264,7 @@ var callFunc: FnEnumFunc = undefined;
 //=================================================
 // description Function
 // choix Cadre
-fn fnCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn fnBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
   var pos:usize = 0;
 
@@ -1287,12 +1286,12 @@ fn fnCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 // description Function
 /// run emun Function ex: combo
 pub const FnEnumFunc = enum {
-  fnCadre,
+  fnBorder,
   none,
 
   pub fn run(self: FnEnumFunc, vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
     switch (self) {
-        .fnCadre => fnCadre(vpnl,vfld),
+        .fnBorder => fnBorder(vpnl,vfld),
         else => dsperr.errorForms( ErrMain.main_run_EnumFunc_invalide),
     }
   }
@@ -1357,9 +1356,9 @@ fn fnCheckCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 
 
-fn fnCheckPanel( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn fnCheckPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   var idx : usize = 0;
-  for (NPANEL.items) |f | {
+  for (VPANEL.items) |f | {
     if (std.mem.eql(u8, f.name, vfld.text) and ( idx == numPanel ) ) {
       return ;
     }  
@@ -1374,18 +1373,18 @@ fn fnCheckPanel( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 
-fn fnCheckF9( vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
+fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
-  const msg = std.fmt.allocPrint(allocator,"{s} lready existing invalide", .{vfld.text}) catch unreachable;
+  const msg = std.fmt.allocPrint(allocator,"Name: {s} lready existing invalide", .{vfld.text}) catch unreachable;
 
   vpnl.keyField = kbd.none;
   var idx : usize = 0;
-  for (NPANEL.items) |f| {
+  for (VPANEL.items) |f| {
     if (std.mem.eql(u8, f.name, vfld.text) and  888 == numPanel  or
       std.mem.eql(u8, f.name, vfld.text)  and  idx == numPanel  ) {
       vpnl.keyField = kbd.task;
       vpnl.idxfld = @enumToInt(fp01.name); 
-      fld.msgErr(vpnl, vpnl.field.items[@enumToInt(fp01.name)],msg);
+      pnl.msgErr(vpnl,msg);
       return ;
     } 
     if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == numPanel ) ) return ;
@@ -1395,17 +1394,17 @@ fn fnCheckF9( vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 
-fn fnCheckF10( vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
+fn fnCheckF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
   const msg = std.fmt.allocPrint(allocator,"{s} lready existing invalide", .{vfld.text}) catch unreachable;
 
   vpnl.keyField = kbd.none;
   var idx : usize = 0;
-  for (NPANEL.items) |f | {
+  for (VPANEL.items) |f | {
     if (std.mem.eql(u8, f.name, vfld.text) and ( idx != numPanel )   ) {
       vpnl.keyField = kbd.task;
       vpnl.idxfld = @enumToInt(fp01.name); 
-      fld.msgErr(vpnl, vpnl.field.items[@enumToInt(fp01.name)],msg);
+      pnl.msgErr(vpnl,msg);
       return ;
     } 
     if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == numPanel ) ) return ;
@@ -1428,17 +1427,18 @@ pub const FnEnumTask = enum {
   fnCheckF10,
   none,
 
-  pub fn run(self: FnEnumTask, vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
+  pub fn run(self: FnEnumTask, VPANEL: *std.ArrayList(pnl.PANEL),vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
       switch (self) {
           .fnCheckPosx  => fnCheckPosx(vpnl,vfld),
           .fnCheckPosy  => fnCheckPosy(vpnl,vfld),
           .fnCheckLines => fnCheckLines(vpnl,vfld),
           .fnCheckCols  => fnCheckCols(vpnl,vfld),
           .fnCheckCadre => fnCheckCadre(vpnl,vfld),
-          .fnCheckPanel => fnCheckPanel(vpnl,vfld),
 
-          .fnCheckF9  => fnCheckF9(vpnl,vfld),
-          .fnCheckF10 => fnCheckF10(vpnl,vfld),
+          .fnCheckPanel => fnCheckPanel(VPANEL,vpnl,vfld),
+
+          .fnCheckF9  => fnCheckF9(VPANEL,vpnl,vfld),
+          .fnCheckF10 => fnCheckF10(VPANEL,vpnl,vfld),
 
           else => dsperr.errorForms( ErrMain.main_run_EnumTask_invalide),
       }
@@ -1470,6 +1470,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
   //std.debug.print(" {d}  {d} ",.{termSize.width,termSize.height});
   //_= kbd.getKEY();
   term.cls();
+
+  var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
   var pFmt01 = Panel_Fmt01();
   // defines the receiving structure of the keyboard
   var Tkey : term.Keyboard = undefined ;
@@ -1482,10 +1484,21 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     NPANEL.append( p) catch dsperr.errorForms( ErrMain.main_run_EnumTask_invalide);
   }
 
+
   numPanel = qryPanel(NPANEL,true,&pFmt01);
 
-  if (numPanel == 999) return ; 
-
+  if (numPanel == 999) {
+    pFmt01.label.clearAndFree();
+    pFmt01.field.clearAndFree();
+    pFmt01.button.clearAndFree();
+    pFmt01.menu.clearAndFree();
+    pFmt01.grid.clearAndFree();
+    pFmt01.lineh.clearAndFree();
+    pFmt01.linev.clearAndFree();
+    pFmt01.buf.clearAndFree();
+    NPANEL.clearAndFree();
+    return ; 
+  }
   if (numPanel < 888 ) {
     loadPanel(&NPANEL.items[numPanel], &pFmt01);
   }
@@ -1503,7 +1516,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
       .task => {
         callTask = FnEnumTask.searchFn(pFmt01.field.items[pFmt01.idxfld].proctask); 
-        callTask.run(&pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
+        callTask.run(&NPANEL, &pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
       },
       
       .F2 => {
@@ -1511,7 +1524,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
         pnl.printPanel(&NPANEL.items[numPanel]);
         _= kbd.getKEY();
         pnl.rstPanel(&NPANEL.items[numPanel],&pFmt01);
-        //term.flushIO();
+        term.flushIO();
       },
 
       .F6 => {
@@ -1527,27 +1540,28 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
       },
 
-      // possibility of duplicating
+      // possibilité duplication
       .F9 => {
         idx = 0;
-        for (pFmt01.field.items) |f| {
-            if (f.proctask.len > 0) {
-              pFmt01.idxfld = idx ;
-              pFmt01.keyField = kbd.none;
-              if (idx == @enumToInt(fp01.name))  callTask = FnEnumTask.searchFn("fnCheckF9")
-              else callTask = FnEnumTask.searchFn(f.proctask);
-              callTask.run(&pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
-              if (pFmt01.keyField == kbd.task) break;
+
+          for (pFmt01.field.items) |f| {
+              if (f.proctask.len > 0) {
+                pFmt01.idxfld = idx ;
+                pFmt01.keyField = kbd.none;
+                if (idx == @enumToInt(fp01.name))  callTask = FnEnumTask.searchFn("fnCheckF9")
+                else callTask = FnEnumTask.searchFn(f.proctask);
+                callTask.run(&NPANEL, &pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+                if (pFmt01.keyField == kbd.task) break;
+              }
             }
-          }
-        if (pFmt01.keyField == kbd.task) continue;
-        pFmt01.idxfld = 9999;
-        NPANEL.append(addPanel(&pFmt01) catch |err| {dsperr.errorForms(err); return;}) catch unreachable;
-        XPANEL.append(addPanel(&pFmt01) catch |err| {dsperr.errorForms(err); return;}) catch unreachable;
-        pnl.msgErr(&pFmt01,"You are in creation correct F9 OK");
-        pnl.clearPanel(&pFmt01);
-        numPanel = NPANEL.items.len - 1;// last panel
-        loadPanel(&XPANEL.items[numPanel], &pFmt01);
+          if (pFmt01.keyField == kbd.task) continue;
+          pFmt01.idxfld = 9999;
+          NPANEL.append(addPanel(&pFmt01) catch |err| {dsperr.errorForms(err); return;}) catch unreachable;
+          XPANEL.append(addPanel(&pFmt01) catch |err| {dsperr.errorForms(err); return;}) catch unreachable;
+          pnl.msgErr(&pFmt01,"You are in creation correct F9 OK");
+          pnl.clearPanel(&pFmt01);
+          numPanel = NPANEL.items.len - 1;// last panel
+          loadPanel(&XPANEL.items[numPanel], &pFmt01);
       },
 
       .F10 => {
@@ -1559,7 +1573,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
               pFmt01.keyField = kbd.none;
               if (idx == @enumToInt(fp01.name))  callTask = FnEnumTask.searchFn("fnCheckF10")
               else callTask = FnEnumTask.searchFn(f.proctask);
-              callTask.run(&pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+              callTask.run(&NPANEL, &pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
               if (pFmt01.keyField == kbd.task) break;
             }
           }
@@ -1581,15 +1595,15 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
       },
 
       .F12 => {
-          pFmt01.label.clearRetainingCapacity();
-          pFmt01.field.clearRetainingCapacity();
-          pFmt01.button.clearRetainingCapacity();
-          pFmt01.menu.clearRetainingCapacity();
-          pFmt01.grid.clearRetainingCapacity();
-          pFmt01.lineh.clearRetainingCapacity();
-          pFmt01.linev.clearRetainingCapacity();
-          pFmt01.buf.clearRetainingCapacity(); 
-          NPANEL.clearRetainingCapacity();
+          pFmt01.label.clearAndFree();
+          pFmt01.field.clearAndFree();
+          pFmt01.button.clearAndFree();
+          pFmt01.menu.clearAndFree();
+          pFmt01.grid.clearAndFree();
+          pFmt01.lineh.clearAndFree();
+          pFmt01.linev.clearAndFree();
+          pFmt01.buf.clearAndFree();
+          NPANEL.clearAndFree();
           return ; 
       },
 
@@ -1860,4 +1874,5 @@ fn updPanel( src: *pnl.PANEL, dst: *pnl.PANEL )  !void {
   dst.cols   = panel.cols;
   dst.frame  = panel.frame;
   dst.button = panel.button;
+  
 }
