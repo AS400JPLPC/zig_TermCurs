@@ -211,25 +211,25 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 XPANEL.items[numPanel].label.append(p) catch unreachable ;
                 }
 
-                pFmt01.label.clearAndFree();
-                pFmt01.field.clearAndFree();
-                pFmt01.button.clearAndFree();
-                pFmt01.menu.clearAndFree();
-                pFmt01.grid.clearAndFree();
-                pFmt01.lineh.clearAndFree();
-                pFmt01.linev.clearAndFree();
-                pFmt01.buf.clearAndFree();
+                pFmt01.label.deinit();
+                pFmt01.field.deinit();
+                pFmt01.button.deinit();
+                pFmt01.menu.deinit();
+                pFmt01.grid.deinit();
+                pFmt01.lineh.deinit();
+                pFmt01.linev.deinit();
+                pFmt01.buf.deinit();
                 return;
             },
             .F12 => {
-                pFmt01.label.clearAndFree();
-                pFmt01.field.clearAndFree();
-                pFmt01.button.clearAndFree();
-                pFmt01.menu.clearAndFree();
-                pFmt01.grid.clearAndFree();
-                pFmt01.lineh.clearAndFree();
-                pFmt01.linev.clearAndFree();
-                pFmt01.buf.clearAndFree();
+                pFmt01.label.deinit();
+                pFmt01.field.deinit();
+                pFmt01.button.deinit();
+                pFmt01.menu.deinit();
+                pFmt01.grid.deinit();
+                pFmt01.lineh.deinit();
+                pFmt01.linev.deinit();
+                pFmt01.buf.deinit();
                 return ; 
             } ,
             .altT => {
@@ -264,6 +264,7 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
     var e_count: usize = 0;
     var tampon: []const u8 = undefined;
     var e_LABEL = std.ArrayList([]const u8).init(allocator);
+    defer e_LABEL.clearAndFree();
     var e_posx: usize = term.posCurs.x;
     var e_posy: usize = term.posCurs.y;
     var e_curs: usize = e_posy;

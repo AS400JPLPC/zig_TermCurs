@@ -258,7 +258,8 @@ modification from :<BR />
 <br />
 -  2023-06-10  recherche optimisation et beug  <br />
 <BR/>
-
+-  2023-06-12  mise en place clean memory  <br />
+<BR/>
 
 
 

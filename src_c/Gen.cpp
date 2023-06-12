@@ -107,13 +107,13 @@ gboolean key_press_ALTF4()
 		const gchar* _MSG_ =  MESSAGE_ALT_F4;
 
 		dialog = gtk_message_dialog_new(
-										 GTK_WINDOW(window),
-										 GTK_DIALOG_MODAL,
-										 GTK_MESSAGE_QUESTION,
-										 GTK_BUTTONS_YES_NO,
-										 _MSG_,
-										 NULL,
-										 NULL);
+										GTK_WINDOW(window),
+										GTK_DIALOG_MODAL,
+										GTK_MESSAGE_QUESTION,
+										GTK_BUTTONS_YES_NO,
+										_MSG_,
+										NULL,
+										NULL);
 
 		int result = gtk_dialog_run (GTK_DIALOG (dialog));
 
@@ -178,9 +178,9 @@ void	init_Terminal()
 	// resize  title  font
     VTE = VTE_TERMINAL (terminal);
 
-	vte_terminal_set_size (VTE, COL, ROW);												/// size du terminal
+	vte_terminal_set_size (VTE, COL, ROW);												                    /// size du terminal
 
-	gtk_window_set_title(GTK_WINDOW(window), VTENAME);									/// titre du terminal de base
+	gtk_window_set_title(GTK_WINDOW(window), VTENAME);									              /// titre du terminal de base
 
 	vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));		/// font utilisé
 
@@ -188,13 +188,13 @@ void	init_Terminal()
 
 	vte_terminal_set_scroll_on_output(VTE,FALSE);										/// pas de défilement en cas de nouvelle sortie
 
-	vte_terminal_set_scroll_on_keystroke(VTE,FALSE);									/// pas de défilement en bas s’il y a interaction de l’utilisateur
+	vte_terminal_set_scroll_on_keystroke(VTE,FALSE);								/// pas de défilement en bas s’il y a interaction de l’utilisateur
 
 	vte_terminal_set_mouse_autohide(VTE, TRUE);											/// cacher le curseur de la souris quand le clavier est utilisé.
 
-	vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);						/// cursor blink on
+	vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);		/// cursor blink on
 
-	vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);							/// define cursor 'block'
+	vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);		  /// define cursor 'block'
 }
 
 
@@ -221,8 +221,8 @@ void on_title_changed(GtkWidget *terminal)
 
 void on_resize_window(GtkWidget *terminal, guint  _col, guint _row)
 {
-	  vte_terminal_set_size (VTE_TERMINAL(terminal),_col,_row);
-	  gtk_widget_show_all(window);
+	vte_terminal_set_size (VTE_TERMINAL(terminal),_col,_row);
+	gtk_widget_show_all(window);
 }
 
 /// -----------------------------------------------------------------------------

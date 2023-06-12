@@ -16,7 +16,7 @@ pub const ErrUtils = error{
         Invalide_subStr_Index,
         fld_ioField_addListStr_invalide,
         Invalide_Character_strToUsize,
-        Invalide_OutOfMemory_usizeToStr
+        Invalide_OutOfMemory_usizeToStr,
 };
 
 
@@ -29,27 +29,37 @@ pub const iteratStr = struct {
   var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
   //defer arena.deinit();
   const allocator = arenastr.allocator();
-  
+
   /// Errors that may occur when using String
   pub const ErrNbrch = error{
       InvalideAllocBuffer,
   };
   
-  fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-      var buf = allocator.alloc(u8, size) catch {
-              return ErrNbrch.InvalideAllocBuffer;
-          };
-      return buf;
-  }
+
 
   pub const StringIterator = struct {
         buf: []u8 ,
         index: usize ,
 
+
+    fn allocBuffer ( size :usize) ErrNbrch![]u8 {
+      var buf = allocator.alloc(u8, size) catch {
+              return ErrNbrch.InvalideAllocBuffer;
+          };
+      return buf;
+    }
+
+    /// Deallocates the internal buffer
+    pub fn deinit(self: *StringIterator) void {
+        if (self.buf.len > 0)  allocator.free(self.buf);
+    }
+
     pub fn next(it: *StringIterator) ?[]const u8 {
         var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        
         it.buf= optional_buf orelse "";
         var idx : usize = 0;
+
         while (true) {
             if (idx >= strbuf.len) break;
             it.buf[idx] = strbuf[idx];
@@ -64,6 +74,7 @@ pub const iteratStr = struct {
     }
     pub fn preview(it: *StringIterator) ?[]const u8 {
         var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        
         it.buf= optional_buf orelse "";
         var idx : usize = 0;
         while (true) {
@@ -122,6 +133,7 @@ pub fn isAlphabeticStr(str:[] const u8) bool {
   
   const allocator = std.heap.page_allocator;
   const result = allocator.alloc(u8, str.len ) catch unreachable;
+  defer allocator.free(result);
   std.mem.copy(u8, result, str);
   var idx:usize = 0;
   var b: bool= true;
@@ -139,6 +151,7 @@ pub fn isUpperStr(str:[] const u8) bool {
   
   const allocator = std.heap.page_allocator;
   const result = allocator.alloc(u8, str.len ) catch unreachable;
+  defer allocator.free(result);
   std.mem.copy(u8, result, str);
   var idx:usize = 0;
   var b: bool= true;
@@ -156,6 +169,7 @@ pub fn isLowerStr(str:[] const u8) bool {
   
   const allocator = std.heap.page_allocator;
   const result = allocator.alloc(u8, str.len ) catch unreachable;
+  defer allocator.free(result);
   std.mem.copy(u8, result, str);
   var idx:usize = 0;
   var b: bool= true;
@@ -171,6 +185,7 @@ pub fn isLowerStr(str:[] const u8) bool {
 /// is String isDigit 
 pub fn isDigitStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -188,6 +203,7 @@ pub fn isDigitStr(str:[] const u8) bool {
 /// is String isDecimal
 pub fn isDecimalStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   var idx : usize =0;
   var p: bool = false; // dot
@@ -211,6 +227,7 @@ pub fn isDecimalStr(str:[] const u8) bool {
 /// is String isDigit 
 pub fn isSignedStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = false;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -229,6 +246,7 @@ pub fn isSignedStr(str:[] const u8) bool {
 /// testing caracter Keyboard 103
 pub fn isLetterStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -320,6 +338,7 @@ pub fn isLetterStr(str:[] const u8) bool {
 // force omit ; csv
 pub fn isSpecialStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -376,6 +395,7 @@ pub fn isSpecialStr(str:[] const u8) bool {
 /// force omit ' ; csv
 pub fn isPunct(str:[] const u8,) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -407,6 +427,7 @@ pub fn isPunct(str:[] const u8,) bool {
 /// is  String omit char 
 pub fn isCarOmit(str: [] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -432,6 +453,7 @@ pub fn isCarOmit(str: [] const u8) bool {
 /// omit , ; / \ _ ` | ~ 
 pub fn isPassword(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -476,6 +498,7 @@ pub fn isPassword(str:[] const u8) bool {
 /// a-zA-Z 0-9 +.-_@
 pub fn isMailStr(str:[] const u8) bool {
   var iter = iteratStr.iterator(str);
+  defer iter.deinit();
   var b:bool = true;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
@@ -504,12 +527,13 @@ pub fn isMailStr(str:[] const u8) bool {
 pub fn upperStr(str:[] const u8) [] const u8 {
   const allocator = std.heap.page_allocator;
   const result = allocator.alloc(u8, str.len ) catch unreachable;
+  defer allocator.free(result);
   std.mem.copy(u8, result, str);
   var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toUpper(result[idx]);
     }
-	return result;
+	return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -519,12 +543,13 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 pub fn lowerStr(str:[] const u8) [] const u8 {
   const allocator = std.heap.page_allocator;
   const result = allocator.alloc(u8, str.len ) catch unreachable;
+  defer allocator.free(result);
   std.mem.copy(u8, result, str);
   var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toLower(result[idx]);
     }
-	return result;
+	return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -533,10 +558,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 /// concat String
 pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
   const allocator = std.heap.page_allocator;
-  const result = allocator.alloc(u8, a.len + b.len) catch unreachable;
-  std.mem.copy(u8, result, a);
-  std.mem.copy(u8, result[a.len..], b);
-  return result;
+  return std.fmt.allocPrint(allocator,"{s}{s}",.{a,b},)  catch unreachable;
 }
 
 
@@ -548,8 +570,9 @@ pub fn subStr( a: []const u8,pos: usize, n:usize) ![]const u8 {
   if (pos > a.len) return ErrUtils.Invalide_subStr_Index;
   const allocator = std.heap.page_allocator;
   const result = try allocator.alloc(u8, n - pos);
+  defer allocator.free(result);
   std.mem.copy(u8, result, a[pos..n]);
-  return result;
+  return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -585,6 +608,7 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 
   var idx : usize =0;
   var iter = iteratStr.iterator(text);
+  defer iter.deinit();
   var string: [] const u8 = "" ;
 
   while (iter.next()) |ch|  {
@@ -615,9 +639,7 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 
 
 pub fn strToUsize(v: []const u8) !usize{
-  var x :u64 = 0;
-  x = std.fmt.parseUnsigned(u64, v,10) catch  return ErrUtils.Invalide_Character_strToUsize;
-  return x;
+  return std.fmt.parseUnsigned(u64, v,10) catch  return ErrUtils.Invalide_Character_strToUsize;
 }
 
 
@@ -625,8 +647,7 @@ pub fn strToUsize(v: []const u8) !usize{
 
 pub fn usizeToStr(v: usize ) ![]const u8{
   const allocator = std.heap.page_allocator;
-  var buf = std.fmt.allocPrint(allocator,"{d}", .{v}) catch return ErrUtils.Invalide_OutOfMemory_usizeToStr;
-  return buf;
+  return std.fmt.allocPrint(allocator,"{d}", .{v}) catch return ErrUtils.Invalide_OutOfMemory_usizeToStr;
 }
 
 
@@ -655,7 +676,9 @@ pub fn addListStr(self: std.ArrayList([]const u8), text : []const u8) ! std.Arra
 
   const allocator = std.heap.page_allocator;
   var LIST = std.ArrayList([] const u8).init(allocator);
+  
   var iter = iteratStr.iterator(text);
+  defer iter.deinit();
 
   for (self.items) | val | {
     LIST.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;

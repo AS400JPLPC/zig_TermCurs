@@ -58,7 +58,7 @@
 /// ex:
 ///------------------------------------------
 
-#define WORKPGM		"./Exemple"
+#define WORKPGM		"./test"
 
 bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 
@@ -108,7 +108,7 @@ bool ctrlPgm(std::string v_TEXT)
 	std::filesystem::path p(v_TEXT.c_str());
 											switch(strswitch(p.stem().c_str()))
 											{
-												case  strswitch("Tcursed")				: b_pgm =true;		break;
+												case  strswitch("test")				: b_pgm =true;		break;
 												case  strswitch("Exemple")		: b_pgm =true;		break;
 											}
 	return b_pgm;

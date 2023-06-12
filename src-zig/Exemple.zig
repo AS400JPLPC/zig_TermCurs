@@ -412,6 +412,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                   )  ;
 
   var Cell = std.ArrayList(grd.CELL).init(allocator);
+  defer Cell.deinit();
   Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
   grd.setHeaders(&Xcombo, Cell) ;
 
@@ -431,6 +432,11 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
   Gkey =grd.ioCombo(&Xcombo,cellPos);
   grd.rstPanel(&Xcombo, vpnl);
+
+  grd.resetGrid(&Xcombo);
+  Cell.deinit();
+  Xcombo.buf.deinit();
+
 
 
   if ( Gkey.Key == kbd.esc )   return ; 
@@ -466,6 +472,10 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
   Gkey =grd.ioCombo(&Xcombo,cellPos);
   grd.rstPanel(&Xcombo, vpnl);
+
+  grd.resetGrid(&Xcombo);
+  Cell.deinit();
+  Xcombo.buf.deinit();
 
   if ( Gkey.Key == kbd.esc )  return ;
   vfld.text = Gkey.Buf.items[0];
@@ -554,6 +564,7 @@ pub fn main() !void {
       .F8 => {
 
         var Gkey :grd.GridSelect = undefined ;
+
         if (grd.countColumns(&pFmt01.grid.items[0]) == 0) {
           var Cell = std.ArrayList(grd.CELL).init(allocator);
           Cell.append(grd.newCell("ID",2,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan)) catch unreachable ;
@@ -616,6 +627,10 @@ pub fn main() !void {
           }
         }
         grd.rstPanel(&pFmt01.grid.items[0], &pFmt01);
+
+        //grd.resetGrid(&pFmt01.grid.items[0]);
+        //Cell.deinit();
+       // pFmt01.grid.items[0].buf.deinit();
       },
       .F23 => {     
         pnl.printPanel(&pFmt01);

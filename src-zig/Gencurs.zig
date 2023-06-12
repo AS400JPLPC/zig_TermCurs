@@ -51,7 +51,7 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 //================================
 // defined var global
 
-var base = std.ArrayList(pnl.PANEL).init(allocator);
+
 var Tkey : term.Keyboard = undefined ;
 var nPnl : usize  = 0;
 var nopt : usize  = 0;
@@ -85,16 +85,16 @@ pub fn main() !void {
 
   fld.myMouse = true ; // active display cursor x/y mouse
 
-  base.append(pnl.initPanel("base",
+ var base = pnl.initPanel("base",
                   1, 1,
                   termSize.height,
                   termSize.width ,
                   dds.CADRE.line1,
-                  "")) catch unreachable ;
+                  "") ;
     //-------------------------------------------------
   //the menu is not double buffered it is not a Panel
 
-  base.items[0].menu.append(mnu.newMenu(
+  base.menu.append(mnu.newMenu(
                       "Screen",               // name
                       2, 2,                   // posx, posy  
                       dds.CADRE.line1,        // type line fram
@@ -112,13 +112,7 @@ pub fn main() !void {
     Screen = 0 ,       // creat panel, objet  , source , exit
   };
   
-  base.append(pnl.initPanel("detail",
-                  1, 1,
-                  termSize.height,
-                  termSize.width ,
-                  dds.CADRE.line1,
-                  "")) catch unreachable ;
-  
+
 
 
 
@@ -127,8 +121,8 @@ pub fn main() !void {
 
     term.cls();
     if (nPnl == 0) {
-      pnl.printPanel(&base.items[0]);
-      nopt = mnu.ioMenu(&base.items[0],base.items[0].menu.items[@enumToInt(menu.Screen)],0);
+      pnl.printPanel(&base);
+      nopt = mnu.ioMenu(&base,base.menu.items[@enumToInt(menu.Screen)],0);
       term.cls();
       if (nopt == @enumToInt(choix.exit )) { break; }
       if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;

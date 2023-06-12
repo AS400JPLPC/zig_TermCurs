@@ -240,6 +240,7 @@ pub fn getCursor() void {
 /// Reset the terminal style.
 pub fn resetStyle() void {
     wcons.print("\x1b[0m", .{}) catch unreachable;
+    flushIO();
 }
 
 /// Sets the terminal style.
@@ -249,16 +250,19 @@ fn setStyle(style: [4]u32) void {
             wcons.print("\x1b[{d}m", .{v}) catch unreachable;
         }
     }
+    flushIO();
 }
 
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: dds.BackgroundColor) void {
     wcons.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
+    flushIO();
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: dds.ForegroundColor) void {
     wcons.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
+    flushIO();
 }
 
 /// write text and attribut
@@ -286,7 +290,7 @@ pub fn enableRawMode() void {
 
     // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
     // https://codeberg.org/josias/zigcurses/src/branch/master/src/main.zig
-    // https://man7.org/linux/man-pages/man3/termios.3.html
+    // https://man7.org/linux/man-pages/man3/ttermios.3.html
 
     // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
 

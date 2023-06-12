@@ -1496,7 +1496,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     pFmt01.lineh.clearAndFree();
     pFmt01.linev.clearAndFree();
     pFmt01.buf.clearAndFree();
-    NPANEL.clearAndFree();
+    NPANEL.deinit();
     return ; 
   }
   if (numPanel < 888 ) {
@@ -1521,10 +1521,13 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
       
       .F2 => {
         if (NPANEL.items.len == 0 ) { dsperr.errorForms(ErrMain.main_NPANEL_invalide); continue;}
+        pnl.initMatrix(&NPANEL.items[numPanel]);
         pnl.printPanel(&NPANEL.items[numPanel]);
         _= kbd.getKEY();
         pnl.rstPanel(&NPANEL.items[numPanel],&pFmt01);
         term.flushIO();
+        NPANEL.items[numPanel].buf.clearRetainingCapacity();
+
       },
 
       .F6 => {
@@ -1595,15 +1598,15 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
       },
 
       .F12 => {
-          pFmt01.label.clearAndFree();
-          pFmt01.field.clearAndFree();
-          pFmt01.button.clearAndFree();
-          pFmt01.menu.clearAndFree();
-          pFmt01.grid.clearAndFree();
-          pFmt01.lineh.clearAndFree();
-          pFmt01.linev.clearAndFree();
-          pFmt01.buf.clearAndFree();
-          NPANEL.clearAndFree();
+          pFmt01.label.deinit();
+          pFmt01.field.deinit();
+          pFmt01.button.deinit();
+          pFmt01.menu.deinit();
+          pFmt01.grid.deinit();
+          pFmt01.lineh.deinit();
+          pFmt01.linev.deinit();
+          pFmt01.buf.deinit();
+          NPANEL.deinit();
           return ; 
       },
 
@@ -1726,6 +1729,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                         )
                     ) catch unreachable ;
     }
+    panel.buf.clearAndFree();
   }
 
 

@@ -331,6 +331,7 @@ pub const  lbl = struct {
   pub fn printLabel(vpnl: *pnl.PANEL, vlbl : LABEL ) void {
     var n  = (vpnl.cols * (vlbl.posx - 1)) + vlbl.posy - 1;
     var iter = utl.iteratStr.iterator(vlbl.text);
+    defer iter.deinit();
     while (iter.next()) |ch| {
       if (vlbl.actif == true) {
         vpnl.buf.items[n].ch = ch ;
@@ -556,6 +557,7 @@ pub const frm = struct {
         npos = vfram.posx;
         n =  npos + (((vfram.cols - wlen ) / 2)) - 1 ;
         var iter = utl.iteratStr.iterator(vfram.title);
+        defer iter.deinit();
         while (iter.next()) |ch| {
           vpnl.buf.items[n].ch = ch ;
           vpnl.buf.items[n].attribut = vfram.titleAttribut;
@@ -909,6 +911,7 @@ pub const btn = struct{
 
         // text Function KEY
         var iter = utl.iteratStr.iterator(button.name);
+        defer iter.deinit();
         while (iter.next()) |ch| {
           if (button.actif == true) {
             vpnl.buf.items[n].ch = ch ;
@@ -926,6 +929,7 @@ pub const btn = struct{
 
         //text Title button
         iter = utl.iteratStr.iterator(button.title);
+        defer iter.deinit();
         while (iter.next()) |ch| {
           if (button.actif == true) {
             vpnl.buf.items[n].ch = ch ;
@@ -1902,6 +1906,7 @@ pub const  grd = struct {
     while (x <= self.lines) : (x += 1) {
       y = 1;
       var iter = utl.iteratStr.iterator(buf);
+      defer iter.deinit();
       while (iter.next()) |ch| : ( n += 1 ) {
           self.buf.items[n].ch = ch;
           self.buf.items[n].attribut  = self.attribut;
@@ -1929,6 +1934,7 @@ pub const  grd = struct {
 
     n = getLenHeaders(self);
     var iter = utl.iteratStr.iterator(buf);
+    defer iter.deinit();
     while (iter.next()) |ch| : ( n += 1) {
       self.buf.items[n].ch = ch;
       self.buf.items[n].attribut  = self.atrTitle;
@@ -1986,6 +1992,7 @@ pub const  grd = struct {
           
           // write matrice 
           var iter = utl.iteratStr.iterator(buf);
+          defer iter.deinit();
             n = nposy + self.headers.items[h].posy;
             while (iter.next()) |ch| : ( n += 1) {
               self.buf.items[n].ch = ch;           
@@ -3336,6 +3343,7 @@ pub const  fld = struct {
             else nfld= dds.SFALSE;
     } 
     var iter = utl.iteratStr.iterator(nfld);
+    defer iter.deinit();
     while (iter.next()) |ch| {
       if (vfld.actif == true ) {
         if (vfld.reftyp == dds.REFTYP.PASSWORD) vpnl.buf.items[n].ch = "*" 
@@ -3383,6 +3391,7 @@ pub const  fld = struct {
   fn nbrCarField() usize {
     var wl : usize =0;
     var iter = utl.iteratStr.iterator(utl.listToStr(e_FIELD));
+    defer iter.deinit();
     while (iter.next()) |_|  { wl += 1 ;}
     return wl;
   }
@@ -3592,8 +3601,8 @@ pub const  fld = struct {
     var nfield :usize = 0 ;
 
     e_FIELD = std.ArrayList([] const u8).init(allocator);
-    e_switch = vfld.zwitch;
     defer e_FIELD.clearAndFree();
+    e_switch = vfld.zwitch;
     const e_reftyp = vfld.reftyp;
 
     var tampon: [] const u8 = undefined;
@@ -4190,6 +4199,24 @@ pub const  pnl = struct {
 
     return xpanel;
 
+  }
+
+  pub fn initMatrix(vpnl: *PANEL) void {
+    vpnl.buf.deinit();
+    vpnl.buf    = std.ArrayList(TERMINAL_CHAR).init(allocator);
+
+        // INIT doublebuffer
+    var i:usize = (vpnl.lines+1) * (vpnl.cols+1);
+    var doublebuffer = TERMINAL_CHAR  { .ch =  " ",
+                                        .attribut = vpnl.attribut,
+                                        .on = false};
+
+    // init matrix
+    while (true) {
+        if (i == 0) break ;
+        vpnl.buf.append(doublebuffer) catch unreachable;
+        i -=1 ;
+    }
   }
 
   pub fn initPanel(vname: [] const u8,
