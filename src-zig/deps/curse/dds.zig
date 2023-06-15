@@ -1,4 +1,46 @@
 
+const std = @import("std");
+
+
+//en sortie de programme ou de session
+var arenaField = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+  //defer arena.deinit();
+pub var  allocatorField = arenaField.allocator();
+pub fn deinitField() void {
+    arenaField.deinit();
+    arenaField = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorField = arenaField.allocator();
+}
+
+
+//en sortie de programme ou de session
+var arenaGrid= std.heap.ArenaAllocator.init(std.heap.page_allocator);
+  //defer arena.deinit();
+pub var  allocatorGrid = arenaGrid.allocator();
+pub fn deinitGrid() void {
+    arenaGrid.deinit();
+    arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorGrid = arenaGrid.allocator();
+}
+
+
+// display utilisatation forms 
+var arenaPrint = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+  //defer arena.deinit();
+var  allocatorPrint = arenaPrint.allocator();
+pub fn deinitPrint() void {
+    arenaPrint.deinit();
+    arenaPrint = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorPrint = arenaPrint.allocator();
+}
+
+
+
+
+
+
+
+
 pub const  Style = enum (u8)  {
     notStyle = 0,      // not styled
     styleBold = 1,     // bold text
@@ -25,7 +67,7 @@ pub const  typeCursor = enum (u8)  {
 
 // def standard color fgd dull color  fg higth color
 pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
-    fgdBlack = 30,          // black
+    fgdBlack = 30,         // black
     fgdRed ,               // red
     fgdGreen,              // green
     fgdYellow,             // yellow
@@ -40,12 +82,12 @@ pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
     fgBlue,               // blue
     fgMagenta,            // magenta
     fgCyan,               // cyan
-    fgWhite,              // white
+    fgWhite      ,        // white
 };
 
 pub const  BackgroundColor = enum (u8)  { // terminal's background colors
     bgBlack = 40,         // black
-    fgRed ,               // red
+    bgRed ,               // red
     bgGreen,              // green
     bgYellow,             // yellow
     bgBlue,               // blue

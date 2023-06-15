@@ -1,5 +1,6 @@
 const std = @import("std");
 
+
 const dds = @import("deps/curse/dds.zig");
 
 // terminal Fonction
@@ -7,6 +8,8 @@ const term = @import("deps/curse/cursed.zig");
 // keyboard
 const kbd = @import("deps/curse/cursed.zig").kbd;
 
+// full
+const forms = @import("deps/curse/forms.zig");
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
 // frame
@@ -23,7 +26,7 @@ const mnu = @import("deps/curse/forms.zig").mnu;
 const grd = @import("deps/curse/forms.zig").grd;
 // flied
 const fld = @import("deps/curse/forms.zig").fld;
-/// line horizontal
+// line horizontal
 const lnh = @import("deps/curse/forms.zig").lnh;
 // line vertival
 const lnv = @import("deps/curse/forms.zig").lnv;
@@ -34,7 +37,6 @@ const utl = @import("deps/curse/utils.zig");
 // tools regex
 const reg = @import("deps/curse/match.zig");
 
-const allocator = std.heap.page_allocator;
 
 
 var numPanel: usize = undefined;
@@ -50,41 +52,14 @@ pub const ErrMain = error{
 
 
 
-// function special for developpeur
-// activat onMouse
-// pose X/Y = clik mouse
-fn dspMouse(vpnl: *pnl.PANEL) void {
-    const AtrDebug: dds.ZONATRB = .{
-        .styled = [_]u32{ @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle) },
-        .backgr = dds.BackgroundColor.bgBlack,
-        .foregr = dds.ForegroundColor.fgRed,
-    };
-
-    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) catch unreachable;
-    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
-    term.writeStyled(msg, AtrDebug);
-    term.gotoXY(term.MouseInfo.x, term.MouseInfo.y);
-}
-
-fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize) void {
-    const AtrDebug: dds.ZONATRB = .{
-        .styled = [_]u32{ @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle) },
-        .backgr = dds.BackgroundColor.bgBlack,
-        .foregr = dds.ForegroundColor.fgRed,
-    };
-
-    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) catch unreachable;
-    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
-    term.writeStyled(msg, AtrDebug);
-    term.gotoXY(x_posx, x_posy);
-}
-
 //=================================================
 // description Function
 // choix work panel
 pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
     var cellPos: usize = 0;
-    var Xcombo = grd.initGrid(
+
+
+    var Xcombo =  grd.initGrid(
         "qryPanel",
         1,
         1,
@@ -93,7 +68,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
         dds.CADRE.line1,
     );
 
-    var Cell = std.ArrayList(grd.CELL).init(allocator);
+    var Cell = std.ArrayList(grd.CELL).init(dds.allocatorGrid);
     Cell.append(grd.newCell("ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen)) catch unreachable;
     Cell.append(grd.newCell("Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow)) catch unreachable;
     Cell.append(grd.newCell("Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen)) catch unreachable;
@@ -110,17 +85,19 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
         Gkey = grd.ioCombo(&Xcombo, cellPos);
         if (Gkey.Key == kbd.enter) {
             //grd.rstPanel(&Xcombo, frompnl);
+            grd.resetGrid(&Xcombo);
             Cell.clearAndFree();
             Xcombo.buf.clearAndFree();
-            grd.resetGrid(&Xcombo);
+            dds.deinitGrid();
 
             return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
         }
         if (Gkey.Key == kbd.esc) {
             //grd.rstPanel(&Xcombo, frompnl);
+            grd.resetGrid(&Xcombo);
             Cell.clearAndFree();
             Xcombo.buf.clearAndFree();
-            grd.resetGrid(&Xcombo);
+            dds.deinitGrid();
             return 999;
         }
     }
@@ -202,7 +179,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     while (true) {
         term.cursShow();
         Tkey = kbd.getKEY();
-        if (Tkey.Key == kbd.mouse)  { dspMouse(&pFmt01);  continue;  } // active display Cursor x/y mouse
+        dds.deinitPrint();
+        if (Tkey.Key == kbd.mouse)  { forms.dspMouse(&pFmt01);  continue;  } // active display Cursor x/y mouse
 
         switch (Tkey.Key) {
             .F10 =>  {
@@ -219,6 +197,10 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 pFmt01.lineh.deinit();
                 pFmt01.linev.deinit();
                 pFmt01.buf.deinit();
+
+
+                dds.deinitPrint();
+
                 return;
             },
             .F12 => {
@@ -230,6 +212,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 pFmt01.lineh.deinit();
                 pFmt01.linev.deinit();
                 pFmt01.buf.deinit();
+
+                dds.deinitPrint();
+
                 return ; 
             } ,
             .altT => {
@@ -263,8 +248,9 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
     //term.getCursor();
     var e_count: usize = 0;
     var tampon: []const u8 = undefined;
+    const allocator = std.heap.page_allocator;
     var e_LABEL = std.ArrayList([]const u8).init(allocator);
-    defer e_LABEL.clearAndFree();
+    defer e_LABEL.deinit();
     var e_posx: usize = term.posCurs.x;
     var e_posy: usize = term.posCurs.y;
     var e_curs: usize = e_posy;
@@ -276,24 +262,18 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
         e_LABEL.append(" ") catch unreachable;
     }
     while (true) {
-        dspCursor(vpnl, e_posx, e_curs);
+        forms.dspCursor(vpnl, e_posx, e_curs);
 
         Lkey = kbd.getKEY();
 
         //dspMouse(vpnl);  // active display Cursor x/y mouse
         //std.debug.print("Key: {d}  - {d}\n\r",.{term.posCurs.x, term.posCurs.y});
         switch (Lkey.Key) {
-            .F2 => {
-                term.gotoXY(e_posx, e_posy);
-                tampon = utl.listToStr(e_LABEL);
-                if (Title) term.writeStyled(utl.trimStr(tampon), lbl.AtrTitle) 
-                else term.writeStyled(utl.trimStr(tampon), lbl.AtrLabel);
-            },
             .F12 => return,
 
 		
             .ctrlV => {
-                tampon = std.fmt.allocPrint(allocator,"L{d}{d}",.{e_posx,e_posy}) catch unreachable;
+                tampon = std.fmt.allocPrint(dds.allocatorField,"L{d}{d}",.{e_posx,e_posy}) catch unreachable;
               if (Title) {
                 vpnl.label.append(lbl.newTitle(
                 tampon, e_posx ,e_posy,utl.trimStr(utl.listToStr(e_LABEL))) ) catch unreachable;

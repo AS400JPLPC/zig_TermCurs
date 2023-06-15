@@ -7,6 +7,9 @@ const term = @import("deps/curse/cursed.zig");
 // keyboard
 const kbd = @import("deps/curse/cursed.zig").kbd;
 
+
+// forms
+const forms = @import("deps/curse/forms.zig");
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
 // frame
@@ -217,7 +220,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   Panel.field.append(fld.newFieldUDigit("udigit",13,32,           // Name , posx posy
                                         5,                        // width
                                         "00102",                  // text
-                                        false,                     // tofill
+                                        true,                    // tofill
                                         "Invalide value",         // error msg
                                         "value numéric not signed",// help
                                         "",                       // regex default standard
@@ -316,7 +319,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-   Panel.field.append(fld.newFieldFunc("cb01",3,76,              // Name , posx posy
+   Panel.field.append(fld.newFieldFunc("cb01",3,76,               // Name , posx posy
                                         20,                       // width
                                         "Amis",                   // text
                                         true,                     // tofill
@@ -329,7 +332,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     Panel.field.append(fld.newFieldFunc("cb02",4,76,              // Name , posx posy
                                         20,                       // width
                                         "",                       // text
-                                        true,                     // tofill
+                                        false,                     // tofill
                                         "comboFn02",              // Process for FUNC 
                                         "required",               // error msg
                                         "select combo",           // help
@@ -406,7 +409,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   var Xcombo = grd.initGrid(
                   "Combo01",
                   4, 76,
-                  3 ,  
+                  4 ,  
                   grd.gridStyle,
                   dds.CADRE.line1,
                   )  ;
@@ -433,9 +436,10 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   Gkey =grd.ioCombo(&Xcombo,cellPos);
   grd.rstPanel(&Xcombo, vpnl);
 
+
   grd.resetGrid(&Xcombo);
-  Cell.deinit();
-  Xcombo.buf.deinit();
+  Cell.clearAndFree();
+  Xcombo.buf.clearAndFree();
 
 
 
@@ -455,6 +459,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                   dds.CADRE.line1,
                   )  ;
 
+
   var Cell = std.ArrayList(grd.CELL).init(allocator);
   Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
   grd.setHeaders(&Xcombo, Cell) ;
@@ -473,9 +478,10 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   Gkey =grd.ioCombo(&Xcombo,cellPos);
   grd.rstPanel(&Xcombo, vpnl);
 
+
   grd.resetGrid(&Xcombo);
-  Cell.deinit();
-  Xcombo.buf.deinit();
+  Cell.clearAndFree();
+  Xcombo.buf.clearAndFree();
 
   if ( Gkey.Key == kbd.esc )  return ;
   vfld.text = Gkey.Buf.items[0];
@@ -518,6 +524,7 @@ test "test" {
 }
 
 
+
 // main----------------------------------
 pub fn main() !void {
 
@@ -537,6 +544,7 @@ pub fn main() !void {
   term.resizeTerm(pFmt01.lines,pFmt01.cols);
 
   //pnl.printPanel(&pFmt01);
+  //forms.mydebeug(561, "stop");
   //Tkey.Key = kbd.F2;
   
   while (true) {
@@ -545,6 +553,9 @@ pub fn main() !void {
     // Tkey = kbd.getKEY();
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
+    
+    forms.deinitPrint();
+
     switch (Tkey.Key) {
 
       .func => {
@@ -576,6 +587,7 @@ pub fn main() !void {
           Cell.append(grd.newCell("Password",10,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen)) catch unreachable ;
           grd.setHeaders(&pFmt01.grid.items[0], Cell);
           grd.printGridHeader(&pFmt01.grid.items[0]);
+          Cell.clearAndFree();
         }
 
 
@@ -627,10 +639,9 @@ pub fn main() !void {
           }
         }
         grd.rstPanel(&pFmt01.grid.items[0], &pFmt01);
-
         //grd.resetGrid(&pFmt01.grid.items[0]);
-        //Cell.deinit();
-       // pFmt01.grid.items[0].buf.deinit();
+        //Cell.clearAndFree();
+        //pFmt01.grid.items[0].buf.deinit();
       },
       .F23 => {     
         pnl.printPanel(&pFmt01);

@@ -14,10 +14,10 @@ const io = std.io;
 /// FORMS
 ///-------------------------------
 
-// const allocator = std.heap.page_allocator;
+
 
 // function special for developpeur
-fn mydebeug(vline : usize, buf: [] const u8) void {
+pub fn mydebeug(vline : usize, buf: [] const u8) void {
   
   const allocator = std.heap.page_allocator;
 
@@ -27,14 +27,16 @@ fn mydebeug(vline : usize, buf: [] const u8) void {
                     @enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle)},
       .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgYellow,
+      .foregr = dds.ForegroundColor.fgYellow
   };
+
   term.getCursor();
   term.gotoXY(39,1);
   var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) catch unreachable;
   term.writeStyled(msg,AtrDebug);
   _=term.kbd.getKEY();
   term.gotoXY(term.posCurs.x,term.posCurs.y);
+  allocator.free(msg);
             
 }
 
@@ -44,25 +46,53 @@ fn mydebeug(vline : usize, buf: [] const u8) void {
 // function special for developpeur
 // activat fld.myMouse = true
 // read ioField -> getKEY()
-pub fn mMouseXY(vpnl : *pnl.PANEL) void {
-  const AtrDebug : dds.ZONATRB = .{
-      .styled=[_]u32{@enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle),
-                    @enumToInt(dds.Style.notStyle)},
-      .backgr = dds.BackgroundColor.bgBlack,
-      .foregr = dds.ForegroundColor.fgRed,
-  };
+ pub fn dspMouse(vpnl: *pnl.PANEL) void {
+    const AtrDebug: dds.ZONATRB = .{
+        .styled = [_]u32{ @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle) },
+        .backgr = dds.BackgroundColor.bgBlack,
+        .foregr = dds.ForegroundColor.fgRed,
+    };
+    const allocator = std.heap.page_allocator;
+    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) catch unreachable;
+    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
+    term.writeStyled(msg, AtrDebug);
+    term.gotoXY(term.MouseInfo.x, term.MouseInfo.y);
+    allocator.free(msg);
+}
 
-  const allocator = std.heap.page_allocator;
-
-  var msg =std.fmt.allocPrint(allocator,"{d:0>2}/{d:0>3}",.{term.MouseInfo.x,term.MouseInfo.y}) catch unreachable;
-  term.gotoXY(vpnl.posx + vpnl.lines - 1  , (vpnl.posy + vpnl.cols - 1) - 7);
-  term.writeStyled(msg,AtrDebug);
-  term.gotoXY(term.posCurs.x,term.posCurs.y);          
+// function special for developpeur
+ pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize) void {
+    const AtrDebug: dds.ZONATRB = .{
+        .styled = [_]u32{ @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle), @enumToInt(dds.Style.notStyle) },
+        .backgr = dds.BackgroundColor.bgBlack,
+        .foregr = dds.ForegroundColor.fgRed,
+    };
+    const allocator = std.heap.page_allocator;
+    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) catch unreachable;
+    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
+    term.writeStyled(msg, AtrDebug);
+    term.gotoXY(x_posx, x_posy);
+    allocator.free(msg);
 }
 
 
+pub fn fieldToStr(text : [] const u8 ) []const u8 {
+  var idx : usize =0;
+  var iter = utl.iteratStr.iterator(text);
+
+  defer iter.deinit();
+  var string: [] const u8 = "" ;
+
+  while (iter.next()) |ch|  {
+    idx += 1 ;
+    if (idx == 1 ) string = ch
+    else {
+      string =  std.fmt.allocPrint(dds.allocatorField,"{s}{s}",.{string,ch},)  catch unreachable;
+    }
+  }
+  return string ;
+
+}
 /// Errors that may occur when using String
 pub const ErrForms = error{
         Invalide_append,
@@ -175,7 +205,8 @@ pub const  dsperr = struct {
         .esc => break,
       else =>  {},
       }
-    } 
+    }
+    allocator.free(msgerr); 
   }
 };
 
@@ -332,6 +363,7 @@ pub const  lbl = struct {
     var n  = (vpnl.cols * (vlbl.posx - 1)) + vlbl.posy - 1;
     var iter = utl.iteratStr.iterator(vlbl.text);
     defer iter.deinit();
+
     while (iter.next()) |ch| {
       if (vlbl.actif == true) {
         vpnl.buf.items[n].ch = ch ;
@@ -457,6 +489,7 @@ pub const frm = struct {
 
     // write MATRIX TERMINAL  ---> arraylist panel-fram
     pub fn printFrame(vpnl : *pnl.PANEL , vfram: FRAME) void {
+
       // assigne FRAME to init matrice for display
       if (dds.CADRE.line0 == vfram.cadre ) return ;
 
@@ -889,6 +922,7 @@ pub const btn = struct{
   // assign -button MATRIX TERMINAL  ---> arraylist panel-button
   pub fn printButton(vpnl: *pnl.PANEL) void {
     if (vpnl.actif == false ) return ;
+  
     var espace :usize = 3;
     var x :usize = 0;
     var y :usize = 0;
@@ -929,7 +963,7 @@ pub const btn = struct{
 
         //text Title button
         iter = utl.iteratStr.iterator(button.title);
-        defer iter.deinit();
+
         while (iter.next()) |ch| {
           if (button.actif == true) {
             vpnl.buf.items[n].ch = ch ;
@@ -1493,6 +1527,11 @@ pub const  grd = struct {
 
   };
 
+  /// concat String
+  fn concatStr( a: []const u8, b: []const u8) []const u8 {
+    return std.fmt.allocPrint(dds.allocatorGrid,"{s}{s}",.{a,b},)  catch unreachable;
+  }
+
 
   // pading Cell 
   fn padingCell( text:[] const u8 , cell :CELL) [] const u8 {
@@ -1505,7 +1544,7 @@ pub const  grd = struct {
     if (cell.reftyp == dds.REFTYP.PASSWORD) {
       i = 0;
       e_FIELD = "";
-      while (i < utl.nbrCharStr(text) ) : ( i += 1 )  e_FIELD = utl.concatStr(e_FIELD,"*");
+      while (i < utl.nbrCharStr(text) ) : ( i += 1 )  e_FIELD = concatStr(e_FIELD,"*");
     }
 
     
@@ -1526,8 +1565,8 @@ pub const  grd = struct {
 
             e_FIELD = utl.subStr(e_FIELD,1,e_FIELD.len) catch unreachable ;
 
-            if ( utl.isSignedStr(text) == false )   e_FIELD = utl.concatStr("+",e_FIELD)
-            else e_FIELD = utl.concatStr(e_signed,e_FIELD);
+            if ( utl.isSignedStr(text) == false )   e_FIELD = concatStr("+",e_FIELD)
+            else e_FIELD = concatStr(e_signed,e_FIELD);
 
           }
         }
@@ -1539,10 +1578,9 @@ pub const  grd = struct {
       else e_FIELD = dds.CFALSE;
     }
 
-    if ( std.mem.eql(u8,cell.edtcar , "") == false)  e_FIELD =   utl.concatStr(e_FIELD,cell.edtcar);
+    if ( std.mem.eql(u8,cell.edtcar , "") == false)  e_FIELD =   concatStr(e_FIELD,cell.edtcar);
 
     return e_FIELD;
-
   }
 
   // calculate the number of pages
@@ -1575,7 +1613,7 @@ pub const  grd = struct {
       .separator = vseparator ,
       .pageRows = vpageRows,
       .data = std.MultiArrayList(ArgData){},
-      .headers = std.ArrayList(CELL).init(allocator),
+      .headers = std.ArrayList(CELL).init(dds.allocatorGrid),
       .actif = true,
       .attribut = AtrGrid,
       .atrTitle = AtrTitle,
@@ -1587,7 +1625,7 @@ pub const  grd = struct {
       .cursligne  = 0,
       .curspage  = 1,
 
-      .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator)
+      .buf    = std.ArrayList(TERMINAL_CHAR).init(dds.allocatorGrid)
     };
 
     return xgrid ;
@@ -1878,6 +1916,7 @@ pub const  grd = struct {
   // assign and display -header MATRIX TERMINAL  ---> arraylist panel-grid
   pub fn printGridHeader(self: *GRID) void {
     if (self.actif == false)  return;
+    
     var buf : [] const u8 = "";
     const Blanc = " ";
     var pos : usize = 0 ;
@@ -1891,13 +1930,13 @@ pub const  grd = struct {
 
     for (self.headers.items) |cellx| {
       if (std.mem.eql(u8,cellx.edtcar , "") == true )
-        buf = std.fmt.allocPrint(allocator,
+        buf = std.fmt.allocPrint(dds.allocatorGrid,
           "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long) }) catch unreachable
       else
-        buf = std.fmt.allocPrint(allocator,
+        buf = std.fmt.allocPrint(dds.allocatorGrid,
           "{s}{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long),Blanc }) catch unreachable;
     }
-    buf = std.fmt.allocPrint(allocator,"{s}{s}", .{ buf,self.separator}) catch unreachable;
+    buf = std.fmt.allocPrint(dds.allocatorGrid,"{s}{s}", .{ buf,self.separator}) catch unreachable;
 
     var x :usize = 1;
     var y :usize = 0;
@@ -1912,7 +1951,6 @@ pub const  grd = struct {
           self.buf.items[n].attribut  = self.attribut;
           self.buf.items[n].on = false;
       }
-
     }
 
     buf ="";
@@ -1922,14 +1960,14 @@ pub const  grd = struct {
         cellx.reftyp == dds.REFTYP.UDECIMAL or
         cellx.reftyp == dds.REFTYP.DECIMAL)
 
-          buf = std.fmt.allocPrint(allocator,
+          buf = std.fmt.allocPrint(dds.allocatorGrid,
           "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.rigth,cellx.long) }) catch unreachable
 
       else buf = std.fmt.allocPrint(
-          allocator,
+          dds.allocatorGrid,
           "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.left,cellx.long) }) catch unreachable;
 
-      if (std.mem.eql(u8,cellx.edtcar , "") == false ) buf = std.fmt.allocPrint(allocator,"{s}{s}", .{ buf,Blanc}) catch unreachable;
+      if (std.mem.eql(u8,cellx.edtcar , "") == false ) buf = std.fmt.allocPrint(dds.allocatorGrid,"{s}{s}", .{ buf,Blanc}) catch unreachable;
     }
 
     n = getLenHeaders(self);
@@ -1955,13 +1993,13 @@ pub const  grd = struct {
         n += 1;
       }
     }
-
   }
 
 
   // assign and display -data MATRIX TERMINAL  ---> arraylist panel-grid
   pub fn printGridRows(self: *GRID) void {
     if (self.actif == false)  return;
+
     var nposy : usize =  (getLenHeaders(self) * 2) + 1;
     var n : usize = 0;
     var x : usize = 0;
@@ -1992,7 +2030,7 @@ pub const  grd = struct {
           
           // write matrice 
           var iter = utl.iteratStr.iterator(buf);
-          defer iter.deinit();
+            defer iter.deinit();
             n = nposy + self.headers.items[h].posy;
             while (iter.next()) |ch| : ( n += 1) {
               self.buf.items[n].ch = ch;           
@@ -2018,7 +2056,6 @@ pub const  grd = struct {
         n += 1;
       }
     }
-
   }
 
 
@@ -2317,7 +2354,7 @@ pub const  grd = struct {
 // defined INPUT_FIELD
 pub const  fld = struct {
       
-  const allocator = std.heap.page_allocator;
+
 
   // define attribut default Fiel
   pub var AtrField : dds.ZONATRB = .{
@@ -2936,7 +2973,7 @@ pub const  fld = struct {
     };
 
       if (std.mem.eql(u8,xfield.regex,"")) {
-        xfield.regex = std.fmt.allocPrint(allocator,"^[0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
       }
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: 0..9" ;
 
@@ -2980,7 +3017,7 @@ pub const  fld = struct {
     };
       xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
       if (std.mem.eql(u8,xfield.regex,"")) {
-        xfield.regex = std.fmt.allocPrint(allocator,"^[+-][0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[+-][0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
       }
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: +0..9" ;
 
@@ -3029,8 +3066,8 @@ pub const  fld = struct {
     else xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
 
     if (std.mem.eql(u8,xfield.regex,"")) {
-      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(allocator,"^[0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
-      else xfield.regex = std.fmt.allocPrint(allocator,"^[0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},)  catch unreachable;
+      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
+      else xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},)  catch unreachable;
     }
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: 12301 or 123.01" ;
 
@@ -3078,8 +3115,12 @@ pub const  fld = struct {
     if (vscal == 0 ) xfield.nbrcar = xfield.width + 1
     else xfield.nbrcar = xfield.width + xfield.scal  + 2 ;
     if (std.mem.eql(u8,xfield.regex,"")) {
-      if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(allocator,"^[+-][0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
-      else xfield.regex = std.fmt.allocPrint(allocator,"^[+-][0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},) catch unreachable;
+
+      if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(
+        dds.allocatorField,"^[+-][0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
+      else xfield.regex = std.fmt.allocPrint(
+        dds.allocatorField,"^[+-][0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},) catch unreachable;
+
     }
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: +12301 or +123.01" ;
 
@@ -3403,21 +3444,25 @@ pub const  fld = struct {
 
   fn insert(c: [] const u8 , n : usize) void {
     _=e_FIELD.orderedRemove(nbrCarField() - 1);
-    
-    var x_FIELD : std.ArrayList([] const u8) = undefined;
-    x_FIELD = std.ArrayList([] const u8).init(allocator);
-    defer x_FIELD.clearAndFree();
-    var idx : usize = 0 ;
+
+    const allocator = std.heap.page_allocator;
+    var x_FIELD = std.ArrayList([] const u8).init(allocator);
+    defer x_FIELD.deinit();
+
     for ( e_FIELD.items) |ch | {
-      if ( n != idx) x_FIELD.append(ch) catch unreachable ;
+      x_FIELD.append(ch) catch unreachable ;
+    }
+    e_FIELD.clearRetainingCapacity();
+
+    var idx : usize = 0 ;
+    for ( x_FIELD.items) |ch | {
+      if ( n != idx) e_FIELD.append(ch) catch unreachable ;
       if ( n == idx) { 
-        x_FIELD.append(c) catch unreachable ;
-        x_FIELD.append(ch) catch unreachable ;
+        e_FIELD.append(c) catch unreachable ;
+        e_FIELD.append(ch) catch unreachable ;
       } 
       idx += 1;
     }
-    e_FIELD.deinit();
-    e_FIELD = x_FIELD;
   }
 
 
@@ -3467,8 +3512,7 @@ pub const  fld = struct {
   /// switch convert bool CTRUE /CFALSE
   /// the buffer displays field the text and completes with blanks
   fn initData(f:FIELD) void {
-    e_FIELD.deinit();
-    e_FIELD = std.ArrayList([] const u8).init(allocator);
+    e_FIELD.clearRetainingCapacity();
     if ( f.reftyp == dds.REFTYP.SWITCH) {
       if (e_switch == true ) 
         e_FIELD = utl.addListStr(e_FIELD  , dds.STRUE) catch unreachable 
@@ -3600,8 +3644,10 @@ pub const  fld = struct {
     var statusCursInsert : bool = false ;
     var nfield :usize = 0 ;
 
+    const allocator = std.heap.page_allocator;
     e_FIELD = std.ArrayList([] const u8).init(allocator);
-    defer e_FIELD.clearAndFree();
+    defer e_FIELD.deinit();
+    
     e_switch = vfld.zwitch;
     const e_reftyp = vfld.reftyp;
 
@@ -3610,7 +3656,7 @@ pub const  fld = struct {
     if ( e_posx == 0) return kbd.enter;
     
     vpnl.keyField = kbd.none;
-
+    
     // prepare the switch edition
     initData(vfld);
 
@@ -3671,7 +3717,7 @@ pub const  fld = struct {
         
             if (term.MouseInfo.action == term.MouseAction.maReleased ) continue;
             
-            if (myMouse) mMouseXY(vpnl);  // active display Cursor x/y mouse
+            if (myMouse) dspMouse(vpnl);  // active display Cursor x/y mouse
 
             switch (term.MouseInfo.button) {
               term.MouseButton.mbLeft    =>  Fkey.Key = kbd.left,
@@ -4559,6 +4605,7 @@ pub const  pnl = struct {
 
       if (nbrFieldIO == 0)  {
         var vKey= kbd.getKEY();
+
         if (isPanelKey(vpnl,vKey.Key)) {
           vpnl.idxfld = 9999;
           return vKey.Key;

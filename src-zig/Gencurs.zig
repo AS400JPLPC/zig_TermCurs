@@ -7,6 +7,9 @@ const term = @import("deps/curse/cursed.zig");
 // keyboard
 const kbd = @import("deps/curse/cursed.zig").kbd;
 
+// full
+const forms = @import("deps/curse/forms.zig");
+
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
 // frame
@@ -23,7 +26,7 @@ const mnu = @import("deps/curse/forms.zig").mnu;
 const grd = @import("deps/curse/forms.zig").grd;
 // flied
 const fld = @import("deps/curse/forms.zig").fld;
-/// line horizontal
+// line horizontal
 const lnh = @import("deps/curse/forms.zig").lnh;
 // line vertival
 const lnv = @import("deps/curse/forms.zig").lnv;
@@ -35,14 +38,11 @@ const utl = @import("deps/curse/utils.zig");
 const reg = @import("deps/curse/match.zig");
 
 
-
- // Descrption PANEL
+// Descrption PANEL
 const mdlPanel = @import("./mdlPanel.zig");
 
 // Descrption Objet
 const mdlObjet = @import("./mdlObjet.zig");
-
-
 
 const allocator = std.heap.page_allocator;
 
@@ -85,7 +85,7 @@ pub fn main() !void {
 
   fld.myMouse = true ; // active display cursor x/y mouse
 
- var base = pnl.initPanel("base",
+  var base = pnl.initPanel("base",
                   1, 1,
                   termSize.height,
                   termSize.width ,
@@ -127,6 +127,7 @@ pub fn main() !void {
       if (nopt == @enumToInt(choix.exit )) { break; }
       if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
       if (nopt == @enumToInt(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
+      if (NPANEL.items.len == 0 ) { dds.deinitField(); dds.deinitGrid(); dds.deinitPrint();}
     }
     nPnl = 0;
 

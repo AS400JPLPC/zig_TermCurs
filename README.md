@@ -260,6 +260,9 @@ modification from :<BR />
 <BR/>
 -  2023-06-12  mise en place clean memory  <br />
 <BR/>
-
+<BR/>
+-  2023-06-15  debeug clean memory   <br />
+-  2023-06-15  setting up memory management  <br />
+<BR/>
 
 

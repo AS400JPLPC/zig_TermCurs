@@ -7,9 +7,10 @@ const term = @import("deps/curse/cursed.zig");
 // keyboard
 const kbd = @import("deps/curse/cursed.zig").kbd;
 
+// full
+const forms = @import("deps/curse/forms.zig");
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
-
 // frame
 const frm = @import("deps/curse/forms.zig").frm;
 // panel
@@ -39,7 +40,14 @@ const reg = @import("deps/curse/match.zig");
 
 
 
-const allocator = std.heap.page_allocator;
+
+var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+var allocator = arena.allocator();
+pub fn deinitPanel() void { 
+    arena.deinit(); 
+    arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocator = arena.allocator();   
+}
 
 
 
@@ -1219,13 +1227,13 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
   var cellPos:usize = 0;
   var Xcombo = grd.initGrid(
                   "qryPanel",
-                  22, 1,
+                  12, 1,
                   20 ,  
                   grd.gridStyle,
                   dds.CADRE.line1,
                   )  ;
   
-  var Cell = std.ArrayList(grd.CELL).init(allocator);
+  var Cell = std.ArrayList(grd.CELL).init(dds.allocatorGrid);
   Cell.append(grd.newCell("ID",3,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgGreen)) catch unreachable ;
   Cell.append(grd.newCell("Name",10,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
   Cell.append(grd.newCell("Title",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
@@ -1244,16 +1252,28 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
     Gkey =grd.ioCombo(&Xcombo,cellPos);
     if ( Gkey.Key == kbd.enter ) {
       grd.rstPanel(&Xcombo, frompnl);
+
+      grd.resetGrid(&Xcombo);
       Cell.clearAndFree();
       Xcombo.buf.clearAndFree();
-      grd.resetGrid(&Xcombo);
+      dds.deinitGrid();
+
+
+
+ 
+
       return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable ;
     }
     if ( Gkey.Key == kbd.esc ) {
       grd.rstPanel(&Xcombo, frompnl);
-      Cell.clearAndFree();
-      Xcombo.buf.clearAndFree();
+
       grd.resetGrid(&Xcombo);
+      Cell.deinit();
+      Xcombo.buf.deinit();
+      dds.deinitGrid();
+
+
+
       return 999;
     }
   }
@@ -1488,15 +1508,18 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
   numPanel = qryPanel(NPANEL,true,&pFmt01);
 
   if (numPanel == 999) {
-    pFmt01.label.clearAndFree();
-    pFmt01.field.clearAndFree();
-    pFmt01.button.clearAndFree();
-    pFmt01.menu.clearAndFree();
-    pFmt01.grid.clearAndFree();
-    pFmt01.lineh.clearAndFree();
-    pFmt01.linev.clearAndFree();
-    pFmt01.buf.clearAndFree();
+    pFmt01.label.deinit();
+    pFmt01.field.deinit();
+    pFmt01.button.deinit();
+    pFmt01.menu.deinit();
+    pFmt01.grid.deinit();
+    pFmt01.lineh.deinit();
+    pFmt01.linev.deinit();
+    pFmt01.buf.deinit();
     NPANEL.deinit();
+
+    dds.deinitPrint();
+
     return ; 
   }
   if (numPanel < 888 ) {
@@ -1508,6 +1531,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     //Tkey = kbd.getKEY();
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
+
+    dds.deinitPrint();
+    
     switch (Tkey.Key) {
       .func => {
         callFunc = FnEnumFunc.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); 
@@ -1526,7 +1552,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
         _= kbd.getKEY();
         pnl.rstPanel(&NPANEL.items[numPanel],&pFmt01);
         term.flushIO();
-        NPANEL.items[numPanel].buf.clearRetainingCapacity();
+        NPANEL.items[numPanel].buf.deinit();
+        dds.deinitPrint();
 
       },
 
@@ -1607,6 +1634,10 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
           pFmt01.linev.deinit();
           pFmt01.buf.deinit();
           NPANEL.deinit();
+
+          dds.deinitPrint();
+
+
           return ; 
       },
 

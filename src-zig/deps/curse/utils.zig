@@ -22,6 +22,7 @@ pub const ErrUtils = error{
 
 
 
+
 /// Iterator support iteration string
 pub const iteratStr = struct {
   var strbuf:[] const u8 = undefined;
@@ -226,16 +227,17 @@ pub fn isDecimalStr(str:[] const u8) bool {
 
 /// is String isDigit 
 pub fn isSignedStr(str:[] const u8) bool {
-  var iter = iteratStr.iterator(str);
+  var iter = iteratStr.iterator(std.mem.trim(u8, str ," "));
   defer iter.deinit();
   var b:bool = false;
   while (iter.next()) |ch| {
     var x = utf.utf8Decode(ch) catch unreachable;
     switch (x) {
-      '-' => return true ,
-      '+' => return true ,
+      '-' => b = true ,
+      '+' =>  b = true ,
       else => b = false ,
     }
+    break;
   }
   return b;
 }
@@ -533,7 +535,7 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toUpper(result[idx]);
     }
-	return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
+	return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -549,7 +551,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toLower(result[idx]);
     }
-	return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
+	return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -557,8 +559,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 
 /// concat String
 pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
-  const allocator = std.heap.page_allocator;
-  return std.fmt.allocPrint(allocator,"{s}{s}",.{a,b},)  catch unreachable;
+  return std.fmt.allocPrint(dds.allocatorField,"{s}{s}",.{a,b},)  catch unreachable;
 }
 
 
@@ -572,7 +573,7 @@ pub fn subStr( a: []const u8,pos: usize, n:usize) ![]const u8 {
   const result = try allocator.alloc(u8, n - pos);
   defer allocator.free(result);
   std.mem.copy(u8, result, a[pos..n]);
-  return std.fmt.allocPrint(allocator,"{s}",.{result},)  catch unreachable;
+  return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -608,7 +609,7 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 
   var idx : usize =0;
   var iter = iteratStr.iterator(text);
-  defer iter.deinit();
+
   var string: [] const u8 = "" ;
 
   while (iter.next()) |ch|  {
@@ -646,8 +647,8 @@ pub fn strToUsize(v: []const u8) !usize{
 
 
 pub fn usizeToStr(v: usize ) ![]const u8{
-  const allocator = std.heap.page_allocator;
-  return std.fmt.allocPrint(allocator,"{d}", .{v}) catch return ErrUtils.Invalide_OutOfMemory_usizeToStr;
+
+  return std.fmt.allocPrint(dds.allocatorField,"{d}", .{v}) catch return ErrUtils.Invalide_OutOfMemory_usizeToStr;
 }
 
 
@@ -656,8 +657,8 @@ pub fn usizeToStr(v: usize ) ![]const u8{
 /// Delete Items ArrayList
 pub fn removeListStr(self: std.ArrayList([]const u8), i: usize) ! std.ArrayList([]const u8){
 
-  const allocator = std.heap.page_allocator;
-  var LIST = std.ArrayList([] const u8).init(allocator);
+  //const allocator = std.heap.page_allocator;
+  var LIST = std.ArrayList([] const u8).init(dds.allocatorField);
   var idx : usize = 0;
   for (self.items) | val| {
     if ( idx != i-1 ) LIST.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;
@@ -674,8 +675,8 @@ pub fn removeListStr(self: std.ArrayList([]const u8), i: usize) ! std.ArrayList(
 /// Add Text ArrayList
 pub fn addListStr(self: std.ArrayList([]const u8), text : []const u8) ! std.ArrayList([]const u8){
 
-  const allocator = std.heap.page_allocator;
-  var LIST = std.ArrayList([] const u8).init(allocator);
+  //const allocator = std.heap.page_allocator;
+  var LIST = std.ArrayList([] const u8).init(dds.allocatorField);
   
   var iter = iteratStr.iterator(text);
   defer iter.deinit();
