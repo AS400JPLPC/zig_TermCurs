@@ -1719,14 +1719,14 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 
 fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
 
-  var panel =  pnl.initPanel(forms.fieldToStr(src.field.items[@enumToInt(fp01.name)].text),
-                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.posx)].text)) catch |err| {return err;},
-                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.posy)].text)) catch |err| {return err;},
-                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.lines)].text)) catch |err| {return err;},
-                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.cols)].text)) catch |err| {return err;},
-                    @intToEnum(dds.CADRE,utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.cadre)].text)) 
+  var panel =  pnl.initPanel(src.field.items[@enumToInt(fp01.name)].text,
+                    utl.strToUsize(src.field.items[@enumToInt(fp01.posx)].text) catch |err| {return err;},
+                    utl.strToUsize(src.field.items[@enumToInt(fp01.posy)].text) catch |err| {return err;},
+                    utl.strToUsize(src.field.items[@enumToInt(fp01.lines)].text) catch |err| {return err;},
+                    utl.strToUsize(src.field.items[@enumToInt(fp01.cols)].text) catch |err| {return err;},
+                    @intToEnum(dds.CADRE,utl.strToUsize(src.field.items[@enumToInt(fp01.cadre)].text) 
                     catch |err| {return err;}),
-                    forms.fieldToStr(src.field.items[@enumToInt(fp01.title)].text));
+                    src.field.items[@enumToInt(fp01.title)].text);
 
   var fxx : usize = @enumToInt(fp01.F1);
   var kxx   : usize =0 ;
@@ -1747,8 +1747,8 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),             // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      forms.fieldToStr(src.field.items[title].text),    // title 
-                        )
+                      src.field.items[title].text,    // title 
+                      )
                     ) catch unreachable ;
     }
     panel.buf.clearAndFree();
@@ -1773,8 +1773,8 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      forms.fieldToStr(src.field.items[title].text),    // title 
-                        )
+                      src.field.items[title].text,    // title 
+                      )
                     ) catch unreachable ;
     }
   }
@@ -1800,8 +1800,8 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      forms.fieldToStr(src.field.items[title].text),    // title 
-                        )
+                      src.field.items[title].text,    // title 
+                      )
                     ) catch unreachable ;
     }
   }

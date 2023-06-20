@@ -5,7 +5,6 @@ const re = @cImport({
 });
 
 
-
 // function macth regex.h  standard libc 
 // display patern only test 
 pub fn isMatch(strVal : [] const  u8, regVal : [] const  u8 ) bool {

@@ -19,8 +19,12 @@ pub const ErrUtils = error{
         Invalide_Character_strToUsize,
 };
 
-
-
+// write to buffer struct and file
+pub fn ToStr(text : [] const u8 ) []const u8 {
+  var result = dds.allocatorRecord.alloc(u8, text.len ) catch unreachable;
+  std.mem.copy(u8, result, text);
+  return result;
+}
 
 
 /// Iterator support iteration string

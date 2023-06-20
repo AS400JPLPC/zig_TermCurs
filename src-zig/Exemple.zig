@@ -555,7 +555,7 @@ pub fn main() !void {
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
     
-
+    dds.deinitUtils();
 
     switch (Tkey.Key) {
 

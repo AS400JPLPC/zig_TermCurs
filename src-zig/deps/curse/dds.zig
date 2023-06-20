@@ -21,6 +21,7 @@ pub fn deinitScreen() void {
     allocatorScreen = arenaScreen.allocator();
 }
 
+
 //free memory on module output
 var arenaGrid= std.heap.ArenaAllocator.init(std.heap.page_allocator);
 pub var  allocatorGrid = arenaGrid.allocator();

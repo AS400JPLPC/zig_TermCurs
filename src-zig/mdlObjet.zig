@@ -294,12 +294,12 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
                 text = utl.trimStr(utl.listToStr(e_LABEL));
               if (Title) {
                 vpnl.label.append(lbl.newTitle(
-                tampon, e_posx ,e_posy,forms.fieldToStr(text)
+                tampon, e_posx ,e_posy,utl.ToStr(text)
                 )) catch unreachable;
               }
               else {
                 vpnl.label.append(lbl.newLabel(
-                tampon, e_posx ,e_posy,forms.fieldToStr(text)
+                tampon, e_posx ,e_posy,utl.ToStr(text)
                 )) catch unreachable;
               }
               return ;
