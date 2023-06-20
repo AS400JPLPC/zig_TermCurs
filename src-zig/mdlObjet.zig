@@ -76,7 +76,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 
     var idx: usize = 0;
     for (vpnl.items) |p| {
-        grd.addRows(&Xcombo, &.{ utl.usizeToStr(idx) catch unreachable, p.name, p.frame.title });
+        grd.addRows(&Xcombo, &.{ utl.usizeToStr(idx), p.name, p.frame.title });
         idx += 1;
     }
 
@@ -162,6 +162,17 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     }
 
 
+    pFmt01.menu.append(mnu.newMenu(
+                      "Choix",                // name
+                      1, 1,                  // posx, posy  
+                      dds.CADRE.line1,        // type line fram
+                      dds.MNUVH.vertical,     // type menu vertical / horizontal
+                      &.{                    // item
+                      "Label-Order",
+                      "Label-Remove",
+                      }
+                      )) catch unreachable ;
+
     pnl.printPanel(&pFmt01);
 
     maxY = pFmt01.cols + pFmt01.posy;
@@ -179,7 +190,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     while (true) {
         term.cursShow();
         Tkey = kbd.getKEY();
-        dds.deinitPrint();
+
         if (Tkey.Key == kbd.mouse)  { forms.dspMouse(&pFmt01);  continue;  } // active display Cursor x/y mouse
 
         switch (Tkey.Key) {
@@ -197,9 +208,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 pFmt01.lineh.deinit();
                 pFmt01.linev.deinit();
                 pFmt01.buf.deinit();
+                dds.deinitUtils();
 
 
-                dds.deinitPrint();
 
                 return;
             },
@@ -212,8 +223,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 pFmt01.lineh.deinit();
                 pFmt01.linev.deinit();
                 pFmt01.buf.deinit();
-
-                dds.deinitPrint();
+                dds.deinitUtils();
 
                 return ; 
             } ,
@@ -235,7 +245,13 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 pnl.printPanel(&pFmt01);
                 term.onMouse();
             },
+            .altW => {
+                var nitem  :usize = 0;
+                  nitem  = mnu.ioMenu(&pFmt01,pFmt01.menu.items[0],nitem);
 
+                  if (nitem == 0) writeLabel(&pFmt01, false);  // remove
+                  if (nitem == 1) writeLabel(&pFmt01, false);  // order
+            },
             else => {},
         }
     }
@@ -248,6 +264,7 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
     //term.getCursor();
     var e_count: usize = 0;
     var tampon: []const u8 = undefined;
+    var text: []const u8 = undefined;
     const allocator = std.heap.page_allocator;
     var e_LABEL = std.ArrayList([]const u8).init(allocator);
     defer e_LABEL.deinit();
@@ -273,14 +290,17 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
 
 		
             .ctrlV => {
-                tampon = std.fmt.allocPrint(dds.allocatorField,"L{d}{d}",.{e_posx,e_posy}) catch unreachable;
+                tampon = std.fmt.allocPrint(dds.allocatorRecord,"L{d}{d}",.{e_posx,e_posy}) catch unreachable;
+                text = utl.trimStr(utl.listToStr(e_LABEL));
               if (Title) {
                 vpnl.label.append(lbl.newTitle(
-                tampon, e_posx ,e_posy,utl.trimStr(utl.listToStr(e_LABEL))) ) catch unreachable;
+                tampon, e_posx ,e_posy,forms.fieldToStr(text)
+                )) catch unreachable;
               }
               else {
                 vpnl.label.append(lbl.newLabel(
-                tampon, e_posx ,e_posy,utl.trimStr(utl.listToStr(e_LABEL))) ) catch unreachable;
+                tampon, e_posx ,e_posy,forms.fieldToStr(text)
+                )) catch unreachable;
               }
               return ;
             },

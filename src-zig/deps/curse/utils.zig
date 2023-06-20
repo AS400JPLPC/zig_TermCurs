@@ -15,8 +15,8 @@ const dds = @import("dds");
 pub const ErrUtils = error{
         Invalide_subStr_Index,
         fld_ioField_addListStr_invalide,
+        fld_ioField_removeListStr,
         Invalide_Character_strToUsize,
-        Invalide_OutOfMemory_usizeToStr,
 };
 
 
@@ -535,7 +535,7 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toUpper(result[idx]);
     }
-	return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
+	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -551,7 +551,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 	while (idx < result.len) :(idx += 1 ) {
     result[idx] = std.ascii.toLower(result[idx]);
     }
-	return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
+	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -559,7 +559,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 
 /// concat String
 pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
-  return std.fmt.allocPrint(dds.allocatorField,"{s}{s}",.{a,b},)  catch unreachable;
+  return std.fmt.allocPrint(dds.allocatorUtils,"{s}{s}",.{a,b},)  catch unreachable;
 }
 
 
@@ -573,7 +573,7 @@ pub fn subStr( a: []const u8,pos: usize, n:usize) ![]const u8 {
   const result = try allocator.alloc(u8, n - pos);
   defer allocator.free(result);
   std.mem.copy(u8, result, a[pos..n]);
-  return std.fmt.allocPrint(dds.allocatorField,"{s}",.{result},)  catch unreachable;
+  return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)  catch unreachable;
 }
 
 
@@ -646,26 +646,29 @@ pub fn strToUsize(v: []const u8) !usize{
 
 
 
-pub fn usizeToStr(v: usize ) ![]const u8{
+pub fn usizeToStr(v: usize ) []const u8{
 
-  return std.fmt.allocPrint(dds.allocatorField,"{d}", .{v}) catch return ErrUtils.Invalide_OutOfMemory_usizeToStr;
+  return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v}) catch unreachable;
 }
 
 
 
-
 /// Delete Items ArrayList
-pub fn removeListStr(self: std.ArrayList([]const u8), i: usize) ! std.ArrayList([]const u8){
+pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) ! void{
 
   //const allocator = std.heap.page_allocator;
-  var LIST = std.ArrayList([] const u8).init(dds.allocatorField);
+  var LIST = std.ArrayList([] const u8).init(dds.allocatorUtils);
   var idx : usize = 0;
   for (self.items) | val| {
-    if ( idx != i-1 ) LIST.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;
+    if ( idx != i-1 ) LIST.append(val) catch return ErrUtils.fld_ioField_removeListStr_invalide;
     idx += 1;
   }
-  self.deinit();
-  return LIST;
+  self.clearAndFree();
+
+  for (LIST.items) | val| {
+    self.append(val) catch return ErrUtils.fld_ioField_removeListStr_invalide;
+  }
+ 
 
 }
 
@@ -673,10 +676,10 @@ pub fn removeListStr(self: std.ArrayList([]const u8), i: usize) ! std.ArrayList(
 
 
 /// Add Text ArrayList
-pub fn addListStr(self: std.ArrayList([]const u8), text : []const u8) ! std.ArrayList([]const u8){
+pub fn addListStr(self: *std.ArrayList([]const u8), text : []const u8) ! void{
 
   //const allocator = std.heap.page_allocator;
-  var LIST = std.ArrayList([] const u8).init(dds.allocatorField);
+  var LIST = std.ArrayList([] const u8).init(dds.allocatorUtils);
   
   var iter = iteratStr.iterator(text);
   defer iter.deinit();
@@ -688,8 +691,12 @@ pub fn addListStr(self: std.ArrayList([]const u8), text : []const u8) ! std.Arra
   while (iter.next()) |ch|  {
     LIST.append(ch) catch return ErrUtils.fld_ioField_addListStr_invalide;
     }
-  self.deinit();
-  return LIST;
+
+  self.clearAndFree();
+
+  for (LIST.items) | val| {
+    self.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;
+  }
 }
 
 

@@ -482,7 +482,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   Panel.label.append(lbl.newLabel(@tagName(fp01.cadre)  ,7,2, "cadre....:") ) catch unreachable ;
   Panel.label.append(lbl.newLabel(@tagName(fp01.title)  ,8,2, "title....:") ) catch unreachable ;
 
-  Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"",true,
+  Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"coucou",true,
                 "required","please enter text [a-zA-Z]{1,1}  [A-z0-9]",
                 "^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
   fld.setTask(&Panel,@enumToInt(fp01.name),"fnCheckPanel") catch unreachable ;
@@ -1241,7 +1241,7 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
 
   var idx : usize = 0;
   for (vpnl.items) |p| {
-    grd.addRows(&Xcombo , &.{utl.usizeToStr(idx) catch unreachable,p.name,p.frame.title}) ;
+    grd.addRows(&Xcombo , &.{utl.usizeToStr(idx),p.name,p.frame.title}) ;
     idx += 1;
   }
   // It seems unlikely that you will go over 50 panel
@@ -1482,15 +1482,9 @@ pub const FnEnumTask = enum {
 
 //pub fn main() !void {
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
-  // open terminal and config and offMouse , cursHide->(cursor hide)
-  //term.enableRawMode();
-  // defer term.disableRawMode() ;
-  
-  //const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-  //std.debug.print(" {d}  {d} ",.{termSize.width,termSize.height});
-  //_= kbd.getKEY();
-  term.cls();
 
+  term.cls();
+  
   var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
   var pFmt01 = Panel_Fmt01();
   // defines the receiving structure of the keyboard
@@ -1518,21 +1512,18 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     pFmt01.buf.deinit();
     NPANEL.deinit();
 
-    dds.deinitPrint();
-
     return ; 
   }
   if (numPanel < 888 ) {
     loadPanel(&NPANEL.items[numPanel], &pFmt01);
   }
-
+  fld.MouseDsp = true ; // active display cursor x/y mouse
   var idx : usize = 0;
   while (true) {
     //Tkey = kbd.getKEY();
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
 
-    dds.deinitPrint();
     
     switch (Tkey.Key) {
       .func => {
@@ -1553,7 +1544,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
         pnl.rstPanel(&NPANEL.items[numPanel],&pFmt01);
         term.flushIO();
         NPANEL.items[numPanel].buf.deinit();
-        dds.deinitPrint();
+
 
       },
 
@@ -1591,6 +1582,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
           pnl.msgErr(&pFmt01,"You are in creation correct F9 OK");
           pnl.clearPanel(&pFmt01);
           numPanel = NPANEL.items.len - 1;// last panel
+          dds.deinitUtils();
           loadPanel(&XPANEL.items[numPanel], &pFmt01);
       },
 
@@ -1619,6 +1611,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
           XPANEL.items[numPanel].button = NPANEL.items[numPanel].button;
           pnl.msgErr(&pFmt01,"The update is correct F10 OK");
           pnl.clearPanel(&pFmt01);
+          dds.deinitUtils();
           loadPanel(&NPANEL.items[numPanel], &pFmt01);
         } 
         else  pnl.msgErr(&pFmt01,"You are in creation mode Bad F10");
@@ -1634,8 +1627,6 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
           pFmt01.linev.deinit();
           pFmt01.buf.deinit();
           NPANEL.deinit();
-
-          dds.deinitPrint();
 
 
           return ; 
@@ -1657,23 +1648,23 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
     catch |err| {dsperr.errorForms(err); return;};
     // posx
     fld.setText(dst,@enumToInt(fp01.posx),
-      utl.usizeToStr(src.posx) catch |err| {dsperr.errorForms(err); return;}) 
+      utl.usizeToStr(src.posx) ) 
       catch |err| {dsperr.errorForms(err); return;};
     // posy
     fld.setText(dst,@enumToInt(fp01.posy),
-      utl.usizeToStr(src.posy) catch |err| {dsperr.errorForms(err); return;}) 
+      utl.usizeToStr(src.posy) ) 
       catch |err| {dsperr.errorForms(err); return;};
     // lines
     fld.setText(dst,@enumToInt(fp01.lines),
-      utl.usizeToStr(src.lines) catch |err| {dsperr.errorForms(err); return;}) 
+      utl.usizeToStr(src.lines) ) 
       catch |err| {dsperr.errorForms(err); return;};
     // cols
     fld.setText(dst,@enumToInt(fp01.cols),
-      utl.usizeToStr(src.cols) catch |err| {dsperr.errorForms(err); return;}) 
+      utl.usizeToStr(src.cols) ) 
       catch |err| {dsperr.errorForms(err); return;};
     // cadre
     fld.setText(dst,@enumToInt(fp01.cadre),
-      utl.usizeToStr(@enumToInt(src.frame.cadre)) catch |err| {dsperr.errorForms(err); return;}) 
+      utl.usizeToStr(@enumToInt(src.frame.cadre)) ) 
       catch |err| {dsperr.errorForms(err); return;};
     // title
     fld.setText(dst,@enumToInt(fp01.title), src.frame.title) 
@@ -1727,15 +1718,15 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 
 
 fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
-  
-  var panel =  pnl.initPanel(src.field.items[@enumToInt(fp01.name)].text,
-                    utl.strToUsize(src.field.items[@enumToInt(fp01.posx)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@enumToInt(fp01.posy)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@enumToInt(fp01.lines)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@enumToInt(fp01.cols)].text) catch |err| {return err;},
-                    @intToEnum(dds.CADRE,utl.strToUsize(src.field.items[@enumToInt(fp01.cadre)].text) 
+
+  var panel =  pnl.initPanel(forms.fieldToStr(src.field.items[@enumToInt(fp01.name)].text),
+                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.posx)].text)) catch |err| {return err;},
+                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.posy)].text)) catch |err| {return err;},
+                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.lines)].text)) catch |err| {return err;},
+                    utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.cols)].text)) catch |err| {return err;},
+                    @intToEnum(dds.CADRE,utl.strToUsize(forms.fieldToStr(src.field.items[@enumToInt(fp01.cadre)].text)) 
                     catch |err| {return err;}),
-                    src.field.items[@enumToInt(fp01.title)].text);
+                    forms.fieldToStr(src.field.items[@enumToInt(fp01.title)].text));
 
   var fxx : usize = @enumToInt(fp01.F1);
   var kxx   : usize =0 ;
@@ -1756,7 +1747,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),             // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      src.field.items[title].text,    // title 
+                      forms.fieldToStr(src.field.items[title].text),    // title 
                         )
                     ) catch unreachable ;
     }
@@ -1782,7 +1773,7 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      src.field.items[title].text,    // title 
+                      forms.fieldToStr(src.field.items[title].text),    // title 
                         )
                     ) catch unreachable ;
     }
@@ -1809,11 +1800,12 @@ fn addPanel( src: *pnl.PANEL ) !pnl.PANEL {
                       @intToEnum(kbd, kxx),           // function
                       src.field.items[show].zwitch,   // show
                       src.field.items[check].zwitch,   // check field
-                      src.field.items[title].text,    // title 
+                      forms.fieldToStr(src.field.items[title].text),    // title 
                         )
                     ) catch unreachable ;
     }
   }
+  
   return panel;
 }
 

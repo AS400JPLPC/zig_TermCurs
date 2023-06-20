@@ -8,7 +8,7 @@ const term = @import("deps/curse/cursed.zig");
 const kbd = @import("deps/curse/cursed.zig").kbd;
 
 
-// forms
+// full forms developpeur
 const forms = @import("deps/curse/forms.zig");
 // error
 const dsperr = @import("deps/curse/forms.zig").dsperr;
@@ -220,9 +220,9 @@ pub fn Panel_Fmt01() pnl.PANEL {
   Panel.field.append(fld.newFieldUDigit("udigit",13,32,           // Name , posx posy
                                         5,                        // width
                                         "00102",                  // text
-                                        true,                    // tofill
+                                        true,                     // tofill
                                         "Invalide value",         // error msg
-                                        "value numéric not signed",// help
+                                        "value numeric not signed",// help
                                         "",                       // regex default standard
                                         )
     ) catch unreachable ;
@@ -232,7 +232,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                                         "+00102",                 // text
                                         true,                     // tofill
                                         "Invalide value",         // error msg
-                                        "value numéric signed",   // help
+                                        "value numeric signed",   // help
                                         "",                       // regex default standard
                                         )
     ) catch unreachable ;
@@ -260,7 +260,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
   
   Panel.field.append(fld.newFieldDateISO("dateiso",18,32,         // Name , posx posy
-                                        "",                       // text
+                                        "1951-10-12",                       // text
                                         true,                     // tofill
                                         "required",               // error msg
                                         "",                       // help default
@@ -282,10 +282,10 @@ pub fn Panel_Fmt01() pnl.PANEL {
                                         "",                       // help default
                                         )
     ) catch unreachable ;
-  
+
   Panel.field.append(fld.newFieldTelephone("telephone",22,32,     // Name , posx posy
                                         25,                       // width
-                                        "",                       // text
+                                        "+(001)451 452 453 545",                       // text
                                         true,                     // tofill
                                         "required or invalide",   // error msg
                                         "ex:+(001)456.123.789",   // help
@@ -295,8 +295,8 @@ pub fn Panel_Fmt01() pnl.PANEL {
 
   Panel.field.append(fld.newFieldTelephone("telephone2",24,32,     // Name , posx posy
                                         25,                       // width
-                                        "",                       // text
-                                        true,                     // tofill
+                                        "+(33)6 01 02 03 04",                       // text
+                                        false,                     // tofill
                                         "required or invalide",   // error msg
                                         "ex:+(33)6.12.34.56.78",  // help
 "^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"   // regex default standard fr
@@ -305,7 +305,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   
   Panel.field.append(fld.newFieldMail("mail",26,32,               // Name , posx posy
                                         100,                      // width
-                                        "gloups@gmail;.com",      // text  error
+                                        "gloups@gmail.com",      // text  error
                                         true,                     // tofill
                                         "required",               // error msg
                                         "",                       // help default
@@ -313,7 +313,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable ;
   
   Panel.field.append(fld.newFieldSwitch("Switch",28,32,             // Name , posx posy
-                                        false,                    // switch
+                                        true,                    // switch
                                         "required",               // error msg
                                         "",                       // help
                                         )
@@ -338,6 +338,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                                         "select combo",           // help
                                         )
     ) catch unreachable ;
+
 
   //-------------------------------------------------
   //the menu is not double buffered it is not a Panel
@@ -536,7 +537,7 @@ pub fn main() !void {
   // define Panel
   var pFmt01 = Panel_Fmt01();
 
-
+  
   // defines the receiving structure of the keyboard
   var Tkey : term.Keyboard = undefined ;
 
@@ -546,7 +547,7 @@ pub fn main() !void {
   //pnl.printPanel(&pFmt01);
   //forms.mydebeug(561, "stop");
   //Tkey.Key = kbd.F2;
-  
+
   while (true) {
     
 
@@ -554,7 +555,7 @@ pub fn main() !void {
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
     
-    forms.deinitPrint();
+
 
     switch (Tkey.Key) {
 

@@ -17,10 +17,8 @@ const io = std.io;
 
 
 // function special for developpeur
-pub fn mydebeug(vline : usize, buf: [] const u8) void {
+pub fn debeug(vline : usize, buf: [] const u8) void {
   
-  const allocator = std.heap.page_allocator;
-
   const AtrDebug : dds.ZONATRB = .{
       .styled=[_]u32{@enumToInt(dds.Style.notStyle),
                     @enumToInt(dds.Style.notStyle),
@@ -32,6 +30,7 @@ pub fn mydebeug(vline : usize, buf: [] const u8) void {
 
   term.getCursor();
   term.gotoXY(39,1);
+  const allocator = std.heap.page_allocator;
   var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) catch unreachable;
   term.writeStyled(msg,AtrDebug);
   _=term.kbd.getKEY();
@@ -77,21 +76,9 @@ pub fn mydebeug(vline : usize, buf: [] const u8) void {
 
 
 pub fn fieldToStr(text : [] const u8 ) []const u8 {
-  var idx : usize =0;
-  var iter = utl.iteratStr.iterator(text);
-
-  defer iter.deinit();
-  var string: [] const u8 = "" ;
-
-  while (iter.next()) |ch|  {
-    idx += 1 ;
-    if (idx == 1 ) string = ch
-    else {
-      string =  std.fmt.allocPrint(dds.allocatorField,"{s}{s}",.{string,ch},)  catch unreachable;
-    }
-  }
-  return string ;
-
+  var result = dds.allocatorRecord.alloc(u8, text.len ) catch unreachable;
+  std.mem.copy(u8, result, text);
+  return result;
 }
 /// Errors that may occur when using String
 pub const ErrForms = error{
@@ -2448,7 +2435,8 @@ pub const  fld = struct {
     actif:bool,
   };
 
-  pub var myMouse : bool = false ;
+  // for developpeur 
+  pub var MouseDsp : bool = false ;
 
   // New Field String ---> arraylist panel-label
   // refence type
@@ -2482,7 +2470,7 @@ pub const  fld = struct {
         .protect = false,
         .pading  = true,
         .edtcar ="",
-        .regex  = vregex,
+        .regex  = "",
         .errmsg = verrmsg,
         .help   = vhelp,
         .text   = vtext,
@@ -2493,7 +2481,8 @@ pub const  fld = struct {
         .atrProtect = AtrProtect,
         .actif  = true
     };
-
+    if (std.mem.eql(u8,vregex,"") == false) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,
+      "{s}",.{vregex}) catch unreachable;
     return xfield;
 
   }
@@ -2739,7 +2728,8 @@ pub const  fld = struct {
     };
 
 
-    xfield.regex = "^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$" ;
+    xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"{s}"
+    ,.{"^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$"}) catch unreachable;
 
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: date DD/MM/YYYY" ;
 
@@ -2785,7 +2775,8 @@ pub const  fld = struct {
         .actif  = true
     };
 
-    xfield.regex = "^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" ;
+    xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"{s}"
+    ,.{"^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" }) catch unreachable;
 
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: date MM/DD/YYYY";
 
@@ -2833,7 +2824,8 @@ pub const  fld = struct {
     };
 
 
-    xfield.regex = "^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$" ;
+    xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"{s}"
+    ,.{"^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$"}) catch unreachable;
 
     if (std.mem.eql(u8, vhelp, ""))  xfield.help = "ex: date YYYY-MM-DD" ;
 
@@ -2881,7 +2873,8 @@ pub const  fld = struct {
 
       // https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
       // chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.
-      xfield.regex = "^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$";
+      xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"{s}"
+      ,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"}) catch unreachable;
       
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: myname.myfirstname@gmail.com" ;
         
@@ -2915,7 +2908,7 @@ pub const  fld = struct {
         .protect = false,
         .pading  = true,
         .edtcar ="",
-        .regex  = vregex,
+        .regex  = "",
         .errmsg = verrmsg,
         .help   = vhelp,
         .text   = vtext,
@@ -2927,9 +2920,12 @@ pub const  fld = struct {
         .actif  = true
       };
 
-      // regex = fr
-      if (std.mem.eql(u8,xfield.regex,"")) xfield.regex = 
-      "^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$";
+      if (std.mem.eql(u8,vregex,"") == false) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,
+      "^{s}",.{vregex}) catch unreachable;
+      // regex standar
+      if (std.mem.eql(u8,xfield.regex,"")) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"{s}"
+      ,.{"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"}) catch unreachable;
+
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex fr : +(33)6.12.131.141" ;
 
     return xfield;
@@ -2973,7 +2969,7 @@ pub const  fld = struct {
     };
 
       if (std.mem.eql(u8,xfield.regex,"")) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"}) catch unreachable;
       }
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: 0..9" ;
 
@@ -3017,7 +3013,7 @@ pub const  fld = struct {
     };
       xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
       if (std.mem.eql(u8,xfield.regex,"")) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[+-][0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"},) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[+-][0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"}) catch unreachable;
       }
       if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: +0..9" ;
 
@@ -3066,8 +3062,8 @@ pub const  fld = struct {
     else xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
 
     if (std.mem.eql(u8,xfield.regex,"")) {
-      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
-      else xfield.regex = std.fmt.allocPrint(dds.allocatorField,"^[0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},)  catch unreachable;
+      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"})  catch unreachable
+      else xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"})  catch unreachable;
     }
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: 12301 or 123.01" ;
 
@@ -3117,9 +3113,9 @@ pub const  fld = struct {
     if (std.mem.eql(u8,xfield.regex,"")) {
 
       if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(
-        dds.allocatorField,"^[+-][0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
+        dds.allocatorScreen,"^[+-][0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
       else xfield.regex = std.fmt.allocPrint(
-        dds.allocatorField,"^[+-][0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},) catch unreachable;
+        dds.allocatorScreen,"^[+-][0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},) catch unreachable;
 
     }
     if (std.mem.eql(u8, vhelp, "")) xfield.help = "ex: +12301 or +123.01" ;
@@ -3515,12 +3511,12 @@ pub const  fld = struct {
     e_FIELD.clearRetainingCapacity();
     if ( f.reftyp == dds.REFTYP.SWITCH) {
       if (e_switch == true ) 
-        e_FIELD = utl.addListStr(e_FIELD  , dds.STRUE) catch unreachable 
+        utl.addListStr(&e_FIELD  , dds.STRUE) catch unreachable 
       else
-        e_FIELD = utl.addListStr(e_FIELD  , dds.SFALSE) catch unreachable;
+        utl.addListStr(&e_FIELD  , dds.SFALSE) catch unreachable;
     }
     else {
-      e_FIELD = utl.addListStr(e_FIELD  , f.text) catch unreachable;
+        utl.addListStr(&e_FIELD  , f.text) catch unreachable;
       var i:usize = 0 ;
       while (i < f.nbrcar - f.text.len) : ( i += 1) {
         e_FIELD.append(" ") catch unreachable;
@@ -3717,7 +3713,7 @@ pub const  fld = struct {
         
             if (term.MouseInfo.action == term.MouseAction.maReleased ) continue;
             
-            if (myMouse) dspMouse(vpnl);  // active display Cursor x/y mouse
+            if (MouseDsp) dspMouse(vpnl);  // active display Cursor x/y mouse
 
             switch (term.MouseInfo.button) {
               term.MouseButton.mbLeft    =>  Fkey.Key = kbd.left,

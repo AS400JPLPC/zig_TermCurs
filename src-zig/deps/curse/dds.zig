@@ -2,20 +2,27 @@
 const std = @import("std");
 
 
-//en sortie de programme ou de session
-var arenaField = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-  //defer arena.deinit();
-pub var  allocatorField = arenaField.allocator();
-pub fn deinitField() void {
-    arenaField.deinit();
-    arenaField = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorField = arenaField.allocator();
+//free memory  output archive JSON
+var arenaRecord = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorRecord = arenaRecord.allocator();
+pub fn deinitRecord() void {
+    arenaRecord.deinit();
+    arenaRecord = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorRecord = arenaRecord.allocator();
 }
 
 
-//en sortie de programme ou de session
+//free memory on module output
+var arenaScreen = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorScreen = arenaScreen.allocator();
+pub fn deinitScreen() void {
+    arenaScreen.deinit();
+    arenaScreen = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorScreen = arenaScreen.allocator();
+}
+
+//free memory on module output
 var arenaGrid= std.heap.ArenaAllocator.init(std.heap.page_allocator);
-  //defer arena.deinit();
 pub var  allocatorGrid = arenaGrid.allocator();
 pub fn deinitGrid() void {
     arenaGrid.deinit();
@@ -24,21 +31,14 @@ pub fn deinitGrid() void {
 }
 
 
-// display utilisatation forms 
-var arenaPrint = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-  //defer arena.deinit();
-var  allocatorPrint = arenaPrint.allocator();
-pub fn deinitPrint() void {
-    arenaPrint.deinit();
-    arenaPrint = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorPrint = arenaPrint.allocator();
+//free memory on module output
+var arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorUtils = arenaUtils.allocator();
+pub fn deinitUtils() void {
+    arenaUtils.deinit();
+    arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorUtils = arenaUtils.allocator();
 }
-
-
-
-
-
-
 
 
 pub const  Style = enum (u8)  {

@@ -10,7 +10,6 @@ const re = @cImport({
 // display patern only test 
 pub fn isMatch(strVal : [] const  u8, regVal : [] const  u8 ) bool {
   const allocator = std.heap.page_allocator;
-  
   var slice  = allocator.alignedAlloc(u8, @sizeOf(usize),@sizeOf(usize)) catch unreachable;
   defer allocator.free(slice);
 

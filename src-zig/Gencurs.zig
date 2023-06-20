@@ -53,7 +53,7 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 
 
 var Tkey : term.Keyboard = undefined ;
-var nPnl : usize  = 0;
+
 var nopt : usize  = 0;
 
 
@@ -83,7 +83,7 @@ pub fn main() !void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
 
 
-  fld.myMouse = true ; // active display cursor x/y mouse
+  fld.MouseDsp = true ; // active display cursor x/y mouse
 
   var base = pnl.initPanel("base",
                   1, 1,
@@ -120,19 +120,19 @@ pub fn main() !void {
   while (true) {
 
     term.cls();
-    if (nPnl == 0) {
-      pnl.printPanel(&base);
-      nopt = mnu.ioMenu(&base,base.menu.items[@enumToInt(menu.Screen)],0);
-      term.cls();
-      if (nopt == @enumToInt(choix.exit )) { break; }
-      if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
-      if (nopt == @enumToInt(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
-      if (NPANEL.items.len == 0 ) { dds.deinitField(); dds.deinitGrid(); dds.deinitPrint();}
-    }
-    nPnl = 0;
 
-    //if (Tkey.Key == kbd.F3) break; // end work
+    pnl.printPanel(&base);
+    nopt = mnu.ioMenu(&base,base.menu.items[@enumToInt(menu.Screen)],0);
+    term.cls();
+    if (nopt == @enumToInt(choix.exit )) { break; }
+
+    if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
+    if (nopt == @enumToInt(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
+    
+    dds.deinitUtils();  dds.deinitScreen(); dds.deinitGrid();
+    if (NPANEL.items.len == 0 ) dds.deinitRecord();
+
+
   }
-term.disableRawMode(); 
+  term.disableRawMode();
 }
-

@@ -264,5 +264,8 @@ modification from :<BR />
 -  2023-06-15  debeug clean memory   <br />
 -  2023-06-15  setting up memory management  <br />
 <BR/>
+<BR/>
+-  2023-06-29  Tuning and learning, memory management MODULE <br />
+<BR/>
 
 
