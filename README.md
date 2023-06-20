@@ -265,7 +265,9 @@ modification from :<BR />
 -  2023-06-15  setting up memory management  <br />
 <BR/>
 <BR/>
--  2023-06-29  Tuning and learning, memory management MODULE <br />
+-  2023-06-19  Tuning and learning, memory management MODULE <br />
 <BR/>
-
+<BR/>
+-  2023-06-20  Tuning  memory OK, I will be able to progress in the project <br />
+<BR/>
 
