@@ -415,10 +415,9 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                   dds.CADRE.line1,
                   )  ;
 
-  var Cell = std.ArrayList(grd.CELL).init(allocator);
-  defer Cell.deinit();
-  Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
-  grd.setHeaders(&Xcombo, Cell) ;
+
+  grd.newCell(&Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Xcombo) ;
 
   grd.addRows(&Xcombo , &.{"---"});
   grd.addRows(&Xcombo , &.{"Famille"});        
@@ -439,8 +438,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
 
   grd.resetGrid(&Xcombo);
-  Cell.clearAndFree();
-  Xcombo.buf.clearAndFree();
+  Xcombo = undefined;
 
 
 
@@ -461,9 +459,9 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                   )  ;
 
 
-  var Cell = std.ArrayList(grd.CELL).init(allocator);
-  Cell.append(grd.newCell("Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
-  grd.setHeaders(&Xcombo, Cell) ;
+
+  grd.newCell(&Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Xcombo) ;
 
   grd.addRows(&Xcombo , &.{"---"});
   grd.addRows(&Xcombo , &.{"Informaticien"});        
@@ -481,8 +479,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
 
   grd.resetGrid(&Xcombo);
-  Cell.clearAndFree();
-  Xcombo.buf.clearAndFree();
+  Xcombo = undefined;
 
   if ( Gkey.Key == kbd.esc )  return ;
   vfld.text = Gkey.Buf.items[0];
@@ -544,14 +541,9 @@ pub fn main() !void {
   // work Panel-01
   term.resizeTerm(pFmt01.lines,pFmt01.cols);
 
-  //pnl.printPanel(&pFmt01);
-  //forms.mydebeug(561, "stop");
-  //Tkey.Key = kbd.F2;
 
   while (true) {
-    
 
-    // Tkey = kbd.getKEY();
 
     Tkey.Key = pnl.ioPanel(&pFmt01);
     
@@ -577,20 +569,32 @@ pub fn main() !void {
 
         var Gkey :grd.GridSelect = undefined ;
 
-        if (grd.countColumns(&pFmt01.grid.items[0]) == 0) {
-          var Cell = std.ArrayList(grd.CELL).init(allocator);
-          Cell.append(grd.newCell("ID",2,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan)) catch unreachable ;
-          Cell.append(grd.newCell("Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
-          Cell.append(grd.newCell("animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) catch unreachable ;
-          Cell.append(grd.newCell("prix",10,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) catch unreachable ;
-          grd.setCellEditCar(&Cell.items[3],"€");
-          Cell.append(grd.newCell("HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) catch unreachable ;
-          Cell.append(grd.newCell("Password",10,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen)) catch unreachable ;
-          grd.setHeaders(&pFmt01.grid.items[0], Cell);
-          grd.printGridHeader(&pFmt01.grid.items[0]);
-          Cell.clearAndFree();
-        }
+            // exemple reset GRID and re load
+            grd.reLoadGrid(
+            &pFmt01.grid.items[0],
+            pFmt01.grid.items[0].name, 
+            pFmt01.grid.items[0].posx,
+            pFmt01.grid.items[0].posy, 
+            pFmt01.grid.items[0].pageRows,
+            pFmt01.grid.items[0].separator, 
+            pFmt01.grid.items[0].cadre
+            );
 
+
+
+
+        if (grd.countColumns(&pFmt01.grid.items[0]) == 0) {
+
+          grd.newCell(&pFmt01.grid.items[0],"ID",2,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan) ;
+          grd.newCell(&pFmt01.grid.items[0],"Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+          grd.newCell(&pFmt01.grid.items[0],"animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite) ;
+          grd.newCell(&pFmt01.grid.items[0],"prix",10,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite) ;
+          grd.setCellEditCar(&pFmt01.grid.items[0].cell.items[3],"€");
+          grd.newCell(&pFmt01.grid.items[0],"HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed) ;
+          grd.newCell(&pFmt01.grid.items[0],"Password",10,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen) ;
+          grd.setHeaders(&pFmt01.grid.items[0]);
+          grd.printGridHeader(&pFmt01.grid.items[0]);
+        }
 
         grd.resetRows(&pFmt01.grid.items[0]);
 
@@ -607,7 +611,6 @@ pub fn main() !void {
         grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100.00","0","tictac"});
 
         //grd.dltRows(&pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};
-
 
         Gkey =grd.ioGrid(&pFmt01.grid.items[0],true);
 
@@ -637,13 +640,18 @@ pub fn main() !void {
             grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100,00","0"});
             // test display pageUp
             Gkey =grd.ioGrid(&pFmt01.grid.items[0],false);
+
           }
         }
         grd.rstPanel(&pFmt01.grid.items[0], &pFmt01);
-        //grd.resetGrid(&pFmt01.grid.items[0]);
-        //Cell.clearAndFree();
-        //pFmt01.grid.items[0].buf.deinit();
+
+
+        // if you have several grids please do a resetGrid on exit and a reloadGrid on enter
+        grd.resetGrid(&pFmt01.grid.items[0]);
+
+
       },
+
       .F23 => {     
         pnl.printPanel(&pFmt01);
       },

@@ -41,13 +41,7 @@ const reg = @import("deps/curse/match.zig");
 
 
 
-var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-var allocator = arena.allocator();
-pub fn deinitPanel() void { 
-    arena.deinit(); 
-    arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocator = arena.allocator();   
-}
+
 
 
 
@@ -403,17 +397,6 @@ const  fp01 = enum (u9)  {
 };
 
 
-pub const FPANEL = struct {
-    name:   [] const u8,
-    posx:   usize,
-    posy:   usize,
-
-    lines:  usize,
-    cols:   usize,
-    cadre:  dds.CADRE,
-    title:  [] const u8,
-    button: std.ArrayList(btn.BUTTON)
-};
 
 
 pub fn Panel_Fmt01() pnl.PANEL {
@@ -482,7 +465,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   Panel.label.append(lbl.newLabel(@tagName(fp01.cadre)  ,7,2, "cadre....:") ) catch unreachable ;
   Panel.label.append(lbl.newLabel(@tagName(fp01.title)  ,8,2, "title....:") ) catch unreachable ;
 
-  Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"coucou",true,
+  Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"",true,
                 "required","please enter text [a-zA-Z]{1,1}  [A-z0-9]",
                 "^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
   fld.setTask(&Panel,@enumToInt(fp01.name),"fnCheckPanel") catch unreachable ;
@@ -1233,11 +1216,10 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
                   dds.CADRE.line1,
                   )  ;
   
-  var Cell = std.ArrayList(grd.CELL).init(dds.allocatorGrid);
-  Cell.append(grd.newCell("ID",3,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgGreen)) catch unreachable ;
-  Cell.append(grd.newCell("Name",10,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) catch unreachable ;
-  Cell.append(grd.newCell("Title",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) catch unreachable ;
-  grd.setHeaders(&Xcombo, Cell) ;
+  grd.newCell(&Xcombo,"ID",3,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgGreen);
+  grd.newCell(&Xcombo,"Name",10,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+  grd.newCell(&Xcombo,"Title",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Xcombo) ;
 
   var idx : usize = 0;
   for (vpnl.items) |p| {
@@ -1250,29 +1232,20 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
   var Gkey :grd.GridSelect = undefined ;
   while (true) {
     Gkey =grd.ioCombo(&Xcombo,cellPos);
+    
     if ( Gkey.Key == kbd.enter ) {
       grd.rstPanel(&Xcombo, frompnl);
 
       grd.resetGrid(&Xcombo);
-      Cell.clearAndFree();
-      Xcombo.buf.clearAndFree();
-      dds.deinitGrid();
-
-
-
- 
-
+      Xcombo = undefined;
       return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable ;
     }
+
     if ( Gkey.Key == kbd.esc ) {
       grd.rstPanel(&Xcombo, frompnl);
 
       grd.resetGrid(&Xcombo);
-      Cell.deinit();
-      Xcombo.buf.deinit();
-      dds.deinitGrid();
-
-
+      Xcombo = undefined;
 
       return 999;
     }
@@ -1298,7 +1271,7 @@ fn fnBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     if (nitem != 9999) break;
   }
 
-  vfld.text = std.fmt.allocPrint(allocator,"{d}",.{nitem}) catch unreachable; 
+  vfld.text = std.fmt.allocPrint(dds.allocatorUtils,"{d}",.{nitem}) catch unreachable; 
   mnu.rstPanel(&vpnl.menu.items[i],vpnl);
 }
 
@@ -1334,16 +1307,24 @@ var callTask: FnEnumTask = undefined;
 fn fnCheckPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
   var posx =  utl.strToUsize(vfld.text) catch unreachable;
-  const msg = std.fmt.allocPrint(allocator,"{d} Position X is out of bounds", .{termSize.height}) catch unreachable;
-  if (termSize.height < posx or posx  == 0 ) { pnl.msgErr(vpnl, msg); vpnl.keyField = kbd.task;}
+  
+  if (termSize.height < posx or posx  == 0 ) {
+    const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position X is out of bounds", .{termSize.height}) catch unreachable;
+    pnl.msgErr(vpnl, msg);
+    vpnl.keyField = kbd.task;
+  }
   return;
 }
 
 fn fnCheckPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
   var posy  = utl.strToUsize(vfld.text) catch unreachable;
-  const msg = std.fmt.allocPrint(allocator,"{d} Position Y is out of bounds", .{termSize.width}) catch unreachable;
-  if (termSize.width < posy or posy == 0 ) { pnl.msgErr(vpnl, msg); vpnl.keyField = kbd.task;}
+  
+  if (termSize.width < posy or posy == 0 ) {
+    const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position Y is out of bounds", .{termSize.width}) catch unreachable;
+    pnl.msgErr(vpnl, msg);
+    vpnl.keyField = kbd.task;
+  }
   return;
 }
 
@@ -1351,8 +1332,12 @@ fn fnCheckLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
     var lines = utl.strToUsize(vfld.text) catch unreachable;
     var posx  = utl.strToUsize(fld.getText(vpnl,@enumToInt(fp01.posx)) catch unreachable) catch unreachable;
-    const msg = std.fmt.allocPrint(allocator,"{d} The number of rows is out of range", .{termSize.height}) catch unreachable;
-    if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) { pnl.msgErr(vpnl, msg); vpnl.keyField = kbd.task;}
+    
+    if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
+      const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of rows is out of range", .{termSize.height}) catch unreachable;
+      pnl.msgErr(vpnl, msg);
+      vpnl.keyField = kbd.task;
+    }
   return;
 }
 
@@ -1360,8 +1345,12 @@ fn fnCheckCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
   var cols  = utl.strToUsize(vfld.text) catch unreachable;
   var posy  = utl.strToUsize(fld.getText(vpnl,@enumToInt(fp01.posy)) catch unreachable) catch unreachable;
-  const msg = std.fmt.allocPrint(allocator,"{d} The number of columns is out of range", .{termSize.width }) catch unreachable;
-  if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) { pnl.msgErr(vpnl, msg); vpnl.keyField = kbd.task;}
+ 
+  if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) { 
+    const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of columns is out of range", .{termSize.width }) catch unreachable;
+    pnl.msgErr(vpnl, msg);
+    vpnl.keyField = kbd.task;
+  }
   return;
 }
 
@@ -1369,8 +1358,12 @@ fn fnCheckCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 fn fnCheckCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
   var cadre = utl.strToUsize(vfld.text) catch unreachable;
-  const msg = std.fmt.allocPrint(allocator,"{d} The number of Lines Cadre is out of range", .{termSize.width }) catch unreachable;
-  if (termSize.width < cadre or cadre == 0 ) { pnl.msgErr(vpnl, msg); vpnl.keyField = kbd.task;}
+  
+  if (termSize.width < cadre or cadre == 0 ) { 
+    const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of Lines Cadre is out of range", .{termSize.width }) catch unreachable;
+    pnl.msgErr(vpnl, msg);
+    vpnl.keyField = kbd.task;
+    }
   return;
 }
 
@@ -1395,7 +1388,6 @@ fn fnCheckPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld
 
 fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
-  const msg = std.fmt.allocPrint(allocator,"Name: {s} lready existing invalide", .{vfld.text}) catch unreachable;
 
   vpnl.keyField = kbd.none;
   var idx : usize = 0;
@@ -1404,6 +1396,7 @@ fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.F
       std.mem.eql(u8, f.name, vfld.text)  and  idx == numPanel  ) {
       vpnl.keyField = kbd.task;
       vpnl.idxfld = @enumToInt(fp01.name); 
+      const msg = std.fmt.allocPrint(dds.allocatorUtils,"Name: {s} lready existing invalide", .{vfld.text}) catch unreachable;
       pnl.msgErr(vpnl,msg);
       return ;
     } 
@@ -1416,14 +1409,15 @@ fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.F
 
 fn fnCheckF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
-  const msg = std.fmt.allocPrint(allocator,"{s} lready existing invalide", .{vfld.text}) catch unreachable;
+  
 
   vpnl.keyField = kbd.none;
   var idx : usize = 0;
   for (VPANEL.items) |f | {
     if (std.mem.eql(u8, f.name, vfld.text) and ( idx != numPanel )   ) {
       vpnl.keyField = kbd.task;
-      vpnl.idxfld = @enumToInt(fp01.name); 
+      vpnl.idxfld = @enumToInt(fp01.name);
+      const msg = std.fmt.allocPrint(dds.allocatorUtils,"{s} lready existing invalide", .{vfld.text}) catch unreachable;
       pnl.msgErr(vpnl,msg);
       return ;
     } 
@@ -1482,18 +1476,15 @@ pub const FnEnumTask = enum {
 
 //pub fn main() !void {
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
-
-  term.cls();
   
-  var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-  var pFmt01 = Panel_Fmt01();
-  // defines the receiving structure of the keyboard
-  var Tkey : term.Keyboard = undefined ;
+  term.cls();
 
-  pnl.clearPanel(&pFmt01);
-  // testing
-  //loadPanel(&pFmt01, &pFmt01);
+
+  var pFmt01 = Panel_Fmt01();
+
+  var NPANEL = std.ArrayList(pnl.PANEL).init(dds.allocatorPnl);
   NPANEL.clearRetainingCapacity();
+
   for (XPANEL.items) |p| {
     NPANEL.append( p) catch dsperr.errorForms( ErrMain.main_run_EnumTask_invalide);
   }
@@ -1502,15 +1493,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
   numPanel = qryPanel(NPANEL,true,&pFmt01);
 
   if (numPanel == 999) {
-    pFmt01.label.deinit();
-    pFmt01.field.deinit();
-    pFmt01.button.deinit();
-    pFmt01.menu.deinit();
-    pFmt01.grid.deinit();
-    pFmt01.lineh.deinit();
-    pFmt01.linev.deinit();
-    pFmt01.buf.deinit();
-    NPANEL.deinit();
+    pnl.deinitPanel(&pFmt01);
+    NPANEL.clearAndFree();
+    pFmt01 = undefined;
 
     return ; 
   }
@@ -1518,7 +1503,10 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     loadPanel(&NPANEL.items[numPanel], &pFmt01);
   }
   fld.MouseDsp = true ; // active display cursor x/y mouse
+  
   var idx : usize = 0;
+  
+  var Tkey : term.Keyboard = undefined ; // defines the receiving structure of the keyboard
   while (true) {
     //Tkey = kbd.getKEY();
 
@@ -1543,7 +1531,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
         _= kbd.getKEY();
         pnl.rstPanel(&NPANEL.items[numPanel],&pFmt01);
         term.flushIO();
-        NPANEL.items[numPanel].buf.deinit();
+        NPANEL.items[numPanel].buf.clearAndFree();
 
 
       },
@@ -1618,15 +1606,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
       },
 
       .F12 => {
-          pFmt01.label.deinit();
-          pFmt01.field.deinit();
-          pFmt01.button.deinit();
-          pFmt01.menu.deinit();
-          pFmt01.grid.deinit();
-          pFmt01.lineh.deinit();
-          pFmt01.linev.deinit();
-          pFmt01.buf.deinit();
-          NPANEL.deinit();
+          pnl.deinitPanel(&pFmt01);
+          NPANEL.clearAndFree();
+          pFmt01 = undefined;
+          dds.deinitScreen();
+
 
 
           return ; 

@@ -113,23 +113,17 @@ pub fn main() !void {
   };
   
 
-
-
-
-
   while (true) {
-
-    term.cls();
 
     pnl.printPanel(&base);
     nopt = mnu.ioMenu(&base,base.menu.items[@enumToInt(menu.Screen)],0);
-    term.cls();
+
     if (nopt == @enumToInt(choix.exit )) { break; }
 
     if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
     if (nopt == @enumToInt(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
     
-    dds.deinitUtils();  dds.deinitScreen(); dds.deinitGrid();
+    dds.deinitUtils();  dds.deinitScreen(); dds.deinitGrid(); 
     if (NPANEL.items.len == 0 ) dds.deinitRecord();
 
 

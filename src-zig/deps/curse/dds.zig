@@ -1,6 +1,7 @@
 
 const std = @import("std");
 
+pub const allocatorPnl = std.heap.page_allocator;
 
 //free memory  output archive JSON
 var arenaRecord = std.heap.ArenaAllocator.init(std.heap.page_allocator);

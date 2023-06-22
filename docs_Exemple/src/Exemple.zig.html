@@ -724,263 +724,266 @@
 <span class="line" id="L415">                  dds.CADRE.line1,</span>
 <span class="line" id="L416">                  )  ;</span>
 <span class="line" id="L417"></span>
-<span class="line" id="L418">  <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
-<span class="line" id="L419">  <span class="tok-kw">defer</span> Cell.deinit();</span>
-<span class="line" id="L420">  Cell.append(grd.newCell(<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L421">  grd.setHeaders(&amp;Xcombo, Cell) ;</span>
-<span class="line" id="L422"></span>
-<span class="line" id="L423">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
-<span class="line" id="L424">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Famille&quot;</span>});        </span>
-<span class="line" id="L425">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Amis&quot;</span>}); </span>
-<span class="line" id="L426">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Professionel&quot;</span>});</span>
-<span class="line" id="L427">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Docteur&quot;</span>});</span>
-<span class="line" id="L428"></span>
-<span class="line" id="L429">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
-<span class="line" id="L430">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Famille&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
-<span class="line" id="L431">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Amis&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
-<span class="line" id="L432">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Professionel&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">3</span>;</span>
-<span class="line" id="L433">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Docteur&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">4</span>;</span>
-<span class="line" id="L434"></span>
-<span class="line" id="L435">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
-<span class="line" id="L436"></span>
-<span class="line" id="L437">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
-<span class="line" id="L438">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
+<span class="line" id="L418"></span>
+<span class="line" id="L419">  grd.newCell(&amp;Xcombo,<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);</span>
+<span class="line" id="L420">  grd.setHeaders(&amp;Xcombo) ;</span>
+<span class="line" id="L421"></span>
+<span class="line" id="L422">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
+<span class="line" id="L423">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Famille&quot;</span>});        </span>
+<span class="line" id="L424">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Amis&quot;</span>}); </span>
+<span class="line" id="L425">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Professionel&quot;</span>});</span>
+<span class="line" id="L426">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Docteur&quot;</span>});</span>
+<span class="line" id="L427"></span>
+<span class="line" id="L428">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
+<span class="line" id="L429">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Famille&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
+<span class="line" id="L430">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Amis&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
+<span class="line" id="L431">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Professionel&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">3</span>;</span>
+<span class="line" id="L432">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Docteur&quot;</span>) == <span class="tok-null">true</span>) cellPos = <span class="tok-number">4</span>;</span>
+<span class="line" id="L433"></span>
+<span class="line" id="L434">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L435"></span>
+<span class="line" id="L436">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
+<span class="line" id="L437">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
+<span class="line" id="L438"></span>
 <span class="line" id="L439"></span>
-<span class="line" id="L440"></span>
-<span class="line" id="L441">  grd.resetGrid(&amp;Xcombo);</span>
-<span class="line" id="L442">  Cell.clearAndFree();</span>
-<span class="line" id="L443">  Xcombo.buf.clearAndFree();</span>
+<span class="line" id="L440">  grd.resetGrid(&amp;Xcombo);</span>
+<span class="line" id="L441">  Xcombo = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L442"></span>
+<span class="line" id="L443"></span>
 <span class="line" id="L444"></span>
-<span class="line" id="L445"></span>
-<span class="line" id="L446"></span>
-<span class="line" id="L447">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )   <span class="tok-kw">return</span> ; </span>
-<span class="line" id="L448">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
-<span class="line" id="L449">  <span class="tok-kw">return</span> ;</span>
-<span class="line" id="L450">}</span>
-<span class="line" id="L451"></span>
-<span class="line" id="L452"><span class="tok-kw">fn</span> <span class="tok-fn">comboFn02</span>( vpnl : *pnl.PANEL , vfld :* fld.FIELD) <span class="tok-type">void</span> {</span>
-<span class="line" id="L453">  <span class="tok-kw">var</span> cellPos:<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L454">  </span>
-<span class="line" id="L455">  <span class="tok-kw">var</span> Xcombo = grd.initGrid(</span>
-<span class="line" id="L456">                  <span class="tok-str">&quot;Combo02&quot;</span>,</span>
-<span class="line" id="L457">                  <span class="tok-number">5</span>, <span class="tok-number">76</span>,</span>
-<span class="line" id="L458">                  <span class="tok-number">4</span> ,  </span>
-<span class="line" id="L459">                  grd.gridStyle,</span>
-<span class="line" id="L460">                  dds.CADRE.line1,</span>
-<span class="line" id="L461">                  )  ;</span>
+<span class="line" id="L445">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )   <span class="tok-kw">return</span> ; </span>
+<span class="line" id="L446">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
+<span class="line" id="L447">  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L448">}</span>
+<span class="line" id="L449"></span>
+<span class="line" id="L450"><span class="tok-kw">fn</span> <span class="tok-fn">comboFn02</span>( vpnl : *pnl.PANEL , vfld :* fld.FIELD) <span class="tok-type">void</span> {</span>
+<span class="line" id="L451">  <span class="tok-kw">var</span> cellPos:<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L452">  </span>
+<span class="line" id="L453">  <span class="tok-kw">var</span> Xcombo = grd.initGrid(</span>
+<span class="line" id="L454">                  <span class="tok-str">&quot;Combo02&quot;</span>,</span>
+<span class="line" id="L455">                  <span class="tok-number">5</span>, <span class="tok-number">76</span>,</span>
+<span class="line" id="L456">                  <span class="tok-number">4</span> ,  </span>
+<span class="line" id="L457">                  grd.gridStyle,</span>
+<span class="line" id="L458">                  dds.CADRE.line1,</span>
+<span class="line" id="L459">                  )  ;</span>
+<span class="line" id="L460"></span>
+<span class="line" id="L461"></span>
 <span class="line" id="L462"></span>
-<span class="line" id="L463"></span>
-<span class="line" id="L464">  <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
-<span class="line" id="L465">  Cell.append(grd.newCell(<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L466">  grd.setHeaders(&amp;Xcombo, Cell) ;</span>
-<span class="line" id="L467"></span>
-<span class="line" id="L468">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
-<span class="line" id="L469">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Informaticien&quot;</span>});        </span>
-<span class="line" id="L470">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;sportif&quot;</span>}); </span>
-<span class="line" id="L471"></span>
-<span class="line" id="L472">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
-<span class="line" id="L473">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Informaticien&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
-<span class="line" id="L474">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;sportif&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
-<span class="line" id="L475"></span>
+<span class="line" id="L463">  grd.newCell(&amp;Xcombo,<span class="tok-str">&quot;Choix&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);</span>
+<span class="line" id="L464">  grd.setHeaders(&amp;Xcombo) ;</span>
+<span class="line" id="L465"></span>
+<span class="line" id="L466">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;---&quot;</span>});</span>
+<span class="line" id="L467">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;Informaticien&quot;</span>});        </span>
+<span class="line" id="L468">  grd.addRows(&amp;Xcombo , &amp;.{<span class="tok-str">&quot;sportif&quot;</span>}); </span>
+<span class="line" id="L469"></span>
+<span class="line" id="L470">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;---&quot;</span>) == <span class="tok-null">true</span>)      cellPos = <span class="tok-number">0</span>;</span>
+<span class="line" id="L471">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;Informaticien&quot;</span>) == <span class="tok-null">true</span>)  cellPos = <span class="tok-number">1</span>;</span>
+<span class="line" id="L472">  <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>,vfld.text,<span class="tok-str">&quot;sportif&quot;</span>) == <span class="tok-null">true</span>)     cellPos = <span class="tok-number">2</span>;</span>
+<span class="line" id="L473"></span>
+<span class="line" id="L474"></span>
+<span class="line" id="L475">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
 <span class="line" id="L476"></span>
-<span class="line" id="L477">  <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
-<span class="line" id="L478"></span>
-<span class="line" id="L479">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
-<span class="line" id="L480">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
-<span class="line" id="L481"></span>
-<span class="line" id="L482"></span>
-<span class="line" id="L483">  grd.resetGrid(&amp;Xcombo);</span>
-<span class="line" id="L484">  Cell.clearAndFree();</span>
-<span class="line" id="L485">  Xcombo.buf.clearAndFree();</span>
-<span class="line" id="L486"></span>
-<span class="line" id="L487">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )  <span class="tok-kw">return</span> ;</span>
-<span class="line" id="L488">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
-<span class="line" id="L489">  <span class="tok-kw">return</span> ;</span>
-<span class="line" id="L490">}</span>
-<span class="line" id="L491"></span>
-<span class="line" id="L492"><span class="tok-comment">/// run emun Function ex: combo</span></span>
-<span class="line" id="L493"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FnEnum = <span class="tok-kw">enum</span> {</span>
-<span class="line" id="L494">  comboFn01,</span>
-<span class="line" id="L495">  comboFn02,</span>
-<span class="line" id="L496">  none,</span>
-<span class="line" id="L497"></span>
-<span class="line" id="L498">  <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(self: FnEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) <span class="tok-type">void</span>  {</span>
-<span class="line" id="L499">      <span class="tok-kw">switch</span> (self) {</span>
-<span class="line" id="L500">          .comboFn01 =&gt; comboFn01(vpnl,vfld),</span>
-<span class="line" id="L501">          .comboFn02 =&gt; comboFn02(vpnl,vfld),</span>
-<span class="line" id="L502">          <span class="tok-kw">else</span> =&gt; dsperr.errorForms( <span class="tok-kw">error</span>.main_function_Enum_invalide),</span>
-<span class="line" id="L503">      }</span>
-<span class="line" id="L504">  }</span>
-<span class="line" id="L505"></span>
-<span class="line" id="L506">  <span class="tok-kw">fn</span> <span class="tok-fn">searchFn</span> ( vtext: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> ) FnEnum {</span>
-<span class="line" id="L507">    <span class="tok-kw">var</span> i   :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L508">    <span class="tok-kw">var</span> max :<span class="tok-type">usize</span> = <span class="tok-builtin">@enumToInt</span>(FnEnum.none) ;</span>
-<span class="line" id="L509">      <span class="tok-kw">while</span>( i &lt; max ) : (i += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L510">        <span class="tok-kw">if</span> ( std.mem.eql(<span class="tok-type">u8</span>, <span class="tok-builtin">@tagName</span>(<span class="tok-builtin">@intToEnum</span>(FnEnum,i)), vtext)) <span class="tok-kw">return</span> <span class="tok-builtin">@intToEnum</span>(FnEnum,i);</span>
-<span class="line" id="L511">      }</span>
-<span class="line" id="L512">      <span class="tok-kw">return</span> FnEnum.none;</span>
-<span class="line" id="L513"></span>
-<span class="line" id="L514">    }</span>
-<span class="line" id="L515">};</span>
-<span class="line" id="L516"><span class="tok-kw">var</span> callFunc: FnEnum = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L477">  Gkey =grd.ioCombo(&amp;Xcombo,cellPos);</span>
+<span class="line" id="L478">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
+<span class="line" id="L479"></span>
+<span class="line" id="L480"></span>
+<span class="line" id="L481">  grd.resetGrid(&amp;Xcombo);</span>
+<span class="line" id="L482">  Xcombo = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L483"></span>
+<span class="line" id="L484">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L485">  vfld.text = Gkey.Buf.items[<span class="tok-number">0</span>];</span>
+<span class="line" id="L486">  <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L487">}</span>
+<span class="line" id="L488"></span>
+<span class="line" id="L489"><span class="tok-comment">/// run emun Function ex: combo</span></span>
+<span class="line" id="L490"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FnEnum = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L491">  comboFn01,</span>
+<span class="line" id="L492">  comboFn02,</span>
+<span class="line" id="L493">  none,</span>
+<span class="line" id="L494"></span>
+<span class="line" id="L495">  <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(self: FnEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) <span class="tok-type">void</span>  {</span>
+<span class="line" id="L496">      <span class="tok-kw">switch</span> (self) {</span>
+<span class="line" id="L497">          .comboFn01 =&gt; comboFn01(vpnl,vfld),</span>
+<span class="line" id="L498">          .comboFn02 =&gt; comboFn02(vpnl,vfld),</span>
+<span class="line" id="L499">          <span class="tok-kw">else</span> =&gt; dsperr.errorForms( <span class="tok-kw">error</span>.main_function_Enum_invalide),</span>
+<span class="line" id="L500">      }</span>
+<span class="line" id="L501">  }</span>
+<span class="line" id="L502"></span>
+<span class="line" id="L503">  <span class="tok-kw">fn</span> <span class="tok-fn">searchFn</span> ( vtext: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> ) FnEnum {</span>
+<span class="line" id="L504">    <span class="tok-kw">var</span> i   :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L505">    <span class="tok-kw">var</span> max :<span class="tok-type">usize</span> = <span class="tok-builtin">@enumToInt</span>(FnEnum.none) ;</span>
+<span class="line" id="L506">      <span class="tok-kw">while</span>( i &lt; max ) : (i += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L507">        <span class="tok-kw">if</span> ( std.mem.eql(<span class="tok-type">u8</span>, <span class="tok-builtin">@tagName</span>(<span class="tok-builtin">@intToEnum</span>(FnEnum,i)), vtext)) <span class="tok-kw">return</span> <span class="tok-builtin">@intToEnum</span>(FnEnum,i);</span>
+<span class="line" id="L508">      }</span>
+<span class="line" id="L509">      <span class="tok-kw">return</span> FnEnum.none;</span>
+<span class="line" id="L510"></span>
+<span class="line" id="L511">    }</span>
+<span class="line" id="L512">};</span>
+<span class="line" id="L513"><span class="tok-kw">var</span> callFunc: FnEnum = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L514"></span>
+<span class="line" id="L515"></span>
+<span class="line" id="L516"><span class="tok-comment">//test ---------- pas de sortie output</span>
+</span>
 <span class="line" id="L517"></span>
-<span class="line" id="L518"></span>
-<span class="line" id="L519"><span class="tok-comment">//test ---------- pas de sortie output</span>
+<span class="line" id="L518"><span class="tok-kw">test</span> <span class="tok-str">&quot;test&quot;</span> {</span>
+<span class="line" id="L519">  <span class="tok-kw">var</span> infox : []<span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L520">  infox = utl.concatStr(<span class="tok-str">&quot;Info : &quot;</span>, infox );</span>
+<span class="line" id="L521">  std.debug.print(<span class="tok-str">&quot;{s}&quot;</span>,.{infox});</span>
+<span class="line" id="L522">}</span>
+<span class="line" id="L523"></span>
+<span class="line" id="L524"></span>
+<span class="line" id="L525"></span>
+<span class="line" id="L526"><span class="tok-comment">// main----------------------------------</span>
 </span>
-<span class="line" id="L520"></span>
-<span class="line" id="L521"><span class="tok-kw">test</span> <span class="tok-str">&quot;test&quot;</span> {</span>
-<span class="line" id="L522">  <span class="tok-kw">var</span> infox : []<span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-str">&quot;&quot;</span>;</span>
-<span class="line" id="L523">  infox = utl.concatStr(<span class="tok-str">&quot;Info : &quot;</span>, infox );</span>
-<span class="line" id="L524">  std.debug.print(<span class="tok-str">&quot;{s}&quot;</span>,.{infox});</span>
-<span class="line" id="L525">}</span>
-<span class="line" id="L526"></span>
-<span class="line" id="L527"></span>
+<span class="line" id="L527"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">main</span>() !<span class="tok-type">void</span> {</span>
 <span class="line" id="L528"></span>
-<span class="line" id="L529"><span class="tok-comment">// main----------------------------------</span>
+<span class="line" id="L529">  <span class="tok-comment">// open terminal and config and offMouse , cursHide-&gt;(cursor hide)</span>
 </span>
-<span class="line" id="L530"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">main</span>() !<span class="tok-type">void</span> {</span>
-<span class="line" id="L531"></span>
-<span class="line" id="L532">  <span class="tok-comment">// open terminal and config and offMouse , cursHide-&gt;(cursor hide)</span>
+<span class="line" id="L530">  term.enableRawMode();</span>
+<span class="line" id="L531">  <span class="tok-kw">defer</span> term.disableRawMode() ;</span>
+<span class="line" id="L532">  </span>
+<span class="line" id="L533"></span>
+<span class="line" id="L534">  <span class="tok-comment">// define Panel</span>
 </span>
-<span class="line" id="L533">  term.enableRawMode();</span>
-<span class="line" id="L534">  <span class="tok-kw">defer</span> term.disableRawMode() ;</span>
-<span class="line" id="L535">  </span>
+<span class="line" id="L535">  <span class="tok-kw">var</span> pFmt01 = Panel_Fmt01();</span>
 <span class="line" id="L536"></span>
-<span class="line" id="L537">  <span class="tok-comment">// define Panel</span>
+<span class="line" id="L537">  </span>
+<span class="line" id="L538">  <span class="tok-comment">// defines the receiving structure of the keyboard</span>
 </span>
-<span class="line" id="L538">  <span class="tok-kw">var</span> pFmt01 = Panel_Fmt01();</span>
-<span class="line" id="L539"></span>
-<span class="line" id="L540">  </span>
-<span class="line" id="L541">  <span class="tok-comment">// defines the receiving structure of the keyboard</span>
+<span class="line" id="L539">  <span class="tok-kw">var</span> Tkey : term.Keyboard = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L540"></span>
+<span class="line" id="L541">  <span class="tok-comment">// work Panel-01</span>
 </span>
-<span class="line" id="L542">  <span class="tok-kw">var</span> Tkey : term.Keyboard = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L542">  term.resizeTerm(pFmt01.lines,pFmt01.cols);</span>
 <span class="line" id="L543"></span>
-<span class="line" id="L544">  <span class="tok-comment">// work Panel-01</span>
-</span>
-<span class="line" id="L545">  term.resizeTerm(pFmt01.lines,pFmt01.cols);</span>
+<span class="line" id="L544"></span>
+<span class="line" id="L545">  <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
 <span class="line" id="L546"></span>
-<span class="line" id="L547">  <span class="tok-comment">//pnl.printPanel(&amp;pFmt01);</span>
-</span>
-<span class="line" id="L548">  <span class="tok-comment">//forms.mydebeug(561, &quot;stop&quot;);</span>
-</span>
-<span class="line" id="L549">  <span class="tok-comment">//Tkey.Key = kbd.F2;</span>
-</span>
-<span class="line" id="L550"></span>
-<span class="line" id="L551">  <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
-<span class="line" id="L552">    </span>
+<span class="line" id="L547"></span>
+<span class="line" id="L548">    Tkey.Key = pnl.ioPanel(&amp;pFmt01);</span>
+<span class="line" id="L549">    </span>
+<span class="line" id="L550">    dds.deinitUtils();</span>
+<span class="line" id="L551"></span>
+<span class="line" id="L552">    <span class="tok-kw">switch</span> (Tkey.Key) {</span>
 <span class="line" id="L553"></span>
-<span class="line" id="L554">    <span class="tok-comment">// Tkey = kbd.getKEY();</span>
+<span class="line" id="L554">      .func =&gt; {</span>
+<span class="line" id="L555">        callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); <span class="tok-comment">// User clicks &quot;increment&quot;</span>
 </span>
-<span class="line" id="L555"></span>
-<span class="line" id="L556">    Tkey.Key = pnl.ioPanel(&amp;pFmt01);</span>
-<span class="line" id="L557">    </span>
+<span class="line" id="L556">        callFunc.run(&amp;pFmt01, &amp;pFmt01.field.items[pFmt01.idxfld]);</span>
+<span class="line" id="L557">      },</span>
 <span class="line" id="L558"></span>
-<span class="line" id="L559"></span>
-<span class="line" id="L560">    <span class="tok-kw">switch</span> (Tkey.Key) {</span>
-<span class="line" id="L561"></span>
-<span class="line" id="L562">      .func =&gt; {</span>
-<span class="line" id="L563">        callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); <span class="tok-comment">// User clicks &quot;increment&quot;</span>
+<span class="line" id="L559">      .F2 =&gt; {</span>
+<span class="line" id="L560">          <span class="tok-comment">// test control chek field</span>
 </span>
-<span class="line" id="L564">        callFunc.run(&amp;pFmt01, &amp;pFmt01.field.items[pFmt01.idxfld]);</span>
-<span class="line" id="L565">      },</span>
-<span class="line" id="L566"></span>
-<span class="line" id="L567">      .F2 =&gt; {</span>
-<span class="line" id="L568">          <span class="tok-comment">// test control chek field</span>
+<span class="line" id="L561">          pnl.msgErr(&amp;pFmt01,<span class="tok-str">&quot;le test de la saisie est OK&quot;</span>);</span>
+<span class="line" id="L562">        },</span>
+<span class="line" id="L563">      .F5 =&gt; {</span>
+<span class="line" id="L564">          <span class="tok-kw">var</span> nitem = mnu.ioMenu(&amp;pFmt01,pFmt01.menu.items[<span class="tok-number">0</span>],<span class="tok-number">0</span>);</span>
+<span class="line" id="L565">          mnu.rstPanel(&amp;pFmt01.menu.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
+<span class="line" id="L566">          std.debug.print(<span class="tok-str">&quot;n°item {}&quot;</span>,.{nitem});</span>
+<span class="line" id="L567">        },</span>
+<span class="line" id="L568">      .F8 =&gt; {</span>
+<span class="line" id="L569"></span>
+<span class="line" id="L570">        <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L571"></span>
+<span class="line" id="L572">            <span class="tok-comment">// exemple reset GRID and re load</span>
 </span>
-<span class="line" id="L569">          pnl.msgErr(&amp;pFmt01,<span class="tok-str">&quot;le test de la saisie est OK&quot;</span>);</span>
-<span class="line" id="L570">        },</span>
-<span class="line" id="L571">      .F5 =&gt; {</span>
-<span class="line" id="L572">          <span class="tok-kw">var</span> nitem = mnu.ioMenu(&amp;pFmt01,pFmt01.menu.items[<span class="tok-number">0</span>],<span class="tok-number">0</span>);</span>
-<span class="line" id="L573">          mnu.rstPanel(&amp;pFmt01.menu.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
-<span class="line" id="L574">          std.debug.print(<span class="tok-str">&quot;n°item {}&quot;</span>,.{nitem});</span>
-<span class="line" id="L575">        },</span>
-<span class="line" id="L576">      .F8 =&gt; {</span>
-<span class="line" id="L577"></span>
-<span class="line" id="L578">        <span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
-<span class="line" id="L579"></span>
-<span class="line" id="L580">        <span class="tok-kw">if</span> (grd.countColumns(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]) == <span class="tok-number">0</span>) {</span>
-<span class="line" id="L581">          <span class="tok-kw">var</span> Cell = std.ArrayList(grd.CELL).init(allocator);</span>
-<span class="line" id="L582">          Cell.append(grd.newCell(<span class="tok-str">&quot;ID&quot;</span>,<span class="tok-number">2</span>,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L583">          Cell.append(grd.newCell(<span class="tok-str">&quot;Name&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L584">          Cell.append(grd.newCell(<span class="tok-str">&quot;animal&quot;</span>,<span class="tok-number">20</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L585">          Cell.append(grd.newCell(<span class="tok-str">&quot;prix&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L586">          grd.setCellEditCar(&amp;Cell.items[<span class="tok-number">3</span>],<span class="tok-str">&quot;€&quot;</span>);</span>
-<span class="line" id="L587">          Cell.append(grd.newCell(<span class="tok-str">&quot;HS&quot;</span>,<span class="tok-number">1</span>,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L588">          Cell.append(grd.newCell(<span class="tok-str">&quot;Password&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L589">          grd.setHeaders(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], Cell);</span>
-<span class="line" id="L590">          grd.printGridHeader(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
-<span class="line" id="L591">          Cell.clearAndFree();</span>
-<span class="line" id="L592">        }</span>
-<span class="line" id="L593"></span>
-<span class="line" id="L594"></span>
-<span class="line" id="L595">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
-<span class="line" id="L596"></span>
-<span class="line" id="L597">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;+1000.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L598">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;2&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;-1001.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac2&quot;</span>});</span>
-<span class="line" id="L599">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;3&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac3&quot;</span>});</span>
-<span class="line" id="L600">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;4&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L601">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;5&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L602">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;6&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L603">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;7&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L604">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;8&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L605">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;9&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L606">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L607">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
-<span class="line" id="L608"></span>
-<span class="line" id="L609">        <span class="tok-comment">//grd.dltRows(&amp;pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};</span>
+<span class="line" id="L573">            grd.reLoadGrid(</span>
+<span class="line" id="L574">            &amp;pFmt01.grid.items[<span class="tok-number">0</span>],</span>
+<span class="line" id="L575">            pFmt01.grid.items[<span class="tok-number">0</span>].name, </span>
+<span class="line" id="L576">            pFmt01.grid.items[<span class="tok-number">0</span>].posx,</span>
+<span class="line" id="L577">            pFmt01.grid.items[<span class="tok-number">0</span>].posy, </span>
+<span class="line" id="L578">            pFmt01.grid.items[<span class="tok-number">0</span>].pageRows,</span>
+<span class="line" id="L579">            pFmt01.grid.items[<span class="tok-number">0</span>].separator, </span>
+<span class="line" id="L580">            pFmt01.grid.items[<span class="tok-number">0</span>].cadre</span>
+<span class="line" id="L581">            );</span>
+<span class="line" id="L582"></span>
+<span class="line" id="L583"></span>
+<span class="line" id="L584"></span>
+<span class="line" id="L585"></span>
+<span class="line" id="L586">        <span class="tok-kw">if</span> (grd.countColumns(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]) == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L587"></span>
+<span class="line" id="L588">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;ID&quot;</span>,<span class="tok-number">2</span>,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan) ;</span>
+<span class="line" id="L589">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;Name&quot;</span>,<span class="tok-number">15</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);</span>
+<span class="line" id="L590">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;animal&quot;</span>,<span class="tok-number">20</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite) ;</span>
+<span class="line" id="L591">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;prix&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite) ;</span>
+<span class="line" id="L592">          grd.setCellEditCar(&amp;pFmt01.grid.items[<span class="tok-number">0</span>].cell.items[<span class="tok-number">3</span>],<span class="tok-str">&quot;€&quot;</span>);</span>
+<span class="line" id="L593">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;HS&quot;</span>,<span class="tok-number">1</span>,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed) ;</span>
+<span class="line" id="L594">          grd.newCell(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-str">&quot;Password&quot;</span>,<span class="tok-number">10</span>,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen) ;</span>
+<span class="line" id="L595">          grd.setHeaders(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L596">          grd.printGridHeader(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L597">        }</span>
+<span class="line" id="L598"></span>
+<span class="line" id="L599">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L600"></span>
+<span class="line" id="L601">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;+1000.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L602">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;2&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;-1001.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac2&quot;</span>});</span>
+<span class="line" id="L603">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;3&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac3&quot;</span>});</span>
+<span class="line" id="L604">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;4&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L605">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;5&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L606">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;6&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L607">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;7&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L608">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;8&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L609">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;9&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L610">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L611">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100.00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>,<span class="tok-str">&quot;tictac&quot;</span>});</span>
+<span class="line" id="L612"></span>
+<span class="line" id="L613">        <span class="tok-comment">//grd.dltRows(&amp;pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};</span>
 </span>
-<span class="line" id="L610"></span>
-<span class="line" id="L611"></span>
-<span class="line" id="L612">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
-<span class="line" id="L613"></span>
-<span class="line" id="L614">        <span class="tok-kw">if</span> ( Gkey.Key == kbd.enter <span class="tok-kw">and</span> pFmt01.idxfld == <span class="tok-number">0</span>) {</span>
-<span class="line" id="L615">          fld.setText(&amp;pFmt01,<span class="tok-number">0</span>,Gkey.Buf.items[<span class="tok-number">2</span>]) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
-<span class="line" id="L616">        }</span>
-<span class="line" id="L617"></span>
-<span class="line" id="L618">        <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageDown) {</span>
-<span class="line" id="L619">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
-<span class="line" id="L620">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;12&quot;</span>, <span class="tok-str">&quot;Bleu12&quot;</span>, <span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L621">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;13&quot;</span>, <span class="tok-str">&quot;Bleu13&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L622">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;14&quot;</span>, <span class="tok-str">&quot;Bleu14&quot;</span>, <span class="tok-str">&quot;Vache&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L623">        <span class="tok-comment">// test display pageDown</span>
+<span class="line" id="L614"></span>
+<span class="line" id="L615">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
+<span class="line" id="L616"></span>
+<span class="line" id="L617">        <span class="tok-kw">if</span> ( Gkey.Key == kbd.enter <span class="tok-kw">and</span> pFmt01.idxfld == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L618">          fld.setText(&amp;pFmt01,<span class="tok-number">0</span>,Gkey.Buf.items[<span class="tok-number">2</span>]) <span class="tok-kw">catch</span> |err| {dsperr.errorForms(err); <span class="tok-kw">return</span>;};</span>
+<span class="line" id="L619">        }</span>
+<span class="line" id="L620"></span>
+<span class="line" id="L621">        <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageDown) {</span>
+<span class="line" id="L622">        grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L623">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;12&quot;</span>, <span class="tok-str">&quot;Bleu12&quot;</span>, <span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L624">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;13&quot;</span>, <span class="tok-str">&quot;Bleu13&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L625">        grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;14&quot;</span>, <span class="tok-str">&quot;Bleu14&quot;</span>, <span class="tok-str">&quot;Vache&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L626">        <span class="tok-comment">// test display pageDown</span>
 </span>
-<span class="line" id="L624">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
-<span class="line" id="L625">          <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageUp) {</span>
-<span class="line" id="L626">            grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
-<span class="line" id="L627">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;01&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1000,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
-<span class="line" id="L628">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;02&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;1001,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
-<span class="line" id="L629">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;03&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L630">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;04&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L631">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;05&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L632">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;06&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L633">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;07&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
-<span class="line" id="L634">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;08&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L635">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;09&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L636">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L637">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
-<span class="line" id="L638">            <span class="tok-comment">// test display pageUp</span>
+<span class="line" id="L627">        Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">true</span>);</span>
+<span class="line" id="L628">          <span class="tok-kw">if</span> (Gkey.Key  == kbd.pageUp) {</span>
+<span class="line" id="L629">            grd.resetRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L630">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;01&quot;</span>, <span class="tok-str">&quot;Adam&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1000,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L631">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;02&quot;</span>, <span class="tok-str">&quot;Eve&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;1001,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L632">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;03&quot;</span>, <span class="tok-str">&quot;Rouge&quot;</span>,<span class="tok-str">&quot;Aigle&quot;</span>,<span class="tok-str">&quot;1002,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L633">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;04&quot;</span>, <span class="tok-str">&quot;Bleu&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L634">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;05&quot;</span>, <span class="tok-str">&quot;Bleu5&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L635">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;06&quot;</span>, <span class="tok-str">&quot;Bleu6&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L636">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;07&quot;</span>, <span class="tok-str">&quot;Bleu7&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;1&quot;</span>});</span>
+<span class="line" id="L637">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;08&quot;</span>, <span class="tok-str">&quot;Bleu8&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L638">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;09&quot;</span>, <span class="tok-str">&quot;Bleu9&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L639">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;10&quot;</span>, <span class="tok-str">&quot;Bleu10&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L640">            grd.addRows(&amp;pFmt01.grid.items[<span class="tok-number">0</span>] , &amp;.{<span class="tok-str">&quot;11&quot;</span>, <span class="tok-str">&quot;Bleu11&quot;</span>, <span class="tok-str">&quot;poisson&quot;</span>,<span class="tok-str">&quot;100,00&quot;</span>,<span class="tok-str">&quot;0&quot;</span>});</span>
+<span class="line" id="L641">            <span class="tok-comment">// test display pageUp</span>
 </span>
-<span class="line" id="L639">            Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">false</span>);</span>
-<span class="line" id="L640">          }</span>
-<span class="line" id="L641">        }</span>
-<span class="line" id="L642">        grd.rstPanel(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
-<span class="line" id="L643">        <span class="tok-comment">//grd.resetGrid(&amp;pFmt01.grid.items[0]);</span>
+<span class="line" id="L642">            Gkey =grd.ioGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>],<span class="tok-null">false</span>);</span>
+<span class="line" id="L643"></span>
+<span class="line" id="L644">          }</span>
+<span class="line" id="L645">        }</span>
+<span class="line" id="L646">        grd.rstPanel(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
+<span class="line" id="L647"></span>
+<span class="line" id="L648"></span>
+<span class="line" id="L649">        <span class="tok-comment">// if you have several grids please do a resetGrid on exit and a reloadGrid on enter</span>
 </span>
-<span class="line" id="L644">        <span class="tok-comment">//Cell.clearAndFree();</span>
-</span>
-<span class="line" id="L645">        <span class="tok-comment">//pFmt01.grid.items[0].buf.deinit();</span>
-</span>
-<span class="line" id="L646">      },</span>
-<span class="line" id="L647">      .F23 =&gt; {     </span>
-<span class="line" id="L648">        pnl.printPanel(&amp;pFmt01);</span>
-<span class="line" id="L649">      },</span>
-<span class="line" id="L650">      <span class="tok-kw">else</span> =&gt; {},</span>
-<span class="line" id="L651">    }</span>
-<span class="line" id="L652">    <span class="tok-kw">if</span> (Tkey.Key == kbd.F3) <span class="tok-kw">break</span>; <span class="tok-comment">// end work</span>
-</span>
-<span class="line" id="L653">  }</span>
+<span class="line" id="L650">        grd.resetGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L651"></span>
+<span class="line" id="L652"></span>
+<span class="line" id="L653">      },</span>
 <span class="line" id="L654"></span>
-<span class="line" id="L655"></span>
-<span class="line" id="L656">}</span>
+<span class="line" id="L655">      .F23 =&gt; {     </span>
+<span class="line" id="L656">        pnl.printPanel(&amp;pFmt01);</span>
+<span class="line" id="L657">      },</span>
+<span class="line" id="L658">      <span class="tok-kw">else</span> =&gt; {},</span>
+<span class="line" id="L659">    }</span>
+<span class="line" id="L660">    <span class="tok-kw">if</span> (Tkey.Key == kbd.F3) <span class="tok-kw">break</span>; <span class="tok-comment">// end work</span>
+</span>
+<span class="line" id="L661">  }</span>
+<span class="line" id="L662"></span>
+<span class="line" id="L663"></span>
+<span class="line" id="L664">}</span>
 </code></pre></body>
 </html>

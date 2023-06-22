@@ -271,3 +271,8 @@ modification from :<BR />
 -  2023-06-20  Tuning  memory OK, I will be able to progress in the project <br />
 <BR/>
 
+<BR/>
+-  2023-06-22  memory management validation <br />
+-  2023-06-22 Simplification of registration of a grid and management of several grids <br />
+-  2023-06-22  Enabling TTY output<br />
+<BR/>

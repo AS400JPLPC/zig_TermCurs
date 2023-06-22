@@ -68,11 +68,11 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
         dds.CADRE.line1,
     );
 
-    var Cell = std.ArrayList(grd.CELL).init(dds.allocatorGrid);
-    Cell.append(grd.newCell("ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen)) catch unreachable;
-    Cell.append(grd.newCell("Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow)) catch unreachable;
-    Cell.append(grd.newCell("Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen)) catch unreachable;
-    grd.setHeaders(&Xcombo, Cell);
+
+    grd.newCell(&Xcombo,"ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
+    grd.newCell(&Xcombo,"Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+    grd.newCell(&Xcombo,"Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+    grd.setHeaders(&Xcombo);
 
     var idx: usize = 0;
     for (vpnl.items) |p| {
@@ -83,21 +83,19 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
     var Gkey: grd.GridSelect = undefined;
     while (true) {
         Gkey = grd.ioCombo(&Xcombo, cellPos);
+
         if (Gkey.Key == kbd.enter) {
             //grd.rstPanel(&Xcombo, frompnl);
             grd.resetGrid(&Xcombo);
-            Cell.clearAndFree();
-            Xcombo.buf.clearAndFree();
-            dds.deinitGrid();
-
+            Xcombo = undefined;
             return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
         }
+
+
         if (Gkey.Key == kbd.esc) {
             //grd.rstPanel(&Xcombo, frompnl);
             grd.resetGrid(&Xcombo);
-            Cell.clearAndFree();
-            Xcombo.buf.clearAndFree();
-            dds.deinitGrid();
+            Xcombo = undefined;
             return 999;
         }
     }
@@ -116,15 +114,11 @@ var Y: usize = 0;
 
 //pub fn main() !void {
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
+    
     term.cls();
-
-    // defines the receiving structure of the keyboard
-    var Tkey: term.Keyboard = undefined;
-
-
 
     numPanel = qryPanel(XPANEL);
-    term.cls();
+
     if (numPanel == 999) return;
 
 
@@ -186,7 +180,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     if (pFmt01.frame.cadre != dds.CADRE.line0) minX += 1;
 
     term.onMouse();
-    //term.cursShow();
+    var Tkey : term.Keyboard = undefined ; // defines the receiving structure of the keyboard
     while (true) {
         term.cursShow();
         Tkey = kbd.getKEY();
@@ -200,30 +194,20 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 XPANEL.items[numPanel].label.append(p) catch unreachable ;
                 }
 
-                pFmt01.label.deinit();
-                pFmt01.field.deinit();
-                pFmt01.button.deinit();
-                pFmt01.menu.deinit();
-                pFmt01.grid.deinit();
-                pFmt01.lineh.deinit();
-                pFmt01.linev.deinit();
-                pFmt01.buf.deinit();
+                pnl.deinitPanel(&pFmt01);
+                pFmt01 = undefined;
                 dds.deinitUtils();
+                dds.deinitScreen();
 
 
 
                 return;
             },
             .F12 => {
-                pFmt01.label.deinit();
-                pFmt01.field.deinit();
-                pFmt01.button.deinit();
-                pFmt01.menu.deinit();
-                pFmt01.grid.deinit();
-                pFmt01.lineh.deinit();
-                pFmt01.linev.deinit();
-                pFmt01.buf.deinit();
+                pnl.deinitPanel(&pFmt01);
+                pFmt01 = undefined;
                 dds.deinitUtils();
+                dds.deinitScreen();
 
                 return ; 
             } ,

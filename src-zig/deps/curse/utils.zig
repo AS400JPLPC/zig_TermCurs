@@ -11,6 +11,13 @@ const dds = @import("dds");
 
 /// Tools for internal variables
 
+// write to buffer struct and file
+pub fn ToStr(text : [] const u8 ) []const u8 {
+  return std.fmt.allocPrint(dds.allocatorRecord,"{s}",.{text}) catch unreachable;
+}
+
+
+
 /// Errors that may occur when using String
 pub const ErrUtils = error{
         Invalide_subStr_Index,
@@ -19,12 +26,7 @@ pub const ErrUtils = error{
         Invalide_Character_strToUsize,
 };
 
-// write to buffer struct and file
-pub fn ToStr(text : [] const u8 ) []const u8 {
-  var result = dds.allocatorRecord.alloc(u8, text.len ) catch unreachable;
-  std.mem.copy(u8, result, text);
-  return result;
-}
+
 
 
 /// Iterator support iteration string
@@ -654,7 +656,6 @@ pub fn usizeToStr(v: usize ) []const u8{
 
   return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v}) catch unreachable;
 }
-
 
 
 /// Delete Items ArrayList

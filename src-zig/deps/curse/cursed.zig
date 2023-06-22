@@ -13,16 +13,13 @@ var TTY: fs.File = undefined;
 var original_termios: os.linux.termios = undefined;
 var use_termios: os.linux.termios = undefined;
 
-const STDOUT_TERM = std.io.getStdOut();
-var buf_Output = std.io.bufferedWriter(STDOUT_TERM.writer());
-// Get the Writer interface from BufferedWriter
-const wcons = buf_Output.writer();
+
 
 const allocator = std.heap.page_allocator;
 
+
 /// flush terminal in-out
 pub fn flushIO() void {
-    buf_Output.flush() catch unreachable;
     _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &use_termios);
 }
 
@@ -31,14 +28,14 @@ pub fn flushIO() void {
 ///-------------
 /// onMouse
 pub fn onMouse() void {
-    wcons.print("\x1b[?1000;1005;1006h", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[?1000;1005;1006h") catch unreachable;
 }
 
 /// offMouse
 pub fn offMouse() void {
-    wcons.print("\x1b[?1000;1005;1006l", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[?1000;1005;1006l") catch unreachable;
 }
 
 ///-------------
@@ -46,39 +43,39 @@ pub fn offMouse() void {
 ///-------------
 /// Clear from cursor until end of screen
 pub fn cls_from_cursor_toEndScreen() void {
-    wcons.print("\x1b[0J", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[0J") catch unreachable;
 }
 
 /// Clear from cursor to beginning of screen
 pub fn cls_from_cursor_toStartScreen() void {
-    wcons.print("\x1b[1J", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[1J") catch unreachable;
 }
 
 /// Clear all screen
 pub fn cls() void {
-    wcons.print("\x1b[2J", .{}) catch unreachable;
-    wcons.print("\x1b[3J", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[2J") catch unreachable;
+  writer.writeAll("\x1b[3J") catch unreachable;
 }
 
 /// Clear from cursor to end of line
 pub fn cls_from_cursor_toEndline() void {
-    wcons.print("\x1b[0K", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[0K") catch unreachable;
 }
 
 /// Clear start of line to the cursor
 pub fn cls_from_cursor_toStartLine() void {
-    wcons.print("\x1b[1K", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[1K") catch unreachable;
 }
 
 /// Clear from cursor to end of line
 pub fn cls_line() void {
-    wcons.print("\x1b[2K", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[2K") catch unreachable;
 }
 
 ///-------------
@@ -90,73 +87,73 @@ pub var posCurs: Point = undefined;
 
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY(x: usize, y: usize) void {
-    wcons.print("\x1b[{d};{d}H", .{ x, y }) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d};{d}H", .{ x, y }) catch unreachable;
 }
 
 /// Moves cursor up `y` rows
 pub fn gotoUp(x: usize) void {
-    wcons.print("\x1b[{d}A", .{x}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}A", .{x}) catch unreachable;
 }
 
 /// Moves cursor down `y` rows
 pub fn gotoDown(x: usize) void {
-    wcons.print("\x1b[{d}B", .{x}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}B", .{x}) catch unreachable;
 }
 
 /// Moves cursor left `y` columns
 pub fn gotoLeft(y: usize) void {
-    wcons.print("\x1b[{d}D", .{y}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}D", .{y}) catch unreachable;
 }
 
 /// Moves cursor right `y` columns
 pub fn gotoRight(y: usize) void {
-    wcons.print("\x1b[{d}C", .{y}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}C", .{y}) catch unreachable;
 }
 
 /// Hide the cursor
 pub fn cursHide() void {
-    wcons.print("\x1b[?25l", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[?25l", .{}) catch unreachable;
 }
 
 /// Show the cursor
 pub fn cursShow() void {
-    wcons.print("\x1b[?25h", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[?25h") catch unreachable;
 }
 
 pub fn defCursor(e_curs: dds.typeCursor) void {
+  const writer = TTY.writer();
     // define type  Cursor form terminal
     switch (e_curs) {
         .cDefault => {
-            wcons.print("\x1b[0 q", .{}) catch unreachable; // 0 → default terminal
+            writer.writeAll("\x1b[0 q") catch unreachable; // 0 → default terminal
         },
         .cBlink => {
-            wcons.print("\x1b[1 q", .{}) catch unreachable; // 1 → blinking block
+            writer.writeAll("\x1b[1 q") catch unreachable; // 1 → blinking block
         },
         .cSteady => {
-            wcons.print("\x1b[2 q", .{}) catch unreachable; //  2 → steady block
+            writer.writeAll("\x1b[2 q") catch unreachable; //  2 → steady block
         },
         .cBlinkUnderline => {
-            wcons.print("\x1b[3 q", .{}) catch unreachable; //  3 → blinking underlines
+            writer.writeAll("\x1b[3 q") catch unreachable; //  3 → blinking underlines
         },
         .cSteadyUnderline => {
-            wcons.print("\x1b[4 q", .{}) catch unreachable; //  4 → steady underlines
+            writer.writeAll("\x1b[4 q") catch unreachable; //  4 → steady underlines
         },
         .cBlinkBar => {
-            wcons.print("\x1b[5 q", .{}) catch unreachable; //  5 → blinking bar
+            writer.writeAll("\x1b[5 q") catch unreachable; //  5 → blinking bar
         },
         .cSteadyBar => {
-            wcons.print("\x1b[6 q", .{}) catch unreachable; //  6 → steady bar
+            writer.writeAll("\x1b[6 q") catch unreachable; //  6 → steady bar
         },
     }
-    wcons.print("\x1b[?25h", .{}) catch unreachable;
-    flushIO();
+    writer.writeAll("\x1b[?25h") catch unreachable;
 }
 
 fn convIntCursor(x: u8) usize {
@@ -215,13 +212,6 @@ pub fn getCursor() void {
     if (cursBuf[5] == 59) {
       posCurs.x = convIntCursor(cursBuf[3]);
       posCurs.x = (posCurs.x * 10) + convIntCursor(cursBuf[4]);
-      
-      if (cursBuf[7] == 59)  posCurs.y = convIntCursor(cursBuf[6]);
-
-      if ( cursBuf[8] == 59) {
-          posCurs.y = convIntCursor(cursBuf[6]);
-          posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]);
-      }
 
       if ( cursBuf[9] == 59 ) {
           posCurs.y = convIntCursor(cursBuf[6]);
@@ -239,39 +229,39 @@ pub fn getCursor() void {
 ///-------------------------
 /// Reset the terminal style.
 pub fn resetStyle() void {
-    wcons.print("\x1b[0m", .{}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.writeAll("\x1b[0m") catch unreachable;
 }
 
 /// Sets the terminal style.
 fn setStyle(style: [4]u32) void {
-    for (style) |v| {
-        if (v != 0) {
-            wcons.print("\x1b[{d}m", .{v}) catch unreachable;
-        }
-    }
-    flushIO();
+  const writer = TTY.writer();
+  for (style) |v| {
+      if (v != 0) {
+          writer.print("\x1b[{d}m", .{v}) catch unreachable;
+      }
+  }
 }
 
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: dds.BackgroundColor) void {
-    wcons.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: dds.ForegroundColor) void {
-    wcons.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
-    flushIO();
+  const writer = TTY.writer();
+  writer.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
 }
 
 /// write text and attribut
 pub fn writeStyled(text: []const u8, attribut: dds.ZONATRB) void {
-    setForegroundColor(attribut.backgr);
-    setBackgroundColor(attribut.foregr);
-    setStyle(attribut.styled);
-    wcons.print("{s}\x1b[0m", .{text}) catch unreachable;
-    //flushIO();
+  const writer = TTY.writer();
+  setForegroundColor(attribut.backgr);
+  setBackgroundColor(attribut.foregr);
+  setStyle(attribut.styled);
+  writer.print("{s}\x1b[0m", .{text}) catch unreachable;
 }
 
 ///-------------------------
@@ -281,86 +271,87 @@ pub fn writeStyled(text: []const u8, attribut: dds.ZONATRB) void {
 /// using this struct. Raw mode is essential to create a TUI.
 /// open terminal and config
 pub fn enableRawMode() void {
-    TTY = fs.cwd().openFile("/dev/tty", .{ .mode = .read_write }) catch unreachable;
-    //defer TTY.close();
+  TTY = fs.cwd().openFile("/dev/tty", .{ .mode = .read_write }) catch unreachable;
+  //defer TTY.close();
 
-    _ = os.linux.tcgetattr(TTY.handle, &original_termios);
+  _ = os.linux.tcgetattr(TTY.handle, &original_termios);
 
-    _ = os.linux.tcgetattr(TTY.handle, &use_termios);
+  _ = os.linux.tcgetattr(TTY.handle, &use_termios);
 
-    // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
-    // https://codeberg.org/josias/zigcurses/src/branch/master/src/main.zig
-    // https://man7.org/linux/man-pages/man3/ttermios.3.html
+  // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+  // https://codeberg.org/josias/zigcurses/src/branch/master/src/main.zig
+  // https://man7.org/linux/man-pages/man3/ttermios.3.html
 
-    // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
+  // https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html
 
-    // https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm
+  // https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm
 
-    use_termios.iflag &= ~(os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |
-        os.linux.INLCR | os.linux.IGNCR | os.linux.ICRNL | os.linux.IXON);
+  use_termios.iflag &= ~(os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |
+      os.linux.INLCR | os.linux.IGNCR | os.linux.ICRNL | os.linux.IXON);
 
-    use_termios.oflag &= ~(os.linux.OPOST);
-    use_termios.cflag &= ~(os.linux.CSIZE | os.linux.PARENB);
-    use_termios.cflag |= (os.linux.CS8);
-    use_termios.lflag &= ~(os.linux.ECHO | os.linux.ECHONL | os.linux.ICANON | os.linux.IEXTEN | os.linux.ISIG);
+  use_termios.oflag &= ~(os.linux.OPOST);
+  use_termios.cflag &= ~(os.linux.CSIZE | os.linux.PARENB);
+  use_termios.cflag |= (os.linux.CS8);
+  use_termios.lflag &= ~(os.linux.ECHO | os.linux.ECHONL | os.linux.ICANON | os.linux.IEXTEN | os.linux.ISIG);
 
-    // Wait until it reads at least one byte  terminal standard
-    use_termios.cc[os.linux.V.MIN] = 1;
+  // Wait until it reads at least one byte  terminal standard
+  use_termios.cc[os.linux.V.MIN] = 1;
 
-    // Wait 100 miliseconds at maximum.
-    use_termios.cc[os.linux.V.TIME] = 0;
+  // Wait 100 miliseconds at maximum.
+  use_termios.cc[os.linux.V.TIME] = 0;
 
-    // apply changes
-    _ = os.linux.tcsetattr(TTY.handle, .NOW, &use_termios);
+  // apply changes
+  _ = os.linux.tcsetattr(TTY.handle, .NOW, &use_termios);
 
-    // cursor HIDE par défault
-    cursHide();
-    offMouse();
+  // cursor HIDE par défault
+  cursHide();
+  offMouse();
 }
 
 /// Clear gross terminal
 fn reset() void {
-    var name = "/bin/echo";
-    var args = [_:null]?[*:0]const u8{ "echo", "\x1b[H\x1b[3J" };
-    var env = [_:null]?[*:0]u8{};
+  var name = "/bin/echo";
+  var args = [_:null]?[*:0]const u8{ "echo", "\x1b[H\x1b[3J" };
+  var env = [_:null]?[*:0]u8{};
 
-    std.os.execveZ(name, args[0..args.len], env[0..env.len]) catch unreachable;
+  std.os.execveZ(name, args[0..args.len], env[0..env.len]) catch unreachable;
 }
 
 /// Returns to the previous terminal state
 pub fn disableRawMode() void {
-    defCursor(dds.typeCursor.cSteady);
-    offMouse();
-    cursShow();
-    cls();
-    wcons.print("\x1b[H", .{}) catch unreachable; // init pos_coursor
+  defCursor(dds.typeCursor.cSteady);
+  offMouse();
+  cursShow();
+  cls();
+  const writer = TTY.writer();
+  writer.print("\x1b[H", .{}) catch unreachable; // init pos_coursor
 
-    _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &original_termios);
-    reset();
+  _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &original_termios);
+  reset();
 }
 
 /// get size terminal
 const TermSize = struct { width: usize, height: usize };
 
 pub fn getSize() !TermSize {
-    var win_size: std.os.linux.winsize = undefined;
+  var win_size: std.os.linux.winsize = undefined;
 
-    const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @ptrToInt(&win_size));
-    if (os.errno(err) != .SUCCESS) {
-        return os.unexpectedErrno(@intToEnum(os.linux.E, err));
-    }
-    return TermSize{
-        .height = win_size.ws_row,
-        .width = win_size.ws_col,
-    };
+  const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @ptrToInt(&win_size));
+  if (os.errno(err) != .SUCCESS) {
+      return os.unexpectedErrno(@intToEnum(os.linux.E, err));
+  }
+  return TermSize{
+      .height = win_size.ws_row,
+      .width = win_size.ws_col,
+  };
 }
 
 /// Update title terminal
 pub fn titleTerm(title: []const u8) void {
-    if (title.len > 0) {
-        wcons.print("\x1b]0;{s}\x07", .{title}) catch unreachable;
-        flushIO();
-    }
+  if (title.len > 0) {
+    const writer = TTY.writer();
+    writer.print("\x1b]0;{s}\x07", .{title}) catch unreachable;
+  }
 }
 
 // if use resize  ok : vte application terminal ex TermVte
@@ -369,10 +360,10 @@ pub fn titleTerm(title: []const u8) void {
 // *allowWindowOps: true  *eightBitInput: false
 
 pub fn resizeTerm(line: usize, cols: usize) void {
-    if (line > 0 and cols > 0) {
-        wcons.print("\x1b[8;{d};{d};t", .{ line, cols }) catch unreachable;
-        flushIO();
-    }
+  if (line > 0 and cols > 0) {
+    const writer = TTY.writer();
+    writer.print("\x1b[8;{d};{d};t", .{ line, cols }) catch unreachable;
+  }
 }
 
 /// mouse struct
@@ -685,7 +676,7 @@ pub const kbd = enum {
         var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
 
         // variable --> Event.Char
-        var vUnicode: []u8 = undefined;
+        var vUnicode: []u8 = undefined; 
         vUnicode = allocator.alloc(u8, 4) catch unreachable;
         var x: usize = 0;
         while (x < 4) : (x += 1) vUnicode[x] = 0;

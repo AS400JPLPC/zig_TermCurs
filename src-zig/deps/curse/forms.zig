@@ -29,7 +29,8 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
   };
 
   term.getCursor();
-  term.gotoXY(39,1);
+  var Xterm = term.getSize() catch unreachable;
+  term.gotoXY(Xterm.height,1) ;
   const allocator = std.heap.page_allocator;
   var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) catch unreachable;
   term.writeStyled(msg,AtrDebug);
@@ -1412,7 +1413,7 @@ pub const  mnu = struct {
 
 pub const  grd = struct {
       
-    const allocator = std.heap.page_allocator;
+  const allocator = std.heap.page_allocator;
 
 
   // define attribut default GRID
@@ -1487,6 +1488,7 @@ pub const  grd = struct {
     pageRows:  usize,
 
     data:     std.MultiArrayList(ArgData),
+    cell:     std.ArrayList(CELL),
     headers:  std.ArrayList(CELL),
 
     separator:  [] const u8,
@@ -1596,6 +1598,7 @@ pub const  grd = struct {
       .pageRows = vpageRows,
       .data = std.MultiArrayList(ArgData){},
       .headers = std.ArrayList(CELL).init(dds.allocatorGrid),
+      .cell =    std.ArrayList(CELL).init(dds.allocatorGrid),
       .actif = true,
       .attribut = AtrGrid,
       .atrTitle = AtrTitle,
@@ -1611,6 +1614,39 @@ pub const  grd = struct {
     };
 
     return xgrid ;
+  }
+
+  pub fn reLoadGrid(self: *GRID ,
+              vname: [] const u8 ,
+              vposx: usize, vposy: usize, 
+              vpageRows : usize , // nbr ligne  + header
+              vseparator: [] const u8 ,
+              vcadre    : dds.CADRE
+              ) void {
+
+      if (self.actif) return ;
+      self.name  = vname;
+      self.posx  = vposx;
+      self.posy  = vposy;
+      self.lines = vpageRows + 2 ; //  row per page  + cadre 
+      self.cols  = 0;             
+      self.separator = vseparator;
+      self.pageRows = vpageRows;
+      self.data = std.MultiArrayList(ArgData){};
+      self.headers = std.ArrayList(CELL).init(dds.allocatorGrid);
+      self.cell =    std.ArrayList(CELL).init(dds.allocatorGrid);
+      self.actif = true;
+      self.attribut = AtrGrid;
+      self.atrTitle = AtrTitle;
+      self.atrCell  = AtrCell;
+      self.cadre = vcadre;
+      self.lignes  = 0;
+      self.pages  = 0;
+      self.maxligne = 0;
+      self.cursligne  = 0;
+      self.curspage  = 1;
+
+      self.buf    = std.ArrayList(TERMINAL_CHAR).init(dds.allocatorGrid);
   }
 
   // return len header  ---> arraylist panel-grid
@@ -1638,11 +1674,11 @@ pub const  grd = struct {
   }
 
   // initialization CELL -header  ---> arraylist panel-grid
-  pub fn setHeaders(self : *GRID, vCell: std.ArrayList(CELL)) void  {
+  pub fn setHeaders(self : *GRID) void  {
     self.cols = 0;
-    for (vCell.items) |xcell| {
+    for (self.cell.items) |xcell| {
       self.headers.append(xcell) catch   {
-                                      std.debug.print("append header err={}\n", .{ErrForms.Invalide_append});
+                                      std.debug.print("append header GRID {s} err={}\n", .{self.name,ErrForms.Invalide_append});
                                       _= kbd.getKEY();
                                     }; 
     }
@@ -1694,7 +1730,7 @@ pub const  grd = struct {
   }
 
   // New  CELL  --> arraylist panel-grid
-  pub fn newCell(vtext: [] const u8, vlong : usize , vreftyp: dds.REFTYP , TextColor: dds.ForegroundColor )  CELL {
+  pub fn newCell(self: *GRID,vtext: [] const u8, vlong : usize , vreftyp: dds.REFTYP , TextColor: dds.ForegroundColor )  void {
 
     var nlong: usize = 0 ;
     if (utl.nbrCharStr(vtext) > vlong )  nlong = utl.nbrCharStr(vtext)
@@ -1711,7 +1747,7 @@ pub const  grd = struct {
         .atrCell = toRefColor(TextColor)
       };
 
-      return cell ;
+    self.cell.append(cell) catch unreachable;
   }
 
   // Set Char  -cell ---> arraylist panel-grid
@@ -1751,7 +1787,10 @@ pub const  grd = struct {
     return self.data.items(.buf)[r].items[i];
   }
 
-
+  //  panel-grid ACTIF
+  pub fn getActif(self: *GRID)  bool {
+    return  self.actif;
+  }
 
   // add row  -data ---> arraylist panel-grid
   pub fn addRows(self: *GRID,  vrows: []const []const u8) void {
@@ -1784,20 +1823,18 @@ pub const  grd = struct {
 
   // reset -GRID ---> arraylist panel-grid
   pub fn resetGrid(self: *GRID) void {
-    self.name  = "";
-    self.posx  = 0;
-    self.posy  = 0;
-    self.lines = 0;
-    self.cols  = 0;
-    self.separator = "";
-    self.pageRows = 0;
     self.data.deinit(allocator);
-    self.headers.deinit();
+    self.headers.clearAndFree();
+    self.cell.clearAndFree();
     self.lignes  = 0;
     self.pages  = 0;
     self.maxligne = 0;
     self.cursligne  = 0;
     self.curspage  = 0;
+    self.buf.clearAndFree();
+    self.actif = false;
+    dds.deinitGrid();
+
   }
 
   // assign -Box(fram) MATRIX TERMINAL  ---> arraylist panel-grid
@@ -2400,9 +2437,8 @@ pub const  fld = struct {
 
 
   pub fn ToStr(text : [] const u8 ) []const u8 {
-    var result = dds.allocatorRecord.alloc(u8, text.len ) catch unreachable;
-    std.mem.copy(u8, result, text);
-    return result;
+
+    return std.fmt.allocPrint(dds.allocatorRecord,"{s}",.{text}) catch unreachable;
   }
 
 
@@ -2978,7 +3014,7 @@ pub const  fld = struct {
     };
 
       if (vregex.len == 0 ) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"}) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{{1,{d}}}$",.{xfield.width}) catch unreachable;
       }
       if (xfield.help.len == 0 ) xfield.help = "ex: 0..9" ;
 
@@ -3022,7 +3058,7 @@ pub const  fld = struct {
     };
       xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
       if (vregex.len == 0 ) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[+-][0-9]{s}{d}{s}$",.{"{1,",xfield.width,"}"}) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[+-][0-9]{{1,{d}}}$",.{xfield.width}) catch unreachable;
       }
       if (xfield.help.len == 0 ) xfield.help = "ex: +0..9" ;
 
@@ -3071,8 +3107,10 @@ pub const  fld = struct {
     else xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
 
     if (vregex.len == 0 ) {
-      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"})  catch unreachable
-      else xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,"^[0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"})  catch unreachable;
+      if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,
+      "^[0-9]{{1,{d}}}$",.{vwidth})  catch unreachable
+      else xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,
+      "^[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal,})  catch unreachable;
     }
     if (xfield.help.len == 0 ) xfield.help = "ex: 12301 or 123.01" ;
 
@@ -3121,10 +3159,10 @@ pub const  fld = struct {
     else xfield.nbrcar = xfield.width + xfield.scal  + 2 ;
     if (vregex.len == 0 ) {
 
-      if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(
-        dds.allocatorScreen,"^[+-][0-9]{s}1,{d}{s}$",.{"{",vwidth,"}"},)  catch unreachable
-      else xfield.regex = std.fmt.allocPrint(
-        dds.allocatorScreen,"^[+-][0-9]{s}1,{d}{s}[.][0-9]{s}{d}{s}$",.{"{",vwidth,"}","{",vscal,"}"},) catch unreachable;
+      if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(dds.allocatorScreen,
+      "^[+-][0-9]{{1,{d}}}$",.{vwidth})  catch unreachable
+      else xfield.regex = std.fmt.allocPrint(dds.allocatorScreen,
+      "^[+-][0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) catch unreachable;
 
     }
     if (xfield.help.len == 0 ) xfield.help = "ex: +12301 or +123.01" ;
@@ -3957,7 +3995,7 @@ pub const  fld = struct {
                   }
                 },
                 .DIGIT => {
-                  if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) or
+                  if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) and e_count > 0 or
                     (std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
                     (std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
                     
@@ -3993,7 +4031,7 @@ pub const  fld = struct {
                   }
                 },
                 .DECIMAL => {
-                  if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) or 
+                  if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) and e_count > 0 or 
                     (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
                     (std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
                     (std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
@@ -4129,7 +4167,6 @@ pub const  fld = struct {
 // defined Panel
 pub const  pnl = struct {
     
-  const allocator = std.heap.page_allocator;
 
   // define attribut default PANEL
   pub var AtrPanel : dds.ZONATRB = .{
@@ -4213,19 +4250,20 @@ pub const  pnl = struct {
           .cols   = vcols,
           .attribut = AtrPanel,
           .frame = undefined,
-          .label  = std.ArrayList(lbl.LABEL).init(allocator),
-          .button = std.ArrayList(btn.BUTTON).init(allocator),
-          .menu   = std.ArrayList(mnu.MENU).init(allocator),
-          .grid   = std.ArrayList(grd.GRID).init(allocator),
-          .field  = std.ArrayList(fld.FIELD).init(allocator),
-          .linev  = std.ArrayList(lnv.LINE).init(allocator),
-          .lineh  = std.ArrayList(lnh.LINE).init(allocator),
-          .buf    = std.ArrayList(TERMINAL_CHAR).init(allocator),
+          .label  = std.ArrayList(lbl.LABEL).init(dds.allocatorPnl),
+          .button = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl),
+          .menu   = std.ArrayList(mnu.MENU).init(dds.allocatorPnl),
+          .grid   = std.ArrayList(grd.GRID).init(dds.allocatorPnl),
+          .field  = std.ArrayList(fld.FIELD).init(dds.allocatorPnl),
+          .linev  = std.ArrayList(lnv.LINE).init(dds.allocatorPnl),
+          .lineh  = std.ArrayList(lnh.LINE).init(dds.allocatorPnl),
+          .buf    = std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl),
           .idxfld = 9999,
           .key    =  kbd.none,
           .keyField = kbd.none,
           .actif  = true,
     };
+
 
     // INIT doublebuffer
     var i:usize = (xpanel.lines+1) * (xpanel.cols+1);
@@ -4254,7 +4292,7 @@ pub const  pnl = struct {
 
   pub fn initMatrix(vpnl: *PANEL) void {
     vpnl.buf.deinit();
-    vpnl.buf    = std.ArrayList(TERMINAL_CHAR).init(allocator);
+    vpnl.buf    = std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl);
 
         // INIT doublebuffer
     var i:usize = (vpnl.lines+1) * (vpnl.cols+1);
@@ -4293,6 +4331,19 @@ pub const  pnl = struct {
       }
       return panel ;
   }
+
+  pub fn deinitPanel(vpnl: *PANEL) void {
+
+      vpnl.label.clearAndFree();
+      vpnl.field.clearAndFree();
+      vpnl.button.clearAndFree();
+      vpnl.menu.clearAndFree();
+      vpnl.grid.clearAndFree();
+      vpnl.lineh.clearAndFree();
+      vpnl.linev.clearAndFree();
+      vpnl.buf.clearAndFree();
+  }
+
 
   pub fn getName(vpnl: *PANEL)  [] const u8 {
     return vpnl.name;
