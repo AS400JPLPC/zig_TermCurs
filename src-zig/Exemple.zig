@@ -437,7 +437,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   grd.rstPanel(&Xcombo, vpnl);
 
 
-  grd.resetGrid(&Xcombo);
+  grd.freeGrid(&Xcombo);
   Xcombo = undefined;
 
 
@@ -478,7 +478,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   grd.rstPanel(&Xcombo, vpnl);
 
 
-  grd.resetGrid(&Xcombo);
+  grd.freeGrid(&Xcombo);
   Xcombo = undefined;
 
   if ( Gkey.Key == kbd.esc )  return ;
@@ -646,8 +646,8 @@ pub fn main() !void {
         grd.rstPanel(&pFmt01.grid.items[0], &pFmt01);
 
 
-        // if you have several grids please do a resetGrid on exit and a reloadGrid on enter
-        grd.resetGrid(&pFmt01.grid.items[0]);
+        // if you have several grids please do a freeGrid on exit and a reloadGrid on enter
+        grd.freeGrid(&pFmt01.grid.items[0]);
 
 
       },

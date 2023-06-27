@@ -86,7 +86,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 
         if (Gkey.Key == kbd.enter) {
             //grd.rstPanel(&Xcombo, frompnl);
-            grd.resetGrid(&Xcombo);
+            grd.freeGrid(&Xcombo);
             Xcombo = undefined;
             return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
         }
@@ -94,7 +94,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 
         if (Gkey.Key == kbd.esc) {
             //grd.rstPanel(&Xcombo, frompnl);
-            grd.resetGrid(&Xcombo);
+            grd.freeGrid(&Xcombo);
             Xcombo = undefined;
             return 999;
         }
@@ -233,8 +233,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
                 var nitem  :usize = 0;
                   nitem  = mnu.ioMenu(&pFmt01,pFmt01.menu.items[0],nitem);
 
-                  if (nitem == 0) writeLabel(&pFmt01, false);  // remove
-                  if (nitem == 1) writeLabel(&pFmt01, false);  // order
+                  if (nitem == 0) orderLabel(&pFmt01);  // Order
+                  if (nitem == 1) removeLabel(&pFmt01);  // Remove
+                  term.offMouse();
+                  pnl.printPanel(&pFmt01);
+                  term.onMouse();
             },
             else => {},
         }
@@ -327,4 +330,176 @@ fn writeLabel(vpnl: *pnl.PANEL, Title: bool) void {
             else => {},
         }
     }
+}
+
+fn orderLabel( vpnl : *pnl.PANEL) void {
+  const allocator = std.heap.page_allocator;
+  var idx: usize = 0;
+  var idy: usize = 0;
+  var newlabel : std.ArrayList(lbl.LABEL) = std.ArrayList(lbl.LABEL).init(allocator);
+  var savlabel : std.ArrayList(lbl.LABEL) = std.ArrayList(lbl.LABEL).init(allocator);
+
+
+
+  var Gkey :grd.GridSelect = undefined ;
+
+  for (vpnl.label.items) |p| {
+    savlabel.append(p) catch unreachable ;
+    }
+
+  var Origine = grd.initGrid(
+                  "Origine",
+                  2, 2,
+                  25,  
+                  grd.gridStyle,
+                  dds.CADRE.line1,
+                  )  ;
+
+  var Order = grd.initGrid(
+                  "Order",
+                  2, 70,
+                  25,  
+                  grd.gridStyle,
+                  dds.CADRE.line1,
+                  )  ;
+
+  grd.newCell(&Origine,"col",3,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.newCell(&Origine,"name",6,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+  grd.newCell(&Origine,"text",40,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Origine) ;
+
+  grd.newCell(&Order,"col",3,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.newCell(&Order,"name",6,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+  grd.newCell(&Order,"text",40,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Order) ;
+
+  while (true) {
+    idx = 0 ; 
+    grd.resetRows(&Origine);
+    for (vpnl.label.items) |l| {
+      var ridx =  std.fmt.allocPrint(allocator, "{d}",.{idx}) catch unreachable;
+
+
+      if ( l.text.len > 40) grd.addRows(&Origine , &.{ridx, l.name, l.text[0..39] })
+      else  grd.addRows(&Origine , &.{ridx, l.name, l.text });
+
+      idx += 1;
+
+    }
+
+
+
+    Gkey =grd.ioGrid(&Origine,false);
+    if ( Gkey.Key == kbd.esc)   break ;
+    if ( Gkey.Key == kbd.F12)   break ;
+    if ( Gkey.Key == kbd.enter ) {
+      newlabel.append(vpnl.label.items[std.fmt.parseInt(usize, Gkey.Buf.items[0], 10) catch unreachable]) catch unreachable;
+      var ridy =  std.fmt.allocPrint(allocator, "{d}",.{idy}) catch unreachable;
+      grd.addRows(&Order , &.{ridy, Gkey.Buf.items[1], Gkey.Buf.items[2] });
+      idy += 1;
+      //grd.printGridRows(Order);
+      _=grd.ioGrid(&Order,false);
+      var ligne : usize = std.fmt.parseInt(usize, Gkey.Buf.items[0], 10) catch unreachable;
+      _=vpnl.label.orderedRemove(ligne);
+    }
+  }
+
+
+  // restor and exit
+  if ( Gkey.Key == kbd.esc ) {
+    vpnl.label.clearRetainingCapacity(); 
+    for (savlabel.items) |p| {
+    vpnl.label.append(p) catch unreachable ;
+    }
+  }
+  // new Order and exit
+  else {
+    vpnl.label.clearRetainingCapacity(); 
+    for (newlabel.items) |p| {
+    vpnl.label.append(p) catch unreachable ;
+    }
+  }
+  
+
+  grd.clearGrid(&Origine);
+  grd.freeGrid(&Order);
+  Origine = undefined;
+  Order   = undefined;
+  newlabel.clearAndFree();
+  savlabel.clearAndFree();
+
+
+  return ;
+}
+
+fn removeLabel( vpnl : *pnl.PANEL) void {
+  const allocator = std.heap.page_allocator;
+  var idx: usize = 0;
+  var savlabel : std.ArrayList(lbl.LABEL) = std.ArrayList(lbl.LABEL).init(allocator);
+
+
+
+  var Gkey :grd.GridSelect = undefined ;
+
+  for (vpnl.label.items) |p| {
+    savlabel.append(p) catch unreachable ;
+    }
+
+  var Origine = grd.initGrid(
+                  "Origine",
+                  2, 2,
+                  25,  
+                  grd.gridStyle,
+                  dds.CADRE.line1,
+                  )  ;
+
+
+  grd.newCell(&Origine,"col",3,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.newCell(&Origine,"name",6,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+  grd.newCell(&Origine,"text",40,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(&Origine) ;
+
+
+
+  while (true) {
+    idx = 0 ; 
+    grd.resetRows(&Origine);
+    for (vpnl.label.items) |l| {
+      var ridx =  std.fmt.allocPrint(allocator, "{d}",.{idx}) catch unreachable;
+
+
+      if ( l.text.len > 40) grd.addRows(&Origine , &.{ridx, l.name, l.text[0..39] })
+      else  grd.addRows(&Origine , &.{ridx, l.name, l.text });
+
+      idx += 1;
+
+    }
+
+
+
+    Gkey =grd.ioGrid(&Origine,false);
+    if ( Gkey.Key == kbd.esc)   break ;
+    if ( Gkey.Key == kbd.F12)   break ;
+    if ( Gkey.Key == kbd.enter ) {
+      var ridx : usize = std.fmt.parseInt(usize, Gkey.Buf.items[0], 10) catch unreachable;
+      _=vpnl.label.orderedRemove(ridx);
+    if ( vpnl.label.items.len == 0)  break ;
+    }
+  }
+
+
+  // restor and exit
+  if ( Gkey.Key == kbd.esc ) {
+    vpnl.label.clearRetainingCapacity(); 
+    for (savlabel.items) |p| {
+    vpnl.label.append(p) catch unreachable ;
+    }
+  }
+  
+
+  grd.freeGrid(&Origine);
+  Origine = undefined;
+  savlabel.clearAndFree();
+
+  return ;
 }

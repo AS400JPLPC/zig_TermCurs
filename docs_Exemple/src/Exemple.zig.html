@@ -746,7 +746,7 @@
 <span class="line" id="L437">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
 <span class="line" id="L438"></span>
 <span class="line" id="L439"></span>
-<span class="line" id="L440">  grd.resetGrid(&amp;Xcombo);</span>
+<span class="line" id="L440">  grd.freeGrid(&amp;Xcombo);</span>
 <span class="line" id="L441">  Xcombo = <span class="tok-null">undefined</span>;</span>
 <span class="line" id="L442"></span>
 <span class="line" id="L443"></span>
@@ -787,7 +787,7 @@
 <span class="line" id="L478">  grd.rstPanel(&amp;Xcombo, vpnl);</span>
 <span class="line" id="L479"></span>
 <span class="line" id="L480"></span>
-<span class="line" id="L481">  grd.resetGrid(&amp;Xcombo);</span>
+<span class="line" id="L481">  grd.freeGrid(&amp;Xcombo);</span>
 <span class="line" id="L482">  Xcombo = <span class="tok-null">undefined</span>;</span>
 <span class="line" id="L483"></span>
 <span class="line" id="L484">  <span class="tok-kw">if</span> ( Gkey.Key == kbd.esc )  <span class="tok-kw">return</span> ;</span>
@@ -967,9 +967,9 @@
 <span class="line" id="L646">        grd.rstPanel(&amp;pFmt01.grid.items[<span class="tok-number">0</span>], &amp;pFmt01);</span>
 <span class="line" id="L647"></span>
 <span class="line" id="L648"></span>
-<span class="line" id="L649">        <span class="tok-comment">// if you have several grids please do a resetGrid on exit and a reloadGrid on enter</span>
+<span class="line" id="L649">        <span class="tok-comment">// if you have several grids please do a freeGrid on exit and a reloadGrid on enter</span>
 </span>
-<span class="line" id="L650">        grd.resetGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
+<span class="line" id="L650">        grd.freeGrid(&amp;pFmt01.grid.items[<span class="tok-number">0</span>]);</span>
 <span class="line" id="L651"></span>
 <span class="line" id="L652"></span>
 <span class="line" id="L653">      },</span>

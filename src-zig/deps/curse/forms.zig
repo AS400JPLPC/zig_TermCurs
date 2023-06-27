@@ -1822,7 +1822,19 @@ pub const  grd = struct {
   }
 
   // reset -GRID ---> arraylist panel-grid
-  pub fn resetGrid(self: *GRID) void {
+  pub fn clearGrid(self: *GRID) void {
+    self.data.deinit(allocator);
+    self.headers.clearAndFree();
+    self.cell.clearAndFree();
+    self.lignes  = 0;
+    self.pages  = 0;
+    self.maxligne = 0;
+    self.cursligne  = 0;
+    self.curspage  = 0;
+    self.buf.clearAndFree();
+    self.actif = false;
+  }
+  pub fn freeGrid(self: *GRID) void {
     self.data.deinit(allocator);
     self.headers.clearAndFree();
     self.cell.clearAndFree();
@@ -1834,7 +1846,6 @@ pub const  grd = struct {
     self.buf.clearAndFree();
     self.actif = false;
     dds.deinitGrid();
-
   }
 
   // assign -Box(fram) MATRIX TERMINAL  ---> arraylist panel-grid
@@ -2155,6 +2166,13 @@ pub const  grd = struct {
         .esc  => {
           self.cursligne = 0;
           gSelect.Key = kbd.esc;
+          gSelect.Buf = undefined;
+          term.offMouse();
+          return gSelect;
+        },
+        .F12  =>{
+          self.cursligne = 0;
+          gSelect.Key = kbd.F12;
           gSelect.Buf = undefined;
           term.offMouse();
           return gSelect;

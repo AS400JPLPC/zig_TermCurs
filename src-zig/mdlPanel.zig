@@ -1236,15 +1236,16 @@ pub fn qryPanel(vpnl : std.ArrayList(pnl.PANEL)   , addpnl : bool, frompnl : *pn
     if ( Gkey.Key == kbd.enter ) {
       grd.rstPanel(&Xcombo, frompnl);
 
-      grd.resetGrid(&Xcombo);
+      grd.freeGrid(&Xcombo);
       Xcombo = undefined;
+      
       return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable ;
     }
 
     if ( Gkey.Key == kbd.esc ) {
       grd.rstPanel(&Xcombo, frompnl);
 
-      grd.resetGrid(&Xcombo);
+      grd.freeGrid(&Xcombo);
       Xcombo = undefined;
 
       return 999;
@@ -1496,6 +1497,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     pnl.deinitPanel(&pFmt01);
     NPANEL.clearAndFree();
     pFmt01 = undefined;
+    dds.deinitScreen();
 
     return ; 
   }

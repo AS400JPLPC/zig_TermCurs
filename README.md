@@ -111,7 +111,34 @@ FIELD<BR/>
 
 <BR/>
 
+GRID<BR/>
 
+| KEY       | text                                      |
+| --------- | ----------------------------------------- |
+| MOUSE     | active                                    |
+| escape    | return key                                |
+| F12       | return key                                |
+| enter     | return ligne                              |
+| up        | prior  ligne                              |
+| down      | next   ligne                              |
+| pageUp    | prior  page                               |
+| pageDown  | next   page                               |
+
+<BR/>
+
+COMBO<BR/>
+
+| KEY       | text                                      |
+| --------- | ----------------------------------------- |
+| CellPos   | Position start display                    |
+| MOUSE     | active                                    |
+| escape    | return key                                |
+| enter     | return field                              |
+| up        | prior  ligne                              |
+| down      | next   ligne                              |
+| pageUp    | prior  page                               |
+| pageDown  | next   page                               |
+<BR/>
 
 
 <BR/><BR/>
@@ -204,31 +231,13 @@ But in terminal mode the application is viable (to do with the commit data-base)
 
 
 les news:<BR />
-→  2023-02-09  real test of "termcurs" with the Gencurs program and its modules.<BR />
-<BR />
-<BR />
-<BR />
-modification from :<BR />
-
-&rarr;&nbsp; 2022-12-23   **General Overhaul**
-<br />
-
 
 →  2023-02-05 Doc version 0.10.1 
 [READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Exemple/index.html) <br />
 <BR/>
 
 <BR/>
-<br />
-** Changing 32" 3840x2610 screen, allowed me to do some tests and found a bug in forms.rstpanel and rest my eyes**<BR/>
-<br />
-→  2023-05-16  update forms : rstPanel<br />
-→  2023-05-16  update Gen.cpp (27" 32")<br />
-<br />
-→  2023-05-21  **update cursed  Important change getCursor() **<br />
-→  2023-05-21  refining bakspace and delete <br />
-→  2023-05-21  Introduction Gencurs label definition (display), this allowed me to solve the problem of getCursor due in fact to the writing on TTY and not on the natural buffer. <br />
-<br />
+
 <br />
 →  2023-05-22  changed regex processing, discontinued use of GO, and introduced regex.zig (https://github.com/tiehuis/zig-regex) <br />
 <br />
@@ -238,32 +247,8 @@ modification from :<BR />
 →  2023-05-22  ex: https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression<br />
 →  2023-05-22  chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.<br />
 <br />
-<br />
-→  2023-05-26  creation of the match module based on regex.h libc for independence of use <br />
-→  2023-05-26  update ismatch mdlpanel.zig<br />
-→  2023-05-26  **I have an obscure DOCS problem 0.11.0** </s><br />
-<br />
-→  2023-05-27  minor correction buildExemple<br />
-→  2023-05-27  minor correction forms ( insert ... )<br />
-→  2023-05-27  **update source for zig 0.10.1**<br />
--  2023-05-27  I recompiled everything so that version 0.10.1 is operational <br /> 
-<br /> 
-<br /> 
--  2023-06-05  add func isSignedStr <br />
--  2023-06-05  update string = subStr(dest,pos,len) <br />
--  2023-06-05  update printGridRows Activation of the "padingCell" ex: 100.00 decimal "+ 100.00€" <br />
--  2023-06-05  See example image below <br />
-<br /> 
--  2023-06-09  Adjustment and synchronization between the matrix and the management of the x-y positioning... (there was a discrepancy because of the zero table)<br />
-<br />
--  2023-06-10  recherche optimisation et beug  <br />
-<BR/>
--  2023-06-12  mise en place clean memory  <br />
-<BR/>
-<BR/>
--  2023-06-15  debeug clean memory   <br />
--  2023-06-15  setting up memory management  <br />
-<BR/>
+
+
 <BR/>
 -  2023-06-19  Tuning and learning, memory management MODULE <br />
 <BR/>
@@ -273,6 +258,14 @@ modification from :<BR />
 
 <BR/>
 -  2023-06-22  memory management validation <br />
--  2023-06-22 Simplification of registration of a grid and management of several grids <br />
+-  2023-06-22  Simplification of registration of a grid and management of several grids <br />
 -  2023-06-22  Enabling TTY output<br />
+<BR/>
+
+<BR/>
+-  2023-06-27  Grid enable with F12 function in ioGrid commits output as escape <br />
+-  2023-06-27  Putting orderLabel() into operation<br />
+-  2023-06-27  Putting removeLabel() into operation<br />
+-  2023-06-27  Putting freeGrid() full free Allocation and arenaGrid.deinit() <br />
+-  2023-06-27  Putting clearGrid() idem freeGrid except arenaGrid.deinit()<br />
 <BR/>
