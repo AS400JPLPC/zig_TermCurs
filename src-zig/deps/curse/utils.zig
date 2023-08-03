@@ -11,9 +11,9 @@ const dds = @import("dds");
 
 /// Tools for internal variables
 
-// write to buffer struct and file
+// write to buffer struct and file 
 pub fn ToStr(text : [] const u8 ) []const u8 {
-  return std.fmt.allocPrint(dds.allocatorRecord,"{s}",.{text}) catch unreachable;
+  return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{text}) catch unreachable;
 }
 
 
@@ -752,3 +752,6 @@ pub fn cboolToBool(v: []const u8) bool {
 pub fn cboolToStr(v: []const u8) []const u8 {
   return if ( std.mem.eql(u8,v, dds.STRUE) ) "1"  else  "0";
 }
+
+
+

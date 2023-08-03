@@ -1,13 +1,13 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.10.1 **</u><BR />
+<u>**zig 0.11.0  DEV  last   zig-0.11.0-dev.4334 **</u><BR />
 <br />
 
-**TESTING** `<br />
+**TESTING** <br />
 *look at the bottom of the testing page* <br />
 
-**os linux**
+**os linux** <br />
 <u>Normally should work POSIX </u><br />
 <br />
 **the termcurs library, does what ncurse does (hopefully).<br />
@@ -71,7 +71,7 @@ https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> inspiration<BR />
 | MAIL_ISO             | DEFAULT      | Y        | normalize mail regex                        |
 | SWITCH               | N            | N / BOOL | CTRUE CFALSE                                |
 | FUNC                 | N            | y        | **dynamic function call**             |
-| TASK                 | N            | N        | **dynamic function call ex: control** |
+| TASK                 | N            | y        | **dynamic function call ex: control** |
 |                      |              |          |                                             |
 
 <BR/>
@@ -232,7 +232,7 @@ But in terminal mode the application is viable (to do with the commit data-base)
 
 les news:<BR />
 
-→  2023-02-05 Doc version 0.10.1 
+→  2023-02-05 Doc version 0.10.1  
 [READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Exemple/index.html) <br />
 <BR/>
 
@@ -263,9 +263,27 @@ les news:<BR />
 <BR/>
 
 <BR/>
--  2023-06-27  Grid enable with F12 function in ioGrid commits output as escape <br />
--  2023-06-27  Putting orderLabel() into operation<br />
--  2023-06-27  Putting removeLabel() into operation<br />
--  2023-06-27  Putting freeGrid() full free Allocation and arenaGrid.deinit() <br />
--  2023-06-27  Putting clearGrid() idem freeGrid except arenaGrid.deinit()<br />
+-  2023-08-1  I am preparing for the version change in order to take advantage of advancements and modify the code if necessary.
+My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" functions what I did<br />
 <BR/>
+-  2023-08-1  Studies of memory cleaning and various functions   0.11<br />
+-  2023-08-1  Add func Grid  ioGridKey  (parm,parm, button KEY return) for management grid to grid ex: modlObjet fn Order <br />
+<br />
+-  2023-08-1  <u>Adjustment for 0.11 test  A lot of changes since version 0.10.1 </u> <br />
+<br />
+-  2023-08-1  look at the build has changed a lot. <br />
+-  2023-08-1  Gencurs modlPanel OK <br />
+-  2023-08-1  Gencurs modlObjet testing "label define  - order remove" OK <br />
+-  2023-08-1  modlObjet alt-T Title alt-L Label  alt-w Menu(order/remove) <br />
+-  2023-08-1  modlObjet ESC abord ctrl-V valide   F10 write all Objet for Panel ... F12 abord and return <br />
+<br />
+<br />
+-  2023-08-1  Changing and reorganizing the code:<br />
+-             new "grid.zig"<br />
+-             the "forms.zig" no longer includes grid management<br />
+-             I reviewed the initialization of the panel and grid<br />
+-             with create mode to better manage memory and make memory allocation more consistent<br />
+-             [https://ziggit.dev/t/philosophical-question-about-memory/1343](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
+-             testing memoory<br />
+-             [https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />  
+-   

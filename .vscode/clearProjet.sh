@@ -22,7 +22,7 @@ folder_cache=$lib_projet"src-zig/zig-cache"
 
 folder_cachetest=$lib_projet"src-zig/deps/curse/zig-cache"
 
-#folder_deps
+folder_home="$HOME/.cache/zig"
 
 echo -en $folder_bin\\n
 echo -en $lib_projet\\n
@@ -42,4 +42,8 @@ fi
 
 if test -d $folder_cachetest ; then
 	rm -r $folder_cachetest
+fi
+
+if test -d $folder_home; then
+	rm -r $folder_home
 fi

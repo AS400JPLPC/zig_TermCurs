@@ -1,43 +1,26 @@
 
 const std = @import("std");
 
+
+// for panel all arraylist (forms.pnl grid)
 pub const allocatorPnl = std.heap.page_allocator;
 
-//free memory  output archive JSON
-var arenaRecord = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorRecord = arenaRecord.allocator();
-pub fn deinitRecord() void {
-    arenaRecord.deinit();
-    arenaRecord = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorRecord = arenaRecord.allocator();
+//free memory  output archive JSON or Field
+pub var arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorStr = arenaStr.allocator();
+pub fn deinitStr() void {
+    arenaStr.deinit();
+    arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocatorStr = arenaStr.allocator();
 }
 
 
-//free memory on module output
-var arenaScreen = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorScreen = arenaScreen.allocator();
-pub fn deinitScreen() void {
-    arenaScreen.deinit();
-    arenaScreen = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorScreen = arenaScreen.allocator();
-}
-
-
-//free memory on module output
-var arenaGrid= std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorGrid = arenaGrid.allocator();
-pub fn deinitGrid() void {
-    arenaGrid.deinit();
-    arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorGrid = arenaGrid.allocator();
-}
-
-
-//free memory on module output
-var arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+//free memory on module output (allocprint ... divers fonction)
+pub var arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 pub var  allocatorUtils = arenaUtils.allocator();
 pub fn deinitUtils() void {
     arenaUtils.deinit();
+    arenaUtils = undefined;
     arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     allocatorUtils = arenaUtils.allocator();
 }

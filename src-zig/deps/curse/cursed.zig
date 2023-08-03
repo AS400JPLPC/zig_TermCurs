@@ -15,7 +15,7 @@ var use_termios: os.linux.termios = undefined;
 
 
 
-const allocator = std.heap.page_allocator;
+
 
 
 /// flush terminal in-out
@@ -190,7 +190,7 @@ pub fn getCursor() void {
         c = TTY.read(&cursBuf) catch unreachable;
     }
     flushIO();
-
+    
     // columns = 1 digit
     if (cursBuf[4] == 59) {
       posCurs.x = convIntCursor(cursBuf[3]);
@@ -212,6 +212,13 @@ pub fn getCursor() void {
     if (cursBuf[5] == 59) {
       posCurs.x = convIntCursor(cursBuf[3]);
       posCurs.x = (posCurs.x * 10) + convIntCursor(cursBuf[4]);
+
+      if (cursBuf[7] == 59)  posCurs.y = convIntCursor(cursBuf[6]);
+
+      if (cursBuf[8] == 59) {
+          posCurs.y = convIntCursor(cursBuf[6]);
+          posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[7]);
+      }
 
       if ( cursBuf[9] == 59 ) {
           posCurs.y = convIntCursor(cursBuf[6]);
@@ -246,13 +253,13 @@ fn setStyle(style: [4]u32) void {
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: dds.BackgroundColor) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
+  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch unreachable;
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: dds.ForegroundColor) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}m", .{@enumToInt(color)}) catch unreachable;
+  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch unreachable;
 }
 
 /// write text and attribut
@@ -336,9 +343,9 @@ const TermSize = struct { width: usize, height: usize };
 pub fn getSize() !TermSize {
   var win_size: std.os.linux.winsize = undefined;
 
-  const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @ptrToInt(&win_size));
+  const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&win_size));
   if (os.errno(err) != .SUCCESS) {
-      return os.unexpectedErrno(@intToEnum(os.linux.E, err));
+      return os.unexpectedErrno(os.errno(err));
   }
   return TermSize{
       .height = win_size.ws_row,
@@ -504,153 +511,66 @@ pub const kbd = enum {
     func,
     task,
 
-    pub const NameTable = [@typeInfo(kbd).Enum.fields.len][:0]const u8{
-        "none",
-        "F1",
-        "F2",
-        "F3",
-        "F4",
-        "F5",
-        "F6",
-        "F7",
-        "F8",
-        "F9",
-        "F10",
-        "F11",
-        "F12",
-        "F13",
-        "F14",
-        "F15",
-        "F16",
-        "F17",
-        "F18",
-        "F19",
-        "F20",
-        "F21",
-        "F22",
-        "F23",
-        "F24",
-        "Alt.a",
-        "Alt.b",
-        "Alt.c",
-        "Alt.d",
-        "Alt.e",
-        "Alt.f",
-        "Alt.g",
-        "Alt.h",
-        "Alt.i",
-        "Alt.j",
-        "Alt.k",
-        "Alt.l",
-        "Alt.m",
-        "Alt.n",
-        "Alt.o",
-        "Alt.p",
-        "Alt.q",
-        "Alt.r",
-        "Alt.s",
-        "Alt.t",
-        "Alt.u",
-        "Alt.v",
-        "Alt.w",
-        "Alt.x",
-        "Alt.y",
-        "Alt.z",
-        "Ctrl.a",
-        "Ctrl.b",
-        "Ctrl.c",
-        "Ctrl.d",
-        "Ctrl.e",
-        "Ctrl.f",
-        "Ctrl.g",
-        "Ctrl.h",
-        "Ctrl.i",
-        "Ctrl.j",
-        "Ctrl.k",
-        "Ctrl.l",
-        "Ctrl.m",
-        "Ctrl.n",
-        "Ctrl.o",
-        "Ctrl.p",
-        "Ctrl.q",
-        "Ctrl.r",
-        "Ctrl.s",
-        "Ctrl.t",
-        "Ctrl.u",
-        "Ctrl.v",
-        "Ctrl.w",
-        "Ctrl.x",
-        "Ctrl.y",
-        "Ctrl.z",
-        // specific for grid
-        "PageUp",
-        "PageDown",
-        "Home",
-        "End",
-        "Esc",
-        // Specific for typing
-        "mouse",
-        "char",
 
-        "up",
-        "down",
-        "left",
-        "right",
-        "delete",
-        "enter",
-        "ins",
-        "tab",
-        "stab",
-        "backspace",
-        "func", // Triggered by ioField function
-        "task", // Triggered by ioField task
-    };
 
-    pub fn str(self: kbd) [:0]const u8 {
-        return NameTable[@enumToInt(self)];
+    pub fn enumToStr(self: kbd) []const u8 {
+        return @as( [] const u8 ,@tagName(self));
     }
 
     pub fn toEnum(name: []const u8) kbd {
         var vlen: usize = 0;
-        var vn: u8 = 0;
         var iter = utl.iteratStr.iterator(name);
+        var result: usize = 0;
         while (iter.next()) |_| {
             vlen += 1;
         }
 
+        //return @intToEnum(kbd, @as(u8, name[1])); 
         if (name[0] == 'F') {
             //f1..f9
-            if (vlen == 2) return @intToEnum(kbd, @as(u8, name[1]));
+
+            if (vlen == 2) {
+              result = @as(u8, name[1]) - 48;
+              return @as(kbd,@enumFromInt(result)) ;
+            }
             // f10..f19
-            if (vlen == 3 and name[1] == '1') return @intToEnum(kbd, 10 + @as(u8, name[2]));
+            if (vlen == 3 and name[1] == '1') {
+              result = @as(u8, name[2]) - 48;
+              return @as(kbd,@enumFromInt(10 + result)) ;
+            }
             // f20..f24
-            if (vlen == 3 and name[2] == '2') return @intToEnum(kbd, 20 + @as(u8, name[2]));
+            if (vlen == 3 and name[1] == '2') {
+              result = @as(u8, name[2]) - 48;
+              return @as(kbd,@enumFromInt(20 + result)) ;
+            }
         }
 
-        if (name[0] == 'A' and name[1] == 'l' and name[2] == 't' and name[3] == '.') {
+        if (name[0] == 'a' and name[1] == 'l' and name[2] == 't') {
+            if (vlen != 4) return .none;
+            result = @as(u8, name[3]) - 41;
+            if (result < 25 or result > 50) return .none else return @as(kbd,@enumFromInt(result)) ;
+        }
+
+        if (name[0] == 'c' and name[1] == 't' and name[2] == 'r' and name[3] == 'l') {
             if (vlen != 5) return .none;
-            vn = @as(u8, name[4]) - 72;
-            if (vn < 25 or vn > 50) return .none else return @intToEnum(kbd, vn);
+            result = @as(u8, name[4]) - 14;
+            if (result < 51 or result > 76) return .none else return @as(kbd,@enumFromInt(result)) ;
         }
 
-        if (name[0] == 'C' and name[1] == 't' and name[2] == 'r' and name[3] == 'l' and name[4] == '.') {
-            if (vlen != 6) return .none;
-            vn = @as(u8, name[4]) - 46;
-            if (vn < 51 or vn > 76) return .none else return @intToEnum(kbd, vn);
-        }
+        std.debug.print("{s}\r\n",.{name});
+        if (std.mem.eql(u8, name, "pageUp")) return kbd.pageUp;
 
-        if (std.eql(u8, name, "PageUp") == true) return .pageUp;
+        if (std.mem.eql(u8, name, "pageDown")) return kbd.pageDown;
 
-        if (std.eql(u8, name, "PageDown") == true) return .pageDown;
+        if (std.mem.eql(u8, name, "pome")) return kbd.home;
 
-        if (std.eql(u8, name, "Home") == true) return .home;
+        if (std.mem.eql(u8, name, "end")) return kbd.end;
 
-        if (std.eql(u8, name, "End") == true) return .end;
-
-        if (std.eql(u8, name, "Esc") == true) return .esc;
+        if (std.mem.eql(u8, name, "esc")) return kbd.esc;
 
         return .none;
     }
+
 
     /// converted keyboard variable
     fn convIntMouse(x: u8) usize {
@@ -670,16 +590,17 @@ pub const kbd = enum {
     }
 
     // get All keyboard keys allowed in terminal
+    
     pub fn getKEY() Keyboard {
 
         // init Event
         var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
 
         // variable --> Event.Char
-        var vUnicode: []u8 = undefined; 
-        vUnicode = allocator.alloc(u8, 4) catch unreachable;
-        var x: usize = 0;
-        while (x < 4) : (x += 1) vUnicode[x] = 0;
+        var vUnicode: []u8 = undefined;
+        vUnicode = dds.allocatorPnl.alloc(u8, 4) catch unreachable;
+
+
 
         // TODO: Check buffer size
         var keybuf: [13]u8 = undefined;
@@ -796,11 +717,11 @@ pub const kbd = enum {
             '\x0D' => { Event.Key = kbd.enter;     return Event; },
 
             else => {
-                var i = utf.utf8Encode(c0, vUnicode) catch unreachable;
+                var i = utf.utf8Encode(c0, vUnicode[0..4]) catch unreachable;
 
                 Event.Char = vUnicode[0..i];
 
-                Event.Key = kbd.char;
+                Event.Key  = kbd.char;
 
                 return Event;
             },

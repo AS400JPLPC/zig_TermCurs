@@ -147,7 +147,7 @@
         "clear": true
       }
     },
-   {
+    {
     "label": "A-GTKVTE",
     "type": "shell",
     "command": "${workspaceFolder}/Term ./${fileBasenameNoExtension}",
@@ -157,8 +157,8 @@
       "reveal": "never",
       "focus": true
     }
-   },
-   {
+    },
+    {
     "label": "Z-Terminal",
     "type": "shell",
     "command": "/home/soleil/.Terminal/console.sh ${workspaceFolder} ",
@@ -168,7 +168,18 @@
       "reveal": "never",
       "focus": true
     }
-   }
+    },
+    {
+    "label": "Z-dbg",
+    "type": "shell",
+    "command": "${workspaceFolder}/dbg.sh ${workspaceFolder} ./${fileBasenameNoExtension} ",
+    "problemMatcher": [],
+    "presentation": {
+      "echo": true,
+      "reveal": "never",
+      "focus": true
+    }
+    },
 
   ]
 }

@@ -1,0 +1,43 @@
+pkexec  sudo lldb
+
+pkexec  sudo lldb --attach-name  Exemple
+pkexec  sudo lldb --attach-pid   12345
+
+process attach --pid ?
+
+
+// break point 
+b Exemple.zig:534 
+
+// delete line src
+br del 534
+
+// break disable
+br dis 534
+
+// break enable
+br en 534
+
+// return program
+thread continue
+
+C
+
+
+// list all breakpoint 
+breakpoint list 
+
+frame info
+
+// dispale all  frame v ? 
+frame variable 
+
+frame v Tkey.Key
+
+frame v Grid01->name
+
+
+process status
+
+
+finish

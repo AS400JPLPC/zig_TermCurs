@@ -1,52 +1,56 @@
 const std = @import("std");
 
-const dds = @import("deps/curse/dds.zig");
+const dds = @import("dds");
 
-// terminal Fonction
-const term = @import("deps/curse/cursed.zig");
+/// terminal Fonction
+const term = @import("cursed");
 // keyboard
-const kbd = @import("deps/curse/cursed.zig").kbd;
-
-// full
-const forms = @import("deps/curse/forms.zig");
+const kbd = @import("cursed").kbd;
 
 // error
-const dsperr = @import("deps/curse/forms.zig").dsperr;
+const dsperr = @import("forms").dsperr;
+
+// full delete for produc
+const forms = @import("forms");
+
 // frame
-const frm = @import("deps/curse/forms.zig").frm;
+const frm = @import("forms").frm;
 // panel
-const pnl = @import("deps/curse/forms.zig").pnl;
+const pnl = @import("forms").pnl;
 // button
-const btn = @import("deps/curse/forms.zig").btn;
+const btn = @import("forms").btn;
 // label
-const lbl = @import("deps/curse/forms.zig").lbl;
+const lbl = @import("forms").lbl;
 // menu
-const mnu = @import("deps/curse/forms.zig").mnu;
-// grid
-const grd = @import("deps/curse/forms.zig").grd;
+const mnu = @import("forms").mnu;
 // flied
-const fld = @import("deps/curse/forms.zig").fld;
+const fld = @import("forms").fld;
 // line horizontal
-const lnh = @import("deps/curse/forms.zig").lnh;
+const lnh = @import("forms").lnh;
 // line vertival
-const lnv = @import("deps/curse/forms.zig").lnv;
+const lnv = @import("forms").lnv;
+
+
+// grid
+const grd = @import("grid").grd;
 
 // tools utility
-const utl = @import("deps/curse/utils.zig");
+const utl = @import("utils");
 
 // tools regex
-const reg = @import("deps/curse/match.zig");
-
+const reg = @import("match");
 
 // Descrption PANEL
-const mdlPanel = @import("./mdlPanel.zig");
+const mdlPanel = @import("mdlPanel");
 
 // Descrption Objet
-const mdlObjet = @import("./mdlObjet.zig");
+const mdlObjet = @import("mdlObjet");
+
 
 const allocator = std.heap.page_allocator;
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
+
 
 //================================
 // defined var global
@@ -63,6 +67,7 @@ const choix = enum {
   source,
   exit
 };
+
 
 
 // main----------------------------------
@@ -85,7 +90,7 @@ pub fn main() !void {
 
   fld.MouseDsp = true ; // active display cursor x/y mouse
 
-  var base = pnl.initPanel("base",
+  var base : *pnl.PANEL = pnl.newPanelC("base",
                   1, 1,
                   termSize.height,
                   termSize.width ,
@@ -111,20 +116,21 @@ pub fn main() !void {
 
     Screen = 0 ,       // creat panel, objet  , source , exit
   };
-  
+
+
+
 
   while (true) {
 
-    pnl.printPanel(&base);
-    nopt = mnu.ioMenu(&base,base.menu.items[@enumToInt(menu.Screen)],0);
+    pnl.printPanel(base);
+    nopt = mnu.ioMenu(base,base.menu.items[@intFromEnum(menu.Screen)],0);
 
-    if (nopt == @enumToInt(choix.exit )) { break; }
+    if (nopt == @intFromEnum(choix.exit )) { break; }
 
-    if (nopt == @enumToInt(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
-    if (nopt == @enumToInt(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
-    
-    dds.deinitUtils();  dds.deinitScreen(); dds.deinitGrid(); 
-    if (NPANEL.items.len == 0 ) dds.deinitRecord();
+    if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
+    if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
+
+    if (NPANEL.items.len == 0 ) dds.deinitStr();
 
 
   }

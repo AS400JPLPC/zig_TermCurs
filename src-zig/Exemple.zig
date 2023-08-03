@@ -1,49 +1,51 @@
 const std = @import("std");
 
-const dds = @import("deps/curse/dds.zig");
+const dds = @import("dds");
 
-// terminal Fonction
-const term = @import("deps/curse/cursed.zig");
+/// terminal Fonction
+const term = @import("cursed");
 // keyboard
-const kbd = @import("deps/curse/cursed.zig").kbd;
+const kbd = @import("cursed").kbd;
 
-
-// full forms developpeur
-const forms = @import("deps/curse/forms.zig");
 // error
-const dsperr = @import("deps/curse/forms.zig").dsperr;
+const dsperr = @import("forms").dsperr;
+
+// full delete for produc
+const forms = @import("forms");
+
 // frame
-const frm = @import("deps/curse/forms.zig").frm;
+const frm = @import("forms").frm;
 // panel
-const pnl = @import("deps/curse/forms.zig").pnl;
+const pnl = @import("forms").pnl;
 // button
-const btn = @import("deps/curse/forms.zig").btn;
+const btn = @import("forms").btn;
 // label
-const lbl = @import("deps/curse/forms.zig").lbl;
+const lbl = @import("forms").lbl;
 // menu
-const mnu = @import("deps/curse/forms.zig").mnu;
-// grid
-const grd = @import("deps/curse/forms.zig").grd;
+const mnu = @import("forms").mnu;
 // flied
-const fld = @import("deps/curse/forms.zig").fld;
+const fld = @import("forms").fld;
 // line horizontal
-const lnh = @import("deps/curse/forms.zig").lnh;
+const lnh = @import("forms").lnh;
 // line vertival
-const lnv = @import("deps/curse/forms.zig").lnv;
+const lnv = @import("forms").lnv;
+
+// grid
+const grd = @import("grid").grd;
 
 // tools utility
-const utl = @import("deps/curse/utils.zig");
+const utl = @import("utils");
 
 // tools regex
-const reg = @import("deps/curse/match.zig");
+const reg = @import("match");
 
-const allocator = std.heap.page_allocator;
+
 
 /// ---------------------------------------------------
 /// Exemple defined Panel Label Field Button Menu Grid
 /// ---------------------------------------------------
 
-pub fn Panel_Fmt01() pnl.PANEL {
+pub fn Panel_Fmt01() *pnl.PANEL {
 
   //-------------------------------------------------
   // Panel
@@ -52,7 +54,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
   // Attribut Panel
   // Type frame, Attribut frame
   // Title Panel, Attribut Title
-  var Panel = pnl.initPanel("Fmt01",
+  var Panel  : *pnl.PANEL = pnl.newPanelC("Fmt01",
                   1, 1,
                   32,
                   132,
@@ -130,8 +132,8 @@ pub fn Panel_Fmt01() pnl.PANEL {
     ) catch unreachable; 
 
   //example: option specific
-  Panel.label.items[1].attribut.styled[0] = @enumToInt(dds.Style.styleItalic);
-  Panel.label.items[1].attribut.styled[1] = @enumToInt(dds.Style.notStyle);
+  Panel.label.items[1].attribut.styled[0] = @intFromEnum(dds.Style.styleItalic);
+  Panel.label.items[1].attribut.styled[1] = @intFromEnum(dds.Style.notStyle);
 
 
  // Field 
@@ -157,7 +159,7 @@ pub fn Panel_Fmt01() pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-  fld.setProtect(&Panel,1,true) catch unreachable;
+  fld.setProtect(Panel,1,true) catch unreachable;
 
   Panel.field.append(fld.newFieldAlpha("alpha",5,32,              // Name , posx posy
                                         30,                       // width
@@ -357,15 +359,6 @@ pub fn Panel_Fmt01() pnl.PANEL {
                       "Exit.."}
                       )) catch unreachable ;
 
-  // Grid ---------------------------------------------------------------
-  Panel.grid.append(grd.initGrid(
-                  "Grid01",                   // Name
-                  20, 62,                     // posx, posy
-                  7,                          // numbers lines
-                  grd.gridStyle,              // separator | or  space
-                  dds.CADRE.line1,            // type line  1,2
-                  )) catch unreachable ;
-
   // button--------------------------------------------------
   Panel.button.append(btn.newButton(
                         kbd.F3,                 // function
@@ -407,23 +400,23 @@ pub fn Panel_Fmt01() pnl.PANEL {
 fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   var cellPos:usize = 0;
 
-  var Xcombo = grd.initGrid(
+  var Xcombo : *grd.GRID =  grd.newGridC(
                   "Combo01",
                   4, 76,
                   4 ,  
                   grd.gridStyle,
                   dds.CADRE.line1,
                   )  ;
+  defer dds.allocatorPnl.destroy(Xcombo);
 
+  grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(Xcombo) ;
 
-  grd.newCell(&Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
-  grd.setHeaders(&Xcombo) ;
-
-  grd.addRows(&Xcombo , &.{"---"});
-  grd.addRows(&Xcombo , &.{"Famille"});        
-  grd.addRows(&Xcombo , &.{"Amis"}); 
-  grd.addRows(&Xcombo , &.{"Professionel"});
-  grd.addRows(&Xcombo , &.{"Docteur"});
+  grd.addRows(Xcombo , &.{"---"});
+  grd.addRows(Xcombo , &.{"Famille"});        
+  grd.addRows(Xcombo , &.{"Amis"}); 
+  grd.addRows(Xcombo , &.{"Professionel"});
+  grd.addRows(Xcombo , &.{"Docteur"});
 
   if (std.mem.eql(u8,vfld.text,"---") == true)      cellPos = 0;
   if (std.mem.eql(u8,vfld.text,"Famille") == true)  cellPos = 1;
@@ -433,14 +426,11 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
   var Gkey :grd.GridSelect = undefined ;
 
-  Gkey =grd.ioCombo(&Xcombo,cellPos);
-  grd.rstPanel(&Xcombo, vpnl);
+  Gkey =grd.ioCombo(Xcombo,cellPos);
+  grd.rstPanel(Xcombo, vpnl);
 
 
-  grd.freeGrid(&Xcombo);
-  Xcombo = undefined;
-
-
+  grd.freeGrid(Xcombo);
 
   if ( Gkey.Key == kbd.esc )   return ; 
   vfld.text = Gkey.Buf.items[0];
@@ -450,22 +440,22 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
   var cellPos:usize = 0;
   
-  var Xcombo = grd.initGrid(
+  var Xcombo : *grd.GRID =  grd.newGridC(
                   "Combo02",
                   5, 76,
                   4 ,  
                   grd.gridStyle,
                   dds.CADRE.line1,
                   )  ;
+  defer dds.allocatorPnl.destroy(Xcombo);
 
 
+  grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
+  grd.setHeaders(Xcombo) ;
 
-  grd.newCell(&Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
-  grd.setHeaders(&Xcombo) ;
-
-  grd.addRows(&Xcombo , &.{"---"});
-  grd.addRows(&Xcombo , &.{"Informaticien"});        
-  grd.addRows(&Xcombo , &.{"sportif"}); 
+  grd.addRows(Xcombo , &.{"---"});
+  grd.addRows(Xcombo , &.{"Informaticien"});        
+  grd.addRows(Xcombo , &.{"sportif"}); 
 
   if (std.mem.eql(u8,vfld.text,"---") == true)      cellPos = 0;
   if (std.mem.eql(u8,vfld.text,"Informaticien") == true)  cellPos = 1;
@@ -474,12 +464,11 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
   var Gkey :grd.GridSelect = undefined ;
 
-  Gkey =grd.ioCombo(&Xcombo,cellPos);
-  grd.rstPanel(&Xcombo, vpnl);
+  Gkey =grd.ioCombo(Xcombo,cellPos);
+  grd.rstPanel(Xcombo, vpnl);
 
 
-  grd.freeGrid(&Xcombo);
-  Xcombo = undefined;
+  grd.freeGrid(Xcombo);
 
   if ( Gkey.Key == kbd.esc )  return ;
   vfld.text = Gkey.Buf.items[0];
@@ -502,9 +491,9 @@ pub const FnEnum = enum {
 
   fn searchFn ( vtext: [] const u8 ) FnEnum {
     var i   :usize = 0;
-    var max :usize = @enumToInt(FnEnum.none) ;
+    var max :usize = @typeInfo(FnEnum).Enum.fields.len;
       while( i < max ) : (i += 1) {
-        if ( std.mem.eql(u8, @tagName(@intToEnum(FnEnum,i)), vtext)) return @intToEnum(FnEnum,i);
+        if ( std.mem.eql(u8, @tagName(@as(FnEnum,@enumFromInt(i))), vtext)) return @as(FnEnum,@enumFromInt(i));
       }
       return FnEnum.none;
 
@@ -534,7 +523,9 @@ pub fn main() !void {
   // define Panel
   var pFmt01 = Panel_Fmt01();
 
-  
+
+
+
   // defines the receiving structure of the keyboard
   var Tkey : term.Keyboard = undefined ;
 
@@ -545,7 +536,7 @@ pub fn main() !void {
   while (true) {
 
 
-    Tkey.Key = pnl.ioPanel(&pFmt01);
+    Tkey.Key = pnl.ioPanel(pFmt01);
     
     dds.deinitUtils();
 
@@ -553,107 +544,105 @@ pub fn main() !void {
 
       .func => {
         callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); // User clicks "increment"
-        callFunc.run(&pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+        callFunc.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
       },
 
       .F2 => {
           // test control chek field
-          pnl.msgErr(&pFmt01,"le test de la saisie est OK");
+          pnl.msgErr(pFmt01,"le test de la saisie est OK");
         },
       .F5 => {
-          var nitem = mnu.ioMenu(&pFmt01,pFmt01.menu.items[0],0);
-          mnu.rstPanel(&pFmt01.menu.items[0], &pFmt01);
+          var nitem = mnu.ioMenu(pFmt01,pFmt01.menu.items[0],0);
+          mnu.rstPanel(&pFmt01.menu.items[0], pFmt01);
           std.debug.print("n°item {}",.{nitem});
         },
       .F8 => {
 
         var Gkey :grd.GridSelect = undefined ;
-
-            // exemple reset GRID and re load
-            grd.reLoadGrid(
-            &pFmt01.grid.items[0],
-            pFmt01.grid.items[0].name, 
-            pFmt01.grid.items[0].posx,
-            pFmt01.grid.items[0].posy, 
-            pFmt01.grid.items[0].pageRows,
-            pFmt01.grid.items[0].separator, 
-            pFmt01.grid.items[0].cadre
-            );
+          // Grid ---------------------------------------------------------------
+        var Grid01 : *grd.GRID =  grd.newGridC(
+                        "Grid01",                   // Name
+                        20, 62,                     // posx, posy
+                        7,                          // numbers lines
+                        grd.gridStyle,              // separator | or  space
+                        dds.CADRE.line1,            // type line  1,2
+                        );
 
 
+        if (grd.countColumns(Grid01) == 0) {
 
-
-        if (grd.countColumns(&pFmt01.grid.items[0]) == 0) {
-
-          grd.newCell(&pFmt01.grid.items[0],"ID",2,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan) ;
-          grd.newCell(&pFmt01.grid.items[0],"Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
-          grd.newCell(&pFmt01.grid.items[0],"animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite) ;
-          grd.newCell(&pFmt01.grid.items[0],"prix",10,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite) ;
-          grd.setCellEditCar(&pFmt01.grid.items[0].cell.items[3],"€");
-          grd.newCell(&pFmt01.grid.items[0],"HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed) ;
-          grd.newCell(&pFmt01.grid.items[0],"Password",10,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen) ;
-          grd.setHeaders(&pFmt01.grid.items[0]);
-          grd.printGridHeader(&pFmt01.grid.items[0]);
+          grd.newCell(Grid01,"ID",2,dds.REFTYP.UDIGIT,dds.ForegroundColor.fgCyan) ;
+          grd.newCell(Grid01,"Name",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+          grd.newCell(Grid01,"animal",20,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgWhite) ;
+          grd.newCell(Grid01,"prix",10,dds.REFTYP.DECIMAL,dds.ForegroundColor.fgWhite) ;
+          grd.setCellEditCar(&Grid01.cell.items[3],"€");
+          grd.newCell(Grid01,"HS",1,dds.REFTYP.SWITCH,dds.ForegroundColor.fgRed) ;
+          //grd.newCell(&Grid01,"Password",10,dds.REFTYP.PASSWORD,dds.ForegroundColor.fgGreen) ;
+          grd.setHeaders(Grid01);
+          grd.printGridHeader(Grid01);
         }
 
-        grd.resetRows(&pFmt01.grid.items[0]);
+        grd.resetRows(Grid01);
 
-        grd.addRows(&pFmt01.grid.items[0] , &.{"1", "Adam","Aigle","+1000.00","1","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"2", "Eve", "poisson","-1001.00","1","tictac2"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"3", "Rouge","Aigle","1002.00","0","tictac3"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"4", "Bleu", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"5", "Bleu5", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"6", "Bleu6", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"7", "Bleu7", "poisson","100.00","1","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"8", "Bleu8", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"9", "Bleu9", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","100.00","0","tictac"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"1", "Adam","Aigle","+1000.00","1","tictac"});
+        grd.addRows(Grid01 , &.{"2", "Eve", "poisson","-1001.00","1","tictac2"});
+        grd.addRows(Grid01 , &.{"3", "Rouge","Aigle","1002.00","0","tictac3"});
+        grd.addRows(Grid01 , &.{"4", "Bleu", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"5", "Bleu5", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"6", "Bleu6", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"7", "Bleu7", "poisson","100.00","1","tictac"});
+        grd.addRows(Grid01 , &.{"8", "Bleu8", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"9", "Bleu9", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"10", "Bleu10", "poisson","100.00","0","tictac"});
+        grd.addRows(Grid01 , &.{"11", "Bleu11", "poisson","100.00","0","tictac"});
 
-        //grd.dltRows(&pFmt01.grid.items[0] , 5) catch |err| {dsperr.errorForms(err); return;};
+        //grd.dltRows(&Grid01 , 5) catch |err| {dsperr.errorForms(err); return;};
+        while (true ){
+          Gkey =grd.ioGrid(Grid01,true);
 
-        Gkey =grd.ioGrid(&pFmt01.grid.items[0],true);
+          if ( Gkey.Key == kbd.enter and pFmt01.idxfld == 0) {
+            fld.setText(pFmt01,0,Gkey.Buf.items[2]) catch |err| {dsperr.errorForms(err); return;};
+            // exemple key reccord hiden 
+            //fld.setText(&pFmt01,0,Gkey.Buf.items[5]) catch |err| {dsperr.errorForms(err); return;};
+            break;
+          }
+          if ( Gkey.Key == kbd.esc) {
+            break;
+          }
 
-        if ( Gkey.Key == kbd.enter and pFmt01.idxfld == 0) {
-          fld.setText(&pFmt01,0,Gkey.Buf.items[2]) catch |err| {dsperr.errorForms(err); return;};
-        }
-
-        if (Gkey.Key  == kbd.pageDown) {
-        grd.resetRows(&pFmt01.grid.items[0]);
-        grd.addRows(&pFmt01.grid.items[0] , &.{"12", "Bleu12", "Aigle","100,00","0"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"13", "Bleu13", "poisson","100,00","0"});
-        grd.addRows(&pFmt01.grid.items[0] , &.{"14", "Bleu14", "Vache","100,00","0"});
-        // test display pageDown
-        Gkey =grd.ioGrid(&pFmt01.grid.items[0],true);
+          if (Gkey.Key  == kbd.pageDown) {
+            grd.resetRows(Grid01);
+            grd.addRows(Grid01 , &.{"12", "Bleu12", "Aigle","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"13", "Bleu13", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"14", "Bleu14", "Vache","100,00","0","tictac"});
+          }
           if (Gkey.Key  == kbd.pageUp) {
-            grd.resetRows(&pFmt01.grid.items[0]);
-            grd.addRows(&pFmt01.grid.items[0] , &.{"01", "Adam","Aigle","1000,00","1"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"02", "Eve", "poisson","1001,00","1"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"03", "Rouge","Aigle","1002,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"04", "Bleu", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"05", "Bleu5", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"06", "Bleu6", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"07", "Bleu7", "poisson","100,00","1"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"08", "Bleu8", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"09", "Bleu9", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"10", "Bleu10", "poisson","100,00","0"});
-            grd.addRows(&pFmt01.grid.items[0] , &.{"11", "Bleu11", "poisson","100,00","0"});
-            // test display pageUp
-            Gkey =grd.ioGrid(&pFmt01.grid.items[0],false);
-
+            grd.resetRows(Grid01);
+            grd.addRows(Grid01 , &.{"01", "Adam","Aigle","1000,00","1","tictac"});
+            grd.addRows(Grid01 , &.{"02", "Eve", "poisson","1001,00","1","tictac"});
+            grd.addRows(Grid01 , &.{"03", "Rouge","Aigle","1002,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"04", "Bleu", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"05", "Bleu5", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"06", "Bleu6", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"07", "Bleu7", "poisson","100,00","1","tictac"});
+            grd.addRows(Grid01 , &.{"08", "Bleu8", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"09", "Bleu9", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"10", "Bleu10", "poisson","100,00","0","tictac"});
+            grd.addRows(Grid01 , &.{"11", "Bleu11", "poisson","100,00","0","tictac"});
           }
         }
-        grd.rstPanel(&pFmt01.grid.items[0], &pFmt01);
-
-
+        grd.rstPanel(Grid01, pFmt01);
         // if you have several grids please do a freeGrid on exit and a reloadGrid on enter
-        grd.freeGrid(&pFmt01.grid.items[0]);
+        grd.freeGrid(Grid01);
 
+        dds.allocatorPnl.destroy(Grid01);
 
+        // for debug control memoire in test CODELLDB
+        // _= kbd.getKEY();
       },
 
       .F23 => {     
-        pnl.printPanel(&pFmt01);
+        pnl.printPanel(pFmt01);
       },
       else => {},
     }

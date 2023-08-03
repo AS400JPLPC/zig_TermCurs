@@ -91,7 +91,7 @@ fi
 # release-fast		No					Yes, Speed
 
 
-# test  -fsummary
+# test  -fsummary --verbose
 #-------------------------------------------------------------------
 
 if [ "$mode" == "DEBUG" ] ; then
@@ -101,8 +101,7 @@ if [ "$mode" == "DEBUG" ] ; then
 		)
 	else
 		(set -x ; \
-					zig  build test   --build-file $projet_lib"/build"$projet_src ;\
-          #exit;\
+					zig  build test -fsummary  --build-file $projet_lib"/build"$projet_src ;\
           rm -r $folder_cache;\
 		)
 	fi
@@ -110,25 +109,25 @@ fi
 
 if [ "$mode" == "PROD" ] ; then
 	( set -x ; \
-				zig build -Drelease-fast=true --build-file $projet_lib"/build"$projet_src ;\
+				zig build -Doptimize=ReleaseFast --build-file $projet_lib"/build"$projet_src ;\
 
 	)
 fi
 
 if [ "$mode" == "SAFE" ] ; then
 	( set -x ; \
-				zig build -Drelease-safe=true --build-file $projet_lib"/build"$projet_src ;\
+				zig build -Doptimize=ReleaseSafe --build-file $projet_lib"/build"$projet_src ;\
 	)
 fi
 
 if [ "$mode" == "SMALL" ] ; then
 	( set -x ; \
-				zig build -Drelease-small=true --build-file $projet_lib"/build"$projet_src ;\
+				zig build -Doptimize=ReleaseSmall --build-file $projet_lib"/build"$projet_src ;\
 	)
 fi
 
 
-# -Doptimize=Debug  --verbose -fno-summary
+# -Doptimize=Debug  --verbose -fno-summary -femit-docs
 
 if [ "$mode" == "DOCS" ] ; then
 
@@ -136,7 +135,7 @@ if [ "$mode" == "DOCS" ] ; then
 			rm -r "docs_"$projet_bin  
 		fi
 	( set -x ; \
-				zig build docs  --build-file $projet_lib"/build"$projet_src ;\
+				zig build docs   --build-file $projet_lib"/build"$projet_src ;\
 				mv $folder_docs  "docs_"$projet_bin;\
 				rm -r $folder_cache;\
         rm -r $folder_homecache; \

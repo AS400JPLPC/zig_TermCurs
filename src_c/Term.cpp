@@ -58,7 +58,7 @@
 /// ex:
 ///------------------------------------------
 
-#define WORKPGM		"./test"
+#define WORKPGM		"./Exemple"
 
 bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 

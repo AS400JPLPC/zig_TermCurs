@@ -3,9 +3,10 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title></title>
-	<meta name="generator" content="LibreOffice 7.5.2.2 (Linux)"/>
+	<meta name="generator" content="LibreOffice 7.5.5.2 (Linux)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2023-05-26T16:00:23.188345704"/>
+	<meta name="changed" content="2023-08-03T11:05:07.279349745"/>
+	<meta name="created" content="00:00:00">
 	<meta name="created" content="00:00:00">
 	<style type="text/css">
 		@page { size: 21cm 29.7cm; margin-left: 2cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm }
@@ -47,28 +48,29 @@ pour simplifier la vie
 
 dir ZIG-Projet ---&gt; exemple:
 
-folder-&gt;Zterm                                   // folder projet
+folder→Zterm						// folder projet
 
-        folder-&gt;src_c
-        folder-&gt;src_zig
-                        Exemple.zig             // test Terminal
-                        folder→ deps 
-                        floder→curse:
-                        module→curse.zig        // fonction basic terminal      
-                        module→dds.zig          // pot commun de défition 
-                        module→forms.zig        // Forms etc. 
-                        module→utils.zig        // outils manipunlation string etc. 
-                        module→match.zig        // regex outils match        
-                        floder-&gt;lib:
-                        module-→sources         // source .h
-                                                // regex.h    forms isMatch
-                                
-        
+		folder-&gt;src_c
+		older-&gt;src_zig
+				Exemple.zig		// test Terminal
+				folder→ deps 
+				floder→curse:
+				module→curse.zig	// fonction basic terminal      
+				module→dds.zig		// pot commun de défition 
+				module→forms.zig	// Formulaire 
+				module→Ggrig.zig	// Grid  
+				module→utils.zig	// outils manipunlation string etc. 
+				module→match.zig	// regex outils match        
+				floder-&gt;lib:
+				module-→sources		// source .h
+							// regex.h    forms isMatch
 
-        folder-&gt;docs                            // zig build docs
-        
 
-        file-&gt;makefile                          // c/c++  ex: un terminal avec libvte 
+
+		folder→docs				// zig build docs
+
+
+		file→makefile				// c/c++  ex: un terminal avec libvte 
 
 
 
@@ -83,31 +85,31 @@ clearVsCodium.sh
 compile.sh  
 // ZIG compile de différente façon et déplace le binaire dans le folder-Projet
 
-compileCPP.sh   // compile source C/C+
+compileCPP.sh		// compile source C/C+
 
-compileGO.sh    // compile source Go
+compileGO.sh		// compile source Go
 
-task.json               // commande
+task.json		// commande
 
-zig_DEBUG               // debug
-zig_FAST                // optimisé et sécurisé
-zig_PROD                // optimisé maximum ( large binaire zig ) utilisé après avoir testé
-zig_SMALL               // optimisé maximum ( petit binaire zig ) utilisé après avoir testé
+zig_DEBUG		// debug
+zig_FAST		// optimisé et sécurisé
+zig_PROD		// optimisé maximum (large binaire zig) utilisé après avoir testé
+zig_SMAL		// optimisé maximum (petit binaire zig  utilisé après avoir testé
 
-ZIG_TEST                // permet d'utiliser l'option test de zig
+ZIG_TEST		// permet d'utiliser l'option test de zig
 
-zig_DOCS                // génération documentation
+zig_DOCS		// génération documentation
 
 pour documentation
-Go_LIB                  // compile lib.a go-lang
-Go_Run                  // test programme go
+Go_LIB			// compile lib.a go-lang
+Go_Run			// test programme go
 
-z-terminal              // ouvre un terminal dans votre projet
+z-terminal		// ouvre un terminal dans votre projet
+Z-dbg			// ouvre un terminal run position source
 
-a-GTKVTE                // call Term avec comme argument un programme   ex:./Term  ./Exemple
+a-GTKVTE		// call Term avec comme argument un programme   ex:./Term  ./Exemple
 
 j'ai laissé les outils glade et grep  go  cela peut-être utile pour vous. 
-
 
 
 
