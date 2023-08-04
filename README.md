@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.11.0 2023-08-04**</u><BR />
+<u>**zig 0.11.0**</u><BR />
 <br />
 
 **TESTING** <br />

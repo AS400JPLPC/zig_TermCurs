@@ -154,20 +154,20 @@ fi
 	echo -en '\033[0;0m'	# video normal
 	echo " "
 	if test -f "$folder_bin"; then
-		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
-		echo -en "  size : "
-		ls -lrtsh $folder_bin | cut -d " " -f6
+	echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
+	echo -en "  size : "
+	ls -lrtsh $folder_bin | cut -d " " -f6
 
-		mv $folder_bin $lib_projet
+	mv $folder_bin $lib_projet
 
-		if test -d $folder_cache ; then
-		rm -r $folder_cache
-		fi
+	if test -d $folder_cache ; then
+	rm -r $folder_cache
+	fi
 		
-    if test -d $folder_out ; then
-    rm -r $folder_out
-    fi
+	if test -d $folder_out ; then
+	rm -r $folder_out
+	fi
 
-    rm -r $folder_homecache;
+	rm -r $folder_homecache;
 	fi
 exit

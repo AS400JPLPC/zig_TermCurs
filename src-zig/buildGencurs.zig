@@ -142,7 +142,6 @@ pub fn build(b: *std.build) void {
         .install_dir = .prefix,
         .install_subdir = "Doc_Gencurs",
     });
-
     
     const docs_step = b.step("docs", "Generate docs");
     docs_step.dependOn(&install_docs.step);
