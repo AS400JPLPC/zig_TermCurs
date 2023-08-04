@@ -7,6 +7,7 @@ pub fn build(b: *std.build) void {
     const target   = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+
   
     // zig-src            source projet
     // zig-src/deps       curs/ form / outils ....
@@ -111,13 +112,12 @@ pub fn build(b: *std.build) void {
 
 
     //Build step to generate docs:  
-    
+  
     const docs = b.addTest(.{
     .name = "Gencurs",
     .root_source_file = .{ .path = "./Gencurs.zig" },
-    .target = target,
-    .optimize = optimize,
-
+    //.target = target,
+    //.optimize = optimize,
     });
 
 
@@ -133,12 +133,19 @@ pub fn build(b: *std.build) void {
     docs.addModule("match" , match);
     docs.addModule("mdlPanel" , mdlPanel);
     docs.addModule("mdlObjet" , mdlObjet);
-
+    
     //docs.emit_docs = .emit;
 
 
+    const install_docs = b.addInstallDirectory(.{
+        .source_dir = docs.getEmittedDocs(),
+        .install_dir = .prefix,
+        .install_subdir = "Doc_Gencurs",
+    });
+
     
     const docs_step = b.step("docs", "Generate docs");
+    docs_step.dependOn(&install_docs.step);
     docs_step.dependOn(&docs.step);
 
 }

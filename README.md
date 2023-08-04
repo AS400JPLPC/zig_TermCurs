@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.11.0  DEV  last   zig-0.11.0-dev.4334 **</u><BR />
+<u>**zig 0.11.0 2023-08-04**</u><BR />
 <br />
 
 **TESTING** <br />
@@ -283,7 +283,9 @@ My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" function
 -             the "forms.zig" no longer includes grid management<br />
 -             I reviewed the initialization of the panel and grid<br />
 -             with create mode to better manage memory and make memory allocation more consistent<br />
--             [https://ziggit.dev/t/philosophical-question-about-memory/1343](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
+-             [ziggit](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
 -             testing memoory<br />
--             [https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />  
--   
+-             [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />  
+<br />
+<br />  
+-  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation

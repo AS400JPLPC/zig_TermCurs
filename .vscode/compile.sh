@@ -45,7 +45,7 @@ folder_out=$projet_lib"/zig-out"
 
 folder_bin=$projet_lib"/zig-out/bin/"$projet_bin
 
-folder_docs=$lib_projet"docs"
+folder_docs=$folder_out"/Doc_"$projet_bin
 
 folder_homecache="$HOME/.cache/zig/"
 
@@ -55,6 +55,7 @@ tested="Projet:"$projet_bin
 #echo -en $projet_lib\\n
 
 #echo -en $folder_bin\\n
+echo -en $folder_out\\n
 echo -en $lib_projet\\n
 #echo -en $projet_src\\n
 #echo -en $folder_src\\n
@@ -135,10 +136,11 @@ if [ "$mode" == "DOCS" ] ; then
 			rm -r "docs_"$projet_bin  
 		fi
 	( set -x ; \
-				zig build docs   --build-file $projet_lib"/build"$projet_src ;\
+				zig build  docs  --build-file $projet_lib"/build"$projet_src ;\
 				mv $folder_docs  "docs_"$projet_bin;\
 				rm -r $folder_cache;\
         rm -r $folder_homecache; \
+        rm -r $folder_out; \
 				exit;\
 	)
 
@@ -161,9 +163,10 @@ fi
 		if test -d $folder_cache ; then
 		rm -r $folder_cache
 		fi
-		if test -d $folder_out ; then
-		rm -r $folder_out
-		fi
+		
+    if test -d $folder_out ; then
+    rm -r $folder_out
+    fi
 
     rm -r $folder_homecache;
 	fi
