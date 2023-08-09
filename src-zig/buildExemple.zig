@@ -130,7 +130,7 @@ pub fn build(b: *std.Build) void {
     const install_docs = b.addInstallDirectory(.{
       .source_dir = docs.getEmittedDocs(),
       .install_dir = .prefix,
-      .install_subdir = "Doc_Exemple",
+      .install_subdir = "../Docs",
     });
     
     const docs_step = b.step("docs", "Generate docs");

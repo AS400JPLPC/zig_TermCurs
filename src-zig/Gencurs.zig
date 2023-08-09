@@ -56,7 +56,6 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 // defined var global
 
 
-var Tkey : term.Keyboard = undefined ;
 
 var nopt : usize  = 0;
 
@@ -69,10 +68,7 @@ const choix = enum {
 };
 
 
-
 // main----------------------------------
-
-
 
 pub fn main() !void {
   //term.offscrool();
@@ -116,7 +112,6 @@ pub fn main() !void {
 
     Screen = 0 ,       // creat panel, objet  , source , exit
   };
-
 
 
 

@@ -623,12 +623,11 @@ pub const  grd = struct {
     var buf : [] const u8 = "";
     const Blanc = " ";
     var pos : usize = 0 ;
-    var idx : usize =0;
-    for (self.headers.items) |_| {
+
+    for (self.headers.items, 0..) |_  ,idx| {
       self.headers.items[idx].posy =pos;
       if (self.headers.items[idx].edtcar.len == 0) pos = pos +  self.headers.items[idx].long  + 1
       else  pos = pos + self.headers.items[idx].long  + 1  + 1;
-      idx += 1;
     }
 
     for (self.headers.items) |cellx| {

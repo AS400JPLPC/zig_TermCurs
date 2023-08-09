@@ -170,14 +170,15 @@
     }
     },
     {
+    // auto close terminal
     "label": "Z-dbg",
     "type": "shell",
-    "command": "${workspaceFolder}/dbg.sh ${workspaceFolder} ./${fileBasenameNoExtension} ",
+    "command": "${workspaceFolder}/Gen ./${fileBasenameNoExtension} ",
     "problemMatcher": [],
     "presentation": {
-      "echo": true,
-      "reveal": "never",
-      "focus": true
+      "reveal": "silent",
+      "revealProblems": "onProblem",
+      "close": true
     }
     },
 

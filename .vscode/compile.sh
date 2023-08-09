@@ -45,7 +45,7 @@ folder_out=$projet_lib"/zig-out"
 
 folder_bin=$projet_lib"/zig-out/bin/"$projet_bin
 
-folder_docs=$folder_out"/Doc_"$projet_bin
+folder_docs=$folder_out"/Docs"
 
 folder_homecache="$HOME/.cache/zig/"
 
@@ -137,10 +137,10 @@ if [ "$mode" == "DOCS" ] ; then
 		fi
 	( set -x ; \
 				zig build  docs  --build-file $projet_lib"/build"$projet_src ;\
-				mv $folder_docs  "docs_"$projet_bin;\
+				mv $folder_docs  "Docs_"$projet_bin;\
+        rm -r $folder_out;\
 				rm -r $folder_cache;\
         rm -r $folder_homecache; \
-        rm -r $folder_out; \
 				exit;\
 	)
 
@@ -154,20 +154,20 @@ fi
 	echo -en '\033[0;0m'	# video normal
 	echo " "
 	if test -f "$folder_bin"; then
-	echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
-	echo -en "  size : "
-	ls -lrtsh $folder_bin | cut -d " " -f6
+		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
+		echo -en "  size : "
+		ls -lrtsh $folder_bin | cut -d " " -f6
 
-	mv $folder_bin $lib_projet
+		mv $folder_bin $lib_projet
 
-	if test -d $folder_cache ; then
-	rm -r $folder_cache
-	fi
+		if test -d $folder_cache ; then
+		rm -r $folder_cache
+		fi
 		
-	if test -d $folder_out ; then
-	rm -r $folder_out
-	fi
+    if test -d $folder_out ; then
+    rm -r $folder_out
+    fi
 
-	rm -r $folder_homecache;
+    rm -r $folder_homecache;
 	fi
 exit

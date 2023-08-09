@@ -468,31 +468,31 @@ pub fn Panel_Fmt01() *pnl.PANEL {
   Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"",true,
                 "required","please enter text [a-zA-Z]{1,1}  [A-z0-9]",
                 "^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.name),"fnCheckPanel") catch unreachable ;
+  fld.setTask(Panel,@intFromEnum(fp01.name),"TaskPanel") catch unreachable ;
   
   Panel.field.append(fld.newFieldUDigit(@tagName(fp01.posx),3,12,2,"",true,
                 "required","please enter Pos X 1...",
                 "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.posx),"fnCheckPosx") catch unreachable ;
+  fld.setTask(Panel,@intFromEnum(fp01.posx),"TaskPosx") catch unreachable ;
   
   Panel.field.append(fld.newFieldUDigit(@tagName(fp01.posy),4,12,3,"",true,
                 "required","please enter Pos y 1...",
                 "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.posy),"fnCheckPosy") catch unreachable ;
+  fld.setTask(Panel,@intFromEnum(fp01.posy),"TaskPosy") catch unreachable ;
   
   Panel.field.append(fld.newFieldUDigit(@tagName(fp01.lines),5,12,2,"",true,
                 "required","please enter Lines 1...",
                 "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.lines),"fnCheckLines") catch unreachable ;
+  fld.setTask(Panel,@intFromEnum(fp01.lines),"TaskLines") catch unreachable ;
 
   Panel.field.append(fld.newFieldUDigit(@tagName(fp01.cols),6,12,3,"",true,
                 "required","please enter Cols  1...",
                 "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.cols),"fnCheckCols") catch unreachable ;                                      
+  fld.setTask(Panel,@intFromEnum(fp01.cols),"TaskCols") catch unreachable ;                                      
 
-  Panel.field.append(fld.newFieldFunc(@tagName(fp01.cadre),7,12,1,"",true,"fnBorder",
+  Panel.field.append(fld.newFieldFunc(@tagName(fp01.cadre),7,12,1,"",true,"FuncBorder",
                 "required","please choose the type of frame")) catch unreachable ;
-  fld.setTask(Panel,@intFromEnum(fp01.cadre),"fnCheckCadre") catch unreachable ; 
+  fld.setTask(Panel,@intFromEnum(fp01.cadre),"TaskCadre") catch unreachable ; 
 
   Panel.field.append(fld.newFieldTextFull(@tagName(fp01.title),8,12,15,"",false,
                 "required","please enter text",
@@ -1226,10 +1226,9 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
     grd.newCell(Xcombo,"Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
     grd.setHeaders(Xcombo);
 
-    var idx: usize = 0;
-    for (vpnl.items) |p| {
+
+    for (vpnl.items , 0..) |p , idx| {
         grd.addRows(Xcombo, &.{ utl.usizeToStr(idx), p.name, p.frame.title });
-        idx += 1;
     }
 
     // It seems unlikely that you will go over 50 panel
@@ -1243,25 +1242,23 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 
         if (Gkey.Key == kbd.enter) {
             grd.freeGrid(Xcombo);
-            //Xcombo = undefined;
-            return utl.strToUsize(Gkey.Buf.items[0]) catch unreachable;
+            return utl.strToUsize(Gkey.Buf.items[0]);
         }
 
 
         if (Gkey.Key == kbd.esc) {
             grd.freeGrid(Xcombo);
-            //Xcombo = undefined;
             return 999;
         }
     }
 }
 
 
-var callFunc: FnEnumFunc = undefined;
+var callFunc: FuncEnum = undefined;
 //=================================================
 // description Function
 // choix Cadre
-fn fnBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
   var pos:usize = 1;
 
@@ -1283,36 +1280,36 @@ fn fnBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 //=================================================
 // description Function
 /// run emun Function ex: combo
-pub const FnEnumFunc = enum {
-  fnBorder,
+pub const FuncEnum = enum {
+  FuncBorder,
   none,
 
-  pub fn run(self: FnEnumFunc, vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
+  pub fn run(self: FuncEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
     switch (self) {
-        .fnBorder => fnBorder(vpnl,vfld),
+        .FuncBorder => FuncBorder(vpnl,vfld),
         else => dsperr.errorForms( ErrMain.main_run_EnumFunc_invalide),
     }
   }
 
-  fn searchFn ( vtext: [] const u8 ) FnEnumFunc {
-    var max :usize = @typeInfo(FnEnumFunc).Enum.fields.len;
+  fn searchFn ( vtext: [] const u8 ) FuncEnum {
+    var max :usize = @typeInfo(FuncEnum).Enum.fields.len;
     
-    inline for (@typeInfo(FnEnumFunc).Enum.fields) |f| { 
-        if ( std.mem.eql(u8, f.name , vtext) ) return @as(FnEnumFunc,@enumFromInt(f.value));
+    inline for (@typeInfo(FuncEnum).Enum.fields) |f| { 
+        if ( std.mem.eql(u8, f.name , vtext) ) return @as(FuncEnum,@enumFromInt(f.value));
       }
-      return @as(FnEnumFunc,@enumFromInt(max)); 
+      return @as(FuncEnum,@enumFromInt(max)); 
   }
 };
 
 
-var callTask: FnEnumTask = undefined;
+var callTask: TaskEnum = undefined;
 //=================================================
 // description Function
 // test exist Name for add or change name
 
-fn fnCheckPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-  var posx =  utl.strToUsize(vfld.text) catch unreachable;
+  var posx =  utl.strToUsize(vfld.text);
   
   if (termSize.height < posx or posx  == 0 ) {
     const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position X is out of bounds", .{termSize.height}) catch unreachable;
@@ -1322,9 +1319,9 @@ fn fnCheckPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   return;
 }
 
-fn fnCheckPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-  var posy  = utl.strToUsize(vfld.text) catch unreachable;
+  var posy  = utl.strToUsize(vfld.text);
   
   if (termSize.width < posy or posy == 0 ) {
     const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position Y is out of bounds", .{termSize.width}) catch unreachable;
@@ -1334,10 +1331,10 @@ fn fnCheckPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   return;
 }
 
-fn fnCheckLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-    var lines = utl.strToUsize(vfld.text) catch unreachable;
-    var posx  = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) catch unreachable;
+    var lines = utl.strToUsize(vfld.text);
+    var posx  = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
     
     if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
       const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of rows is out of range", .{termSize.height}) catch unreachable;
@@ -1347,10 +1344,10 @@ fn fnCheckLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   return;
 }
 
-fn fnCheckCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-  var cols  = utl.strToUsize(vfld.text) catch unreachable;
-  var posy  = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable) catch unreachable;
+  var cols  = utl.strToUsize(vfld.text);
+  var posy  = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
 
   if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) { 
     const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of columns is out of range", .{termSize.width }) catch unreachable;
@@ -1361,9 +1358,9 @@ fn fnCheckCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 
-fn fnCheckCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
   const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
-  var cadre = utl.strToUsize(vfld.text) catch unreachable;
+  var cadre = utl.strToUsize(vfld.text);
   
   if (termSize.width < cadre or cadre == 0 ) { 
     const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} The number of Lines Cadre is out of range", .{termSize.width }) catch unreachable;
@@ -1375,9 +1372,9 @@ fn fnCheckCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 
 
-fn fnCheckPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
-  var idx : usize = 0;
-  for (VPANEL.items) |f | {
+fn TaskPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+  for (VPANEL.items , 0..) |f, idx | {
     if (std.mem.eql(u8, f.name, vfld.text) and ( idx == numPanel ) ) {
       return ;
     }  
@@ -1386,18 +1383,17 @@ fn fnCheckPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld
       vpnl.keyField = kbd.task; 
       return ;
     }
-    idx += 1;
   }
   return;
 }
 
 
-fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
 
   vpnl.keyField = kbd.none;
-  var idx : usize = 0;
-  for (VPANEL.items) |f| {
+
+  for (VPANEL.items , 0..) |f , idx| {
     if (std.mem.eql(u8, f.name, vfld.text) and  888 == numPanel  or
       std.mem.eql(u8, f.name, vfld.text)  and  idx == numPanel  ) {
       vpnl.keyField = kbd.task;
@@ -1407,19 +1403,19 @@ fn fnCheckF9(  VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.F
       return ;
     } 
     if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == numPanel ) ) return ;
-    idx += 1;
+
   }
   return ;
 }
 
 
-fn fnCheckF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD) void {
 
   
 
   vpnl.keyField = kbd.none;
-  var idx : usize = 0;
-  for (VPANEL.items) |f | {
+
+  for (VPANEL.items ,0..) |f ,idx | {
     if (std.mem.eql(u8, f.name, vfld.text) and ( idx != numPanel )   ) {
       vpnl.keyField = kbd.task;
       vpnl.idxfld = @intFromEnum(fp01.name);
@@ -1428,7 +1424,7 @@ fn fnCheckF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.F
       return ;
     } 
     if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == numPanel ) ) return ;
-    idx += 1;
+
   }
   return ;
 }
@@ -1436,40 +1432,40 @@ fn fnCheckF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.F
 //=================================================
 // description Function
 /// run emun Function ex: combo
-pub const FnEnumTask = enum {
-  fnCheckPosx,
-  fnCheckPosy,
-  fnCheckLines,
-  fnCheckCols,
-  fnCheckCadre,
-  fnCheckPanel,
-  fnCheckF9,
-  fnCheckF10,
+pub const TaskEnum = enum {
+  TaskPosx,
+  TaskPosy,
+  TaskLines,
+  TaskCols,
+  TaskCadre,
+  TaskPanel,
+  TaskF9,
+  TaskF10,
   none,
 
-  pub fn run(self: FnEnumTask, VPANEL: *std.ArrayList(pnl.PANEL),vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
+  pub fn run(self: TaskEnum, VPANEL: *std.ArrayList(pnl.PANEL),vpnl : *pnl.PANEL, vfld: *fld.FIELD) void  {
       switch (self) {
-          .fnCheckPosx  => fnCheckPosx(vpnl,vfld),
-          .fnCheckPosy  => fnCheckPosy(vpnl,vfld),
-          .fnCheckLines => fnCheckLines(vpnl,vfld),
-          .fnCheckCols  => fnCheckCols(vpnl,vfld),
-          .fnCheckCadre => fnCheckCadre(vpnl,vfld),
+          .TaskPosx  => TaskPosx(vpnl,vfld),
+          .TaskPosy  => TaskPosy(vpnl,vfld),
+          .TaskLines => TaskLines(vpnl,vfld),
+          .TaskCols  => TaskCols(vpnl,vfld),
+          .TaskCadre => TaskCadre(vpnl,vfld),
 
-          .fnCheckPanel => fnCheckPanel(VPANEL,vpnl,vfld),
+          .TaskPanel => TaskPanel(VPANEL,vpnl,vfld),
 
-          .fnCheckF9  => fnCheckF9(VPANEL,vpnl,vfld),
-          .fnCheckF10 => fnCheckF10(VPANEL,vpnl,vfld),
+          .TaskF9  => TaskF9(VPANEL,vpnl,vfld),
+          .TaskF10 => TaskF10(VPANEL,vpnl,vfld),
 
           else => dsperr.errorForms( ErrMain.main_run_EnumTask_invalide),
       }
   }
-  fn searchFn ( vtext: [] const u8 ) FnEnumTask {
-    var max :usize = @typeInfo(FnEnumTask).Enum.fields.len;
+  fn searchFn ( vtext: [] const u8 ) TaskEnum {
+    var max :usize = @typeInfo(TaskEnum).Enum.fields.len;
     
-    inline for (@typeInfo(FnEnumTask).Enum.fields) |f| { 
-        if ( std.mem.eql(u8, f.name , vtext) ) return @as(FnEnumTask,@enumFromInt(f.value));
+    inline for (@typeInfo(TaskEnum).Enum.fields) |f| { 
+        if ( std.mem.eql(u8, f.name , vtext) ) return @as(TaskEnum,@enumFromInt(f.value));
       }
-      return @as(FnEnumTask,@enumFromInt(max));
+      return @as(TaskEnum,@enumFromInt(max));
   }
 };
 
@@ -1505,7 +1501,6 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
   }
   fld.MouseDsp = true ; // active display cursor x/y mouse
   
-  var idx : usize = 0;
   
   var Tkey : term.Keyboard = undefined ; // defines the receiving structure of the keyboard
 
@@ -1519,13 +1514,13 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
     switch (Tkey.Key) {
       // call function combo
       .func => {
-        callFunc = FnEnumFunc.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); 
+        callFunc = FuncEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); 
         callFunc.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
       },
 
       // call proc contrôl chek value
       .task => {
-        callTask = FnEnumTask.searchFn(pFmt01.field.items[pFmt01.idxfld].proctask); 
+        callTask = TaskEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].proctask); 
         callTask.run(&NPANEL, pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
       },
       
@@ -1558,14 +1553,13 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
       // creat Panel
       .F9 => {
-        idx = 0;
 
-          for (pFmt01.field.items) |f| {
+          for (pFmt01.field.items , 0..) |f , idx| {
               if (f.proctask.len > 0) {
                 pFmt01.idxfld = idx ;
                 pFmt01.keyField = kbd.none;
-                if (idx == @intFromEnum(fp01.name))  callTask = FnEnumTask.searchFn("fnCheckF9")
-                else callTask = FnEnumTask.searchFn(f.proctask);
+                if (idx == @intFromEnum(fp01.name))  callTask = TaskEnum.searchFn("TaskF9")
+                else callTask = TaskEnum.searchFn(f.proctask);
                 callTask.run(&NPANEL, pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
                 if (pFmt01.keyField == kbd.task) break;
               }
@@ -1582,14 +1576,14 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) !void {
 
       // update Panel
       .F10 => {
-        idx = 0;
+
         if ( numPanel < 888 ) {
-          for (pFmt01.field.items) |f| {
+          for (pFmt01.field.items , 0..) |f, idx| {
             if (f.proctask.len > 0) {
               pFmt01.idxfld = idx ;
               pFmt01.keyField = kbd.none;
-              if (idx == @intFromEnum(fp01.name))  callTask = FnEnumTask.searchFn("fnCheckF10")
-              else callTask = FnEnumTask.searchFn(f.proctask);
+              if (idx == @intFromEnum(fp01.name))  callTask = TaskEnum.searchFn("TaskF10")
+              else callTask = TaskEnum.searchFn(f.proctask);
               callTask.run(&NPANEL, pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
               if (pFmt01.keyField == kbd.task) break;
             }
@@ -1703,11 +1697,11 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 fn addPanel( src: *pnl.PANEL, vNPANEL :  *std.ArrayList(pnl.PANEL),  vXPANEL:  *std.ArrayList(pnl.PANEL) ) !void {
 
   var panel = pnl.initPanel(src.field.items[@intFromEnum(fp01.name)].text,
-                    utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text) catch |err| {return err;},
-                    utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text) catch |err| {return err;},
-                    @as(dds.CADRE,@enumFromInt(utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text) catch |err| {return err;})),
+                    utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text),
+                    utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text),
+                    utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
+                    utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text),
+                    @as(dds.CADRE,@enumFromInt(utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
                     src.field.items[@intFromEnum(fp01.title)].text);
 
 
@@ -1797,11 +1791,11 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :  *std.ArrayList(pnl.PANEL),  vXPANEL:  *
 fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )  !void {
   
   var panel : *pnl.PANEL = pnl.newPanelC(src.field.items[@intFromEnum(fp01.name)].text,
-              utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text) catch |err| {return err;},
-              utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text) catch |err| {return err;},
-              utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text) catch |err| {return err;},
-              utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text) catch |err| {return err;},
-              @as(dds.CADRE,@enumFromInt(utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text) catch |err| {return err;})),
+              utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text) ,
+              utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text) ,
+              utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
+              utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text) ,
+              @as(dds.CADRE,@enumFromInt(utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
               src.field.items[@intFromEnum(fp01.title)].text);
 
   defer dds.allocatorPnl.destroy(panel);

@@ -288,4 +288,12 @@ My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" function
 -             [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />  
 <br />
 <br />  
--  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation
+-  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
+<br />
+-  2023-08-09 small update project due to version change<br />
+-  2023-08-09 modlObjet alt-F start of field processing <br />
+-  2023-08-09 Json studies to encapsulate the generation (IN/OUT) <br />
+
+
+
+

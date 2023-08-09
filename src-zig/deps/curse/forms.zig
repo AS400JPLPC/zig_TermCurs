@@ -274,10 +274,9 @@ pub const  lbl = struct {
 
   // return index-label  ---> arraylist panel-label
   pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )  ErrForms ! usize {
-    var idx : usize = 0 ;
-    for (vpnl.label.items) |l| {
+
+    for (vpnl.label.items, 0..) |l, idx| {
       if (std.mem.eql(u8, l.name, name)) return idx ;
-      idx += 1;
     }
     return ErrForms.lbl_getIndex_Name_Label_Invalide;
   }
@@ -822,10 +821,9 @@ pub const btn = struct{
 
   // return index-button  ---> arraylist panel-button
   pub fn getIndex(vpnl: *pnl.PANEL , key: kbd  ) ErrForms ! usize {
-    var idx : usize =0;
-    for (vpnl.button.items) |b  | {
+
+    for (vpnl.button.item, 0..) |b ,idx  | {
       if (b.button.key == key) return idx;
-      idx += 1;
     }
     return ErrForms.btn_getIndex_Key_Button_Invalide;
   }
@@ -1064,10 +1062,9 @@ pub const  mnu = struct {
 
   // return index-menu  ---> arraylist panel-menu
   pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )  ErrForms ! usize {
-    var idx : usize = 0 ;
-    for (vpnl.menu.items) |l| {
+
+    for (vpnl.menu.items, 0..) |l, idx| {
       if (std.mem.eql(u8, l.name, name)) return idx;
-      idx += 1;
     }
     return ErrForms.mnu_getIndex_Name_Menu_Invalide;
   }
@@ -2220,10 +2217,8 @@ pub const  fld = struct {
   //========================================================================
   //========================================================================
   pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )  ErrForms ! usize {
-    var idx : usize = 0 ;
-    for (vpnl.field.items) |f | {
+    for (vpnl.field.items, 0..) |f, idx | {
       if (std.mem.eql(u8, f.name, name)) return idx;
-      idx += 1;
     }
     return ErrForms.fld_getIndex_Name_Field_Invalide;
   }
@@ -2503,14 +2498,13 @@ pub const  fld = struct {
     }
     e_FIELD.clearRetainingCapacity();
 
-    var idx : usize = 0 ;
-    for ( x_FIELD.items) |ch | {
+
+    for ( x_FIELD.items ,0..) |ch , idx | {
       if ( n != idx) e_FIELD.append(ch) catch unreachable ;
       if ( n == idx) { 
         e_FIELD.append(c) catch unreachable ;
         e_FIELD.append(ch) catch unreachable ;
       } 
-      idx += 1;
     }
   }
 
@@ -2564,12 +2558,12 @@ pub const  fld = struct {
     e_FIELD.clearRetainingCapacity();
     if ( f.reftyp == dds.REFTYP.SWITCH) {
       if (e_switch == true ) 
-        utl.addListStr(&e_FIELD  , dds.STRUE) catch unreachable 
+        utl.addListStr(&e_FIELD  , dds.STRUE)  
       else
-        utl.addListStr(&e_FIELD  , dds.SFALSE) catch unreachable;
+        utl.addListStr(&e_FIELD  , dds.SFALSE);
     }
     else {
-        utl.addListStr(&e_FIELD  , f.text) catch unreachable;
+        utl.addListStr(&e_FIELD  , f.text);
       var i:usize = 0 ;
       while (i < f.nbrcar - f.text.len) : ( i += 1) {
         e_FIELD.append(" ") catch unreachable;
@@ -3466,11 +3460,11 @@ pub const  pnl = struct {
     vpnl.idxfld =9999;
 
     vpnl.keyField =kbd.none;
-    var idx : usize = 0 ;
-    for (vpnl.field.items) |_| {
+
+    for (vpnl.field.items, 0..) |_, idx| {
       vpnl.field.items[idx].text =" ";
       vpnl.field.items[idx].zwitch =false;
-      idx += 1;
+
     }
   }
   // restor -panel  MATRIX to terminal ---> arraylist panel
@@ -3619,9 +3613,8 @@ pub const  pnl = struct {
   pub fn isValide(vpnl: *PANEL) bool {
     if (vpnl.actif == false ) return  false ;
 
-    // recherche erreur
-    var idx : usize = 0 ;
-    for (vpnl.field.items) |f| {
+
+    for (vpnl.field.items, 0..) |f, idx| {
       if ( !f.protect and f.actif) {
         //check tofill and field.len > 0
         if (f.tofill and utl.trimStr(f.text).len == 0 ) {
@@ -3637,7 +3630,6 @@ pub const  pnl = struct {
         }
         // function call proctask            
       }
-      idx += 1;
     }
     vpnl.idxfld = 0;
     return true;

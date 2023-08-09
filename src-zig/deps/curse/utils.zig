@@ -21,9 +21,6 @@ pub fn ToStr(text : [] const u8 ) []const u8 {
 /// Errors that may occur when using String
 pub const ErrUtils = error{
         Invalide_subStr_Index,
-        fld_ioField_addListStr_invalide,
-        fld_ioField_removeListStr,
-        Invalide_Character_strToUsize,
 };
 
 
@@ -576,7 +573,7 @@ pub fn subStr( a: []const u8,pos: usize, n:usize) ![]const u8 {
   if (n == 0 or n > a.len) return ErrUtils.Invalide_subStr_Index;
   if (pos > a.len) return ErrUtils.Invalide_subStr_Index;
   const allocator = std.heap.page_allocator;
-  const result = try allocator.alloc(u8, n - pos);
+  const result = allocator.alloc(u8, n - pos) catch unreachable;
   defer allocator.free(result);
   std.mem.copy(u8, result, a[pos..n]);
   return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)  catch unreachable;
@@ -645,8 +642,8 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 
 
 
-pub fn strToUsize(v: []const u8) !usize{
-  return std.fmt.parseUnsigned(u64, v,10) catch  return ErrUtils.Invalide_Character_strToUsize;
+pub fn strToUsize(v: []const u8) usize{
+  return std.fmt.parseUnsigned(u64, v,10) catch return 9999999999999999999;
 }
 
 
@@ -659,49 +656,37 @@ pub fn usizeToStr(v: usize ) []const u8{
 
 
 /// Delete Items ArrayList
-pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) ! void{
+pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void{
 
   //const allocator = std.heap.page_allocator;
   var LIST = std.ArrayList([] const u8).init(dds.allocatorUtils);
   var idx : usize = 0;
   for (self.items) | val| {
-    if ( idx != i-1 ) LIST.append(val) catch return ErrUtils.fld_ioField_removeListStr_invalide;
+    if ( idx != i-1 ) LIST.append(val) catch unreachable;
     idx += 1;
   }
   self.clearAndFree();
 
   for (LIST.items) | val| {
-    self.append(val) catch return ErrUtils.fld_ioField_removeListStr_invalide;
+    self.append(val) catch unreachable;
   }
- 
-
 }
 
 
 
 
 /// Add Text ArrayList
-pub fn addListStr(self: *std.ArrayList([]const u8), text : []const u8) ! void{
+pub fn addListStr(self: *std.ArrayList([]const u8), text : []const u8) void{
 
-  //const allocator = std.heap.page_allocator;
-  var LIST = std.ArrayList([] const u8).init(dds.allocatorUtils);
   
   var iter = iteratStr.iterator(text);
   defer iter.deinit();
 
-  for (self.items) | val | {
-    LIST.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;
-  }
 
   while (iter.next()) |ch|  {
-    LIST.append(ch) catch return ErrUtils.fld_ioField_addListStr_invalide;
+    self.append(ch) catch unreachable;
     }
 
-  self.clearAndFree();
-
-  for (LIST.items) | val| {
-    self.append(val) catch return ErrUtils.fld_ioField_addListStr_invalide;
-  }
 }
 
 
@@ -752,6 +737,3 @@ pub fn cboolToBool(v: []const u8) bool {
 pub fn cboolToStr(v: []const u8) []const u8 {
   return if ( std.mem.eql(u8,v, dds.STRUE) ) "1"  else  "0";
 }
-
-
-
