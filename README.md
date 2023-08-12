@@ -46,6 +46,15 @@ https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> inspiration<BR />
 
 
 <br />
+
+<br />
+
+
+
+ ![](assets/20230812_012345_Field.png)
+
+
+
 ---
 
 <BR/><BR/>
@@ -191,8 +200,7 @@ pub const AtrLabel : stl.ZONATRB = .{<br />
 Please wait, if there are bugs everything is not fixed.<br />
 
 <u>-------TESTING------------------------------------</u><BR />
-&rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler than xterm or other terminals* <br />
-&rarr;&nbsp; forms.zig   Exemple --->  exemple.zig <br />
+&rarr;&nbsp; *Use the gtk Term.c terminal, it's much simpler terminals  ex: exf4-terminal* <br />
 <u>-------To write and think--------------------------------</u><BR />
 &rarr;&nbsp; inspiration `<br />`
 
@@ -212,10 +220,6 @@ Please wait, if there are bugs everything is not fixed.<br />
 
 
 
-<u>2023-02-26 correction code for (xxx.item) |l,i| new code ---> var idx: suize = 0 for (...) |l| { ... idx += 1;}<br />
-<br />
-<u>2023-05-22 correction code regex processing change no external software, only the libc with the regex.huse match<br />
-<br />
 <br />
 <br />
 |   for information|
@@ -232,8 +236,8 @@ But in terminal mode the application is viable (to do with the commit data-base)
 
 les news:<BR />
 
-→  2023-02-05 Doc version 0.10.1  
-[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Gencurs/index.html) <br />
+→  2023-02-05 Doc version 0.11.1  
+[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Docs_Gencurs/index.html) <br />
 <BR/>
 
 <BR/>
@@ -249,20 +253,7 @@ les news:<BR />
 <br />
 
 
-<BR/>
--  2023-06-19  Tuning and learning, memory management MODULE <br />
-<BR/>
-<BR/>
--  2023-06-20  Tuning  memory OK, I will be able to progress in the project <br />
-<BR/>
 
-<BR/>
--  2023-06-22  memory management validation <br />
--  2023-06-22  Simplification of registration of a grid and management of several grids <br />
--  2023-06-22  Enabling TTY output<br />
-<BR/>
-
-<BR/>
 -  2023-08-1  I am preparing for the version change in order to take advantage of advancements and modify the code if necessary.
 My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" functions what I did<br />
 <BR/>
@@ -293,7 +284,9 @@ My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" function
 -  2023-08-09 small update project due to version change<br />
 -  2023-08-09 modlObjet alt-F start of field processing <br />
 -  2023-08-09 Json studies to encapsulate the generation (IN/OUT) <br />
-
+ <br />
+-  2023-08-12 **After a big discussion, setting up the wrestling**<br />
+-  2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
 
 
 
