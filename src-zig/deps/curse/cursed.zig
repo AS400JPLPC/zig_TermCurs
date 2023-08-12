@@ -1,7 +1,7 @@
 const std = @import("std");
 const utf = @import("std").unicode;
 const dds = @import("dds");
-const utl = @import("utils");
+
 
 const io = std.io;
 const os = std.os;
@@ -15,8 +15,90 @@ var use_termios: os.linux.termios = undefined;
 
 
 
+// outils
+/// Iterator support iteration string
+pub const iteratStr = struct {
+  var strbuf:[] const u8 = undefined;
+
+  var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+  //defer arena.deinit();
+  const allocator = arenastr.allocator();
+
+  /// Errors that may occur when using String
+  pub const ErrNbrch = error{
+      InvalideAllocBuffer,
+  };
+  
 
 
+  pub const StringIterator = struct {
+        buf: []u8 ,
+        index: usize ,
+
+
+    fn allocBuffer ( size :usize) ErrNbrch![]u8 {
+      var buf = allocator.alloc(u8, size) catch {
+              return ErrNbrch.InvalideAllocBuffer;
+          };
+      return buf;
+    }
+
+    /// Deallocates the internal buffer
+    pub fn deinit(self: *StringIterator) void {
+        if (self.buf.len > 0)  allocator.free(self.buf);
+    }
+
+    pub fn next(it: *StringIterator) ?[]const u8 {
+        var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        
+        it.buf= optional_buf orelse "";
+        var idx : usize = 0;
+
+        while (true) {
+            if (idx >= strbuf.len) break;
+            it.buf[idx] = strbuf[idx];
+            idx += 1;
+        }
+
+        if (it.index == it.buf.len) return null;
+        idx = it.index;
+        it.index += getUTF8Size(it.buf[idx]);
+        return it.buf[idx..it.index];
+
+    }
+    pub fn preview(it: *StringIterator) ?[]const u8 {
+        var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        
+        it.buf= optional_buf orelse "";
+        var idx : usize = 0;
+        while (true) {
+            if (idx >= strbuf.len) break;
+            it.buf[idx] = strbuf[idx];
+            idx += 1;
+        }
+
+        if (it.index == 0) return null;
+        idx = it.buf.len;
+        it.index -= getUTF8Size(it.buf[idx]);
+        return it.buf[idx..it.index];
+
+    }
+  };
+
+  /// iterator String
+  pub fn iterator(str:[] const u8) StringIterator {
+      strbuf = str;
+      return StringIterator{
+          .buf = undefined,
+          .index = 0,
+      };
+  }
+
+  /// Returns the UTF-8 character's size
+  fn getUTF8Size(char: u8) u3 {
+      return std.unicode.utf8ByteSequenceLength(char) catch unreachable;
+  }
+};
 
 /// flush terminal in-out
 pub fn flushIO() void {
@@ -29,13 +111,13 @@ pub fn flushIO() void {
 /// onMouse
 pub fn onMouse() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[?1000;1005;1006h") catch unreachable;
+  writer.writeAll("\x1b[?1000;1005;1006h") catch {};
 }
 
 /// offMouse
 pub fn offMouse() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[?1000;1005;1006l") catch unreachable;
+  writer.writeAll("\x1b[?1000;1005;1006l") catch {};
 }
 
 ///-------------
@@ -44,38 +126,38 @@ pub fn offMouse() void {
 /// Clear from cursor until end of screen
 pub fn cls_from_cursor_toEndScreen() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[0J") catch unreachable;
+  writer.writeAll("\x1b[0J") catch {};
 }
 
 /// Clear from cursor to beginning of screen
 pub fn cls_from_cursor_toStartScreen() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[1J") catch unreachable;
+  writer.writeAll("\x1b[1J") catch {};
 }
 
 /// Clear all screen
 pub fn cls() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[2J") catch unreachable;
-  writer.writeAll("\x1b[3J") catch unreachable;
+  writer.writeAll("\x1b[2J") catch {};
+  writer.writeAll("\x1b[3J") catch {};
 }
 
 /// Clear from cursor to end of line
 pub fn cls_from_cursor_toEndline() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[0K") catch unreachable;
+  writer.writeAll("\x1b[0K") catch {};
 }
 
 /// Clear start of line to the cursor
 pub fn cls_from_cursor_toStartLine() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[1K") catch unreachable;
+  writer.writeAll("\x1b[1K") catch {};
 }
 
 /// Clear from cursor to end of line
 pub fn cls_line() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[2K") catch unreachable;
+  writer.writeAll("\x1b[2K") catch {};
 }
 
 ///-------------
@@ -88,43 +170,43 @@ pub var posCurs: Point = undefined;
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY(x: usize, y: usize) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d};{d}H", .{ x, y }) catch unreachable;
+  writer.print("\x1b[{d};{d}H", .{ x, y }) catch {};
 }
 
 /// Moves cursor up `y` rows
 pub fn gotoUp(x: usize) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}A", .{x}) catch unreachable;
+  writer.print("\x1b[{d}A", .{x}) catch {};
 }
 
 /// Moves cursor down `y` rows
 pub fn gotoDown(x: usize) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}B", .{x}) catch unreachable;
+  writer.print("\x1b[{d}B", .{x}) catch {};
 }
 
 /// Moves cursor left `y` columns
 pub fn gotoLeft(y: usize) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}D", .{y}) catch unreachable;
+  writer.print("\x1b[{d}D", .{y}) catch {};
 }
 
 /// Moves cursor right `y` columns
 pub fn gotoRight(y: usize) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}C", .{y}) catch unreachable;
+  writer.print("\x1b[{d}C", .{y}) catch {};
 }
 
 /// Hide the cursor
 pub fn cursHide() void {
   const writer = TTY.writer();
-  writer.print("\x1b[?25l", .{}) catch unreachable;
+  writer.print("\x1b[?25l", .{}) catch {};
 }
 
 /// Show the cursor
 pub fn cursShow() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[?25h") catch unreachable;
+  writer.writeAll("\x1b[?25h") catch {};
 }
 
 pub fn defCursor(e_curs: dds.typeCursor) void {
@@ -132,28 +214,28 @@ pub fn defCursor(e_curs: dds.typeCursor) void {
     // define type  Cursor form terminal
     switch (e_curs) {
         .cDefault => {
-            writer.writeAll("\x1b[0 q") catch unreachable; // 0 → default terminal
+            writer.writeAll("\x1b[0 q") catch {}; // 0 → default terminal
         },
         .cBlink => {
-            writer.writeAll("\x1b[1 q") catch unreachable; // 1 → blinking block
+            writer.writeAll("\x1b[1 q") catch {}; // 1 → blinking block
         },
         .cSteady => {
-            writer.writeAll("\x1b[2 q") catch unreachable; //  2 → steady block
+            writer.writeAll("\x1b[2 q") catch {}; //  2 → steady block
         },
         .cBlinkUnderline => {
-            writer.writeAll("\x1b[3 q") catch unreachable; //  3 → blinking underlines
+            writer.writeAll("\x1b[3 q") catch {}; //  3 → blinking underlines
         },
         .cSteadyUnderline => {
-            writer.writeAll("\x1b[4 q") catch unreachable; //  4 → steady underlines
+            writer.writeAll("\x1b[4 q") catch {}; //  4 → steady underlines
         },
         .cBlinkBar => {
-            writer.writeAll("\x1b[5 q") catch unreachable; //  5 → blinking bar
+            writer.writeAll("\x1b[5 q") catch {}; //  5 → blinking bar
         },
         .cSteadyBar => {
-            writer.writeAll("\x1b[6 q") catch unreachable; //  6 → steady bar
+            writer.writeAll("\x1b[6 q") catch {}; //  6 → steady bar
         },
     }
-    writer.writeAll("\x1b[?25h") catch unreachable;
+    writer.writeAll("\x1b[?25h") catch {};
 }
 
 fn convIntCursor(x: u8) usize {
@@ -183,7 +265,7 @@ pub fn getCursor() void {
     flushIO();
 
     // Don't forget to flush!
-    wtty.writeAll("\x1b[?6n") catch unreachable;
+    wtty.writeAll("\x1b[?6n") catch {};
 
     var c: usize = 0;
     while (c == 0) {
@@ -237,7 +319,7 @@ pub fn getCursor() void {
 /// Reset the terminal style.
 pub fn resetStyle() void {
   const writer = TTY.writer();
-  writer.writeAll("\x1b[0m") catch unreachable;
+  writer.writeAll("\x1b[0m") catch {};
 }
 
 /// Sets the terminal style.
@@ -245,7 +327,7 @@ fn setStyle(style: [4]u32) void {
   const writer = TTY.writer();
   for (style) |v| {
       if (v != 0) {
-          writer.print("\x1b[{d}m", .{v}) catch unreachable;
+          writer.print("\x1b[{d}m", .{v}) catch {};
       }
   }
 }
@@ -253,13 +335,13 @@ fn setStyle(style: [4]u32) void {
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: dds.BackgroundColor) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch unreachable;
+  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: dds.ForegroundColor) void {
   const writer = TTY.writer();
-  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch unreachable;
+  writer.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// write text and attribut
@@ -268,7 +350,7 @@ pub fn writeStyled(text: []const u8, attribut: dds.ZONATRB) void {
   setForegroundColor(attribut.backgr);
   setBackgroundColor(attribut.foregr);
   setStyle(attribut.styled);
-  writer.print("{s}\x1b[0m", .{text}) catch unreachable;
+  writer.print("{s}\x1b[0m", .{text}) catch {};
 }
 
 ///-------------------------
@@ -321,7 +403,7 @@ fn reset() void {
   var args = [_:null]?[*:0]const u8{ "echo", "\x1b[H\x1b[3J" };
   var env = [_:null]?[*:0]u8{};
 
-  std.os.execveZ(name, args[0..args.len], env[0..env.len]) catch unreachable;
+  std.os.execveZ(name, args[0..args.len], env[0..env.len]) catch {};
 }
 
 /// Returns to the previous terminal state
@@ -331,7 +413,7 @@ pub fn disableRawMode() void {
   cursShow();
   cls();
   const writer = TTY.writer();
-  writer.print("\x1b[H", .{}) catch unreachable; // init pos_coursor
+  writer.print("\x1b[H", .{}) catch {}; // init pos_coursor
 
   _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &original_termios);
   reset();
@@ -340,12 +422,13 @@ pub fn disableRawMode() void {
 /// get size terminal
 const TermSize = struct { width: usize, height: usize };
 
-pub fn getSize() !TermSize {
+pub fn getSize() TermSize {
   var win_size: std.os.linux.winsize = undefined;
 
   const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&win_size));
   if (os.errno(err) != .SUCCESS) {
-      return os.unexpectedErrno(os.errno(err));
+      @panic(" Cursed getSize error ioctl TTY");
+      //return os.unexpectedErrno(os.errno(err));
   }
   return TermSize{
       .height = win_size.ws_row,
@@ -357,7 +440,7 @@ pub fn getSize() !TermSize {
 pub fn titleTerm(title: []const u8) void {
   if (title.len > 0) {
     const writer = TTY.writer();
-    writer.print("\x1b]0;{s}\x07", .{title}) catch unreachable;
+    writer.print("\x1b]0;{s}\x07", .{title}) catch {};
   }
 }
 
@@ -369,7 +452,7 @@ pub fn titleTerm(title: []const u8) void {
 pub fn resizeTerm(line: usize, cols: usize) void {
   if (line > 0 and cols > 0) {
     const writer = TTY.writer();
-    writer.print("\x1b[8;{d};{d};t", .{ line, cols }) catch unreachable;
+    writer.print("\x1b[8;{d};{d};t", .{ line, cols }) catch {};
   }
 }
 
@@ -519,7 +602,7 @@ pub const kbd = enum {
 
     pub fn toEnum(name: []const u8) kbd {
         var vlen: usize = 0;
-        var iter = utl.iteratStr.iterator(name);
+        var iter = iteratStr.iterator(name);
         var result: usize = 0;
         while (iter.next()) |_| {
             vlen += 1;
@@ -609,7 +692,7 @@ pub const kbd = enum {
 
         var c: usize = 0;
         while (c == 0) {
-            c = TTY.read(&keybuf) catch continue;
+            c = TTY.read(&keybuf) catch {Event.Key = kbd.none; return Event;};
         }
 
         const view = std.unicode.Utf8View.init(keybuf[0..c]) catch {
@@ -717,8 +800,7 @@ pub const kbd = enum {
             '\x0D' => { Event.Key = kbd.enter;     return Event; },
 
             else => {
-                var i = utf.utf8Encode(c0, vUnicode[0..4]) catch unreachable;
-
+                var i = utf.utf8Encode(c0, vUnicode[0..4]) catch {Event.Key = kbd.none; return Event;};
                 Event.Char = vUnicode[0..i];
 
                 Event.Key  = kbd.char;

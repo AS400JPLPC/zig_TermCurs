@@ -233,7 +233,7 @@ But in terminal mode the application is viable (to do with the commit data-base)
 les news:<BR />
 
 →  2023-02-05 Doc version 0.10.1  
-[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Exemple/index.html) <br />
+[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/docs_Gencurs/index.html) <br />
 <BR/>
 
 <BR/>

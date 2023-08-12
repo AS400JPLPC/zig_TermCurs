@@ -24,17 +24,19 @@ pub fn build(b: *std.build) void {
       .source_file = .{ .path = "./deps/curse/dds.zig" },
     });
     
-    const utils = b.createModule(.{
-      .source_file = .{ .path = "./deps/curse/utils.zig" },
-      .dependencies= &.{.{ .name = "dds", .module = dds }},
-    });
-
     const cursed = b.createModule(.{
       .source_file = .{ .path = "./deps/curse/cursed.zig" },
       .dependencies= &.{
         .{ .name = "dds", .module = dds },
-        .{ .name = "utils", .module = utils },
       },
+    });
+
+    const utils = b.createModule(.{
+      .source_file = .{ .path = "./deps/curse/utils.zig" },
+      .dependencies= &.{
+      .{ .name = "dds", .module = dds },
+      .{ .name = "cursed", .module = cursed },
+      }
     });
   
     const forms = b.createModule(.{
@@ -53,8 +55,8 @@ pub fn build(b: *std.build) void {
       .dependencies= &.{
         .{ .name = "dds",    .module = dds },
         .{ .name = "cursed", .module = cursed },
-        .{ .name = "forms",  .module = forms },
         .{ .name = "utils",  .module = utils },
+        .{ .name = "forms",  .module = forms },
       },
     });
     
@@ -97,7 +99,7 @@ pub fn build(b: *std.build) void {
     Prog.linkLibC();
     Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
     Prog.addModule("dds"   , dds);
-    Prog.addModule("cursed", cursed);
+    Prog.addModule("cursed", cursed); 
     Prog.addModule("utils" , utils);
     Prog.addModule("forms" , forms);
     Prog.addModule("grid"  , grid);

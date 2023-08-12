@@ -21,7 +21,7 @@ pub fn isMatch(strVal : [] const  u8, regVal : [] const  u8 ) bool {
   defer re.pcre2_regfree(regex); // IMPORTANT!!
 
 
-  const creg: []u8 = allocator.alloc(u8, regVal.len ,  ) catch unreachable;
+  const creg: []u8 = allocator.alloc(u8, regVal.len ,  ) catch |err| { @panic(@errorName(err));};
   defer allocator.free(creg);
   std.mem.copy(u8, creg, regVal);
 
@@ -32,7 +32,7 @@ pub fn isMatch(strVal : [] const  u8, regVal : [] const  u8 ) bool {
     return false ;
   }
 
-  const cval: []u8 = allocator.alloc(u8, strVal.len ) catch unreachable;
+  const cval: []u8 = allocator.alloc(u8, strVal.len ) catch |err| { @panic(@errorName(err));};
   defer allocator.free(cval);
   std.mem.copy(u8, cval, strVal);
 

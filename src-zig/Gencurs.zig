@@ -81,7 +81,7 @@ pub fn main() !void {
 
 
   //term.resizeTerm(52,172);
-  const termSize = term.getSize() catch |err| {dsperr.errorForms(err); return;};
+  const termSize = term.getSize();
 
 
   fld.MouseDsp = true ; // active display cursor x/y mouse
@@ -122,8 +122,8 @@ pub fn main() !void {
 
     if (nopt == @intFromEnum(choix.exit )) { break; }
 
-    if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) catch unreachable;
-    if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) catch unreachable;
+    if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
+    if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) ;
 
     if (NPANEL.items.len == 0 ) dds.deinitStr();
 

@@ -29,10 +29,11 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
   };
 
   term.getCursor();
-  var Xterm = term.getSize() catch unreachable;
+  var Xterm = term.getSize();
   term.gotoXY(Xterm.height,1) ;
   const allocator = std.heap.page_allocator;
-  var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) catch unreachable;
+  var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) 
+                  catch |err| { @panic(@errorName(err));};
   term.writeStyled(msg,AtrDebug);
   _=term.kbd.getKEY();
   term.gotoXY(term.posCurs.x,term.posCurs.y);
@@ -43,47 +44,10 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
 
   
 
-// function special for developpeur
-// activat fld.myMouse = true
-// read ioField -> getKEY()
- pub fn dspMouse(vpnl: *pnl.PANEL) void {
-    const AtrDebug: dds.ZONATRB = .{
-        .styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
-        .backgr = dds.BackgroundColor.bgBlack,
-        .foregr = dds.ForegroundColor.fgRed,
-    };
-    const allocator = std.heap.page_allocator;
-    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) catch unreachable;
-    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
-    term.writeStyled(msg, AtrDebug);
-    term.gotoXY(term.MouseInfo.x, term.MouseInfo.y);
-    allocator.free(msg);
-}
-
-// function special for developpeur
- pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize) void {
-    const AtrDebug: dds.ZONATRB = .{
-        .styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
-        .backgr = dds.BackgroundColor.bgBlack,
-        .foregr = dds.ForegroundColor.fgRed,
-    };
-    const allocator = std.heap.page_allocator;
-    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) catch unreachable;
-    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
-    term.writeStyled(msg, AtrDebug);
-    term.gotoXY(x_posx, x_posy);
-    allocator.free(msg);
-}
 
 
 /// Errors that may occur when using String
 pub const ErrForms = error{
-        Invalide_append,
-        Invalide_Panel,
-        Invalide_Menu,
-        Invalide_Grid,
-        Invalide_Grid_Buf,
-        grd_dltRows_Index_invalide,
 
         lbl_getIndex_Name_Label_Invalide,
         lbl_getName_Index_invalide,
@@ -132,7 +96,7 @@ pub const ErrForms = error{
         fld_getWidth_Index_invalide,
         fld_getScal_Index_invalide,
         fld_getNbrCar_Index_invalide,
-        fld_gettofill_Index_invalide,
+        fld_getRequier_Index_invalide,
         fld_getProtect_Index_invalide,
         fld_getPading_Index_invalide,
         fld_getEdtcar_Index_invalide,
@@ -157,13 +121,15 @@ pub const ErrForms = error{
 
         fld_dltRows_Index_invalide,
 
+        Invalide_subStr_Index,
 
+        char_not_digital,
     };
 
 
 // Shows serious programming errors
 pub const  dsperr = struct {    
-  pub fn errorForms(errpgm :anyerror ) void { 
+  pub fn errorForms(vpnl: *pnl.PANEL, errpgm :anyerror ) void { 
     // define attribut default MSG Error
     const MsgErr : dds.ZONATRB = .{
         .styled=[_]u32{@intFromEnum(dds.Style.styleBlink),
@@ -173,23 +139,48 @@ pub const  dsperr = struct {
         .backgr = dds.BackgroundColor.bgBlack,
         .foregr = dds.ForegroundColor.fgYellow,
     };
-    const xSize = term.getSize() catch unreachable;
 
     const allocator = std.heap.page_allocator;
 
-    var msgerr:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) catch unreachable; 
-    var x: usize  = xSize.height - 1 ;
-    var y: usize  = 2; 
-    term.gotoXY( x , y    );
+    var errTxt:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) 
+                                    catch |err| { @panic(@errorName(err));};
+    defer allocator.free(errTxt);
+    
+
+    var x: usize  = vpnl.lines;
+    var n: usize  = vpnl.cols * (x - 2) ;
+    var y: usize  = 1 ;
+
+    var msgerr:[]const u8 = utl.concatStr("Info : ", errTxt) ;
+    var boucle : bool= true ;
+
+    if (vpnl.cols < (msgerr.len) )  msgerr = subStr(vpnl, msgerr, 0,  vpnl.cols - 2);
+
+    // clear line button 
+    while (y <= (vpnl.cols - 2) ) : (y += 1) {
+      term.gotoXY(vpnl.posx + x  - 2   , y + vpnl.posy  );
+      term.writeStyled(" ",vpnl.attribut);
+    }
+    // display msgerr
+    y = 1 ;
+    term.gotoXY(vpnl.posx + x  - 2, y + vpnl.posy   );
     term.writeStyled(msgerr,MsgErr);
-    while (true) {
+
+    while (boucle) {
       var e_key = kbd.getKEY();
+
       switch ( e_key.Key ) {
-        .esc => break,
+        .esc=>boucle = false,
       else =>  {},
       }
     }
-    allocator.free(msgerr); 
+
+    // restore line panel
+    while (y <= (vpnl.cols - 2)) : (y += 1) {
+      n += 1;
+      term.gotoXY( vpnl.posx + x  - 2, y + vpnl.posy  );
+      term.writeStyled(vpnl.buf.items[n].ch,vpnl.buf.items[n].attribut);
+    } 
   }
 };
 
@@ -200,6 +191,105 @@ const TERMINAL_CHAR = struct {
   attribut:dds.ZONATRB,
   on:bool
 };
+
+//----------------------------
+// OUTIL 
+//----------------------------
+
+
+/// intern solution substring String
+pub fn subStr( vpnl: *pnl.PANEL, a: []const u8,pos: usize, n:usize) []const u8 {
+  if (n == 0 or n > a.len) {dsperr.errorForms(vpnl, ErrForms.Invalide_subStr_Index);return " " ;}
+
+  if (pos > a.len) {dsperr.errorForms(vpnl, ErrForms.Invalide_subStr_Index);return " " ;}
+
+  const allocator = std.heap.page_allocator;
+  const result = allocator.alloc(u8, n - pos) 
+                catch |err| { @panic(@errorName(err));};
+  defer allocator.free(result);
+
+  std.mem.copy(u8, result, a[pos..n]);
+  return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+                catch |err| { @panic(@errorName(err));};
+}
+
+
+// interne soltion
+fn strToUsize( v : []const u8 ) usize{
+  return std.fmt.parseUnsigned(u64, v,10) 
+        catch |err| { @panic(@errorName(err));};
+}
+
+fn usizeToStr( v : usize ) []const u8{
+
+  return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v})
+  catch |err| { @panic(@errorName(err));};
+}
+
+
+
+pub fn strToUint( str : []const u8) usize{
+
+if( str.len == 0) return 0 ;
+
+var digit: [1][] u8 = undefined;
+var buffer : [100] u8 =  [_]u8{0} ** 100;
+
+digit [0]  = std.fmt.bufPrint(buffer[0..], "{s}",.{str}) 
+                  catch |err| { @panic(@errorName(err));};
+
+      for ( digit, 0..) |d, idx| {
+
+        if ( !std.ascii.isDigit(d[idx])) {
+            dsperr(ErrForms.char_not_digital_invalide);
+            return 0 ;
+        }
+      }
+
+return std.fmt.parseUnsigned(u64, str,10) 
+        catch |err| { @panic(@errorName(err));};
+}
+
+
+pub fn UintToStr(v: usize ) []const u8{
+
+  return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v})
+  catch |err| { @panic(@errorName(err));};
+}
+
+// function special for developpeur
+// activat fld.myMouse = true
+// read ioField -> getKEY()
+ pub fn dspMouse(vpnl: *pnl.PANEL) void {
+    const AtrDebug: dds.ZONATRB = .{
+        .styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
+        .backgr = dds.BackgroundColor.bgBlack,
+        .foregr = dds.ForegroundColor.fgRed,
+    };
+    const allocator = std.heap.page_allocator;
+    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) 
+                      catch |err| { @panic(@errorName(err));};
+    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
+    term.writeStyled(msg, AtrDebug);
+    term.gotoXY(term.MouseInfo.x, term.MouseInfo.y);
+    allocator.free(msg);
+}
+
+// function special for developpeur
+ pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize) void {
+    const AtrDebug: dds.ZONATRB = .{
+        .styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
+        .backgr = dds.BackgroundColor.bgBlack,
+        .foregr = dds.ForegroundColor.fgRed,
+    };
+    const allocator = std.heap.page_allocator;
+    var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) 
+                      catch |err| { @panic(@errorName(err));};
+    term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
+    term.writeStyled(msg, AtrDebug);
+    term.gotoXY(x_posx, x_posy);
+    allocator.free(msg);
+}
 
 
 // defined Label
@@ -1383,7 +1473,8 @@ pub const  fld = struct {
 
 
   pub fn ToStr(text : [] const u8 ) []const u8 {
-    return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{text}) catch unreachable; 
+    return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{text}) 
+                  catch |err| { @panic(@errorName(err));};
   }
 
   // define attribut default Fiel
@@ -1458,7 +1549,7 @@ pub const  fld = struct {
     scal:   usize,
     nbrcar: usize,        // nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =  ALPA..DIGIT..
 
-    tofill: bool,          // tofill or FULL
+    requier: bool,          // requier or FULL
     protect: bool,        // only display
 
     pading: bool,         // pading blank
@@ -1501,7 +1592,7 @@ pub const  fld = struct {
                     vreftyp: dds.REFTYP,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -1514,7 +1605,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = vwidth,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -1530,7 +1621,7 @@ pub const  fld = struct {
         .actif  = true
     };
     if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
-      "{s}",.{vregex}) catch unreachable;
+      "{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
     return xfield;
 
   }
@@ -1542,14 +1633,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.TEXT_FREE,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1560,14 +1651,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.TEXT_FULL,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1577,14 +1668,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
     
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.ALPHA,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1594,14 +1685,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.ALPHA_UPPER,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1611,14 +1702,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.ALPHA_NUMERIC,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1628,14 +1719,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.ALPHA_NUMERIC_UPPER,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1645,14 +1736,14 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
 
     return initFieldString(vname,  vposx, vposy,
                           dds.REFTYP.PASSWORD,
-                          vwidth, vtext, vtofill, verrmsg, vhelp, vregex);
+                          vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
   }
 
   // New Field String  ---> arraylist panel-lfield
@@ -1661,7 +1752,7 @@ pub const  fld = struct {
   pub fn newFieldYesNo(vname: [] const u8,
                     vposx: usize, vposy: usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
 
@@ -1674,7 +1765,7 @@ pub const  fld = struct {
             .width  = 1,
             .scal   = 0,
             .nbrcar = 1,
-            .tofill  = vtofill,
+            .requier  = vrequier,
             .protect = false,
             .pading  = false,
             .edtcar = "",
@@ -1712,7 +1803,7 @@ pub const  fld = struct {
         .width  = 1,
         .scal   = 0,
         .nbrcar = 1,
-        .tofill  = false,
+        .requier  = false,
         .protect = false,
         .pading  = false,
         .edtcar = "",
@@ -1746,7 +1837,7 @@ pub const  fld = struct {
   pub fn newFieldDateFR(vname: [] const u8,
                     vposx: usize, vposy: usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
 
@@ -1759,7 +1850,7 @@ pub const  fld = struct {
         .width  = 10,
         .scal   = 0,
         .nbrcar = 10,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = false,
         .edtcar ="",
@@ -1777,7 +1868,8 @@ pub const  fld = struct {
 
 
     xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
-    ,.{"^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$"}) catch unreachable;
+    ,.{"^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$"}) 
+    catch |err| { @panic(@errorName(err));};
 
     if (xfield.help.len == 0 ) xfield.help = "ex: date DD/MM/YYYY" ;
 
@@ -1794,7 +1886,7 @@ pub const  fld = struct {
   pub fn newFieldDateUS(vname: [] const u8,
                     vposx: usize, vposy: usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
 
@@ -1807,7 +1899,7 @@ pub const  fld = struct {
         .width  = 10,
         .scal   = 0,
         .nbrcar = 10,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = false,
         .edtcar ="",
@@ -1824,7 +1916,8 @@ pub const  fld = struct {
     };
 
     xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
-    ,.{"^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" }) catch unreachable;
+    ,.{"^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" })
+    catch |err| { @panic(@errorName(err));};
 
     if (xfield.help.len == 0 ) xfield.help = "ex: date MM/DD/YYYY";
 
@@ -1842,7 +1935,7 @@ pub const  fld = struct {
   pub fn newFieldDateISO(vname: [] const u8,
                     vposx: usize, vposy: usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
 
@@ -1855,7 +1948,7 @@ pub const  fld = struct {
         .width  = 10,
         .scal   = 0,
         .nbrcar = 10,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = false,
         .edtcar ="",
@@ -1873,7 +1966,8 @@ pub const  fld = struct {
 
 
     xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
-    ,.{"^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$"}) catch unreachable;
+    ,.{"^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$"})
+    catch |err| { @panic(@errorName(err));};
 
     if (xfield.help.len == 0 )  xfield.help = "ex: date YYYY-MM-DD" ;
 
@@ -1890,7 +1984,7 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
 
@@ -1902,7 +1996,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = vwidth,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -1922,7 +2016,8 @@ pub const  fld = struct {
       // https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
       // chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.
       xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
-      ,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"}) catch unreachable;
+      ,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"})
+      catch |err| { @panic(@errorName(err));};
       
       if (xfield.help.len == 0 ) xfield.help = "ex: myname.myfirstname@gmail.com" ;
         
@@ -1939,7 +2034,7 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -1952,7 +2047,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = vwidth,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -1969,10 +2064,11 @@ pub const  fld = struct {
       };
 
       if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
-      "^{s}",.{vregex}) catch unreachable;
+      "^{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
       // regex standar
       if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
-      ,.{"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"}) catch unreachable;
+      ,.{"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"})
+      catch |err| { @panic(@errorName(err));};
 
       if (xfield.help.len == 0 ) xfield.help = "ex fr : +(33)6.12.131.141" ;
 
@@ -1987,7 +2083,7 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -2000,7 +2096,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = vwidth,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -2017,7 +2113,8 @@ pub const  fld = struct {
     };
 
       if (vregex.len == 0 ) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[0-9]{{1,{d}}}$",.{xfield.width}) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[0-9]{{1,{d}}}$",.{xfield.width})
+        catch |err| { @panic(@errorName(err));};
       }
       if (xfield.help.len == 0 ) xfield.help = "ex: 0..9" ;
 
@@ -2031,7 +2128,7 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -2044,7 +2141,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = 0,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -2061,7 +2158,8 @@ pub const  fld = struct {
     };
       xfield.nbrcar = xfield.width + xfield.scal  + 1 ;
       if (vregex.len == 0 ) {
-        xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[+-][0-9]{{1,{d}}}$",.{xfield.width}) catch unreachable;
+        xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[+-][0-9]{{1,{d}}}$",.{xfield.width})
+        catch |err| { @panic(@errorName(err));};
       }
       if (xfield.help.len == 0 ) xfield.help = "ex: +0..9" ;
 
@@ -2076,7 +2174,7 @@ pub const  fld = struct {
                     vwidth:  usize,
                     vscal:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -2089,7 +2187,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = vscal,
         .nbrcar = 0,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -2111,9 +2209,11 @@ pub const  fld = struct {
 
     if (vregex.len == 0 ) {
       if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
-      "^[0-9]{{1,{d}}}$",.{vwidth})  catch unreachable
+      "^[0-9]{{1,{d}}}$",.{vwidth})  catch |err| { @panic(@errorName(err));}
+
       else xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
-      "^[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal,})  catch unreachable;
+      "^[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal,})
+      catch |err| { @panic(@errorName(err));};
     }
     if (xfield.help.len == 0 ) xfield.help = "ex: 12301 or 123.01" ;
 
@@ -2128,7 +2228,7 @@ pub const  fld = struct {
                     vwidth: usize,
                     vscal:  usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     verrmsg: []const u8,
                     vhelp: []const u8,
                     vregex: []const u8) FIELD {
@@ -2141,7 +2241,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = vscal,
         .nbrcar = 0,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = true,
         .edtcar ="",
@@ -2163,9 +2263,11 @@ pub const  fld = struct {
     if (vregex.len == 0 ) {
 
       if (vscal == 0 ) xfield.regex =  std.fmt.allocPrint(dds.allocatorPnl,
-      "^[+-][0-9]{{1,{d}}}$",.{vwidth})  catch unreachable
+      "^[+-][0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
+
       else xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
-      "^[+-][0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) catch unreachable;
+      "^[+-][0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) 
+      catch |err| { @panic(@errorName(err));};
 
     }
     if (xfield.help.len == 0 ) xfield.help = "ex: +12301 or +123.01" ;
@@ -2181,7 +2283,7 @@ pub const  fld = struct {
                     vposx: usize, vposy: usize,
                     vwidth: usize,
                     vtext: []const u8,
-                    vtofill: bool,
+                    vrequier: bool,
                     vprocfunc:  [] const u8,
                     verrmsg: []const u8,
                     vhelp: []const u8) FIELD {
@@ -2194,7 +2296,7 @@ pub const  fld = struct {
         .width  = vwidth,
         .scal   = 0,
         .nbrcar = vwidth,
-        .tofill  = vtofill,
+        .requier  = vrequier,
         .protect = false,
         .pading  = false,
         .edtcar = "",
@@ -2252,9 +2354,9 @@ pub const  fld = struct {
     if ( n < vpnl.field.items.len) return vpnl.field.items[n].nbrcar;
     return ErrForms.fld_getNbrCar_Index_invalide ;
   }
-  pub fn gettofill(vpnl: *pnl.PANEL , n: usize)  ErrForms ! bool {
-    if ( n < vpnl.field.items.len) return vpnl.field.items[n].tofill;
-    return ErrForms.fld_gettofill_Index_invalide ;
+  pub fn getRequier(vpnl: *pnl.PANEL , n: usize)  ErrForms ! bool {
+    if ( n < vpnl.field.items.len) return vpnl.field.items[n].requier;
+    return ErrForms.fld_getRequier_Index_invalide ;
   }
   pub fn getProtect(vpnl: *pnl.PANEL , n: usize)  ErrForms ! bool {
     if ( n < vpnl.field.items.len) return vpnl.field.items[n].protect;
@@ -2333,6 +2435,12 @@ pub const  fld = struct {
     if ( n < vpnl.field.items.len)  vpnl.field.items[n].protect = val
     else return ErrForms.fld_setProtect_Index_invalide;
   }
+
+  pub fn setRequier(vpnl: *pnl.PANEL , n: usize, val :bool)  ErrForms ! void {
+    if ( n < vpnl.field.items.len)  vpnl.field.items[n].protect = val
+    else return ErrForms.fld_setProtect_Index_invalide;
+  }
+
   pub fn setEdtcar(vpnl: *pnl.PANEL , n: usize, val:[] const u8)  ErrForms ! void {
     if ( n < vpnl.field.items.len) vpnl.field.items[n].edtcar = val
     else return ErrForms.fld_setEdtcar_Index_invalide;
@@ -2483,7 +2591,7 @@ pub const  fld = struct {
 
   fn delete(n : usize) void {
     _=e_FIELD.orderedRemove(n);
-    e_FIELD.append(" ") catch unreachable;
+    e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
   }
 
   fn insert(c: [] const u8 , n : usize) void {
@@ -2494,23 +2602,23 @@ pub const  fld = struct {
     defer x_FIELD.deinit();
 
     for ( e_FIELD.items) |ch | {
-      x_FIELD.append(ch) catch unreachable ;
+      x_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
     }
     e_FIELD.clearRetainingCapacity();
 
 
     for ( x_FIELD.items ,0..) |ch , idx | {
-      if ( n != idx) e_FIELD.append(ch) catch unreachable ;
+      if ( n != idx) e_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
       if ( n == idx) { 
-        e_FIELD.append(c) catch unreachable ;
-        e_FIELD.append(ch) catch unreachable ;
+        e_FIELD.append(c)  catch |err| { @panic(@errorName(err));};
+        e_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
       } 
     }
   }
 
 
 
-  fn istofill() bool {
+  fn isrequier() bool {
     var text = utl.listToStr(e_FIELD);
     text = utl.trimStr(text);
 
@@ -2558,7 +2666,7 @@ pub const  fld = struct {
     e_FIELD.clearRetainingCapacity();
     if ( f.reftyp == dds.REFTYP.SWITCH) {
       if (e_switch == true ) 
-        utl.addListStr(&e_FIELD  , dds.STRUE)  
+        utl.addListStr(&e_FIELD  , dds.STRUE) 
       else
         utl.addListStr(&e_FIELD  , dds.SFALSE);
     }
@@ -2566,7 +2674,7 @@ pub const  fld = struct {
         utl.addListStr(&e_FIELD  , f.text);
       var i:usize = 0 ;
       while (i < f.nbrcar - f.text.len) : ( i += 1) {
-        e_FIELD.append(" ") catch unreachable;
+        e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
       }
     }
   }
@@ -2592,7 +2700,7 @@ pub const  fld = struct {
     var msghlp:[]const u8 = utl.concatStr("Help : ", f.help) ;
     var boucle : bool= true ;
 
-    if (vpnl.cols < (msghlp.len) )  msghlp = utl.subStr(msghlp,0,  vpnl.cols - 2) catch |err| {dsperr.errorForms(err); return;};
+    if (vpnl.cols < (msghlp.len) )  msghlp = subStr(vpnl, msghlp,0,  vpnl.cols - 2);
 
     // clear line button 
     while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -2642,7 +2750,7 @@ pub const  fld = struct {
     var msgerr:[]const u8 = utl.concatStr("Info : ", info) ;
     var boucle : bool= true ;
 
-    if (vpnl.cols < (msgerr.len) )  msgerr = utl.subStr(msgerr, 0,  vpnl.cols - 2) catch |err| {dsperr.errorForms(err); return;};
+    if (vpnl.cols < (msgerr.len) )  msgerr = subStr(vpnl, msgerr, 0,  vpnl.cols - 2);
 
     // clear line button 
     while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -2841,16 +2949,16 @@ pub const  fld = struct {
           },
           .enter , .up , .down => {  // enrg to Field
 
-            //check tofill and field.len > 0
-            if (vfld.tofill and utl.trimStr(utl.listToStr(e_FIELD)).len == 0 ) {
+            //check requier and field.len > 0
+            if (vfld.requier and utl.trimStr(utl.listToStr(e_FIELD)).len == 0 ) {
               msgErr(vpnl,vfld,vfld.errmsg);
               e_curs = e_posy;
               e_count = 0;
               continue;
             }
 
-            //check tofill and field.len > 0 and regexLen > 0 execute regex
-            if ( vfld.regex.len > 0 and vfld.tofill and utl.trimStr(utl.listToStr(e_FIELD)).len > 0) {
+            //check requier and field.len > 0 and regexLen > 0 execute regex
+            if ( vfld.regex.len > 0 and vfld.requier and utl.trimStr(utl.listToStr(e_FIELD)).len > 0) {
                 if ( ! reg.isMatch(utl.trimStr(utl.listToStr(e_FIELD)) ,vfld.regex) ) {
                   msgErr(vpnl,vfld,vfld.errmsg);
                   e_curs = e_posy;
@@ -2861,13 +2969,15 @@ pub const  fld = struct {
 
 
             //write value keyboard to field.text return key
-            nfield = getIndex(vpnl,vfld.name) catch unreachable;
+            nfield = getIndex(vpnl,vfld.name) catch |err| { @panic(@errorName(err));};
 
-            if (vfld.reftyp == dds.REFTYP.SWITCH) setSwitch(vpnl, nfield, e_switch ) catch unreachable
+            if (vfld.reftyp == dds.REFTYP.SWITCH) setSwitch(vpnl, nfield, e_switch ) 
+              catch |err| { @panic(@errorName(err));}
             
             else {
               
-              setText(vpnl, nfield, ToStr(utl.trimStr(utl.listToStr(e_FIELD)))) catch unreachable;
+              setText(vpnl, nfield, ToStr(utl.trimStr(utl.listToStr(e_FIELD)))) 
+              catch |err| { @panic(@errorName(err));};
             }
             vpnl.keyField = Fkey.Key; 
             // control is task 
@@ -3268,11 +3378,7 @@ pub const  pnl = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        xpanel.buf.append(doublebuffer) catch {
-                                    std.debug.print("newPanel err={}\n", .{ErrForms.Invalide_Panel});
-                                    _= kbd.getKEY(); 
-                                    break ;
-                                  };
+        xpanel.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
         i -=1 ;
     }
 
@@ -3297,7 +3403,8 @@ pub const  pnl = struct {
                   vcadre : dds.CADRE,
                   vtitle: [] const u8 ) *PANEL {
 
-    var device = dds.allocatorPnl.create(PANEL) catch unreachable ;
+    var device = dds.allocatorPnl.create(PANEL) 
+                  catch |err| { @panic(@errorName(err)) ; };
 
     device.name   = vname;
     device.posx   = vposx;
@@ -3328,11 +3435,7 @@ pub const  pnl = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        device.buf.append(doublebuffer) catch {
-                                    std.debug.print("newPanel err={}\n", .{ErrForms.Invalide_Panel});
-                                    _= kbd.getKEY(); 
-                                    break;
-                                  };
+        device.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
         i -=1 ;
     }
 
@@ -3361,7 +3464,7 @@ pub const  pnl = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        vpnl.buf.append(doublebuffer) catch unreachable;
+        vpnl.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
         i -=1 ;
     }
   }
@@ -3544,7 +3647,7 @@ pub const  pnl = struct {
 
     var msgerr:[]const u8 = utl.concatStr("Info : ", info);
 
-    if (vpnl.cols < (msgerr.len) )  msgerr = utl.subStr(msgerr, 0, vpnl.cols - 2) catch |err| {dsperr.errorForms(err); return;};
+    if (vpnl.cols < (msgerr.len) )  msgerr = subStr(vpnl, msgerr, 0, vpnl.cols - 2) ;
 
 
     while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -3616,13 +3719,13 @@ pub const  pnl = struct {
 
     for (vpnl.field.items, 0..) |f, idx| {
       if ( !f.protect and f.actif) {
-        //check tofill and field.len > 0
-        if (f.tofill and utl.trimStr(f.text).len == 0 ) {
+        //check requier and field.len > 0
+        if (f.requier and utl.trimStr(f.text).len == 0 ) {
             vpnl.idxfld = idx;
             return false;
         }
-        //check tofill and field.len > 0 and regexLen > 0 execute regex
-        if ( f.regex.len > 0 and f.tofill and utl.trimStr(f.text).len > 0) {
+        //check requier and field.len > 0 and regexLen > 0 execute regex
+        if ( f.regex.len > 0 and f.requier and utl.trimStr(f.text).len > 0) {
             if ( !reg.isMatch(utl.trimStr(f.text) ,f.regex)) {
               vpnl.idxfld = idx;
               return false;

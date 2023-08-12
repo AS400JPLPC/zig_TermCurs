@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>cursed.zig - source view</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPNJREFUeNpi/P//PwMlgOXHUjly9E0G4hwgZmQiQZMqEK8H4v9QzUEgQSaoADK+zhH9iAGL+C0gDoAaNg9mGLoLfgA1awK9hS9gzgJxA9RQBmQDrgMxJzRMGKE4HYj/Ial5A8QmQLwCJoBsgBYW2+TR1ChDaWt4LOBxKsi/VUh8XiD+gq4IVyzwQAMJBoKwacZlAB8Qf0bi96IZhtOAe1D6LpqaEiz6rmEzQAeIzwGxCJpieFqApo/vQKyJboAaEBsAsSEupwI1MwKjGBTVHOhegMX5UajYRqiBjMgYmj400cVh0XgTiKdC0zhJgJHS7AwQYABm9EAdCKrEfAAAAABJRU5ErkJggg=="/>
+    <style>
+      body{
+        font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      pre > code {
+        display: block;
+        overflow: auto;
+        line-height: normal;
+        margin: 0em;
+      }
+      .tok-kw {
+          color: #333;
+          font-weight: bold;
+      }
+      .tok-str {
+          color: #d14;
+      }
+      .tok-builtin {
+          color: #005C7A;
+      }
+      .tok-comment {
+          color: #545454;
+          font-style: italic;
+      }
+      .tok-fn {
+          color: #900;
+          font-weight: bold;
+      }
+      .tok-null {
+          color: #005C5C;
+      }
+      .tok-number {
+          color: #005C5C;
+      }
+      .tok-type {
+          color: #458;
+          font-weight: bold;
+      }
+      pre {
+        counter-reset: line;
+      }
+      pre .line:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        padding-right: 1em;
+        width: 2em;
+        text-align: right;
+        color: #999;
+      }
+      
+      .line {
+        width: 100%;
+        display: inline-block;
+      }
+      .line:target {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        background: #fafafa;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body{
+            background:#222;
+            color: #ccc;
+        }
+        pre > code {
+            color: #ccc;
+            background: #222;
+            border: unset;
+        }
+        .line:target {
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #444;
+            background: #333;
+        }
+        .tok-kw {
+            color: #eee;
+        }
+        .tok-str {
+            color: #2e5;
+        }
+        .tok-builtin {
+            color: #ff894c;
+        }
+        .tok-comment {
+            color: #aa7;
+        }
+        .tok-fn {
+            color: #B1A0F8;
+        }
+        .tok-null {
+            color: #ff8080;
+        }
+        .tok-number {
+            color: #ff8080;
+        }
+        .tok-type {
+            color: #68f;
+        }
+      }
+    </style>
+</head>
+<body>
+<pre><code><span class="line" id="L1"><span class="tok-kw">const</span> std = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>);</span>
+<span class="line" id="L2"><span class="tok-kw">const</span> utf = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>).unicode;</span>
+<span class="line" id="L3"><span class="tok-kw">const</span> dds = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;dds&quot;</span>);</span>
+<span class="line" id="L4"></span>
+<span class="line" id="L5"></span>
+<span class="line" id="L6"><span class="tok-kw">const</span> io = std.io;</span>
+<span class="line" id="L7"><span class="tok-kw">const</span> os = std.os;</span>
+<span class="line" id="L8"><span class="tok-kw">const</span> fs = std.fs;</span>
+<span class="line" id="L9"></span>
+<span class="line" id="L10"><span class="tok-comment">/// Define use terminal basic</span></span>
+<span class="line" id="L11"><span class="tok-kw">var</span> TTY: fs.File = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L12"></span>
+<span class="line" id="L13"><span class="tok-kw">var</span> original_termios: os.linux.termios = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L14"><span class="tok-kw">var</span> use_termios: os.linux.termios = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L15"></span>
+<span class="line" id="L16"></span>
+<span class="line" id="L17"></span>
+<span class="line" id="L18"><span class="tok-comment">// outils</span>
+</span>
+<span class="line" id="L19"><span class="tok-comment">/// Iterator support iteration string</span></span>
+<span class="line" id="L20"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> iteratStr = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L21">  <span class="tok-kw">var</span> strbuf:[] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L22"></span>
+<span class="line" id="L23">  <span class="tok-kw">var</span> arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);</span>
+<span class="line" id="L24">  <span class="tok-comment">//defer arena.deinit();</span>
+</span>
+<span class="line" id="L25">  <span class="tok-kw">const</span> allocator = arenastr.allocator();</span>
+<span class="line" id="L26"></span>
+<span class="line" id="L27">  <span class="tok-comment">/// Errors that may occur when using String</span></span>
+<span class="line" id="L28">  <span class="tok-kw">pub</span> <span class="tok-kw">const</span> ErrNbrch = <span class="tok-kw">error</span>{</span>
+<span class="line" id="L29">      InvalideAllocBuffer,</span>
+<span class="line" id="L30">  };</span>
+<span class="line" id="L31">  </span>
+<span class="line" id="L32"></span>
+<span class="line" id="L33"></span>
+<span class="line" id="L34">  <span class="tok-kw">pub</span> <span class="tok-kw">const</span> StringIterator = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L35">        buf: []<span class="tok-type">u8</span> ,</span>
+<span class="line" id="L36">        index: <span class="tok-type">usize</span> ,</span>
+<span class="line" id="L37"></span>
+<span class="line" id="L38"></span>
+<span class="line" id="L39">    <span class="tok-kw">fn</span> <span class="tok-fn">allocBuffer</span> ( size :<span class="tok-type">usize</span>) ErrNbrch![]<span class="tok-type">u8</span> {</span>
+<span class="line" id="L40">      <span class="tok-kw">var</span> buf = allocator.alloc(<span class="tok-type">u8</span>, size) <span class="tok-kw">catch</span> {</span>
+<span class="line" id="L41">              <span class="tok-kw">return</span> ErrNbrch.InvalideAllocBuffer;</span>
+<span class="line" id="L42">          };</span>
+<span class="line" id="L43">      <span class="tok-kw">return</span> buf;</span>
+<span class="line" id="L44">    }</span>
+<span class="line" id="L45"></span>
+<span class="line" id="L46">    <span class="tok-comment">/// Deallocates the internal buffer</span></span>
+<span class="line" id="L47">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">deinit</span>(self: *StringIterator) <span class="tok-type">void</span> {</span>
+<span class="line" id="L48">        <span class="tok-kw">if</span> (self.buf.len &gt; <span class="tok-number">0</span>)  allocator.free(self.buf);</span>
+<span class="line" id="L49">    }</span>
+<span class="line" id="L50"></span>
+<span class="line" id="L51">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">next</span>(it: *StringIterator) ?[]<span class="tok-kw">const</span> <span class="tok-type">u8</span> {</span>
+<span class="line" id="L52">        <span class="tok-kw">var</span> optional_buf: ?[]<span class="tok-type">u8</span>  = allocBuffer(strbuf.len) <span class="tok-kw">catch</span> <span class="tok-kw">return</span> <span class="tok-null">null</span>;</span>
+<span class="line" id="L53">        </span>
+<span class="line" id="L54">        it.buf= optional_buf <span class="tok-kw">orelse</span> <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L55">        <span class="tok-kw">var</span> idx : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L56"></span>
+<span class="line" id="L57">        <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L58">            <span class="tok-kw">if</span> (idx &gt;= strbuf.len) <span class="tok-kw">break</span>;</span>
+<span class="line" id="L59">            it.buf[idx] = strbuf[idx];</span>
+<span class="line" id="L60">            idx += <span class="tok-number">1</span>;</span>
+<span class="line" id="L61">        }</span>
+<span class="line" id="L62"></span>
+<span class="line" id="L63">        <span class="tok-kw">if</span> (it.index == it.buf.len) <span class="tok-kw">return</span> <span class="tok-null">null</span>;</span>
+<span class="line" id="L64">        idx = it.index;</span>
+<span class="line" id="L65">        it.index += getUTF8Size(it.buf[idx]);</span>
+<span class="line" id="L66">        <span class="tok-kw">return</span> it.buf[idx..it.index];</span>
+<span class="line" id="L67"></span>
+<span class="line" id="L68">    }</span>
+<span class="line" id="L69">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">preview</span>(it: *StringIterator) ?[]<span class="tok-kw">const</span> <span class="tok-type">u8</span> {</span>
+<span class="line" id="L70">        <span class="tok-kw">var</span> optional_buf: ?[]<span class="tok-type">u8</span>  = allocBuffer(strbuf.len) <span class="tok-kw">catch</span> <span class="tok-kw">return</span> <span class="tok-null">null</span>;</span>
+<span class="line" id="L71">        </span>
+<span class="line" id="L72">        it.buf= optional_buf <span class="tok-kw">orelse</span> <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L73">        <span class="tok-kw">var</span> idx : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L74">        <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L75">            <span class="tok-kw">if</span> (idx &gt;= strbuf.len) <span class="tok-kw">break</span>;</span>
+<span class="line" id="L76">            it.buf[idx] = strbuf[idx];</span>
+<span class="line" id="L77">            idx += <span class="tok-number">1</span>;</span>
+<span class="line" id="L78">        }</span>
+<span class="line" id="L79"></span>
+<span class="line" id="L80">        <span class="tok-kw">if</span> (it.index == <span class="tok-number">0</span>) <span class="tok-kw">return</span> <span class="tok-null">null</span>;</span>
+<span class="line" id="L81">        idx = it.buf.len;</span>
+<span class="line" id="L82">        it.index -= getUTF8Size(it.buf[idx]);</span>
+<span class="line" id="L83">        <span class="tok-kw">return</span> it.buf[idx..it.index];</span>
+<span class="line" id="L84"></span>
+<span class="line" id="L85">    }</span>
+<span class="line" id="L86">  };</span>
+<span class="line" id="L87"></span>
+<span class="line" id="L88">  <span class="tok-comment">/// iterator String</span></span>
+<span class="line" id="L89">  <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">iterator</span>(str:[] <span class="tok-kw">const</span> <span class="tok-type">u8</span>) StringIterator {</span>
+<span class="line" id="L90">      strbuf = str;</span>
+<span class="line" id="L91">      <span class="tok-kw">return</span> StringIterator{</span>
+<span class="line" id="L92">          .buf = <span class="tok-null">undefined</span>,</span>
+<span class="line" id="L93">          .index = <span class="tok-number">0</span>,</span>
+<span class="line" id="L94">      };</span>
+<span class="line" id="L95">  }</span>
+<span class="line" id="L96"></span>
+<span class="line" id="L97">  <span class="tok-comment">/// Returns the UTF-8 character's size</span></span>
+<span class="line" id="L98">  <span class="tok-kw">fn</span> <span class="tok-fn">getUTF8Size</span>(char: <span class="tok-type">u8</span>) <span class="tok-type">u3</span> {</span>
+<span class="line" id="L99">      <span class="tok-kw">return</span> std.unicode.utf8ByteSequenceLength(char) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L100">  }</span>
+<span class="line" id="L101">};</span>
+<span class="line" id="L102"></span>
+<span class="line" id="L103"><span class="tok-comment">/// flush terminal in-out</span></span>
+<span class="line" id="L104"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">flushIO</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L105">    _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &amp;use_termios);</span>
+<span class="line" id="L106">}</span>
+<span class="line" id="L107"></span>
+<span class="line" id="L108"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L109"><span class="tok-comment">/// mouse</span></span>
+<span class="line" id="L110"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L111"><span class="tok-comment">/// onMouse</span></span>
+<span class="line" id="L112"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">onMouse</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L113">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L114">  writer.writeAll(<span class="tok-str">&quot;\x1b[?1000;1005;1006h&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L115">}</span>
+<span class="line" id="L116"></span>
+<span class="line" id="L117"><span class="tok-comment">/// offMouse</span></span>
+<span class="line" id="L118"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">offMouse</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L119">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L120">  writer.writeAll(<span class="tok-str">&quot;\x1b[?1000;1005;1006l&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L121">}</span>
+<span class="line" id="L122"></span>
+<span class="line" id="L123"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L124"><span class="tok-comment">/// clear</span></span>
+<span class="line" id="L125"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L126"><span class="tok-comment">/// Clear from cursor until end of screen</span></span>
+<span class="line" id="L127"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls_from_cursor_toEndScreen</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L128">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L129">  writer.writeAll(<span class="tok-str">&quot;\x1b[0J&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L130">}</span>
+<span class="line" id="L131"></span>
+<span class="line" id="L132"><span class="tok-comment">/// Clear from cursor to beginning of screen</span></span>
+<span class="line" id="L133"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls_from_cursor_toStartScreen</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L134">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L135">  writer.writeAll(<span class="tok-str">&quot;\x1b[1J&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L136">}</span>
+<span class="line" id="L137"></span>
+<span class="line" id="L138"><span class="tok-comment">/// Clear all screen</span></span>
+<span class="line" id="L139"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L140">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L141">  writer.writeAll(<span class="tok-str">&quot;\x1b[2J&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L142">  writer.writeAll(<span class="tok-str">&quot;\x1b[3J&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L143">}</span>
+<span class="line" id="L144"></span>
+<span class="line" id="L145"><span class="tok-comment">/// Clear from cursor to end of line</span></span>
+<span class="line" id="L146"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls_from_cursor_toEndline</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L147">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L148">  writer.writeAll(<span class="tok-str">&quot;\x1b[0K&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L149">}</span>
+<span class="line" id="L150"></span>
+<span class="line" id="L151"><span class="tok-comment">/// Clear start of line to the cursor</span></span>
+<span class="line" id="L152"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls_from_cursor_toStartLine</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L153">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L154">  writer.writeAll(<span class="tok-str">&quot;\x1b[1K&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L155">}</span>
+<span class="line" id="L156"></span>
+<span class="line" id="L157"><span class="tok-comment">/// Clear from cursor to end of line</span></span>
+<span class="line" id="L158"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cls_line</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L159">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L160">  writer.writeAll(<span class="tok-str">&quot;\x1b[2K&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L161">}</span>
+<span class="line" id="L162"></span>
+<span class="line" id="L163"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L164"><span class="tok-comment">/// cursor</span></span>
+<span class="line" id="L165"><span class="tok-comment">///-------------</span></span>
+<span class="line" id="L166"><span class="tok-kw">const</span> Point = <span class="tok-kw">struct</span> { x: <span class="tok-type">usize</span>, y: <span class="tok-type">usize</span> };</span>
+<span class="line" id="L167"></span>
+<span class="line" id="L168"><span class="tok-kw">pub</span> <span class="tok-kw">var</span> posCurs: Point = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L169"></span>
+<span class="line" id="L170"><span class="tok-comment">/// Moves cursor to `x` column and `y` row</span></span>
+<span class="line" id="L171"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">gotoXY</span>(x: <span class="tok-type">usize</span>, y: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L172">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L173">  writer.print(<span class="tok-str">&quot;\x1b[{d};{d}H&quot;</span>, .{ x, y }) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L174">}</span>
+<span class="line" id="L175"></span>
+<span class="line" id="L176"><span class="tok-comment">/// Moves cursor up `y` rows</span></span>
+<span class="line" id="L177"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">gotoUp</span>(x: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L178">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L179">  writer.print(<span class="tok-str">&quot;\x1b[{d}A&quot;</span>, .{x}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L180">}</span>
+<span class="line" id="L181"></span>
+<span class="line" id="L182"><span class="tok-comment">/// Moves cursor down `y` rows</span></span>
+<span class="line" id="L183"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">gotoDown</span>(x: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L184">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L185">  writer.print(<span class="tok-str">&quot;\x1b[{d}B&quot;</span>, .{x}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L186">}</span>
+<span class="line" id="L187"></span>
+<span class="line" id="L188"><span class="tok-comment">/// Moves cursor left `y` columns</span></span>
+<span class="line" id="L189"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">gotoLeft</span>(y: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L190">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L191">  writer.print(<span class="tok-str">&quot;\x1b[{d}D&quot;</span>, .{y}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L192">}</span>
+<span class="line" id="L193"></span>
+<span class="line" id="L194"><span class="tok-comment">/// Moves cursor right `y` columns</span></span>
+<span class="line" id="L195"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">gotoRight</span>(y: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L196">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L197">  writer.print(<span class="tok-str">&quot;\x1b[{d}C&quot;</span>, .{y}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L198">}</span>
+<span class="line" id="L199"></span>
+<span class="line" id="L200"><span class="tok-comment">/// Hide the cursor</span></span>
+<span class="line" id="L201"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cursHide</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L202">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L203">  writer.print(<span class="tok-str">&quot;\x1b[?25l&quot;</span>, .{}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L204">}</span>
+<span class="line" id="L205"></span>
+<span class="line" id="L206"><span class="tok-comment">/// Show the cursor</span></span>
+<span class="line" id="L207"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">cursShow</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L208">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L209">  writer.writeAll(<span class="tok-str">&quot;\x1b[?25h&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L210">}</span>
+<span class="line" id="L211"></span>
+<span class="line" id="L212"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">defCursor</span>(e_curs: dds.typeCursor) <span class="tok-type">void</span> {</span>
+<span class="line" id="L213">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L214">    <span class="tok-comment">// define type  Cursor form terminal</span>
+</span>
+<span class="line" id="L215">    <span class="tok-kw">switch</span> (e_curs) {</span>
+<span class="line" id="L216">        .cDefault =&gt; {</span>
+<span class="line" id="L217">            writer.writeAll(<span class="tok-str">&quot;\x1b[0 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">// 0 → default terminal</span>
+</span>
+<span class="line" id="L218">        },</span>
+<span class="line" id="L219">        .cBlink =&gt; {</span>
+<span class="line" id="L220">            writer.writeAll(<span class="tok-str">&quot;\x1b[1 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">// 1 → blinking block</span>
+</span>
+<span class="line" id="L221">        },</span>
+<span class="line" id="L222">        .cSteady =&gt; {</span>
+<span class="line" id="L223">            writer.writeAll(<span class="tok-str">&quot;\x1b[2 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">//  2 → steady block</span>
+</span>
+<span class="line" id="L224">        },</span>
+<span class="line" id="L225">        .cBlinkUnderline =&gt; {</span>
+<span class="line" id="L226">            writer.writeAll(<span class="tok-str">&quot;\x1b[3 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">//  3 → blinking underlines</span>
+</span>
+<span class="line" id="L227">        },</span>
+<span class="line" id="L228">        .cSteadyUnderline =&gt; {</span>
+<span class="line" id="L229">            writer.writeAll(<span class="tok-str">&quot;\x1b[4 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">//  4 → steady underlines</span>
+</span>
+<span class="line" id="L230">        },</span>
+<span class="line" id="L231">        .cBlinkBar =&gt; {</span>
+<span class="line" id="L232">            writer.writeAll(<span class="tok-str">&quot;\x1b[5 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">//  5 → blinking bar</span>
+</span>
+<span class="line" id="L233">        },</span>
+<span class="line" id="L234">        .cSteadyBar =&gt; {</span>
+<span class="line" id="L235">            writer.writeAll(<span class="tok-str">&quot;\x1b[6 q&quot;</span>) <span class="tok-kw">catch</span> {}; <span class="tok-comment">//  6 → steady bar</span>
+</span>
+<span class="line" id="L236">        },</span>
+<span class="line" id="L237">    }</span>
+<span class="line" id="L238">    writer.writeAll(<span class="tok-str">&quot;\x1b[?25h&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L239">}</span>
+<span class="line" id="L240"></span>
+<span class="line" id="L241"><span class="tok-kw">fn</span> <span class="tok-fn">convIntCursor</span>(x: <span class="tok-type">u8</span>) <span class="tok-type">usize</span> {</span>
+<span class="line" id="L242">    <span class="tok-kw">switch</span> (x) {</span>
+<span class="line" id="L243">        <span class="tok-str">'0'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">0</span>,</span>
+<span class="line" id="L244">        <span class="tok-str">'1'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">1</span>,</span>
+<span class="line" id="L245">        <span class="tok-str">'2'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">2</span>,</span>
+<span class="line" id="L246">        <span class="tok-str">'3'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">3</span>,</span>
+<span class="line" id="L247">        <span class="tok-str">'4'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">4</span>,</span>
+<span class="line" id="L248">        <span class="tok-str">'5'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">5</span>,</span>
+<span class="line" id="L249">        <span class="tok-str">'6'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">6</span>,</span>
+<span class="line" id="L250">        <span class="tok-str">'7'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">7</span>,</span>
+<span class="line" id="L251">        <span class="tok-str">'8'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">8</span>,</span>
+<span class="line" id="L252">        <span class="tok-str">'9'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">9</span>,</span>
+<span class="line" id="L253">        <span class="tok-kw">else</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">0</span>,</span>
+<span class="line" id="L254">    }</span>
+<span class="line" id="L255">}</span>
+<span class="line" id="L256"></span>
+<span class="line" id="L257"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getCursor</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L258">    <span class="tok-comment">// get Cursor form terminal</span>
+</span>
+<span class="line" id="L259">    <span class="tok-kw">var</span> cursBuf: [<span class="tok-number">13</span>]<span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L260">    <span class="tok-kw">const</span> wtty = TTY.writer();</span>
+<span class="line" id="L261"></span>
+<span class="line" id="L262">    posCurs.x = <span class="tok-number">0</span>;</span>
+<span class="line" id="L263">    posCurs.y = <span class="tok-number">0</span>;</span>
+<span class="line" id="L264"></span>
+<span class="line" id="L265">    flushIO();</span>
+<span class="line" id="L266"></span>
+<span class="line" id="L267">    <span class="tok-comment">// Don't forget to flush!</span>
+</span>
+<span class="line" id="L268">    wtty.writeAll(<span class="tok-str">&quot;\x1b[?6n&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L269"></span>
+<span class="line" id="L270">    <span class="tok-kw">var</span> c: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L271">    <span class="tok-kw">while</span> (c == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L272">        c = TTY.read(&amp;cursBuf) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L273">    }</span>
+<span class="line" id="L274">    flushIO();</span>
+<span class="line" id="L275">    </span>
+<span class="line" id="L276">    <span class="tok-comment">// columns = 1 digit</span>
+</span>
+<span class="line" id="L277">    <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">4</span>] == <span class="tok-number">59</span>) {</span>
+<span class="line" id="L278">      posCurs.x = convIntCursor(cursBuf[<span class="tok-number">3</span>]);</span>
+<span class="line" id="L279"></span>
+<span class="line" id="L280">      <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">6</span>] == <span class="tok-number">59</span>)  posCurs.y = convIntCursor(cursBuf[<span class="tok-number">5</span>]);</span>
+<span class="line" id="L281"></span>
+<span class="line" id="L282">      <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">7</span>] == <span class="tok-number">59</span>) {</span>
+<span class="line" id="L283">          posCurs.y = convIntCursor(cursBuf[<span class="tok-number">5</span>]);</span>
+<span class="line" id="L284">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">6</span>]);</span>
+<span class="line" id="L285">      }</span>
+<span class="line" id="L286"></span>
+<span class="line" id="L287">      <span class="tok-kw">if</span> ( cursBuf[<span class="tok-number">8</span>] == <span class="tok-number">59</span> ) {</span>
+<span class="line" id="L288">          posCurs.y = convIntCursor(cursBuf[<span class="tok-number">5</span>]);</span>
+<span class="line" id="L289">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">6</span>]);</span>
+<span class="line" id="L290">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">7</span>]);</span>
+<span class="line" id="L291">      }</span>
+<span class="line" id="L292">    }</span>
+<span class="line" id="L293">    <span class="tok-comment">// columns = 2 digits</span>
+</span>
+<span class="line" id="L294">    <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">5</span>] == <span class="tok-number">59</span>) {</span>
+<span class="line" id="L295">      posCurs.x = convIntCursor(cursBuf[<span class="tok-number">3</span>]);</span>
+<span class="line" id="L296">      posCurs.x = (posCurs.x * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">4</span>]);</span>
+<span class="line" id="L297"></span>
+<span class="line" id="L298">      <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">7</span>] == <span class="tok-number">59</span>)  posCurs.y = convIntCursor(cursBuf[<span class="tok-number">6</span>]);</span>
+<span class="line" id="L299"></span>
+<span class="line" id="L300">      <span class="tok-kw">if</span> (cursBuf[<span class="tok-number">8</span>] == <span class="tok-number">59</span>) {</span>
+<span class="line" id="L301">          posCurs.y = convIntCursor(cursBuf[<span class="tok-number">6</span>]);</span>
+<span class="line" id="L302">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">7</span>]);</span>
+<span class="line" id="L303">      }</span>
+<span class="line" id="L304"></span>
+<span class="line" id="L305">      <span class="tok-kw">if</span> ( cursBuf[<span class="tok-number">9</span>] == <span class="tok-number">59</span> ) {</span>
+<span class="line" id="L306">          posCurs.y = convIntCursor(cursBuf[<span class="tok-number">6</span>]);</span>
+<span class="line" id="L307">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">7</span>]);</span>
+<span class="line" id="L308">          posCurs.y = (posCurs.y * <span class="tok-number">10</span>) + convIntCursor(cursBuf[<span class="tok-number">8</span>]);</span>
+<span class="line" id="L309">      }</span>
+<span class="line" id="L310"></span>
+<span class="line" id="L311"></span>
+<span class="line" id="L312">    }</span>
+<span class="line" id="L313">    flushIO();</span>
+<span class="line" id="L314">}</span>
+<span class="line" id="L315"></span>
+<span class="line" id="L316"><span class="tok-comment">///-------------------------</span></span>
+<span class="line" id="L317"><span class="tok-comment">/// style color writestyled</span></span>
+<span class="line" id="L318"><span class="tok-comment">///-------------------------</span></span>
+<span class="line" id="L319"><span class="tok-comment">/// Reset the terminal style.</span></span>
+<span class="line" id="L320"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resetStyle</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L321">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L322">  writer.writeAll(<span class="tok-str">&quot;\x1b[0m&quot;</span>) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L323">}</span>
+<span class="line" id="L324"></span>
+<span class="line" id="L325"><span class="tok-comment">/// Sets the terminal style.</span></span>
+<span class="line" id="L326"><span class="tok-kw">fn</span> <span class="tok-fn">setStyle</span>(style: [<span class="tok-number">4</span>]<span class="tok-type">u32</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L327">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L328">  <span class="tok-kw">for</span> (style) |v| {</span>
+<span class="line" id="L329">      <span class="tok-kw">if</span> (v != <span class="tok-number">0</span>) {</span>
+<span class="line" id="L330">          writer.print(<span class="tok-str">&quot;\x1b[{d}m&quot;</span>, .{v}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L331">      }</span>
+<span class="line" id="L332">  }</span>
+<span class="line" id="L333">}</span>
+<span class="line" id="L334"></span>
+<span class="line" id="L335"><span class="tok-comment">/// Sets the terminal's foreground color.</span></span>
+<span class="line" id="L336"><span class="tok-kw">fn</span> <span class="tok-fn">setForegroundColor</span>(color: dds.BackgroundColor) <span class="tok-type">void</span> {</span>
+<span class="line" id="L337">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L338">  writer.print(<span class="tok-str">&quot;\x1b[{d}m&quot;</span>, .{<span class="tok-builtin">@intFromEnum</span>(color)}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L339">}</span>
+<span class="line" id="L340"></span>
+<span class="line" id="L341"><span class="tok-comment">/// Sets the terminal's Background color.</span></span>
+<span class="line" id="L342"><span class="tok-kw">fn</span> <span class="tok-fn">setBackgroundColor</span>(color: dds.ForegroundColor) <span class="tok-type">void</span> {</span>
+<span class="line" id="L343">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L344">  writer.print(<span class="tok-str">&quot;\x1b[{d}m&quot;</span>, .{<span class="tok-builtin">@intFromEnum</span>(color)}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L345">}</span>
+<span class="line" id="L346"></span>
+<span class="line" id="L347"><span class="tok-comment">/// write text and attribut</span></span>
+<span class="line" id="L348"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">writeStyled</span>(text: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>, attribut: dds.ZONATRB) <span class="tok-type">void</span> {</span>
+<span class="line" id="L349">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L350">  setForegroundColor(attribut.backgr);</span>
+<span class="line" id="L351">  setBackgroundColor(attribut.foregr);</span>
+<span class="line" id="L352">  setStyle(attribut.styled);</span>
+<span class="line" id="L353">  writer.print(<span class="tok-str">&quot;{s}\x1b[0m&quot;</span>, .{text}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L354">}</span>
+<span class="line" id="L355"></span>
+<span class="line" id="L356"><span class="tok-comment">///-------------------------</span></span>
+<span class="line" id="L357"><span class="tok-comment">/// Terminal</span></span>
+<span class="line" id="L358"><span class="tok-comment">///-------------------------</span></span>
+<span class="line" id="L359"><span class="tok-comment">/// A raw terminal representation, you can enter terminal raw mode</span></span>
+<span class="line" id="L360"><span class="tok-comment">/// using this struct. Raw mode is essential to create a TUI.</span></span>
+<span class="line" id="L361"><span class="tok-comment">/// open terminal and config</span></span>
+<span class="line" id="L362"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">enableRawMode</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L363">  TTY = fs.cwd().openFile(<span class="tok-str">&quot;/dev/tty&quot;</span>, .{ .mode = .read_write }) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L364">  <span class="tok-comment">//defer TTY.close();</span>
+</span>
+<span class="line" id="L365"></span>
+<span class="line" id="L366">  _ = os.linux.tcgetattr(TTY.handle, &amp;original_termios);</span>
+<span class="line" id="L367"></span>
+<span class="line" id="L368">  _ = os.linux.tcgetattr(TTY.handle, &amp;use_termios);</span>
+<span class="line" id="L369"></span>
+<span class="line" id="L370">  <span class="tok-comment">// https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html</span>
+</span>
+<span class="line" id="L371">  <span class="tok-comment">// https://codeberg.org/josias/zigcurses/src/branch/master/src/main.zig</span>
+</span>
+<span class="line" id="L372">  <span class="tok-comment">// https://man7.org/linux/man-pages/man3/ttermios.3.html</span>
+</span>
+<span class="line" id="L373"></span>
+<span class="line" id="L374">  <span class="tok-comment">// https://manpages.ubuntu.com/manpages/trusty/fr/man3/termios.3.html</span>
+</span>
+<span class="line" id="L375"></span>
+<span class="line" id="L376">  <span class="tok-comment">// https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm</span>
+</span>
+<span class="line" id="L377"></span>
+<span class="line" id="L378">  use_termios.iflag &amp;= ~(os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |</span>
+<span class="line" id="L379">      os.linux.INLCR | os.linux.IGNCR | os.linux.ICRNL | os.linux.IXON);</span>
+<span class="line" id="L380"></span>
+<span class="line" id="L381">  use_termios.oflag &amp;= ~(os.linux.OPOST);</span>
+<span class="line" id="L382">  use_termios.cflag &amp;= ~(os.linux.CSIZE | os.linux.PARENB);</span>
+<span class="line" id="L383">  use_termios.cflag |= (os.linux.CS8);</span>
+<span class="line" id="L384">  use_termios.lflag &amp;= ~(os.linux.ECHO | os.linux.ECHONL | os.linux.ICANON | os.linux.IEXTEN | os.linux.ISIG);</span>
+<span class="line" id="L385"></span>
+<span class="line" id="L386">  <span class="tok-comment">// Wait until it reads at least one byte  terminal standard</span>
+</span>
+<span class="line" id="L387">  use_termios.cc[os.linux.V.MIN] = <span class="tok-number">1</span>;</span>
+<span class="line" id="L388"></span>
+<span class="line" id="L389">  <span class="tok-comment">// Wait 100 miliseconds at maximum.</span>
+</span>
+<span class="line" id="L390">  use_termios.cc[os.linux.V.TIME] = <span class="tok-number">0</span>;</span>
+<span class="line" id="L391"></span>
+<span class="line" id="L392">  <span class="tok-comment">// apply changes</span>
+</span>
+<span class="line" id="L393">  _ = os.linux.tcsetattr(TTY.handle, .NOW, &amp;use_termios);</span>
+<span class="line" id="L394"></span>
+<span class="line" id="L395">  <span class="tok-comment">// cursor HIDE par défault</span>
+</span>
+<span class="line" id="L396">  cursHide();</span>
+<span class="line" id="L397">  offMouse();</span>
+<span class="line" id="L398">}</span>
+<span class="line" id="L399"></span>
+<span class="line" id="L400"><span class="tok-comment">/// Clear gross terminal</span></span>
+<span class="line" id="L401"><span class="tok-kw">fn</span> <span class="tok-fn">reset</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L402">  <span class="tok-kw">var</span> name = <span class="tok-str">&quot;/bin/echo&quot;</span>;</span>
+<span class="line" id="L403">  <span class="tok-kw">var</span> args = [_:<span class="tok-null">null</span>]?[*:<span class="tok-number">0</span>]<span class="tok-kw">const</span> <span class="tok-type">u8</span>{ <span class="tok-str">&quot;echo&quot;</span>, <span class="tok-str">&quot;\x1b[H\x1b[3J&quot;</span> };</span>
+<span class="line" id="L404">  <span class="tok-kw">var</span> env = [_:<span class="tok-null">null</span>]?[*:<span class="tok-number">0</span>]<span class="tok-type">u8</span>{};</span>
+<span class="line" id="L405"></span>
+<span class="line" id="L406">  std.os.execveZ(name, args[<span class="tok-number">0</span>..args.len], env[<span class="tok-number">0</span>..env.len]) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L407">}</span>
+<span class="line" id="L408"></span>
+<span class="line" id="L409"><span class="tok-comment">/// Returns to the previous terminal state</span></span>
+<span class="line" id="L410"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">disableRawMode</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L411">  defCursor(dds.typeCursor.cSteady);</span>
+<span class="line" id="L412">  offMouse();</span>
+<span class="line" id="L413">  cursShow();</span>
+<span class="line" id="L414">  cls();</span>
+<span class="line" id="L415">  <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L416">  writer.print(<span class="tok-str">&quot;\x1b[H&quot;</span>, .{}) <span class="tok-kw">catch</span> {}; <span class="tok-comment">// init pos_coursor</span>
+</span>
+<span class="line" id="L417"></span>
+<span class="line" id="L418">  _ = os.linux.tcsetattr(TTY.handle, .FLUSH, &amp;original_termios);</span>
+<span class="line" id="L419">  reset();</span>
+<span class="line" id="L420">}</span>
+<span class="line" id="L421"></span>
+<span class="line" id="L422"><span class="tok-comment">/// get size terminal</span></span>
+<span class="line" id="L423"><span class="tok-kw">const</span> TermSize = <span class="tok-kw">struct</span> { width: <span class="tok-type">usize</span>, height: <span class="tok-type">usize</span> };</span>
+<span class="line" id="L424"></span>
+<span class="line" id="L425"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getSize</span>() TermSize {</span>
+<span class="line" id="L426">  <span class="tok-kw">var</span> win_size: std.os.linux.winsize = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L427"></span>
+<span class="line" id="L428">  <span class="tok-kw">const</span> err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, <span class="tok-builtin">@intFromPtr</span>(&amp;win_size));</span>
+<span class="line" id="L429">  <span class="tok-kw">if</span> (os.errno(err) != .SUCCESS) {</span>
+<span class="line" id="L430">      <span class="tok-builtin">@panic</span>(<span class="tok-str">&quot; Cursed getSize error ioctl TTY&quot;</span>);</span>
+<span class="line" id="L431">      <span class="tok-comment">//return os.unexpectedErrno(os.errno(err));</span>
+</span>
+<span class="line" id="L432">  }</span>
+<span class="line" id="L433">  <span class="tok-kw">return</span> TermSize{</span>
+<span class="line" id="L434">      .height = win_size.ws_row,</span>
+<span class="line" id="L435">      .width = win_size.ws_col,</span>
+<span class="line" id="L436">  };</span>
+<span class="line" id="L437">}</span>
+<span class="line" id="L438"></span>
+<span class="line" id="L439"><span class="tok-comment">/// Update title terminal</span></span>
+<span class="line" id="L440"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">titleTerm</span>(title: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L441">  <span class="tok-kw">if</span> (title.len &gt; <span class="tok-number">0</span>) {</span>
+<span class="line" id="L442">    <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L443">    writer.print(<span class="tok-str">&quot;\x1b]0;{s}\x07&quot;</span>, .{title}) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L444">  }</span>
+<span class="line" id="L445">}</span>
+<span class="line" id="L446"></span>
+<span class="line" id="L447"><span class="tok-comment">// if use resize  ok : vte application terminal ex TermVte</span>
+</span>
+<span class="line" id="L448"><span class="tok-comment">// change XTERM</span>
+</span>
+<span class="line" id="L449"><span class="tok-comment">// sudo thunar /etc/X11/app-defaults/XTerm</span>
+</span>
+<span class="line" id="L450"><span class="tok-comment">// *allowWindowOps: true  *eightBitInput: false</span>
+</span>
+<span class="line" id="L451"></span>
+<span class="line" id="L452"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resizeTerm</span>(line: <span class="tok-type">usize</span>, cols: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L453">  <span class="tok-kw">if</span> (line &gt; <span class="tok-number">0</span> <span class="tok-kw">and</span> cols &gt; <span class="tok-number">0</span>) {</span>
+<span class="line" id="L454">    <span class="tok-kw">const</span> writer = TTY.writer();</span>
+<span class="line" id="L455">    writer.print(<span class="tok-str">&quot;\x1b[8;{d};{d};t&quot;</span>, .{ line, cols }) <span class="tok-kw">catch</span> {};</span>
+<span class="line" id="L456">  }</span>
+<span class="line" id="L457">}</span>
+<span class="line" id="L458"></span>
+<span class="line" id="L459"><span class="tok-comment">/// mouse struct</span></span>
+<span class="line" id="L460"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MouseAction = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L461">    maNone,</span>
+<span class="line" id="L462">    maPressed,</span>
+<span class="line" id="L463">    maReleased,</span>
+<span class="line" id="L464">};</span>
+<span class="line" id="L465"></span>
+<span class="line" id="L466"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MouseButton = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L467">    mbNone,</span>
+<span class="line" id="L468">    mbLeft,</span>
+<span class="line" id="L469">    mbMiddle,</span>
+<span class="line" id="L470">    mbRight,</span>
+<span class="line" id="L471">};</span>
+<span class="line" id="L472"></span>
+<span class="line" id="L473"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ScrollDirection = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L474">    msNone,</span>
+<span class="line" id="L475">    msUp,</span>
+<span class="line" id="L476">    msDown,</span>
+<span class="line" id="L477">};</span>
+<span class="line" id="L478"></span>
+<span class="line" id="L479"><span class="tok-kw">const</span> Mouse = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L480">    x: <span class="tok-type">usize</span>, <span class="tok-comment">// x mouse position</span>
+</span>
+<span class="line" id="L481">    y: <span class="tok-type">usize</span>, <span class="tok-comment">// y mouse position</span>
+</span>
+<span class="line" id="L482">    button: MouseButton, <span class="tok-comment">// which button was pressed</span>
+</span>
+<span class="line" id="L483">    action: MouseAction, <span class="tok-comment">// if button was released or pressed</span>
+</span>
+<span class="line" id="L484">    ctrl: <span class="tok-type">bool</span>, <span class="tok-comment">// was ctrl was down on event</span>
+</span>
+<span class="line" id="L485">    shift: <span class="tok-type">bool</span>, <span class="tok-comment">// was shift was down on event</span>
+</span>
+<span class="line" id="L486">    scroll: <span class="tok-type">bool</span>, <span class="tok-comment">// if this is a mouse scroll</span>
+</span>
+<span class="line" id="L487">    scrollDir: ScrollDirection,</span>
+<span class="line" id="L488">    move: <span class="tok-type">bool</span>, <span class="tok-comment">// if this a mouse move</span>
+</span>
+<span class="line" id="L489">};</span>
+<span class="line" id="L490"></span>
+<span class="line" id="L491"><span class="tok-kw">pub</span> <span class="tok-kw">var</span> MouseInfo: Mouse = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L492"></span>
+<span class="line" id="L493"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> Keyboard = <span class="tok-kw">struct</span> { Key: kbd, Char: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> };</span>
+<span class="line" id="L494"></span>
+<span class="line" id="L495"><span class="tok-comment">/// Decrypt the keyboard</span></span>
+<span class="line" id="L496"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> kbd = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L497">    none,</span>
+<span class="line" id="L498">    F1,</span>
+<span class="line" id="L499">    F2,</span>
+<span class="line" id="L500">    F3,</span>
+<span class="line" id="L501">    F4,</span>
+<span class="line" id="L502">    F5,</span>
+<span class="line" id="L503">    F6,</span>
+<span class="line" id="L504">    F7,</span>
+<span class="line" id="L505">    F8,</span>
+<span class="line" id="L506">    F9,</span>
+<span class="line" id="L507">    F10,</span>
+<span class="line" id="L508">    F11,</span>
+<span class="line" id="L509">    F12,</span>
+<span class="line" id="L510">    F13,</span>
+<span class="line" id="L511">    F14,</span>
+<span class="line" id="L512">    F15,</span>
+<span class="line" id="L513">    F16,</span>
+<span class="line" id="L514">    F17,</span>
+<span class="line" id="L515">    F18,</span>
+<span class="line" id="L516">    F19,</span>
+<span class="line" id="L517">    F20,</span>
+<span class="line" id="L518">    F21,</span>
+<span class="line" id="L519">    F22,</span>
+<span class="line" id="L520">    F23,</span>
+<span class="line" id="L521">    F24,</span>
+<span class="line" id="L522">    altA,</span>
+<span class="line" id="L523">    altB,</span>
+<span class="line" id="L524">    altC,</span>
+<span class="line" id="L525">    altD,</span>
+<span class="line" id="L526">    altE,</span>
+<span class="line" id="L527">    altF,</span>
+<span class="line" id="L528">    altG,</span>
+<span class="line" id="L529">    altH,</span>
+<span class="line" id="L530">    altI,</span>
+<span class="line" id="L531">    altJ,</span>
+<span class="line" id="L532">    altK,</span>
+<span class="line" id="L533">    altL,</span>
+<span class="line" id="L534">    altM,</span>
+<span class="line" id="L535">    altN,</span>
+<span class="line" id="L536">    altO,</span>
+<span class="line" id="L537">    altP,</span>
+<span class="line" id="L538">    altQ,</span>
+<span class="line" id="L539">    altR,</span>
+<span class="line" id="L540">    altS,</span>
+<span class="line" id="L541">    altT,</span>
+<span class="line" id="L542">    altU,</span>
+<span class="line" id="L543">    altV,</span>
+<span class="line" id="L544">    altW,</span>
+<span class="line" id="L545">    altX,</span>
+<span class="line" id="L546">    altY,</span>
+<span class="line" id="L547">    altZ,</span>
+<span class="line" id="L548">    ctrlA,</span>
+<span class="line" id="L549">    ctrlB,</span>
+<span class="line" id="L550">    ctrlC,</span>
+<span class="line" id="L551">    ctrlD,</span>
+<span class="line" id="L552">    ctrlE,</span>
+<span class="line" id="L553">    ctrlF,</span>
+<span class="line" id="L554">    ctrlG,</span>
+<span class="line" id="L555">    ctrlH,</span>
+<span class="line" id="L556">    ctrlI,</span>
+<span class="line" id="L557">    ctrlJ,</span>
+<span class="line" id="L558">    ctrlK,</span>
+<span class="line" id="L559">    ctrlL,</span>
+<span class="line" id="L560">    ctrlM,</span>
+<span class="line" id="L561">    ctrlN,</span>
+<span class="line" id="L562">    ctrlO,</span>
+<span class="line" id="L563">    ctrlP,</span>
+<span class="line" id="L564">    ctrlQ,</span>
+<span class="line" id="L565">    ctrlR,</span>
+<span class="line" id="L566">    ctrlS,</span>
+<span class="line" id="L567">    ctrlT,</span>
+<span class="line" id="L568">    ctrlU,</span>
+<span class="line" id="L569">    ctrlV,</span>
+<span class="line" id="L570">    ctrlW,</span>
+<span class="line" id="L571">    ctrlX,</span>
+<span class="line" id="L572">    ctrlY,</span>
+<span class="line" id="L573">    ctrlZ,</span>
+<span class="line" id="L574">    <span class="tok-comment">// specific for grid</span>
+</span>
+<span class="line" id="L575">    pageUp,</span>
+<span class="line" id="L576">    pageDown,</span>
+<span class="line" id="L577">    home,</span>
+<span class="line" id="L578">    end,</span>
+<span class="line" id="L579">    esc,</span>
+<span class="line" id="L580">    <span class="tok-comment">// Specific for typing</span>
+</span>
+<span class="line" id="L581">    mouse,</span>
+<span class="line" id="L582">    char,</span>
+<span class="line" id="L583"></span>
+<span class="line" id="L584">    up,</span>
+<span class="line" id="L585">    down,</span>
+<span class="line" id="L586">    left,</span>
+<span class="line" id="L587">    right,</span>
+<span class="line" id="L588">    delete,</span>
+<span class="line" id="L589">    enter,</span>
+<span class="line" id="L590">    ins,</span>
+<span class="line" id="L591">    tab,</span>
+<span class="line" id="L592">    stab,</span>
+<span class="line" id="L593">    backspace,</span>
+<span class="line" id="L594">    func,</span>
+<span class="line" id="L595">    task,</span>
+<span class="line" id="L596"></span>
+<span class="line" id="L597"></span>
+<span class="line" id="L598"></span>
+<span class="line" id="L599">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">enumToStr</span>(self: kbd) []<span class="tok-kw">const</span> <span class="tok-type">u8</span> {</span>
+<span class="line" id="L600">        <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>( [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> ,<span class="tok-builtin">@tagName</span>(self));</span>
+<span class="line" id="L601">    }</span>
+<span class="line" id="L602"></span>
+<span class="line" id="L603">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">toEnum</span>(name: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>) kbd {</span>
+<span class="line" id="L604">        <span class="tok-kw">var</span> vlen: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L605">        <span class="tok-kw">var</span> iter = iteratStr.iterator(name);</span>
+<span class="line" id="L606">        <span class="tok-kw">var</span> result: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L607">        <span class="tok-kw">while</span> (iter.next()) |_| {</span>
+<span class="line" id="L608">            vlen += <span class="tok-number">1</span>;</span>
+<span class="line" id="L609">        }</span>
+<span class="line" id="L610"></span>
+<span class="line" id="L611">        <span class="tok-comment">//return @intToEnum(kbd, @as(u8, name[1])); </span>
+</span>
+<span class="line" id="L612">        <span class="tok-kw">if</span> (name[<span class="tok-number">0</span>] == <span class="tok-str">'F'</span>) {</span>
+<span class="line" id="L613">            <span class="tok-comment">//f1..f9</span>
+</span>
+<span class="line" id="L614"></span>
+<span class="line" id="L615">            <span class="tok-kw">if</span> (vlen == <span class="tok-number">2</span>) {</span>
+<span class="line" id="L616">              result = <span class="tok-builtin">@as</span>(<span class="tok-type">u8</span>, name[<span class="tok-number">1</span>]) - <span class="tok-number">48</span>;</span>
+<span class="line" id="L617">              <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>(kbd,<span class="tok-builtin">@enumFromInt</span>(result)) ;</span>
+<span class="line" id="L618">            }</span>
+<span class="line" id="L619">            <span class="tok-comment">// f10..f19</span>
+</span>
+<span class="line" id="L620">            <span class="tok-kw">if</span> (vlen == <span class="tok-number">3</span> <span class="tok-kw">and</span> name[<span class="tok-number">1</span>] == <span class="tok-str">'1'</span>) {</span>
+<span class="line" id="L621">              result = <span class="tok-builtin">@as</span>(<span class="tok-type">u8</span>, name[<span class="tok-number">2</span>]) - <span class="tok-number">48</span>;</span>
+<span class="line" id="L622">              <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>(kbd,<span class="tok-builtin">@enumFromInt</span>(<span class="tok-number">10</span> + result)) ;</span>
+<span class="line" id="L623">            }</span>
+<span class="line" id="L624">            <span class="tok-comment">// f20..f24</span>
+</span>
+<span class="line" id="L625">            <span class="tok-kw">if</span> (vlen == <span class="tok-number">3</span> <span class="tok-kw">and</span> name[<span class="tok-number">1</span>] == <span class="tok-str">'2'</span>) {</span>
+<span class="line" id="L626">              result = <span class="tok-builtin">@as</span>(<span class="tok-type">u8</span>, name[<span class="tok-number">2</span>]) - <span class="tok-number">48</span>;</span>
+<span class="line" id="L627">              <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>(kbd,<span class="tok-builtin">@enumFromInt</span>(<span class="tok-number">20</span> + result)) ;</span>
+<span class="line" id="L628">            }</span>
+<span class="line" id="L629">        }</span>
+<span class="line" id="L630"></span>
+<span class="line" id="L631">        <span class="tok-kw">if</span> (name[<span class="tok-number">0</span>] == <span class="tok-str">'a'</span> <span class="tok-kw">and</span> name[<span class="tok-number">1</span>] == <span class="tok-str">'l'</span> <span class="tok-kw">and</span> name[<span class="tok-number">2</span>] == <span class="tok-str">'t'</span>) {</span>
+<span class="line" id="L632">            <span class="tok-kw">if</span> (vlen != <span class="tok-number">4</span>) <span class="tok-kw">return</span> .none;</span>
+<span class="line" id="L633">            result = <span class="tok-builtin">@as</span>(<span class="tok-type">u8</span>, name[<span class="tok-number">3</span>]) - <span class="tok-number">41</span>;</span>
+<span class="line" id="L634">            <span class="tok-kw">if</span> (result &lt; <span class="tok-number">25</span> <span class="tok-kw">or</span> result &gt; <span class="tok-number">50</span>) <span class="tok-kw">return</span> .none <span class="tok-kw">else</span> <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>(kbd,<span class="tok-builtin">@enumFromInt</span>(result)) ;</span>
+<span class="line" id="L635">        }</span>
+<span class="line" id="L636"></span>
+<span class="line" id="L637">        <span class="tok-kw">if</span> (name[<span class="tok-number">0</span>] == <span class="tok-str">'c'</span> <span class="tok-kw">and</span> name[<span class="tok-number">1</span>] == <span class="tok-str">'t'</span> <span class="tok-kw">and</span> name[<span class="tok-number">2</span>] == <span class="tok-str">'r'</span> <span class="tok-kw">and</span> name[<span class="tok-number">3</span>] == <span class="tok-str">'l'</span>) {</span>
+<span class="line" id="L638">            <span class="tok-kw">if</span> (vlen != <span class="tok-number">5</span>) <span class="tok-kw">return</span> .none;</span>
+<span class="line" id="L639">            result = <span class="tok-builtin">@as</span>(<span class="tok-type">u8</span>, name[<span class="tok-number">4</span>]) - <span class="tok-number">14</span>;</span>
+<span class="line" id="L640">            <span class="tok-kw">if</span> (result &lt; <span class="tok-number">51</span> <span class="tok-kw">or</span> result &gt; <span class="tok-number">76</span>) <span class="tok-kw">return</span> .none <span class="tok-kw">else</span> <span class="tok-kw">return</span> <span class="tok-builtin">@as</span>(kbd,<span class="tok-builtin">@enumFromInt</span>(result)) ;</span>
+<span class="line" id="L641">        }</span>
+<span class="line" id="L642"></span>
+<span class="line" id="L643">        std.debug.print(<span class="tok-str">&quot;{s}\r\n&quot;</span>,.{name});</span>
+<span class="line" id="L644">        <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, name, <span class="tok-str">&quot;pageUp&quot;</span>)) <span class="tok-kw">return</span> kbd.pageUp;</span>
+<span class="line" id="L645"></span>
+<span class="line" id="L646">        <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, name, <span class="tok-str">&quot;pageDown&quot;</span>)) <span class="tok-kw">return</span> kbd.pageDown;</span>
+<span class="line" id="L647"></span>
+<span class="line" id="L648">        <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, name, <span class="tok-str">&quot;pome&quot;</span>)) <span class="tok-kw">return</span> kbd.home;</span>
+<span class="line" id="L649"></span>
+<span class="line" id="L650">        <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, name, <span class="tok-str">&quot;end&quot;</span>)) <span class="tok-kw">return</span> kbd.end;</span>
+<span class="line" id="L651"></span>
+<span class="line" id="L652">        <span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, name, <span class="tok-str">&quot;esc&quot;</span>)) <span class="tok-kw">return</span> kbd.esc;</span>
+<span class="line" id="L653"></span>
+<span class="line" id="L654">        <span class="tok-kw">return</span> .none;</span>
+<span class="line" id="L655">    }</span>
+<span class="line" id="L656"></span>
+<span class="line" id="L657"></span>
+<span class="line" id="L658">    <span class="tok-comment">/// converted keyboard variable</span></span>
+<span class="line" id="L659">    <span class="tok-kw">fn</span> <span class="tok-fn">convIntMouse</span>(x: <span class="tok-type">u8</span>) <span class="tok-type">usize</span> {</span>
+<span class="line" id="L660">        <span class="tok-kw">switch</span> (x) {</span>
+<span class="line" id="L661">            <span class="tok-str">'0'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">0</span>,</span>
+<span class="line" id="L662">            <span class="tok-str">'1'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">1</span>,</span>
+<span class="line" id="L663">            <span class="tok-str">'2'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">2</span>,</span>
+<span class="line" id="L664">            <span class="tok-str">'3'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">3</span>,</span>
+<span class="line" id="L665">            <span class="tok-str">'4'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">4</span>,</span>
+<span class="line" id="L666">            <span class="tok-str">'5'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">5</span>,</span>
+<span class="line" id="L667">            <span class="tok-str">'6'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">6</span>,</span>
+<span class="line" id="L668">            <span class="tok-str">'7'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">7</span>,</span>
+<span class="line" id="L669">            <span class="tok-str">'8'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">8</span>,</span>
+<span class="line" id="L670">            <span class="tok-str">'9'</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">9</span>,</span>
+<span class="line" id="L671">            <span class="tok-kw">else</span> =&gt; <span class="tok-kw">return</span> <span class="tok-number">1</span>,</span>
+<span class="line" id="L672">        }</span>
+<span class="line" id="L673">    }</span>
+<span class="line" id="L674"></span>
+<span class="line" id="L675">    <span class="tok-comment">// get All keyboard keys allowed in terminal</span>
+</span>
+<span class="line" id="L676">    </span>
+<span class="line" id="L677">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getKEY</span>() Keyboard {</span>
+<span class="line" id="L678"></span>
+<span class="line" id="L679">        <span class="tok-comment">// init Event</span>
+</span>
+<span class="line" id="L680">        <span class="tok-kw">var</span> Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = <span class="tok-str">&quot;&quot;</span> };</span>
+<span class="line" id="L681"></span>
+<span class="line" id="L682">        <span class="tok-comment">// variable --&gt; Event.Char</span>
+</span>
+<span class="line" id="L683">        <span class="tok-kw">var</span> vUnicode: []<span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L684">        vUnicode = dds.allocatorPnl.alloc(<span class="tok-type">u8</span>, <span class="tok-number">4</span>) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L685"></span>
+<span class="line" id="L686"></span>
+<span class="line" id="L687"></span>
+<span class="line" id="L688">        <span class="tok-comment">// TODO: Check buffer size</span>
+</span>
+<span class="line" id="L689">        <span class="tok-kw">var</span> keybuf: [<span class="tok-number">13</span>]<span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L690"></span>
+<span class="line" id="L691">        flushIO();</span>
+<span class="line" id="L692"></span>
+<span class="line" id="L693">        <span class="tok-kw">var</span> c: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L694">        <span class="tok-kw">while</span> (c == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L695">            c = TTY.read(&amp;keybuf) <span class="tok-kw">catch</span> {Event.Key = kbd.none; <span class="tok-kw">return</span> Event;};</span>
+<span class="line" id="L696">        }</span>
+<span class="line" id="L697"></span>
+<span class="line" id="L698">        <span class="tok-kw">const</span> view = std.unicode.Utf8View.init(keybuf[<span class="tok-number">0</span>..c]) <span class="tok-kw">catch</span> {</span>
+<span class="line" id="L699">            Event.Key = kbd.none;</span>
+<span class="line" id="L700">            <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L701">        };</span>
+<span class="line" id="L702"></span>
+<span class="line" id="L703">        <span class="tok-kw">var</span> iter = view.iterator();</span>
+<span class="line" id="L704"></span>
+<span class="line" id="L705">        <span class="tok-comment">// TODO: Find a better way to iterate buffer</span>
+</span>
+<span class="line" id="L706"></span>
+<span class="line" id="L707">        <span class="tok-kw">if</span> (iter.nextCodepoint()) |c0| <span class="tok-kw">switch</span> (c0) {</span>
+<span class="line" id="L708">            <span class="tok-str">'\x1b'</span> =&gt; {</span>
+<span class="line" id="L709">                <span class="tok-kw">if</span> (iter.nextCodepoint()) |c1| <span class="tok-kw">switch</span> (c1) {</span>
+<span class="line" id="L710">                    <span class="tok-comment">// fn (1 - 4)</span>
+</span>
+<span class="line" id="L711">                    <span class="tok-comment">// O - 0x6f - 111</span>
+</span>
+<span class="line" id="L712">                    <span class="tok-str">'\x4f'</span> =&gt; {</span>
+<span class="line" id="L713">                        <span class="tok-kw">switch</span> ((<span class="tok-number">1</span> + keybuf[<span class="tok-number">2</span>] - <span class="tok-str">'\x50'</span>)) {</span>
+<span class="line" id="L714">                            <span class="tok-number">1</span> =&gt; { Event.Key = kbd.F1; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L715">                            <span class="tok-number">2</span> =&gt; { Event.Key = kbd.F2; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L716">                            <span class="tok-number">3</span> =&gt; { Event.Key = kbd.F3; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L717">                            <span class="tok-number">4</span> =&gt; { Event.Key = kbd.F4; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L718">                            <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L719">                        }</span>
+<span class="line" id="L720">                    },</span>
+<span class="line" id="L721"></span>
+<span class="line" id="L722">                    <span class="tok-comment">// csi</span>
+</span>
+<span class="line" id="L723">                    <span class="tok-str">'['</span> =&gt; {</span>
+<span class="line" id="L724">                        <span class="tok-kw">return</span> parse_csiFunc(keybuf[<span class="tok-number">2</span>..c]);</span>
+<span class="line" id="L725">                    },</span>
+<span class="line" id="L726"></span>
+<span class="line" id="L727">                    <span class="tok-comment">// alt key</span>
+</span>
+<span class="line" id="L728">                    <span class="tok-kw">else</span> =&gt; {</span>
+<span class="line" id="L729">                        <span class="tok-kw">switch</span> (c1) {</span>
+<span class="line" id="L730">                            <span class="tok-str">'a'</span> =&gt; { Event.Key = kbd.altA; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L731">                            <span class="tok-str">'b'</span> =&gt; { Event.Key = kbd.altB; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L732">                            <span class="tok-str">'c'</span> =&gt; { Event.Key = kbd.altC; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L733">                            <span class="tok-str">'d'</span> =&gt; { Event.Key = kbd.altD; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L734">                            <span class="tok-str">'e'</span> =&gt; { Event.Key = kbd.altE; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L735">                            <span class="tok-str">'f'</span> =&gt; { Event.Key = kbd.altF; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L736">                            <span class="tok-str">'g'</span> =&gt; { Event.Key = kbd.altG; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L737">                            <span class="tok-str">'h'</span> =&gt; { Event.Key = kbd.altH; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L738">                            <span class="tok-str">'i'</span> =&gt; { Event.Key = kbd.altI; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L739">                            <span class="tok-str">'j'</span> =&gt; { Event.Key = kbd.altJ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L740">                            <span class="tok-str">'k'</span> =&gt; { Event.Key = kbd.altK; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L741">                            <span class="tok-str">'l'</span> =&gt; { Event.Key = kbd.altL; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L742">                            <span class="tok-str">'m'</span> =&gt; { Event.Key = kbd.altM; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L743">                            <span class="tok-str">'n'</span> =&gt; { Event.Key = kbd.altN; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L744">                            <span class="tok-str">'o'</span> =&gt; { Event.Key = kbd.altO; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L745">                            <span class="tok-str">'p'</span> =&gt; { Event.Key = kbd.altP; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L746">                            <span class="tok-str">'q'</span> =&gt; { Event.Key = kbd.altQ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L747">                            <span class="tok-str">'r'</span> =&gt; { Event.Key = kbd.altR; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L748">                            <span class="tok-str">'s'</span> =&gt; { Event.Key = kbd.altS; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L749">                            <span class="tok-str">'t'</span> =&gt; { Event.Key = kbd.altT; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L750">                            <span class="tok-str">'u'</span> =&gt; { Event.Key = kbd.altU; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L751">                            <span class="tok-str">'v'</span> =&gt; { Event.Key = kbd.altV; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L752">                            <span class="tok-str">'w'</span> =&gt; { Event.Key = kbd.altW; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L753">                            <span class="tok-str">'x'</span> =&gt; { Event.Key = kbd.altX; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L754">                            <span class="tok-str">'y'</span> =&gt; { Event.Key = kbd.altY; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L755">                            <span class="tok-str">'z'</span> =&gt; { Event.Key = kbd.altZ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L756">                            <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L757">                        }</span>
+<span class="line" id="L758">                    },</span>
+<span class="line" id="L759">                } <span class="tok-kw">else</span> { Event.Key = kbd.esc; <span class="tok-kw">return</span> Event; }</span>
+<span class="line" id="L760">            },</span>
+<span class="line" id="L761"></span>
+<span class="line" id="L762">            <span class="tok-comment">// ctrl keys ( crtl-i (x09)   ctrl-m (x0D) )</span>
+</span>
+<span class="line" id="L763">            <span class="tok-str">'\x01'</span>...<span class="tok-str">'\x08'</span>, <span class="tok-str">'\x0A'</span>...<span class="tok-str">'\x0C'</span>, <span class="tok-str">'\x0E'</span>...<span class="tok-str">'\x1A'</span> =&gt; {</span>
+<span class="line" id="L764">                <span class="tok-kw">switch</span> (c0 + <span class="tok-str">'\x60'</span>) {</span>
+<span class="line" id="L765">                    <span class="tok-str">'a'</span> =&gt; { Event.Key = kbd.ctrlA; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L766">                    <span class="tok-str">'b'</span> =&gt; { Event.Key = kbd.ctrlB; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L767">                    <span class="tok-str">'c'</span> =&gt; { Event.Key = kbd.ctrlC; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L768">                    <span class="tok-str">'d'</span> =&gt; { Event.Key = kbd.ctrlD; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L769">                    <span class="tok-str">'e'</span> =&gt; { Event.Key = kbd.ctrlE; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L770">                    <span class="tok-str">'f'</span> =&gt; { Event.Key = kbd.ctrlF; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L771">                    <span class="tok-str">'g'</span> =&gt; { Event.Key = kbd.ctrlG; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L772">                    <span class="tok-str">'h'</span> =&gt; { Event.Key = kbd.ctrlH; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L773">                    <span class="tok-str">'i'</span> =&gt; { Event.Key = kbd.ctrlI; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L774">                    <span class="tok-str">'j'</span> =&gt; { Event.Key = kbd.ctrlJ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L775">                    <span class="tok-str">'k'</span> =&gt; { Event.Key = kbd.ctrlK; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L776">                    <span class="tok-str">'l'</span> =&gt; { Event.Key = kbd.ctrlL; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L777">                    <span class="tok-str">'m'</span> =&gt; { Event.Key = kbd.ctrlM; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L778">                    <span class="tok-str">'n'</span> =&gt; { Event.Key = kbd.ctrlN; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L779">                    <span class="tok-str">'o'</span> =&gt; { Event.Key = kbd.ctrlO; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L780">                    <span class="tok-str">'p'</span> =&gt; { Event.Key = kbd.ctrlP; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L781">                    <span class="tok-str">'q'</span> =&gt; { Event.Key = kbd.ctrlQ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L782">                    <span class="tok-str">'r'</span> =&gt; { Event.Key = kbd.ctrlR; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L783">                    <span class="tok-str">'s'</span> =&gt; { Event.Key = kbd.ctrlS; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L784">                    <span class="tok-str">'t'</span> =&gt; { Event.Key = kbd.ctrlT; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L785">                    <span class="tok-str">'u'</span> =&gt; { Event.Key = kbd.ctrlU; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L786">                    <span class="tok-str">'v'</span> =&gt; { Event.Key = kbd.ctrlV; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L787">                    <span class="tok-str">'w'</span> =&gt; { Event.Key = kbd.ctrlW; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L788">                    <span class="tok-str">'x'</span> =&gt; { Event.Key = kbd.ctrlX; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L789">                    <span class="tok-str">'y'</span> =&gt; { Event.Key = kbd.ctrlY; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L790">                    <span class="tok-str">'z'</span> =&gt; { Event.Key = kbd.ctrlZ; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L791">                    <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L792">                }</span>
+<span class="line" id="L793">            },</span>
+<span class="line" id="L794"></span>
+<span class="line" id="L795">            <span class="tok-comment">// tab</span>
+</span>
+<span class="line" id="L796">            <span class="tok-str">'\x09'</span> =&gt; { Event.Key = kbd.tab;       <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L797">            <span class="tok-comment">// backspace</span>
+</span>
+<span class="line" id="L798">            <span class="tok-str">'\x7f'</span> =&gt; { Event.Key = kbd.backspace; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L799">            <span class="tok-comment">// Enter</span>
+</span>
+<span class="line" id="L800">            <span class="tok-str">'\x0D'</span> =&gt; { Event.Key = kbd.enter;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L801"></span>
+<span class="line" id="L802">            <span class="tok-kw">else</span> =&gt; {</span>
+<span class="line" id="L803">                <span class="tok-kw">var</span> i = utf.utf8Encode(c0, vUnicode[<span class="tok-number">0</span>..<span class="tok-number">4</span>]) <span class="tok-kw">catch</span> {Event.Key = kbd.none; <span class="tok-kw">return</span> Event;};</span>
+<span class="line" id="L804">                Event.Char = vUnicode[<span class="tok-number">0</span>..i];</span>
+<span class="line" id="L805"></span>
+<span class="line" id="L806">                Event.Key  = kbd.char;</span>
+<span class="line" id="L807"></span>
+<span class="line" id="L808">                <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L809">            },</span>
+<span class="line" id="L810">        };</span>
+<span class="line" id="L811"></span>
+<span class="line" id="L812">        Event.Key = kbd.none;</span>
+<span class="line" id="L813">        <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L814">    }</span>
+<span class="line" id="L815"></span>
+<span class="line" id="L816">    <span class="tok-kw">fn</span> <span class="tok-fn">parse_csiFunc</span>(csibuf: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>) Keyboard {</span>
+<span class="line" id="L817">        <span class="tok-comment">// init</span>
+</span>
+<span class="line" id="L818">        <span class="tok-kw">var</span> Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = <span class="tok-str">&quot;&quot;</span> };</span>
+<span class="line" id="L819"></span>
+<span class="line" id="L820">        <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">0</span>]) {</span>
+<span class="line" id="L821">            <span class="tok-comment">// keys</span>
+</span>
+<span class="line" id="L822">            <span class="tok-str">'A'</span> =&gt; { Event.Key = kbd.up;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L823">            <span class="tok-str">'B'</span> =&gt; { Event.Key = kbd.down;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L824">            <span class="tok-str">'C'</span> =&gt; { Event.Key = kbd.right;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L825">            <span class="tok-str">'D'</span> =&gt; { Event.Key = kbd.left;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L826">            <span class="tok-str">'H'</span> =&gt; { Event.Key = kbd.home;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L827">            <span class="tok-str">'F'</span> =&gt; { Event.Key = kbd.end;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L828">            <span class="tok-str">'3'</span> =&gt; { Event.Key = kbd.delete; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L829">            <span class="tok-str">'Z'</span> =&gt; { Event.Key = kbd.stab;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L830"></span>
+<span class="line" id="L831">            <span class="tok-str">'1'</span>...<span class="tok-str">'2'</span> =&gt; {</span>
+<span class="line" id="L832">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">126</span>) {</span>
+<span class="line" id="L833">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">0</span>]) { <span class="tok-comment">// insert</span>
+</span>
+<span class="line" id="L834">                        <span class="tok-str">'2'</span> =&gt;  { Event.Key = kbd.ins;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L835">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L836">                    }</span>
+<span class="line" id="L837">                }</span>
+<span class="line" id="L838">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">2</span>] == <span class="tok-number">126</span>) {</span>
+<span class="line" id="L839">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">1</span>]) { <span class="tok-comment">// f5..f12</span>
+</span>
+<span class="line" id="L840">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.F5;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L841">                        <span class="tok-str">'7'</span> =&gt; { Event.Key = kbd.F6;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L842">                        <span class="tok-str">'8'</span> =&gt; { Event.Key = kbd.F7;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L843">                        <span class="tok-str">'9'</span> =&gt; { Event.Key = kbd.F8;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L844">                        <span class="tok-str">'0'</span> =&gt; { Event.Key = kbd.F9;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L845">                        <span class="tok-str">'1'</span> =&gt; { Event.Key = kbd.F10; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L846">                        <span class="tok-str">'3'</span> =&gt; { Event.Key = kbd.F11; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L847">                        <span class="tok-str">'4'</span> =&gt; { Event.Key = kbd.F12; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L848">                        <span class="tok-kw">else</span> =&gt; {Event.Key = kbd.none;<span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L849">                    }</span>
+<span class="line" id="L850">                }</span>
+<span class="line" id="L851">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">2</span>] == <span class="tok-number">50</span>) { <span class="tok-comment">// f11..f14 and // shift</span>
+</span>
+<span class="line" id="L852">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">3</span>]) {</span>
+<span class="line" id="L853">                        <span class="tok-str">'P'</span> =&gt; { Event.Key = kbd.F13;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L854">                        <span class="tok-str">'Q'</span> =&gt; { Event.Key = kbd.F14;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L855">                        <span class="tok-str">'R'</span> =&gt; { Event.Key = kbd.F15;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L856">                        <span class="tok-str">'S'</span> =&gt; { Event.Key = kbd.F16;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L857">                        <span class="tok-str">'A'</span> =&gt; { Event.Key = kbd.up;      <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L858">                        <span class="tok-str">'B'</span> =&gt; { Event.Key = kbd.down;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L859">                        <span class="tok-str">'C'</span> =&gt; { Event.Key = kbd.right;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L860">                        <span class="tok-str">'D'</span> =&gt; { Event.Key = kbd.left;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L861">                        <span class="tok-str">'H'</span> =&gt; { Event.Key = kbd.home;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L862">                        <span class="tok-str">'F'</span> =&gt; { Event.Key = kbd.end;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L863">                        <span class="tok-str">'3'</span> =&gt; { Event.Key = kbd.delete;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L864">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.pageUp;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L865">                        <span class="tok-str">'6'</span> =&gt; { Event.Key = kbd.pageDown; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L866">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L867">                    }</span>
+<span class="line" id="L868">                }</span>
+<span class="line" id="L869">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">2</span>] == <span class="tok-number">53</span>) { <span class="tok-comment">//  sihft ctrl</span>
+</span>
+<span class="line" id="L870">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">3</span>]) {</span>
+<span class="line" id="L871">                        <span class="tok-str">'A'</span> =&gt; { Event.Key = kbd.up;       <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L872">                        <span class="tok-str">'B'</span> =&gt; { Event.Key = kbd.down;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L873">                        <span class="tok-str">'C'</span> =&gt; { Event.Key = kbd.right;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L874">                        <span class="tok-str">'D'</span> =&gt; { Event.Key = kbd.left;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L875">                        <span class="tok-str">'H'</span> =&gt; { Event.Key = kbd.home;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L876">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.pageUp;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L877">                        <span class="tok-str">'6'</span> =&gt; { Event.Key = kbd.pageDown; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L878">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L879">                    }</span>
+<span class="line" id="L880">                }</span>
+<span class="line" id="L881"></span>
+<span class="line" id="L882">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">2</span>] == <span class="tok-number">54</span>) { <span class="tok-comment">//  sihft / controle</span>
+</span>
+<span class="line" id="L883">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">3</span>]) {</span>
+<span class="line" id="L884">                        <span class="tok-str">'A'</span> =&gt; {Event.Key = kbd.up;        <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L885">                        <span class="tok-str">'B'</span> =&gt; {Event.Key = kbd.down;      <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L886">                        <span class="tok-str">'C'</span> =&gt; {Event.Key = kbd.right;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L887">                        <span class="tok-str">'D'</span> =&gt; {Event.Key = kbd.left;      <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L888">                        <span class="tok-str">'H'</span> =&gt; {Event.Key = kbd.home;      <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L889">                        <span class="tok-str">'5'</span> =&gt; {Event.Key = kbd.pageUp;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L890">                        <span class="tok-str">'6'</span> =&gt; {Event.Key = kbd.pageDown;  <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L891">                        <span class="tok-kw">else</span> =&gt; {Event.Key = kbd.none;     <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L892">                    }</span>
+<span class="line" id="L893">                }</span>
+<span class="line" id="L894"></span>
+<span class="line" id="L895">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">2</span>] == <span class="tok-number">60</span>) { <span class="tok-comment">// f11..f14</span>
+</span>
+<span class="line" id="L896">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">3</span>]) {</span>
+<span class="line" id="L897">                        <span class="tok-str">'P'</span> =&gt; { Event.Key = kbd.F13;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L898">                        <span class="tok-str">'Q'</span> =&gt; { Event.Key = kbd.F14;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L899">                        <span class="tok-str">'R'</span> =&gt; { Event.Key = kbd.F15;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L900">                        <span class="tok-str">'S'</span> =&gt; { Event.Key = kbd.F16;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L901">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L902">                    }</span>
+<span class="line" id="L903">                }</span>
+<span class="line" id="L904">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">4</span>] == <span class="tok-number">126</span>) { <span class="tok-comment">// f15..f24</span>
+</span>
+<span class="line" id="L905">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">1</span>]) {</span>
+<span class="line" id="L906">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.F17;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L907">                        <span class="tok-str">'7'</span> =&gt; { Event.Key = kbd.F18;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L908">                        <span class="tok-str">'8'</span> =&gt; { Event.Key = kbd.F19;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L909">                        <span class="tok-str">'9'</span> =&gt; { Event.Key = kbd.F20;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L910">                        <span class="tok-str">'0'</span> =&gt; { Event.Key = kbd.F21;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L911">                        <span class="tok-str">'1'</span> =&gt; { Event.Key = kbd.F22;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L912">                        <span class="tok-str">'3'</span> =&gt; { Event.Key = kbd.F23;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L913">                        <span class="tok-str">'4'</span> =&gt; { Event.Key = kbd.F24;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L914">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L915">                    }</span>
+<span class="line" id="L916">                }</span>
+<span class="line" id="L917">            },</span>
+<span class="line" id="L918"></span>
+<span class="line" id="L919">            <span class="tok-str">'5'</span>...<span class="tok-str">'6'</span> =&gt; {</span>
+<span class="line" id="L920">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">126</span>) {</span>
+<span class="line" id="L921">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">0</span>]) {</span>
+<span class="line" id="L922">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.pageUp;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L923">                        <span class="tok-str">'6'</span> =&gt; { Event.Key = kbd.pageDown; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L924">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L925">                    }</span>
+<span class="line" id="L926">                }</span>
+<span class="line" id="L927">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">3</span>] == <span class="tok-number">126</span>) {</span>
+<span class="line" id="L928">                    <span class="tok-kw">switch</span> (csibuf[<span class="tok-number">2</span>]) {</span>
+<span class="line" id="L929">                        <span class="tok-str">'5'</span> =&gt; { Event.Key = kbd.pageUp;   <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L930">                        <span class="tok-str">'6'</span> =&gt; { Event.Key = kbd.pageDown; <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L931">                        <span class="tok-kw">else</span> =&gt; { Event.Key = kbd.none;    <span class="tok-kw">return</span> Event; },</span>
+<span class="line" id="L932">                    }</span>
+<span class="line" id="L933">                }</span>
+<span class="line" id="L934">            },</span>
+<span class="line" id="L935"></span>
+<span class="line" id="L936">            <span class="tok-str">'&lt;'</span> =&gt; { <span class="tok-comment">// mouse</span>
+</span>
+<span class="line" id="L937">                MouseInfo.action = MouseAction.maNone;</span>
+<span class="line" id="L938">                MouseInfo.button = MouseButton.mbNone;</span>
+<span class="line" id="L939">                MouseInfo.scrollDir = ScrollDirection.msNone;</span>
+<span class="line" id="L940">                MouseInfo.scroll = <span class="tok-null">false</span>;</span>
+<span class="line" id="L941">                MouseInfo.x = <span class="tok-number">0</span>;</span>
+<span class="line" id="L942">                MouseInfo.y = <span class="tok-number">0</span>;</span>
+<span class="line" id="L943">                Event.Key = kbd.mouse;</span>
+<span class="line" id="L944">                Event.Char = <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L945"></span>
+<span class="line" id="L946">                <span class="tok-kw">var</span> i: <span class="tok-type">usize</span> = <span class="tok-number">3</span>;</span>
+<span class="line" id="L947">                <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L948">                    <span class="tok-kw">if</span> (csibuf[i] != <span class="tok-number">59</span> <span class="tok-kw">and</span> MouseInfo.y == <span class="tok-number">0</span>) MouseInfo.y = convIntMouse(csibuf[<span class="tok-number">3</span>]);</span>
+<span class="line" id="L949">                    <span class="tok-kw">if</span> (csibuf[i] == <span class="tok-number">59</span>) <span class="tok-kw">break</span>;</span>
+<span class="line" id="L950">                    <span class="tok-kw">if</span> (csibuf[i] != <span class="tok-number">59</span> <span class="tok-kw">and</span> i &gt; <span class="tok-number">3</span>) MouseInfo.y = (MouseInfo.y * <span class="tok-number">10</span>) + convIntMouse(csibuf[i]);</span>
+<span class="line" id="L951">                    i += <span class="tok-number">1</span>;</span>
+<span class="line" id="L952">                }</span>
+<span class="line" id="L953"></span>
+<span class="line" id="L954">                <span class="tok-kw">var</span> u: <span class="tok-type">usize</span> = i + <span class="tok-number">1</span>;</span>
+<span class="line" id="L955">                <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L956">                    <span class="tok-kw">if</span> (csibuf[u] != <span class="tok-number">59</span> <span class="tok-kw">and</span> MouseInfo.x == <span class="tok-number">0</span>) MouseInfo.x = convIntMouse(csibuf[u]);</span>
+<span class="line" id="L957">                    <span class="tok-kw">if</span> (csibuf[u] == <span class="tok-number">59</span> <span class="tok-kw">or</span> csibuf[u] == <span class="tok-number">77</span> <span class="tok-kw">or</span> csibuf[u] == <span class="tok-number">109</span>) <span class="tok-kw">break</span>;</span>
+<span class="line" id="L958">                    <span class="tok-kw">if</span> (csibuf[u] != <span class="tok-number">59</span> <span class="tok-kw">and</span> u &gt; (i + <span class="tok-number">1</span>)) MouseInfo.x = (MouseInfo.x * <span class="tok-number">10</span>) + convIntMouse(csibuf[u]);</span>
+<span class="line" id="L959">                    u += <span class="tok-number">1</span>;</span>
+<span class="line" id="L960">                }</span>
+<span class="line" id="L961"></span>
+<span class="line" id="L962">                <span class="tok-kw">if</span> (csibuf.len == <span class="tok-number">7</span>) {</span>
+<span class="line" id="L963">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">6</span>] == <span class="tok-number">77</span>)  MouseInfo.action = MouseAction.maPressed;</span>
+<span class="line" id="L964"></span>
+<span class="line" id="L965">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">6</span>] == <span class="tok-number">109</span>) MouseInfo.action = MouseAction.maReleased;</span>
+<span class="line" id="L966">                }</span>
+<span class="line" id="L967"></span>
+<span class="line" id="L968">                <span class="tok-kw">if</span> (csibuf.len == <span class="tok-number">8</span>) {</span>
+<span class="line" id="L969">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">7</span>] == <span class="tok-number">77</span>)  MouseInfo.action = MouseAction.maPressed;</span>
+<span class="line" id="L970"></span>
+<span class="line" id="L971">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">7</span>] == <span class="tok-number">109</span>) MouseInfo.action = MouseAction.maReleased;</span>
+<span class="line" id="L972">                }</span>
+<span class="line" id="L973"></span>
+<span class="line" id="L974">                <span class="tok-kw">if</span> (csibuf.len == <span class="tok-number">9</span>) {</span>
+<span class="line" id="L975">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">8</span>] == <span class="tok-number">77</span>)  MouseInfo.action = MouseAction.maPressed;</span>
+<span class="line" id="L976"></span>
+<span class="line" id="L977">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">8</span>] == <span class="tok-number">109</span>) MouseInfo.action = MouseAction.maReleased;</span>
+<span class="line" id="L978">                }</span>
+<span class="line" id="L979"></span>
+<span class="line" id="L980">                <span class="tok-kw">if</span> (csibuf.len == <span class="tok-number">10</span>) {</span>
+<span class="line" id="L981">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">9</span>] == <span class="tok-number">77</span>)  MouseInfo.action = MouseAction.maPressed;</span>
+<span class="line" id="L982"></span>
+<span class="line" id="L983">                    <span class="tok-kw">if</span> (csibuf[<span class="tok-number">9</span>] == <span class="tok-number">109</span>) MouseInfo.action = MouseAction.maReleased;</span>
+<span class="line" id="L984">                }</span>
+<span class="line" id="L985"></span>
+<span class="line" id="L986">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">48</span>) MouseInfo.button = MouseButton.mbLeft;</span>
+<span class="line" id="L987"></span>
+<span class="line" id="L988">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">49</span>) MouseInfo.button = MouseButton.mbMiddle;</span>
+<span class="line" id="L989"></span>
+<span class="line" id="L990">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">50</span>) MouseInfo.button = MouseButton.mbRight;</span>
+<span class="line" id="L991"></span>
+<span class="line" id="L992">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">54</span> <span class="tok-kw">and</span> csibuf[<span class="tok-number">2</span>] == <span class="tok-number">52</span>) {</span>
+<span class="line" id="L993">                    MouseInfo.scroll = <span class="tok-null">true</span>;</span>
+<span class="line" id="L994">                    MouseInfo.scrollDir = ScrollDirection.msUp;</span>
+<span class="line" id="L995">                    MouseInfo.x = <span class="tok-number">0</span>;</span>
+<span class="line" id="L996">                    MouseInfo.y = <span class="tok-number">0</span>;</span>
+<span class="line" id="L997">                }</span>
+<span class="line" id="L998"></span>
+<span class="line" id="L999">                <span class="tok-kw">if</span> (csibuf[<span class="tok-number">1</span>] == <span class="tok-number">54</span> <span class="tok-kw">and</span> csibuf[<span class="tok-number">2</span>] == <span class="tok-number">53</span>) {</span>
+<span class="line" id="L1000">                    MouseInfo.scroll = <span class="tok-null">true</span>;</span>
+<span class="line" id="L1001">                    MouseInfo.scrollDir = ScrollDirection.msDown;</span>
+<span class="line" id="L1002">                    MouseInfo.x = <span class="tok-number">0</span>;</span>
+<span class="line" id="L1003">                    MouseInfo.y = <span class="tok-number">0</span>;</span>
+<span class="line" id="L1004">                }</span>
+<span class="line" id="L1005"></span>
+<span class="line" id="L1006">              <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L1007"></span>
+<span class="line" id="L1008">            },</span>
+<span class="line" id="L1009">            <span class="tok-kw">else</span> =&gt; {</span>
+<span class="line" id="L1010">                Event.Key = kbd.none;</span>
+<span class="line" id="L1011">                <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L1012">            },</span>
+<span class="line" id="L1013">        }</span>
+<span class="line" id="L1014"></span>
+<span class="line" id="L1015">        Event.Key = kbd.none;</span>
+<span class="line" id="L1016">        <span class="tok-kw">return</span> Event;</span>
+<span class="line" id="L1017">    }</span>
+<span class="line" id="L1018">};</span>
+<span class="line" id="L1019"></span>
+</code></pre></body>
+</html>

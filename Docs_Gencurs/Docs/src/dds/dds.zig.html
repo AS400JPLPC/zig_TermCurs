@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>dds.zig - source view</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPNJREFUeNpi/P//PwMlgOXHUjly9E0G4hwgZmQiQZMqEK8H4v9QzUEgQSaoADK+zhH9iAGL+C0gDoAaNg9mGLoLfgA1awK9hS9gzgJxA9RQBmQDrgMxJzRMGKE4HYj/Ial5A8QmQLwCJoBsgBYW2+TR1ChDaWt4LOBxKsi/VUh8XiD+gq4IVyzwQAMJBoKwacZlAB8Qf0bi96IZhtOAe1D6LpqaEiz6rmEzQAeIzwGxCJpieFqApo/vQKyJboAaEBsAsSEupwI1MwKjGBTVHOhegMX5UajYRqiBjMgYmj400cVh0XgTiKdC0zhJgJHS7AwQYABm9EAdCKrEfAAAAABJRU5ErkJggg=="/>
+    <style>
+      body{
+        font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      pre > code {
+        display: block;
+        overflow: auto;
+        line-height: normal;
+        margin: 0em;
+      }
+      .tok-kw {
+          color: #333;
+          font-weight: bold;
+      }
+      .tok-str {
+          color: #d14;
+      }
+      .tok-builtin {
+          color: #005C7A;
+      }
+      .tok-comment {
+          color: #545454;
+          font-style: italic;
+      }
+      .tok-fn {
+          color: #900;
+          font-weight: bold;
+      }
+      .tok-null {
+          color: #005C5C;
+      }
+      .tok-number {
+          color: #005C5C;
+      }
+      .tok-type {
+          color: #458;
+          font-weight: bold;
+      }
+      pre {
+        counter-reset: line;
+      }
+      pre .line:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        padding-right: 1em;
+        width: 2em;
+        text-align: right;
+        color: #999;
+      }
+      
+      .line {
+        width: 100%;
+        display: inline-block;
+      }
+      .line:target {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        background: #fafafa;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body{
+            background:#222;
+            color: #ccc;
+        }
+        pre > code {
+            color: #ccc;
+            background: #222;
+            border: unset;
+        }
+        .line:target {
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #444;
+            background: #333;
+        }
+        .tok-kw {
+            color: #eee;
+        }
+        .tok-str {
+            color: #2e5;
+        }
+        .tok-builtin {
+            color: #ff894c;
+        }
+        .tok-comment {
+            color: #aa7;
+        }
+        .tok-fn {
+            color: #B1A0F8;
+        }
+        .tok-null {
+            color: #ff8080;
+        }
+        .tok-number {
+            color: #ff8080;
+        }
+        .tok-type {
+            color: #68f;
+        }
+      }
+    </style>
+</head>
+<body>
+<pre><code><span class="line" id="L1"></span>
+<span class="line" id="L2"><span class="tok-kw">const</span> std = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>);</span>
+<span class="line" id="L3"></span>
+<span class="line" id="L4"></span>
+<span class="line" id="L5"><span class="tok-comment">// for panel all arraylist (forms.pnl grid)</span>
+</span>
+<span class="line" id="L6"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> allocatorPnl = std.heap.page_allocator;</span>
+<span class="line" id="L7"></span>
+<span class="line" id="L8"><span class="tok-comment">//free memory  output archive JSON or Field</span>
+</span>
+<span class="line" id="L9"><span class="tok-kw">pub</span> <span class="tok-kw">var</span> arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);</span>
+<span class="line" id="L10"><span class="tok-kw">pub</span> <span class="tok-kw">var</span>  allocatorStr = arenaStr.allocator();</span>
+<span class="line" id="L11"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">deinitStr</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L12">    arenaStr.deinit();</span>
+<span class="line" id="L13">    arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);</span>
+<span class="line" id="L14">    allocatorStr = arenaStr.allocator();</span>
+<span class="line" id="L15">}</span>
+<span class="line" id="L16"></span>
+<span class="line" id="L17"></span>
+<span class="line" id="L18"><span class="tok-comment">//free memory on module output (allocprint ... divers fonction)</span>
+</span>
+<span class="line" id="L19"><span class="tok-kw">pub</span> <span class="tok-kw">var</span> arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);</span>
+<span class="line" id="L20"><span class="tok-kw">pub</span> <span class="tok-kw">var</span>  allocatorUtils = arenaUtils.allocator();</span>
+<span class="line" id="L21"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">deinitUtils</span>() <span class="tok-type">void</span> {</span>
+<span class="line" id="L22">    arenaUtils.deinit();</span>
+<span class="line" id="L23">    arenaUtils = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L24">    arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);</span>
+<span class="line" id="L25">    allocatorUtils = arenaUtils.allocator();</span>
+<span class="line" id="L26">}</span>
+<span class="line" id="L27"></span>
+<span class="line" id="L28"></span>
+<span class="line" id="L29"><span class="tok-kw">pub</span> <span class="tok-kw">const</span>  Style = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>)  {</span>
+<span class="line" id="L30">    notStyle = <span class="tok-number">0</span>,      <span class="tok-comment">// not styled</span>
+</span>
+<span class="line" id="L31">    styleBold = <span class="tok-number">1</span>,     <span class="tok-comment">// bold text</span>
+</span>
+<span class="line" id="L32">    styleDim,          <span class="tok-comment">// dim text</span>
+</span>
+<span class="line" id="L33">    styleItalic,       <span class="tok-comment">// italic (or reverse on terminals not supporting)</span>
+</span>
+<span class="line" id="L34">    styleUnderscore,   <span class="tok-comment">// underscored text</span>
+</span>
+<span class="line" id="L35">    styleBlink,        <span class="tok-comment">// blinking/bold text</span>
+</span>
+<span class="line" id="L36">    styleBlinkRapid,   <span class="tok-comment">// rapid blinking/bold text (not widely supported)</span>
+</span>
+<span class="line" id="L37">    styleReverse,      <span class="tok-comment">// reverse</span>
+</span>
+<span class="line" id="L38">    styleHidden,       <span class="tok-comment">// hidden text</span>
+</span>
+<span class="line" id="L39">    styleCrossed       <span class="tok-comment">// strikethrough</span>
+</span>
+<span class="line" id="L40">};</span>
+<span class="line" id="L41"></span>
+<span class="line" id="L42"></span>
+<span class="line" id="L43"><span class="tok-kw">pub</span> <span class="tok-kw">const</span>  typeCursor = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>)  {</span>
+<span class="line" id="L44">    cDefault,</span>
+<span class="line" id="L45">    cBlink,</span>
+<span class="line" id="L46">    cSteady,</span>
+<span class="line" id="L47">    cBlinkUnderline,</span>
+<span class="line" id="L48">    cSteadyUnderline,</span>
+<span class="line" id="L49">    cBlinkBar,</span>
+<span class="line" id="L50">    cSteadyBar</span>
+<span class="line" id="L51">};</span>
+<span class="line" id="L52"></span>
+<span class="line" id="L53"><span class="tok-comment">// def standard color fgd dull color  fg higth color</span>
+</span>
+<span class="line" id="L54"><span class="tok-kw">pub</span> <span class="tok-kw">const</span>  ForegroundColor = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>) {<span class="tok-comment">// terminal's foreground colors</span>
+</span>
+<span class="line" id="L55">    fgdBlack = <span class="tok-number">30</span>,         <span class="tok-comment">// black</span>
+</span>
+<span class="line" id="L56">    fgdRed ,               <span class="tok-comment">// red</span>
+</span>
+<span class="line" id="L57">    fgdGreen,              <span class="tok-comment">// green</span>
+</span>
+<span class="line" id="L58">    fgdYellow,             <span class="tok-comment">// yellow</span>
+</span>
+<span class="line" id="L59">    fgdBlue,               <span class="tok-comment">// blue</span>
+</span>
+<span class="line" id="L60">    fgdMagenta,            <span class="tok-comment">// magenta</span>
+</span>
+<span class="line" id="L61">    fgdCyan,               <span class="tok-comment">// cyan</span>
+</span>
+<span class="line" id="L62">    fgdWhite,              <span class="tok-comment">// white</span>
+</span>
+<span class="line" id="L63">    fgBlack = <span class="tok-number">90</span>,        <span class="tok-comment">// black</span>
+</span>
+<span class="line" id="L64">    fgRed ,               <span class="tok-comment">// red</span>
+</span>
+<span class="line" id="L65">    fgGreen,              <span class="tok-comment">// green</span>
+</span>
+<span class="line" id="L66">    fgYellow,             <span class="tok-comment">// yellow</span>
+</span>
+<span class="line" id="L67">    fgBlue,               <span class="tok-comment">// blue</span>
+</span>
+<span class="line" id="L68">    fgMagenta,            <span class="tok-comment">// magenta</span>
+</span>
+<span class="line" id="L69">    fgCyan,               <span class="tok-comment">// cyan</span>
+</span>
+<span class="line" id="L70">    fgWhite      ,        <span class="tok-comment">// white</span>
+</span>
+<span class="line" id="L71">};</span>
+<span class="line" id="L72"></span>
+<span class="line" id="L73"><span class="tok-kw">pub</span> <span class="tok-kw">const</span>  BackgroundColor = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>)  { <span class="tok-comment">// terminal's background colors</span>
+</span>
+<span class="line" id="L74">    bgBlack = <span class="tok-number">40</span>,         <span class="tok-comment">// black</span>
+</span>
+<span class="line" id="L75">    bgRed ,               <span class="tok-comment">// red</span>
+</span>
+<span class="line" id="L76">    bgGreen,              <span class="tok-comment">// green</span>
+</span>
+<span class="line" id="L77">    bgYellow,             <span class="tok-comment">// yellow</span>
+</span>
+<span class="line" id="L78">    bgBlue,               <span class="tok-comment">// blue</span>
+</span>
+<span class="line" id="L79">    bgMagenta,            <span class="tok-comment">// magenta</span>
+</span>
+<span class="line" id="L80">    bgCyan  = <span class="tok-number">106</span> ,       <span class="tok-comment">// cyan</span>
+</span>
+<span class="line" id="L81">    bgWhite = <span class="tok-number">47</span>,         <span class="tok-comment">// white</span>
+</span>
+<span class="line" id="L82">};</span>
+<span class="line" id="L83"></span>
+<span class="line" id="L84"></span>
+<span class="line" id="L85"></span>
+<span class="line" id="L86"><span class="tok-comment">// attribut standard</span>
+</span>
+<span class="line" id="L87"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ZONATRB = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L88">    styled      : [<span class="tok-number">4</span>]<span class="tok-type">u32</span>,</span>
+<span class="line" id="L89">    backgr      : BackgroundColor,</span>
+<span class="line" id="L90">    foregr      : ForegroundColor</span>
+<span class="line" id="L91"></span>
+<span class="line" id="L92">};</span>
+<span class="line" id="L93"></span>
+<span class="line" id="L94"></span>
+<span class="line" id="L95"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CADRE = <span class="tok-kw">enum</span>  {</span>
+<span class="line" id="L96">    line0,</span>
+<span class="line" id="L97">    line1,</span>
+<span class="line" id="L98">    line2</span>
+<span class="line" id="L99">};</span>
+<span class="line" id="L100"></span>
+<span class="line" id="L101"></span>
+<span class="line" id="L102"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> LINE = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L103">    line1 ,</span>
+<span class="line" id="L104">    line2</span>
+<span class="line" id="L105">};</span>
+<span class="line" id="L106"></span>
+<span class="line" id="L107"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MNUVH = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L108">vertical ,</span>
+<span class="line" id="L109">horizontal</span>
+<span class="line" id="L110">};</span>
+<span class="line" id="L111"></span>
+<span class="line" id="L112"></span>
+<span class="line" id="L113"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> REFTYP = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L114">    TEXT_FREE,            <span class="tok-comment">// Free</span>
+</span>
+<span class="line" id="L115">    TEXT_FULL,            <span class="tok-comment">// Letter Digit Char-special</span>
+</span>
+<span class="line" id="L116">    ALPHA,                <span class="tok-comment">// Letter</span>
+</span>
+<span class="line" id="L117">    ALPHA_UPPER,          <span class="tok-comment">// Letter</span>
+</span>
+<span class="line" id="L118">    ALPHA_NUMERIC,        <span class="tok-comment">// Letter Digit espace -</span>
+</span>
+<span class="line" id="L119">    ALPHA_NUMERIC_UPPER,  <span class="tok-comment">// Letter Digit espace -</span>
+</span>
+<span class="line" id="L120">    PASSWORD,             <span class="tok-comment">// Letter Digit and normaliz char-special</span>
+</span>
+<span class="line" id="L121">    YES_NO,               <span class="tok-comment">// 'y' or 'Y' / 'o' or 'O'</span>
+</span>
+<span class="line" id="L122">    UDIGIT,               <span class="tok-comment">// Digit unsigned</span>
+</span>
+<span class="line" id="L123">    DIGIT,                <span class="tok-comment">// Digit signed </span>
+</span>
+<span class="line" id="L124">    UDECIMAL,             <span class="tok-comment">// Decimal unsigned</span>
+</span>
+<span class="line" id="L125">    DECIMAL,              <span class="tok-comment">// Decimal signed</span>
+</span>
+<span class="line" id="L126">    DATE_ISO,             <span class="tok-comment">// YYYY/MM/DD</span>
+</span>
+<span class="line" id="L127">    DATE_FR,              <span class="tok-comment">// DD/MM/YYYY</span>
+</span>
+<span class="line" id="L128">    DATE_US,              <span class="tok-comment">// MM/DD/YYYY</span>
+</span>
+<span class="line" id="L129">    TELEPHONE,            <span class="tok-comment">// (+123) 6 00 01 00 02 </span>
+</span>
+<span class="line" id="L130">    MAIL_ISO,             <span class="tok-comment">// normalize regex</span>
+</span>
+<span class="line" id="L131">    SWITCH,               <span class="tok-comment">// CTRUE CFALSE</span>
+</span>
+<span class="line" id="L132">    FUNC,                 <span class="tok-comment">// call Function</span>
+</span>
+<span class="line" id="L133">    FCALL                 <span class="tok-comment">// call program</span>
+</span>
+<span class="line" id="L134">};</span>
+<span class="line" id="L135"></span>
+<span class="line" id="L136"></span>
+<span class="line" id="L137"></span>
+<span class="line" id="L138"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALIGNS = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L139">    left ,</span>
+<span class="line" id="L140">    rigth</span>
+<span class="line" id="L141">    };</span>
+<span class="line" id="L142"></span>
+<span class="line" id="L143"></span>
+<span class="line" id="L144"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CMP = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L145">    LT,</span>
+<span class="line" id="L146">    EQ,</span>
+<span class="line" id="L147">    GT</span>
+<span class="line" id="L148">};</span>
+<span class="line" id="L149"></span>
+<span class="line" id="L150"></span>
+<span class="line" id="L151"><span class="tok-comment">// display grid</span>
+</span>
+<span class="line" id="L152"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CTRUE  = <span class="tok-str">&quot;✔&quot;</span>;</span>
+<span class="line" id="L153"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CFALSE = <span class="tok-str">&quot; &quot;</span>;</span>
+<span class="line" id="L154"><span class="tok-comment">// input   field</span>
+</span>
+<span class="line" id="L155"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> STRUE  = <span class="tok-str">&quot;✔&quot;</span>;</span>
+<span class="line" id="L156"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SFALSE = <span class="tok-str">&quot;◉&quot;</span>;</span>
+</code></pre></body>
+</html>

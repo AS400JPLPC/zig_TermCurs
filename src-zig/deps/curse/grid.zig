@@ -2,8 +2,13 @@ const std = @import("std");
 const utf = @import("std").unicode;
 
 const dds = @import("dds");
+
+/// terminal Fonction
+const term = @import("cursed");
+// keyboard
 const kbd = @import("cursed").kbd;
-const term= @import("cursed");
+
+// tools utility
 const utl = @import("utils");
 
 
@@ -49,13 +54,11 @@ const io = std.io;
 
 
 /// Errors that may occur when using String
-pub const ErrForms = error{
-        Invalide_append,
-        Invalide_Grid,
-        Invalide_Grid_Buf,
+pub const ErrGrid = error{
         grd_dltRows_Index_invalide,
-
 };
+
+
 
 // buffer terminal MATRIX
 const TERMINAL_CHAR = struct {
@@ -66,6 +69,7 @@ const TERMINAL_CHAR = struct {
 
 
 const allocatorGrid = std.heap.page_allocator;
+
 
 pub const  grd = struct {
 
@@ -169,12 +173,28 @@ pub const  grd = struct {
 
   /// concat String
   fn concatStr( a: []const u8, b: []const u8) []const u8 {
-    return std.fmt.allocPrint(allocatorGrid,"{s}{s}",.{a,b},)  catch unreachable;
+    return std.fmt.allocPrint(allocatorGrid,"{s}{s}",.{a,b},) catch |err| { @panic(@errorName(err));};
   }
+
+  /// substring String
+fn subStrGrid(a: []const u8,pos: usize, n:usize) []const u8 {
+  if (n == 0 or n > a.len)  @panic("Invalide_subStrGrid_Index");
+
+  if (pos > a.len) @panic("ErrGrid.Invalide_subStr_Index");
+
+  const allocator = std.heap.page_allocator;
+  const result = allocator.alloc(u8, n - pos) 
+                catch |err| { @panic(@errorName(err));};
+  defer allocator.free(result);
+
+  std.mem.copy(u8, result, a[pos..n]);
+  return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+                catch |err| { @panic(@errorName(err));};
+}
 
 
   // pading Cell 
-  fn padingCell( text:[] const u8 , cell :CELL) [] const u8 {
+  fn padingCell(text:[] const u8 , cell :CELL) [] const u8 {
 
     var i: usize = 0;
 
@@ -195,15 +215,15 @@ pub const  grd = struct {
         cell.reftyp == dds.REFTYP.DECIMAL)
         {
           if (utl.isSignedStr(text) == true ) {
-              e_FIELD = utl.subStr(e_FIELD,1,e_FIELD.len) catch unreachable ;
-              e_signed = utl.subStr(text,0,1) catch unreachable ;
+              e_FIELD = subStrGrid(e_FIELD,1,e_FIELD.len);
+              e_signed = subStrGrid(text,0,1);
           }
 
           e_FIELD = utl.alignStr(e_FIELD,dds.ALIGNS.rigth,cell.long);
 
           if (cell.reftyp == dds.REFTYP.DIGIT or cell.reftyp == dds.REFTYP.DECIMAL) {
 
-            e_FIELD = utl.subStr(e_FIELD,1,e_FIELD.len) catch unreachable ;
+            e_FIELD = subStrGrid(e_FIELD,1,e_FIELD.len);
 
             if ( utl.isSignedStr(text) == false )   e_FIELD = concatStr("+",e_FIELD)
             else e_FIELD = concatStr(e_signed,e_FIELD);
@@ -242,7 +262,8 @@ pub const  grd = struct {
               vcadre    : dds.CADRE
               ) *GRID {
 
-    var device = dds.allocatorPnl.create(GRID) catch unreachable ;
+    var device = dds.allocatorPnl.create(GRID) 
+                  catch |err| { @panic(@errorName(err));};
 
     device.name  = vname;
     device.posx  = vposx;
@@ -332,10 +353,7 @@ pub const  grd = struct {
   pub fn setHeaders(self : *GRID) void  {
     self.cols = 0;
     for (self.cell.items) |xcell| {
-      self.headers.append(xcell) catch   {
-                                      std.debug.print("append header GRID {s} err={}\n", .{self.name,ErrForms.Invalide_append});
-                                      _= kbd.getKEY();
-                                    }; 
+      self.headers.append(xcell) catch |err| { @panic(@errorName(err));}; 
     }
     self.cols += getLenHeaders(self) ;
     // this.lines + 2 = cadre + header    cols + separator
@@ -348,10 +366,7 @@ pub const  grd = struct {
     // init matrix
     while (true) {
         if (i == 0) break ;
-        self.buf.append(doublebuffer) catch {
-                std.debug.print("setHeader doubleBuffererr={}\n", .{ErrForms.Invalide_Grid_Buf});
-                _= kbd.getKEY();
-                };
+        self.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
         i -=1 ;
     }
 
@@ -402,7 +417,7 @@ pub const  grd = struct {
         .atrCell = toRefColor(TextColor)
       };
 
-    self.cell.append(cell) catch unreachable;
+    self.cell.append(cell) catch |err| { @panic(@errorName(err));};
   }
 
   // Set Char  -cell ---> arraylist panel-grid
@@ -451,18 +466,18 @@ pub const  grd = struct {
   pub fn addRows(self: *GRID,  vrows: []const []const u8) void {
     const vlist = std.ArrayList([]const u8);
     var m = vlist.init(allocatorGrid);
-    m.appendSlice(vrows) catch unreachable;
-    self.data.append(allocatorGrid ,.{.buf = m}) catch unreachable;
+    m.appendSlice(vrows) catch |err| { @panic(@errorName(err));};
+    self.data.append(allocatorGrid ,.{.buf = m}) catch |err| { @panic(@errorName(err));};
     setPageGrid(self) ;
   }
 
   // delete row  -data ---> arraylist panel-grid
-  pub fn dltRows(self: *GRID,  r :usize )  ErrForms ! void {
+  pub fn dltRows(self: *GRID,  r :usize )  ErrGrid ! void {
     if ( r < self.data.len )  {
       self.data.orderedRemove(r);
       setPageGrid(self) ;
     }
-    else return ErrForms.grd_dltRows_Index_invalide;
+    else return ErrGrid.grd_dltRows_Index_invalide;
   }
 
   // reset row data  -GRID ---> arraylist panel-grid
@@ -633,12 +648,15 @@ pub const  grd = struct {
     for (self.headers.items) |cellx| {
       if (std.mem.eql(u8,cellx.edtcar , "") == true )
         buf = std.fmt.allocPrint(allocatorGrid,
-          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long) }) catch unreachable
+          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long) }) 
+          catch |err| { @panic(@errorName(err));}
       else
         buf = std.fmt.allocPrint(allocatorGrid,
-          "{s}{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long),Blanc }) catch unreachable;
+          "{s}{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long),Blanc })
+          catch |err| { @panic(@errorName(err));};
     }
-    buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,self.separator}) catch unreachable;
+    buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,self.separator}) 
+                  catch |err| { @panic(@errorName(err));};
 
     var x :usize = 1;
     var y :usize = 0;
@@ -663,39 +681,41 @@ pub const  grd = struct {
         cellx.reftyp == dds.REFTYP.DECIMAL)
 
           buf = std.fmt.allocPrint(allocatorGrid,
-          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.rigth,cellx.long) }) catch unreachable
+          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.rigth,cellx.long) }) 
+          catch |err| { @panic(@errorName(err));}
 
       else buf = std.fmt.allocPrint(allocatorGrid,
-          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.left,cellx.long) }) catch unreachable;
+          "{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.left,cellx.long) }) 
+          catch |err| { @panic(@errorName(err));};
 
-      if (std.mem.eql(u8,cellx.edtcar , "") == false ) buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,Blanc}) catch unreachable;
-    }
+      if (std.mem.eql(u8,cellx.edtcar , "") == false ) buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,Blanc}) 
+                                                                    catch |err| { @panic(@errorName(err));};
 
-    n = getLenHeaders(self);
-    var iter = utl.iteratStr.iterator(buf);
-    defer iter.deinit();
-    while (iter.next()) |ch| : ( n += 1) {
-      self.buf.items[n].ch = ch;
-      self.buf.items[n].attribut  = self.atrTitle;
-      self.buf.items[n].on = true;
-    }
+      n = getLenHeaders(self);
+      var iter = utl.iteratStr.iterator(buf);
+      defer iter.deinit();
+      while (iter.next()) |ch| : ( n += 1) {
+        self.buf.items[n].ch = ch;
+        self.buf.items[n].attribut  = self.atrTitle;
+        self.buf.items[n].on = true;
+      }
 
-    // this.lines + 2 = cadre + header
-    GridBox(self );
+      // this.lines + 2 = cadre + header
+      GridBox(self );
 
-    x = 1;
-    y = 0;
-    n = 0;
-    while (x <= self.lines) : (x += 1) {
-      y = 1;
-      while (y <= getLenHeaders(self)) : (y += 1) {
-        term.gotoXY(x + self.posx - 1  , y + self.posy - 1 );
-        term.writeStyled(self.buf.items[n].ch,self.buf.items[n].attribut);
-        n += 1;
+      x = 1;
+      y = 0;
+      n = 0;
+      while (x <= self.lines) : (x += 1) {
+        y = 1;
+        while (y <= getLenHeaders(self)) : (y += 1) {
+          term.gotoXY(x + self.posx - 1  , y + self.posy - 1 );
+          term.writeStyled(self.buf.items[n].ch,self.buf.items[n].attribut);
+          n += 1;
+        }
       }
     }
   }
-
 
   // assign and display -data MATRIX TERMINAL  ---> arraylist panel-grid
   pub fn printGridRows(self: *GRID) void {
@@ -774,11 +794,12 @@ pub const  grd = struct {
   };
 
 
-  ///------------------------------------
-  /// manual= on return pageUp/pageDown no select
-  /// esc   = return no select
-  /// enter = return enter and line select 
-  /// -----------------------------------
+  //------------------------------------
+  // manual= on return pageUp/pageDown no select
+  // esc   = return no select
+  // enter = return enter and line select 
+  // -----------------------------------
+  
   pub fn ioGrid(self: *GRID , manual: bool) GridSelect {
 
     var gSelect : GridSelect = .{

@@ -1,3 +1,11 @@
+
+
+
+A revoir suit à la mise en place des catch et diffente adaptation
+
+To be reviewed following the implementation of wrestling and different adaptation
+
+
 const std = @import("std");
 
 const dds = @import("dds");
