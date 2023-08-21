@@ -15,6 +15,11 @@ pub fn build(b: *std.build) void {
     // zig-src/lib        source .h 
 
 
+    // Definition of logger
+    const logger = b.createModule(.{
+      .source_file = .{ .path = "./deps/curse/logger.zig"},
+    });
+
     // Definition of module
     const match = b.createModule(.{
       .source_file = .{ .path = "./deps/curse/match.zig"},
@@ -85,6 +90,18 @@ pub fn build(b: *std.build) void {
       },
     });
 
+    const mdlSjson = b.createModule(.{
+      .source_file = .{ .path = "./mdlSjson.zig" },
+      .dependencies= &.{
+        .{ .name = "dds",    .module = dds },
+        .{ .name = "cursed", .module = cursed },
+        .{ .name = "utils",  .module = utils },
+        .{ .name = "forms",  .module = forms },
+        .{ .name = "grid",   .module = grid  },
+        .{ .name = "match",  .module = match },
+      },
+    });
+
     // Building the executable
 
     const Prog = b.addExecutable(.{
@@ -106,8 +123,9 @@ pub fn build(b: *std.build) void {
     Prog.addModule("match" , match);
     Prog.addModule("mdlPanel" , mdlPanel);
     Prog.addModule("mdlObjet" , mdlObjet);
+    Prog.addModule("mdlSjson" , mdlSjson);
 
-
+    Prog.addModule("logger" , logger);
 
     const install_exe = b.addInstallArtifact(Prog, .{});
     b.getInstallStep().dependOn(&install_exe.step); 

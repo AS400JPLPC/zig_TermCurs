@@ -22,16 +22,21 @@ Currently everything is not operational and the goal is to make a screen generat
 ** I use the gencurs program to thoroughly test the termcurs lib.<br />**
 <br />
 <BR />
-Thank you
-Resumption of the project https://github.com/xyaman/mibu
+Thank you<br/>
 a little more : XYAMAN
-<BR />
-Thank you
+Resumption of the project https://github.com/xyaman/mibu<BR />
+
+Thank you<BR />
 https://zig.news/<BR />
-https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm<BR />
-https://zig.news/david_vanderson<BR /> thank you for your valuable explanations   David Vanderson <BR />
-https://zig.news/xq/zig-build-explained-part-3-1ima <BR /> Structure the complex build<BR />
-https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> inspiration<BR />
+https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm<BR /><BR />
+ thank you for your valuable explanations   David Vanderson<br />
+https://zig.news/david_vanderson<br /> <br />
+Structure the complex build
+https://zig.news/xq/zig-build-explained-part-3-1ima <BR /><br />
+inspiration
+https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> <br />
+extra..., to follow and have a history
+https://github.com/kissy24/zig-logger/<BR /> <br />
 <br />
 
 ![](assets/20230605_135950_Exemple.png)
@@ -39,7 +44,7 @@ https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> inspiration<BR />
 
 **In the example, some errors are introduced such as the mail, all of this is voluntary and allows you to see the default interaction of the input control.<br />**
 <br />
-<br />
+
 
 
 ![](assets/20230213_012619_mdlPanel.png)
@@ -288,5 +293,13 @@ My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" function
 -  2023-08-12 **After a big discussion, setting up the wrestling**<br />
 -  2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
 
+-  2023-08-14 Installation of a logger
+I modified the logger and redirected to a file,
+it can also be used for recording other than errors or for monitoring data, diagrams test [zig_demoJson](https://github.com/AS400JPLPC/zig_demoJson) <br />
+<br />
+<br />
+-  2023-08-21 First Json test, now I will refine,
+it's too hot break.<br />
 
-
+-  2023-08-21 in .vscode, "Print source" software enscript, zig is not yet listed, but with "java" we have something quite clean
+look at my task option "print *Source". There comes a time when you need paper to mark.....<br />

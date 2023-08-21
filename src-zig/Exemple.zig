@@ -1,11 +1,3 @@
-
-
-
-A revoir suit à la mise en place des catch et diffente adaptation
-
-To be reviewed following the implementation of wrestling and different adaptation
-
-
 const std = @import("std");
 
 const dds = @import("dds");
@@ -47,8 +39,11 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("match");
 
+/// Errors 
+pub const Error = error{
 
-
+        main_function_Enum_invalide,
+};
 /// ---------------------------------------------------
 /// Exemple defined Panel Label Field Button Menu Grid
 /// ---------------------------------------------------
@@ -493,7 +488,7 @@ pub const FnEnum = enum {
       switch (self) {
           .comboFn01 => comboFn01(vpnl,vfld),
           .comboFn02 => comboFn02(vpnl,vfld),
-          else => dsperr.errorForms( error.main_function_Enum_invalide),
+          else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
       }
   }
 
@@ -609,7 +604,7 @@ pub fn main() !void {
           Gkey =grd.ioGrid(Grid01,true);
 
           if ( Gkey.Key == kbd.enter and pFmt01.idxfld == 0) {
-            fld.setText(pFmt01,0,Gkey.Buf.items[2]) catch |err| {dsperr.errorForms(err); return;};
+            fld.setText(pFmt01,0,Gkey.Buf.items[2]) catch |err| {dsperr.errorForms(pFmt01,err); return;};
             // exemple key reccord hiden 
             //fld.setText(&pFmt01,0,Gkey.Buf.items[5]) catch |err| {dsperr.errorForms(err); return;};
             break;

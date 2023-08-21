@@ -181,6 +181,16 @@
       "close": true
     }
     },
+    {
+      "label": "Print *source",
+      "type": "shell",
+      "command": "./.vscode/enscript.sh ${fileBasename} ${fileDirname} ${workspaceFolder}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+      }
+    },
 
   ]
 }

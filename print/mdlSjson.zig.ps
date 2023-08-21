@@ -1,0 +1,2738 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 571 818
+%%Title: Enscript Output
+%%For: SOLEIL
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Mon Aug 21 23:46:05 2023
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88594 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/Aogonek      	/kgreenlandic 	/Rcedilla     	
+/currency     	/Itilde       	/Lcedilla     	/section      	
+/dieresis     	/Scaron       	/Emacron      	/Gcedilla     	
+/Tbar         	/hyphen       	/Zcaron       	/macron       	
+/degree       	/aogonek      	/ogonek       	/rcedilla     	
+/acute        	/itilde       	/lcedilla     	/caron        	
+/cedilla      	/scaron       	/emacron      	/gacute       	
+/tbar         	/Eng          	/zcaron       	/eng          	
+/Amacron      	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Iogonek      	
+/Ccaron       	/Eacute       	/Eogonek      	/Edieresis    	
+/Edotaccent   	/Iacute       	/Icircumflex  	/Imacron      	
+/Eth          	/Ncedilla     	/Omacron      	/Kcedilla     	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Uogonek      	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Utilde       	/Umacron      	/germandbls   	
+/amacron      	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/iogonek      	
+/ccaron       	/eacute       	/eogonek      	/edieresis    	
+/edotaccent   	/iacute       	/icircumflex  	/imacron      	
+/dbar         	/ncedilla     	/omacron      	/kcedilla     	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/uogonek      	/uacute       	/ucircumflex  	
+/udieresis    	/utilde       	/umacron      	/dotaccent    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 10 10 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 794 def
+/d_page_h 547 def
+/d_header_x 0 def
+/d_header_y 511 def
+/d_header_w 794 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 794 def
+/d_footer_h 0 def
+/d_output_w 794 def
+/d_output_h 511 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 1 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+30 498 M (1:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 498 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 498 M
+( std = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 498 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 498 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 498 M
+("std") s
+/F-gs-font 10 10 SF
+0 setgray
+198 498 M
+(\);) s
+30 487 M (2:) s
+30 476 M (3:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 476 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 476 M
+( dds = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 476 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 476 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 476 M
+("dds") s
+/F-gs-font 10 10 SF
+0 setgray
+198 476 M
+(\);) s
+30 465 M (4:) s
+30 454 M (5:) s
+30 443 M (6:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 443 M
+(// keyboard) s
+/F-gs-font 10 10 SF
+30 432 M (7:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 432 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 432 M
+( kbd = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 432 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 432 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 432 M
+("cursed") s
+/F-gs-font 10 10 SF
+0 setgray
+216 432 M
+(\).kbd;) s
+30 421 M (8:) s
+30 410 M (9:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 410 M
+(// panel) s
+/F-gs-font 10 10 SF
+24 399 M (10:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 399 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 399 M
+( pnl = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 399 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 399 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 399 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 399 M
+(\).pnl;) s
+24 388 M (11:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 388 M
+(// button) s
+/F-gs-font 10 10 SF
+24 377 M (12:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 377 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 377 M
+( btn = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 377 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 377 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 377 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 377 M
+(\).btn;) s
+24 366 M (13:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 366 M
+(// label) s
+/F-gs-font 10 10 SF
+24 355 M (14:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 355 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 355 M
+( lbl = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 355 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 355 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 355 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 355 M
+(\).lbl;) s
+24 344 M (15:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 344 M
+(// menu) s
+/F-gs-font 10 10 SF
+24 333 M (16:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 333 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 333 M
+( mnu = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 333 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 333 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 333 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 333 M
+(\).mnu;) s
+24 322 M (17:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 322 M
+(// flied) s
+/F-gs-font 10 10 SF
+24 311 M (18:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 311 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 311 M
+( fld = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 311 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 311 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 311 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 311 M
+(\).fld;) s
+24 300 M (19:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 300 M
+(// line horizontal) s
+/F-gs-font 10 10 SF
+24 289 M (20:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 289 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 289 M
+( lnh = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 289 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 289 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 289 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 289 M
+(\).lnh;) s
+24 278 M (21:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 278 M
+(// line vertival) s
+/F-gs-font 10 10 SF
+24 267 M (22:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 267 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 267 M
+( lnv = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 267 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 267 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 267 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+210 267 M
+(\).lnv;) s
+24 256 M (23:) s
+24 245 M (24:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 245 M
+(// grid) s
+/F-gs-font 10 10 SF
+24 234 M (25:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 234 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 234 M
+( grd = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 234 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+162 234 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 234 M
+("grid") s
+/F-gs-font 10 10 SF
+0 setgray
+204 234 M
+(\).grd;) s
+24 223 M (26:) s
+24 212 M (27:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 212 M
+(// full delete for produc) s
+/F-gs-font 10 10 SF
+24 201 M (28:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 201 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 201 M
+( forms = @) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+138 201 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+174 201 M
+(\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+180 201 M
+("forms") s
+/F-gs-font 10 10 SF
+0 setgray
+222 201 M
+(\);) s
+24 190 M (29:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 190 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 190 M
+( allocator = std.heap.page_allocator;) s
+24 179 M (30:) s
+24 168 M (31:) s
+24 157 M (32:) s
+48 157 M
+(pub fn SavJson\(XPANEL: std.ArrayList\(pnl.PANEL\)\) !) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+348 157 M
+(void) s
+/F-gs-font 10 10 SF
+0 setgray
+372 157 M
+( {) s
+24 146 M (33:) s
+24 135 M (34:) s
+48 135 M
+(var out_buf: [20480]u8 = undefined;) s
+24 124 M (35:) s
+48 124 M
+(var slice_stream = std.io.fixedBufferStream\(&out_buf\);) s
+24 113 M (36:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 113 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 113 M
+( out = slice_stream.writer\(\);) s
+24 102 M (37:) s
+24 91 M (38:) s
+48 91 M
+(var w = std.json.writeStream\(out, .{ .whitespace = .indent_2 }\);) s
+24 80 M (39:) s
+24 69 M (40:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 69 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+78 69 M
+( Ipanel = std.enums.EnumIndexer\(pnl.Epanel\);) s
+24 58 M (41:) s
+48 58 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 58 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+78 58 M
+( w.beginObject\(\);) s
+24 47 M (42:) s
+48 47 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 47 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+78 47 M
+( w.objectField\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+168 47 M
+("PANEL") s
+/F-gs-font 10 10 SF
+0 setgray
+210 47 M
+(\);) s
+24 36 M (43:) s
+48 36 M
+(  var nbrPnl : usize  = XPANEL.items.len ;) s
+24 25 M (44:) s
+48 25 M
+(  var np :usize = 0 ;) s
+24 14 M (45:) s
+48 14 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 14 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+90 14 M
+( \(np < nbrPnl\) : \( np += 1\) {) s
+24 3 M (46:) s
+48 3 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 3 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+90 3 M
+( w.beginArray\(\);) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 2 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+24 498 M (47:) s
+48 498 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 498 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+114 498 M
+( w.beginObject\(\);) s
+24 487 M (48:) s
+48 487 M
+(        var p : usize = 0;) s
+24 476 M (49:) s
+48 476 M
+(          ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+108 476 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+138 476 M
+(\(p < Ipanel.count \) : \( p += 1\) {) s
+24 465 M (50:) s
+48 465 M
+(            ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+120 465 M
+(switch) s
+/F-gs-font 10 10 SF
+0 setgray
+156 465 M
+(\(Ipanel.keyForIndex\(p\)\) {) s
+24 454 M (51:) s
+48 454 M
+(              .name  => {) s
+24 443 M (52:) s
+48 443 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 443 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 443 M
+( w.objectField\(@tagName\(pnl.Epanel.name\)\);) s
+24 432 M (53:) s
+48 432 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 432 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 432 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 432 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+318 432 M
+(,.{XPANEL.items[np].name}\) ;) s
+24 421 M (54:) s
+48 421 M
+(              },) s
+24 410 M (55:) s
+48 410 M
+(              .posx  => {) s
+24 399 M (56:) s
+48 399 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 399 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 399 M
+( w.objectField\(@tagName\(pnl.Epanel.posx\)\);) s
+24 388 M (57:) s
+48 388 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 388 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 388 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 388 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+294 388 M
+(,.{XPANEL.items[np].posx}\) ;) s
+24 377 M (58:) s
+48 377 M
+(              },) s
+24 366 M (59:) s
+48 366 M
+(              .posy  => {) s
+24 355 M (60:) s
+48 355 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 355 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 355 M
+( w.objectField\(@tagName\(pnl.Epanel.posy\)\);) s
+24 344 M (61:) s
+48 344 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 344 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 344 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 344 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+294 344 M
+(,.{XPANEL.items[np].posy}\) ;) s
+24 333 M (62:) s
+48 333 M
+(              },) s
+24 322 M (63:) s
+48 322 M
+(              .lines  => {) s
+24 311 M (64:) s
+48 311 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 311 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 311 M
+( w.objectField\(@tagName\(pnl.Epanel.lines\)\);) s
+24 300 M (65:) s
+48 300 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 300 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 300 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 300 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+294 300 M
+(,.{XPANEL.items[np].lines}\) ;) s
+24 289 M (66:) s
+48 289 M
+(              },) s
+24 278 M (67:) s
+48 278 M
+(              .cadre  => {) s
+24 267 M (68:) s
+48 267 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 267 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 267 M
+( w.objectField\(@tagName\(pnl.Epanel.cadre\)\);) s
+24 256 M (69:) s
+48 256 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 256 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 256 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 256 M
+("{s}") s
+/F-gs-font 10 10 SF
+0 setgray
+294 256 M
+(,.{@tagName\(XPANEL.items[np].frame.cadre\)}\) ;) s
+24 245 M (70:) s
+48 245 M
+(              },) s
+24 234 M (71:) s
+48 234 M
+(              .title  => {) s
+24 223 M (72:) s
+48 223 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 223 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 223 M
+( w.objectField\(@tagName\(pnl.Epanel.title\)\);) s
+24 212 M (73:) s
+48 212 M
+(                        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+192 212 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+210 212 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 212 M
+("{s}") s
+/F-gs-font 10 10 SF
+0 setgray
+294 212 M
+(,.{XPANEL.items[np].frame.title}\) ;) s
+24 201 M (74:) s
+48 201 M
+(              },) s
+24 190 M (75:) s
+48 190 M
+(              .button => {) s
+24 179 M (76:) s
+24 168 M (77:) s
+48 168 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 168 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+174 168 M
+( Ibutton = std.enums.EnumIndexer\(btn.Ebutton\);) s
+24 157 M (78:) s
+48 157 M
+(                var nbrBtn : usize  = XPANEL.items[np].button.items.len ;) s
+24 146 M (79:) s
+48 146 M
+(                var bp :usize = 0 ;) s
+24 135 M (80:) s
+48 135 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 135 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 135 M
+( w.objectField\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+252 135 M
+("button") s
+/F-gs-font 10 10 SF
+0 setgray
+300 135 M
+(\);) s
+24 124 M (81:) s
+48 124 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 124 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 124 M
+( w.beginArray\(\);) s
+24 113 M (82:) s
+48 113 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 113 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+174 113 M
+(\(bp < nbrBtn \) : \( bp += 1\) {) s
+24 102 M (83:) s
+48 102 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 102 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+174 102 M
+( w.beginObject\(\);) s
+24 91 M (84:) s
+48 91 M
+(                  var b : usize = 0;) s
+24 80 M (85:) s
+48 80 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 80 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+186 80 M
+(\(b < Ibutton.count\) : \( b += 1\) {) s
+24 69 M (86:) s
+24 58 M (87:) s
+48 58 M
+(                    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+168 58 M
+(switch) s
+/F-gs-font 10 10 SF
+0 setgray
+204 58 M
+(\(Ibutton.keyForIndex\(b\)\) {) s
+24 47 M (88:) s
+48 47 M
+(                      .name  => {) s
+24 36 M (89:) s
+48 36 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 36 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 36 M
+( w.objectField\(@tagName\(btn.Ebutton.name\)\);) s
+24 25 M (90:) s
+48 25 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 25 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 25 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 25 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 25 M
+(,.{XPANEL.items[np].button.items[bp].name}\) ;) s
+24 14 M (91:) s
+48 14 M
+(                      },) s
+24 3 M (92:) s
+48 3 M
+(                      .key  => {) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 3 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+24 498 M (93:) s
+48 498 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 498 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 498 M
+( w.objectField\(@tagName\(btn.Ebutton.key\)\);) s
+24 487 M (94:) s
+48 487 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 487 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 487 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 487 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 487 M
+(,.{@tagName\(XPANEL.items[np].button.items[bp].key\)}\) ;) s
+24 476 M (95:) s
+48 476 M
+(                      },) s
+24 465 M (96:) s
+48 465 M
+(                      .show  => {) s
+24 454 M (97:) s
+48 454 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 454 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 454 M
+( w.objectField\(@tagName\(btn.Ebutton.show\)\);) s
+24 443 M (98:) s
+48 443 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 443 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 443 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 443 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 443 M
+(,.{@intFromBool\(XPANEL.items[np].button.items[bp].show\)}\) ;) s
+24 432 M (99:) s
+48 432 M
+(                      },) s
+18 421 M (100:) s
+48 421 M
+(                      .check  => {) s
+18 410 M (101:) s
+48 410 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 410 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 410 M
+( w.objectField\(@tagName\(btn.Ebutton.check\)\);) s
+18 399 M (102:) s
+48 399 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 399 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 399 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 399 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 399 M
+(,.{@intFromBool\(XPANEL.items[np].button.items[bp].check\)}\) ;) s
+18 388 M (103:) s
+48 388 M
+(                      },) s
+18 377 M (104:) s
+48 377 M
+(                      .title  => {) s
+18 366 M (105:) s
+48 366 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 366 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 366 M
+( w.objectField\(@tagName\(btn.Ebutton.title\)\);) s
+18 355 M (106:) s
+48 355 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 355 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 355 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 355 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 355 M
+(,.{XPANEL.items[np].button.items[bp].title}\) ;) s
+18 344 M (107:) s
+48 344 M
+(                      }) s
+18 333 M (108:) s
+48 333 M
+(                    }) s
+18 322 M (109:) s
+48 322 M
+(                  }) s
+18 311 M (110:) s
+48 311 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 311 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 311 M
+( w.endObject\(\);) s
+18 300 M (111:) s
+48 300 M
+(                }) s
+18 289 M (112:) s
+18 278 M (113:) s
+48 278 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 278 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 278 M
+( w.endArray\(\);) s
+18 267 M (114:) s
+48 267 M
+(              },) s
+18 256 M (115:) s
+48 256 M
+(              .label => {) s
+18 245 M (116:) s
+18 234 M (117:) s
+48 234 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 234 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+174 234 M
+( Ilabel = std.enums.EnumIndexer\(lbl.Elabel\);) s
+18 223 M (118:) s
+48 223 M
+(                var l : usize = 0;) s
+18 212 M (119:) s
+48 212 M
+(                var nbrLbl : usize  = XPANEL.items[np].label.items.len ;) s
+18 201 M (120:) s
+18 190 M (121:) s
+48 190 M
+(                var lp :usize = 0 ;) s
+18 179 M (122:) s
+48 179 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 179 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 179 M
+( w.objectField\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+252 179 M
+("label") s
+/F-gs-font 10 10 SF
+0 setgray
+294 179 M
+(\);) s
+18 168 M (123:) s
+48 168 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 168 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 168 M
+( w.beginArray\(\);) s
+18 157 M (124:) s
+48 157 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 157 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+174 157 M
+(\(lp < nbrLbl \) : \( lp += 1\) {) s
+18 146 M (125:) s
+48 146 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 146 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+174 146 M
+( w.beginObject\(\);) s
+18 135 M (126:) s
+48 135 M
+(                  l = 0 ;) s
+18 124 M (127:) s
+48 124 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 124 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+186 124 M
+(\(l < Ilabel.count\) : \( l += 1\) {) s
+18 113 M (128:) s
+18 102 M (129:) s
+48 102 M
+(                    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+168 102 M
+(switch) s
+/F-gs-font 10 10 SF
+0 setgray
+204 102 M
+(\(Ilabel.keyForIndex\(l\)\) {) s
+18 91 M (130:) s
+48 91 M
+(                      .name  => {) s
+18 80 M (131:) s
+48 80 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 80 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 80 M
+( w.objectField\(@tagName\(lbl.Elabel.name\)\);) s
+18 69 M (132:) s
+48 69 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 69 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 69 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 69 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 69 M
+(,.{XPANEL.items[np].label.items[lp].name}\) ;) s
+18 58 M (133:) s
+48 58 M
+(                      },) s
+18 47 M (134:) s
+48 47 M
+(                      .posx  => {) s
+18 36 M (135:) s
+48 36 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 36 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 36 M
+( w.objectField\(@tagName\(lbl.Elabel.posx\)\);) s
+18 25 M (136:) s
+48 25 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 25 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 25 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 25 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 25 M
+(,.{XPANEL.items[np].label.items[lp].posx}\) ;) s
+18 14 M (137:) s
+48 14 M
+(                      },) s
+18 3 M (138:) s
+48 3 M
+(                      .posy  => {) s
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 4 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+18 498 M (139:) s
+48 498 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 498 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 498 M
+( w.objectField\(@tagName\(lbl.Elabel.posy\)\);) s
+18 487 M (140:) s
+48 487 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 487 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 487 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 487 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 487 M
+(,.{XPANEL.items[np].label.items[lp].posy}\) ;) s
+18 476 M (141:) s
+48 476 M
+(                      },) s
+18 465 M (142:) s
+48 465 M
+(                      .text  => {) s
+18 454 M (143:) s
+48 454 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 454 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 454 M
+( w.objectField\(@tagName\(lbl.Elabel.title\)\);) s
+18 443 M (144:) s
+48 443 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 443 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 443 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 443 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 443 M
+(,.{XPANEL.items[np].label.items[lp].text}\) ;) s
+18 432 M (145:) s
+48 432 M
+(                      },) s
+18 421 M (146:) s
+48 421 M
+(                      .title  => {) s
+18 410 M (147:) s
+48 410 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 410 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 410 M
+( w.objectField\(@tagName\(lbl.Elabel.title\)\);) s
+18 399 M (148:) s
+48 399 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 399 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 399 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 399 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 399 M
+(,.{@intFromBool\(XPANEL.items[np].label.items[lp].title\)}\) ;) s
+18 388 M (149:) s
+48 388 M
+(                      }) s
+18 377 M (150:) s
+48 377 M
+(                    }) s
+18 366 M (151:) s
+48 366 M
+(                  }) s
+18 355 M (152:) s
+48 355 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 355 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 355 M
+( w.endObject\(\);) s
+18 344 M (153:) s
+48 344 M
+(                }) s
+18 333 M (154:) s
+18 322 M (155:) s
+48 322 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 322 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 322 M
+( w.endArray\(\);) s
+18 311 M (156:) s
+48 311 M
+(              },) s
+18 300 M (157:) s
+48 300 M
+(              .field => {) s
+18 289 M (158:) s
+18 278 M (159:) s
+48 278 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 278 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+174 278 M
+( Ifield = std.enums.EnumIndexer\(fld.Efield\);) s
+18 267 M (160:) s
+48 267 M
+(                var f : usize = 0;) s
+18 256 M (161:) s
+48 256 M
+(                var nbrFld : usize  = XPANEL.items[np].field.items.len ;) s
+18 245 M (162:) s
+18 234 M (163:) s
+48 234 M
+(                var fp :usize = 0 ;) s
+18 223 M (164:) s
+48 223 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 223 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 223 M
+( w.objectField\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+252 223 M
+("field") s
+/F-gs-font 10 10 SF
+0 setgray
+294 223 M
+(\);) s
+18 212 M (165:) s
+48 212 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 212 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 212 M
+( w.beginArray\(\);) s
+18 201 M (166:) s
+48 201 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 201 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+174 201 M
+(\(fp < nbrFld \) : \( fp += 1\) {) s
+18 190 M (167:) s
+48 190 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 190 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+174 190 M
+( w.beginObject\(\);) s
+18 179 M (168:) s
+48 179 M
+(                  f = 0 ;) s
+18 168 M (169:) s
+48 168 M
+(                  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 168 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+186 168 M
+(\(f < Ifield.count\) : \( f += 1\) {) s
+18 157 M (170:) s
+18 146 M (171:) s
+48 146 M
+(                    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+168 146 M
+(switch) s
+/F-gs-font 10 10 SF
+0 setgray
+204 146 M
+(\(Ifield.keyForIndex\(f\)\) {) s
+18 135 M (172:) s
+48 135 M
+(                      .name  => {) s
+18 124 M (173:) s
+48 124 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 124 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 124 M
+( w.objectField\(@tagName\(fld.Efield.name\)\);) s
+18 113 M (174:) s
+48 113 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 113 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 113 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 113 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 113 M
+(,.{XPANEL.items[np].field.items[fp].name}\) ;) s
+18 102 M (175:) s
+48 102 M
+(                      },) s
+18 91 M (176:) s
+48 91 M
+(                      .posx  => {) s
+18 80 M (177:) s
+48 80 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 80 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 80 M
+( w.objectField\(@tagName\(fld.Efield.posx\)\);) s
+18 69 M (178:) s
+48 69 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 69 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 69 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 69 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 69 M
+(,.{XPANEL.items[np].field.items[fp].posx}\) ;) s
+18 58 M (179:) s
+48 58 M
+(                      },) s
+18 47 M (180:) s
+48 47 M
+(                      .posy  => {) s
+18 36 M (181:) s
+48 36 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 36 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 36 M
+( w.objectField\(@tagName\(fld.Efield.posy\)\);) s
+18 25 M (182:) s
+48 25 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 25 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 25 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 25 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 25 M
+(,.{XPANEL.items[np].field.items[fp].posy}\) ;) s
+18 14 M (183:) s
+48 14 M
+(                      },) s
+18 3 M (184:) s
+48 3 M
+(                      .reftyp  => {) s
+_R
+S
+%%Page: (5) 5
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 5 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (5) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+18 498 M (185:) s
+48 498 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 498 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 498 M
+( w.objectField\(@tagName\(fld.Efield.reftyp\)\);) s
+18 487 M (186:) s
+48 487 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 487 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 487 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 487 M
+("{s}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 487 M
+(,.{@tagName\(XPANEL.items[np].field.items[fp].reftyp\)}\) ;) s
+18 476 M (187:) s
+48 476 M
+(                      },) s
+18 465 M (188:) s
+48 465 M
+(                      .width  => {) s
+18 454 M (189:) s
+48 454 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 454 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 454 M
+( w.objectField\(@tagName\(fld.Efield.width\)\);) s
+18 443 M (190:) s
+48 443 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 443 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 443 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 443 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 443 M
+(,.{XPANEL.items[np].field.items[fp].width}\) ;) s
+18 432 M (191:) s
+48 432 M
+(                      },) s
+18 421 M (192:) s
+48 421 M
+(                      .scal  => {) s
+18 410 M (193:) s
+48 410 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 410 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 410 M
+( w.objectField\(@tagName\(fld.Efield.scal\)\);) s
+18 399 M (194:) s
+48 399 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 399 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 399 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 399 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 399 M
+(,.{XPANEL.items[np].field.items[fp].scal}\);) s
+18 388 M (195:) s
+48 388 M
+(                      },) s
+18 377 M (196:) s
+48 377 M
+(                      .requier  => {) s
+18 366 M (197:) s
+48 366 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 366 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 366 M
+( w.objectField\(@tagName\(fld.Efield.requier\)\);) s
+18 355 M (198:) s
+48 355 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 355 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 355 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 355 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 355 M
+(,.{@intFromBool\(XPANEL.items[np].field.items[fp].requier\)}\) ;) s
+18 344 M (199:) s
+48 344 M
+(                      },) s
+18 333 M (200:) s
+48 333 M
+(                      .protect  => {) s
+18 322 M (201:) s
+48 322 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 322 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 322 M
+( w.objectField\(@tagName\(fld.Efield.protect\)\);) s
+18 311 M (202:) s
+48 311 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 311 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 311 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 311 M
+("{d}") s
+/F-gs-font 10 10 SF
+0 setgray
+342 311 M
+(,.{@intFromBool\(XPANEL.items[np].field.items[fp].protect\)}\) ;) s
+18 300 M (203:) s
+48 300 M
+(                      },) s
+18 289 M (204:) s
+48 289 M
+(                      .edtcar  => {) s
+18 278 M (205:) s
+48 278 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 278 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 278 M
+( w.objectField\(@tagName\(fld.Efield.edtcar\)\);) s
+18 267 M (206:) s
+48 267 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 267 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 267 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 267 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 267 M
+(,.{XPANEL.items[np].field.items[fp].edtcar}\) ;) s
+18 256 M (207:) s
+48 256 M
+(                      },) s
+18 245 M (208:) s
+48 245 M
+(                      .errmsg  => {) s
+18 234 M (209:) s
+48 234 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 234 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 234 M
+( w.objectField\(@tagName\(fld.Efield.errmsg\)\);) s
+18 223 M (210:) s
+48 223 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 223 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 223 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 223 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 223 M
+(,.{XPANEL.items[np].field.items[fp].errmsg}\) ;) s
+18 212 M (211:) s
+48 212 M
+(                      },) s
+18 201 M (212:) s
+48 201 M
+(                      .help  => {) s
+18 190 M (213:) s
+48 190 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 190 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 190 M
+( w.objectField\(@tagName\(fld.Efield.help\)\);) s
+18 179 M (214:) s
+48 179 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 179 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 179 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 179 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 179 M
+(,.{XPANEL.items[np].field.items[fp].help}\) ;) s
+18 168 M (215:) s
+48 168 M
+(                      },) s
+18 157 M (216:) s
+48 157 M
+(                      .procfunc  => {) s
+18 146 M (217:) s
+48 146 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 146 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 146 M
+( w.objectField\(@tagName\(fld.Efield.procfunc\)\);) s
+18 135 M (218:) s
+48 135 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 135 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 135 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 135 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 135 M
+(,.{XPANEL.items[np].field.items[fp].procfunc}\) ;) s
+18 124 M (219:) s
+48 124 M
+(                      },) s
+18 113 M (220:) s
+48 113 M
+(                      .proctask  => {) s
+18 102 M (221:) s
+48 102 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 102 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 102 M
+( w.objectField\(@tagName\(fld.Efield.proctask\)\);) s
+18 91 M (222:) s
+48 91 M
+(                                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+240 91 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+258 91 M
+( w.print\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 91 M
+("\\"{s}\\"") s
+/F-gs-font 10 10 SF
+0 setgray
+366 91 M
+(,.{XPANEL.items[np].field.items[fp].proctask}\) ;) s
+18 80 M (223:) s
+48 80 M
+(                      }) s
+18 69 M (224:) s
+48 69 M
+(                    }) s
+18 58 M (225:) s
+48 58 M
+(                  }) s
+18 47 M (226:) s
+48 47 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 47 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 47 M
+( w.endObject\(\);) s
+18 36 M (227:) s
+48 36 M
+(                }) s
+18 25 M (228:) s
+18 14 M (229:) s
+48 14 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 14 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 14 M
+( w.endArray\(\);) s
+18 3 M (230:) s
+48 3 M
+(              },) s
+_R
+S
+%%Page: (6) 6
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 6 def
+/fname (/home/soleil/Zterm/src-zig/mdlSjson.zig) def
+/fdir (/home/soleil/Zterm/src-zig) def
+/ftail (mdlSjson.zig) def
+% User defined strings:
+/pagenumstr (6) def
+/moddatestr (08/19/23) def
+/modtimestr (09:36:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+18 498 M (231:) s
+48 498 M
+(              ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+132 498 M
+(else) s
+/F-gs-font 10 10 SF
+0 setgray
+156 498 M
+( => {}) s
+18 487 M (232:) s
+18 476 M (233:) s
+48 476 M
+(            }) s
+18 465 M (234:) s
+48 465 M
+(          }) s
+18 454 M (235:) s
+48 454 M
+(      ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+84 454 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+102 454 M
+( w.endObject\(\);) s
+18 443 M (236:) s
+48 443 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 443 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+90 443 M
+( w.endArray\(\);) s
+18 432 M (237:) s
+48 432 M
+(  }) s
+18 421 M (238:) s
+48 421 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 421 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+78 421 M
+( w.endObject\(\);) s
+18 410 M (239:) s
+18 399 M (240:) s
+48 399 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 399 M
+(const) s
+/F-gs-font 10 10 SF
+0 setgray
+90 399 M
+( result = slice_stream.getWritten\(\);) s
+18 388 M (241:) s
+18 377 M (242:) s
+48 377 M
+(  var my_file = ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 377 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+162 377 M
+( std.fs.cwd\(\).createFile\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+312 377 M
+("Zdspf.txt") s
+/F-gs-font 10 10 SF
+0 setgray
+378 377 M
+(, .{ .read = ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+456 377 M
+(true) s
+/F-gs-font 10 10 SF
+0 setgray
+480 377 M
+( }\);) s
+18 366 M (243:) s
+48 366 M
+(  _ = ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+84 366 M
+(try) s
+/F-gs-font 10 10 SF
+0 setgray
+102 366 M
+( my_file.write\(result\);) s
+18 355 M (244:) s
+48 355 M
+(  my_file.close\(\);) s
+18 344 M (245:) s
+18 333 M (246:) s
+48 333 M
+(  _= kbd.getKEY\(\);) s
+18 322 M (247:) s
+48 322 M
+(  slice_stream.reset\(\);) s
+18 311 M (248:) s
+48 311 M
+(}) s
+_R
+S
+%%Trailer
+%%Pages: 6
+%%DocumentNeededResources: font Times-Roman Courier-Oblique Courier-Bold 
+%%+ font Courier Times-Bold 
+%%EOF

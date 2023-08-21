@@ -1,5 +1,6 @@
 const std = @import("std");
 
+
 const dds = @import("dds");
 
 /// terminal Fonction
@@ -46,6 +47,8 @@ const mdlPanel = @import("mdlPanel");
 // Descrption Objet
 const mdlObjet = @import("mdlObjet");
 
+// sauvegarde JSON
+const mdlSjson = @import("mdlSjson");
 
 const allocator = std.heap.page_allocator;
 
@@ -63,7 +66,7 @@ var nopt : usize  = 0;
 const choix = enum {
   panel,
   objet,
-  source,
+  sjson,
   exit
 };
 
@@ -103,7 +106,7 @@ pub fn main() !void {
                       &.{
                       "Panel..",              // item
                       "Objet..",
-                      "Source.",
+                      "SavJson.",
                       "Exit...",
                       }
                       )) catch unreachable ;
@@ -124,10 +127,12 @@ pub fn main() !void {
 
     if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
     if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) ;
+    if (nopt == @intFromEnum(choix.sjson)) try mdlSjson.SavJson(NPANEL) ;
 
     if (NPANEL.items.len == 0 ) dds.deinitStr();
 
 
+    
   }
   term.disableRawMode();
 }
