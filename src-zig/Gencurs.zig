@@ -48,7 +48,7 @@ const mdlPanel = @import("mdlPanel");
 const mdlObjet = @import("mdlObjet");
 
 // sauvegarde JSON
-const mdlSjson = @import("mdlSjson");
+const mdlFile = @import("mdlFile");
 
 const allocator = std.heap.page_allocator;
 
@@ -60,79 +60,82 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 
 
 
-var nopt : usize  = 0;
+var nopt : usize	= 0;
 
 
 const choix = enum {
-  panel,
-  objet,
-  sjson,
-  exit
+	panel,
+	objet,
+	sjson,
+	rjson,
+	exit
 };
 
 
 // main----------------------------------
 
 pub fn main() !void {
-  //term.offscrool();
-  // open terminal and config and offMouse , cursHide->(cursor hide)
-  term.enableRawMode();
-  defer term.disableRawMode() ;
+	//term.offscrool();
+	// open terminal and config and offMouse , cursHide->(cursor hide)
+	term.enableRawMode();
+	defer term.disableRawMode() ;
 
-  // Initialisation
-  term.titleTerm("DESIGNER");
-
-
-  //term.resizeTerm(52,172);
-  const termSize = term.getSize();
+	// Initialisation
+	term.titleTerm("DESIGNER");
 
 
-  fld.MouseDsp = true ; // active display cursor x/y mouse
-
-  var base : *pnl.PANEL = pnl.newPanelC("base",
-                  1, 1,
-                  termSize.height,
-                  termSize.width ,
-                  dds.CADRE.line1,
-                  "") ;
-    //-------------------------------------------------
-  //the menu is not double buffered it is not a Panel
-
-  base.menu.append(mnu.newMenu(
-                      "Screen",               // name
-                      2, 2,                   // posx, posy  
-                      dds.CADRE.line1,        // type line fram
-                      dds.MNUVH.vertical,     // type menu vertical / horizontal
-                      &.{
-                      "Panel..",              // item
-                      "Objet..",
-                      "SavJson.",
-                      "Exit...",
-                      }
-                      )) catch unreachable ;
-
-  const  menu = enum (u8)  {
-
-    Screen = 0 ,       // creat panel, objet  , source , exit
-  };
+	//term.resizeTerm(52,172);
+	const termSize = term.getSize();
 
 
+	fld.MouseDsp = true ; // active display cursor x/y mouse
 
-  while (true) {
+	var base : *pnl.PANEL = pnl.newPanelC("base",
+					1, 1,
+					termSize.height,
+					termSize.width ,
+					dds.CADRE.line1,
+					"") ;
+	//-------------------------------------------------
+	//the menu is not double buffered it is not a Panel
 
-    pnl.printPanel(base);
-    nopt = mnu.ioMenu(base,base.menu.items[@intFromEnum(menu.Screen)],0);
+	base.menu.append(mnu.newMenu(
+					"Screen",				 // name
+					2, 2,					 // posx, posy	
+					dds.CADRE.line1,		// type line fram
+					dds.MNUVH.vertical,	 // type menu vertical / horizontal
+					&.{
+					"Panel..",				// item
+					"Objet..",
+					"SavJson.",
+					"RstJson",
+					"Exit...",
+					}
+					)) catch unreachable ;
 
-    if (nopt == @intFromEnum(choix.exit )) { break; }
+	const	menu = enum (u8)	{
 
-    if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
-    if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) ;
-    if (nopt == @intFromEnum(choix.sjson)) try mdlSjson.SavJson(NPANEL) ;
-
-    if (NPANEL.items.len == 0 ) dds.deinitStr();
+	Screen = 0 ,	// creat panel, objet	, source , exit
+	};
 
 
-    
-  }
-  term.disableRawMode();
+
+	while (true) {
+
+	pnl.printPanel(base);
+	nopt = mnu.ioMenu(base,base.menu.items[@intFromEnum(menu.Screen)],0);
+
+	if (nopt == @intFromEnum(choix.exit )) { break; }
+
+	if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
+	if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) ;
+	if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
+	if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
+
+	if (NPANEL.items.len == 0 ) dds.deinitStr();
+
+
+	
+	}
+	term.disableRawMode();
 }

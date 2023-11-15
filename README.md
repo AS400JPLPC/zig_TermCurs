@@ -29,7 +29,7 @@ Resumption of the project https://github.com/xyaman/mibu<BR />
 Thank you<BR />
 https://zig.news/<BR />
 https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm<BR /><BR />
- thank you for your valuable explanations   David Vanderson<br />
+thank you for your valuable explanations   David Vanderson<br />
 https://zig.news/david_vanderson<br /> <br />
 Structure the complex build
 https://zig.news/xq/zig-build-explained-part-3-1ima <BR /><br />
@@ -45,65 +45,61 @@ https://github.com/kissy24/zig-logger/<BR /> <br />
 **In the example, some errors are introduced such as the mail, all of this is voluntary and allows you to see the default interaction of the input control.<br />**
 <br />
 
-
-
 ![](assets/20230213_012619_mdlPanel.png)
 
-
 <br />
 
 <br />
 
-
-
- ![](assets/20230812_012345_Field.png)
-
-
+![](assets/20230812_012345_Field.png)
 
 ---
 
 <BR/><BR/>
 
-| Field                | Regex        | Text     | Type                                        |
-| -------------------- | ------------ | -------- | ------------------------------------------- |
-| TEXT_FREE            | Y            | Y        | Free                                        |
-| TEXT_FULL            | Y            | Y        | Letter Digit Char-special                   |
-| ALPHA                | Y            | Y        | Letter                                      |
-| ALPHA_UPPER          | Y            | Y        | Letter                                      |
-| ALPHA_NUMERIC        | Y            | Y        | Letter Digit espace -                       |
-| ALPHA_NUMERICT_UPPER | Y            | Y        | Letter Digit espace -                       |
-| PASSWORD             | N            | Y        | Letter Digit and normaliz char-special      |
-| YES_NO               | N            | Y        | 'y' or 'Y' / 'o' or 'O'                     |
-| UDIGIT               | N            | Y        | Digit unsigned                              |
-| DIGIT                | N            | Y        | Digit signed                                |
-| UDECIMAL             | N            | Y        | Decimal unsigned                            |
-| DECIMAL              | N            | Y        | Decimal signed                              |
-| DATE_ISO             | DEFAULT      | Y        | YYYY/MM/DD                                  |
-| DATE_FR              | DEFAULT      | Y        | DD/MM/YYYY                                  |
-| DATE_US              | DEFAULT      | Y        | MM/DD/YYYY                                  |
-| TELEPHONE            | Y OR DEFAULT | Y        | +(033) 6 00 01 00 02                        |
-| MAIL_ISO             | DEFAULT      | Y        | normalize mail regex                        |
-| SWITCH               | N            | N / BOOL | CTRUE CFALSE                                |
-| FUNC                 | N            | y        | **dynamic function call**             |
-| TASK                 | N            | y        | **dynamic function call ex: control** |
-|                      |              |          |                                             |
+
+| Field                | Regex        | Text     | Type                                   |
+| ---------------------- | -------------- | ---------- | ---------------------------------------- |
+| TEXT_FREE            | Y            | Y        | Free                                   |
+| TEXT_FULL            | Y            | Y        | Letter Digit Char-special              |
+| ALPHA                | Y            | Y        | Letter                                 |
+| ALPHA_UPPER          | Y            | Y        | Letter                                 |
+| ALPHA_NUMERIC        | Y            | Y        | Letter Digit espace -                  |
+| ALPHA_NUMERICT_UPPER | Y            | Y        | Letter Digit espace -                  |
+| PASSWORD             | N            | Y        | Letter Digit and normaliz char-special |
+| YES_NO               | N            | Y        | 'y' or 'Y' / 'o' or 'O'                |
+| UDIGIT               | N            | Y        | Digit unsigned                         |
+| DIGIT                | N            | Y        | Digit signed                           |
+| UDECIMAL             | N            | Y        | Decimal unsigned                       |
+| DECIMAL              | N            | Y        | Decimal signed                         |
+| DATE_ISO             | DEFAULT      | Y        | YYYY/MM/DD                             |
+| DATE_FR              | DEFAULT      | Y        | DD/MM/YYYY                             |
+| DATE_US              | DEFAULT      | Y        | MM/DD/YYYY                             |
+| TELEPHONE            | Y OR DEFAULT | Y        | +(033) 6 00 01 00 02                   |
+| MAIL_ISO             | DEFAULT      | Y        | normalize mail regex                   |
+| SWITCH               | N            | N / BOOL | CTRUE CFALSE                           |
+| FUNC                 | N            | y        | **dynamic function call**              |
+| TASK                 | N            | y        | **dynamic function call ex: control**  |
+|                      |              |          |                                        |
 
 <BR/>
 MOUSE<BR/>
 
-| Type      | up | down | left | Middle | right | X/Y |
-| --------- | -- | ---- | ---- | ------ | ----- | --- |
-| Menu      | Y  | Y    | Y    | Y      | Y     | N   |
-| GRID      | Y  | Y    | Y    | Y      | Y     | N   |
-| FIELD     | Y  | Y    | Y    | Y      | Y     | N   |
-| getKEY    | Y  | Y    | Y    | Y      | Y     | Y   |
-| <BR/> |    |      |      |        |       |     |
+
+| Type   | up | down | left | Middle | right | X/Y |
+| -------- | ---- | ------ | ------ | -------- | ------- | ----- |
+| Menu   | Y  | Y    | Y    | Y      | Y     | N   |
+| GRID   | Y  | Y    | Y    | Y      | Y     | N   |
+| FIELD  | Y  | Y    | Y    | Y      | Y     | N   |
+| getKEY | Y  | Y    | Y    | Y      | Y     | Y   |
+| <BR/>  |    |      |      |        |       |     |
 
 <BR/>
 FIELD<BR/>
 
+
 | KEY       | text                                      |
-| --------- | ----------------------------------------- |
+| ----------- | ------------------------------------------- |
 | MOUSE     | mouse array reference                     |
 | escape    | Restores the original area                |
 | ctrl-H    | Show help                                 |
@@ -127,33 +123,34 @@ FIELD<BR/>
 
 GRID<BR/>
 
-| KEY       | text                                      |
-| --------- | ----------------------------------------- |
-| MOUSE     | active                                    |
-| escape    | return key                                |
-| F12       | return key                                |
-| enter     | return ligne                              |
-| up        | prior  ligne                              |
-| down      | next   ligne                              |
-| pageUp    | prior  page                               |
-| pageDown  | next   page                               |
+
+| KEY      | text         |
+| ---------- | -------------- |
+| MOUSE    | active       |
+| escape   | return key   |
+| F12      | return key   |
+| enter    | return ligne |
+| up       | prior  ligne |
+| down     | next   ligne |
+| pageUp   | prior  page  |
+| pageDown | next   page  |
 
 <BR/>
 
 COMBO<BR/>
 
-| KEY       | text                                      |
-| --------- | ----------------------------------------- |
-| CellPos   | Position start display                    |
-| MOUSE     | active                                    |
-| escape    | return key                                |
-| enter     | return field                              |
-| up        | prior  ligne                              |
-| down      | next   ligne                              |
-| pageUp    | prior  page                               |
-| pageDown  | next   page                               |
-<BR/>
 
+| KEY      | text                   |
+| ---------- | ------------------------ |
+| CellPos  | Position start display |
+| MOUSE    | active                 |
+| escape   | return key             |
+| enter    | return field           |
+| up       | prior  ligne           |
+| down     | next   ligne           |
+| pageUp   | prior  page            |
+| pageDown | next   page            |
+| <BR/>    |                        |
 
 <BR/><BR/>
 <u>---.VSCODE-------------------------------------------</u><BR />
@@ -169,7 +166,6 @@ COMBO<BR/>
 &rarr;&nbsp; build: build+source-name ex: buildexemple <br />
 &rarr;&nbsp; makefile <br />
 <br />
-
 
 <u>--peculiarity-------------------------------------------------</u><BR />
 test alt-ctrl ctrshift... etc for <br />
@@ -223,8 +219,6 @@ Please wait, if there are bugs everything is not fixed.<br />
 <br />
 <br />
 
-
-
 <br />
 <br />
 |   for information|
@@ -238,10 +232,9 @@ then compile with SMALL and to ensure violation of ALT-F4 use the cpp program gt
 But in terminal mode the application is viable (to do with the commit data-base)<br />
 <u>I wish the friend google translate my french slang correctly </u>
 
-
 les news:<BR />
 
-→  2023-02-05 Doc version 0.11.1  
+→  2023-02-05 Doc version 0.11.1
 [READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Docs_Gencurs/index.html) <br />
 <BR/>
 
@@ -257,49 +250,67 @@ les news:<BR />
 →  2023-05-22  chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.<br />
 <br />
 
+- 2023-08-1  I am preparing for the version change in order to take advantage of advancements and modify the code if necessary.
+  My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" functions what I did<br />
+  <BR/>
+- 2023-08-1  Studies of memory cleaning and various functions   0.11<br />
+- 2023-08-1  Add func Grid  ioGridKey  (parm,parm, button KEY return) for management grid to grid ex: modlObjet fn Order <br />
+  <br />
+- 2023-08-1  <u>Adjustment for 0.11 test  A lot of changes since version 0.10.1 </u> <br />
+  <br />
+- 2023-08-1  look at the build has changed a lot. <br />
+- 2023-08-1  Gencurs modlPanel OK <br />
+- 2023-08-1  Gencurs modlObjet testing "label define  - order remove" OK <br />
+- 2023-08-1  modlObjet alt-T Title alt-L Label  alt-w Menu(order/remove) <br />
+- 2023-08-1  modlObjet ESC abord ctrl-V valide   F11 write all Objet for Panel ... F12 abord and return <br />
+  <br />
+  <br />
+- 2023-08-1  Changing and reorganizing the code:<br />
+- new "grid.zig"<br />
+  - the "forms.zig" no longer includes grid management<br />
+
+    - I reviewed the initialization of the panel and grid<br />
+
+      - with create mode to better manage memory and make memory allocation more consistent<br />
+
+        - [ziggit](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
+
+          - testing memoory<br />
+
+            -         [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
+            <br />
+            <br />  
+            -  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
+            <br />
+            -  2023-08-09 small update project due to version change<br />
+            -  2023-08-09 modlObjet alt-F start of field processing <br />
+            -  2023-08-09 Json studies to encapsulate the generation (IN/OUT) <br />
+             <br />
+            -  2023-08-12 **After a big discussion, setting up the wrestling**<br />
+            -  2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
+
+            - 2023-08-14 Installation of a logger
+              I modified the logger and redirected to a file,
+              it can also be used for recording other than errors or for monitoring data, diagrams test [zig_demoJson](https://github.com/AS400JPLPC/zig_demoJson) <br />
+              <br />
+              <br />
+            - 2023-08-21 First Json test, now I will refine,
+              it's too hot break.<br />
 
 
--  2023-08-1  I am preparing for the version change in order to take advantage of advancements and modify the code if necessary.
-My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" functions what I did<br />
-<BR/>
--  2023-08-1  Studies of memory cleaning and various functions   0.11<br />
--  2023-08-1  Add func Grid  ioGridKey  (parm,parm, button KEY return) for management grid to grid ex: modlObjet fn Order <br />
-<br />
--  2023-08-1  <u>Adjustment for 0.11 test  A lot of changes since version 0.10.1 </u> <br />
-<br />
--  2023-08-1  look at the build has changed a lot. <br />
--  2023-08-1  Gencurs modlPanel OK <br />
--  2023-08-1  Gencurs modlObjet testing "label define  - order remove" OK <br />
--  2023-08-1  modlObjet alt-T Title alt-L Label  alt-w Menu(order/remove) <br />
--  2023-08-1  modlObjet ESC abord ctrl-V valide   F10 write all Objet for Panel ... F12 abord and return <br />
-<br />
-<br />
--  2023-08-1  Changing and reorganizing the code:<br />
--             new "grid.zig"<br />
--             the "forms.zig" no longer includes grid management<br />
--             I reviewed the initialization of the panel and grid<br />
--             with create mode to better manage memory and make memory allocation more consistent<br />
--             [ziggit](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
--             testing memoory<br />
--             [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />  
-<br />
-<br />  
--  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
-<br />
--  2023-08-09 small update project due to version change<br />
--  2023-08-09 modlObjet alt-F start of field processing <br />
--  2023-08-09 Json studies to encapsulate the generation (IN/OUT) <br />
- <br />
--  2023-08-12 **After a big discussion, setting up the wrestling**<br />
--  2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
+# reprise du projet  
 
--  2023-08-14 Installation of a logger
-I modified the logger and redirected to a file,
-it can also be used for recording other than errors or for monitoring data, diagrams test [zig_demoJson](https://github.com/AS400JPLPC/zig_demoJson) <br />
-<br />
-<br />
--  2023-08-21 First Json test, now I will refine,
-it's too hot break.<br />
+I had to buy a PC In the meantime I changed publisher etc...
 
--  2023-08-21 in .vscode, "Print source" software enscript, zig is not yet listed, but with "java" we have something quite clean
-look at my task option "print *Source". There comes a time when you need paper to mark.....<br />
+
+  * 2023-11-15 add module mdlSjson (save file)<br />
+  * 2023-11-15 add module mdlRjson (restore file)<br />
+  * 2023-11-15 add module mdlFile  (manager file)<br />
+  * 2023-11-15 in the "mdlObjet" module have little reordered and deleted<br />
+  * 2023-11-15 A “dspf” folder groups JSON files : Label Field<br />
+  * 2023-11-15 The software runs in a terminal<br />
+  * 2023-11-15 A small change F10 became F11 for convenience with the terminal
+
+
+
+

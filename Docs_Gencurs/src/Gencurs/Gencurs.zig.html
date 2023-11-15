@@ -113,168 +113,179 @@
 <body>
 <pre><code><span class="line" id="L1"><span class="tok-kw">const</span> std = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>);</span>
 <span class="line" id="L2"></span>
-<span class="line" id="L3"><span class="tok-kw">const</span> dds = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;dds&quot;</span>);</span>
-<span class="line" id="L4"></span>
-<span class="line" id="L5"><span class="tok-comment">/// terminal Fonction</span></span>
-<span class="line" id="L6"><span class="tok-kw">const</span> term = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>);</span>
-<span class="line" id="L7"><span class="tok-comment">// keyboard</span>
+<span class="line" id="L3"></span>
+<span class="line" id="L4"><span class="tok-kw">const</span> dds = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;dds&quot;</span>);</span>
+<span class="line" id="L5"></span>
+<span class="line" id="L6"><span class="tok-comment">/// terminal Fonction</span></span>
+<span class="line" id="L7"><span class="tok-kw">const</span> term = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>);</span>
+<span class="line" id="L8"><span class="tok-comment">// keyboard</span>
 </span>
-<span class="line" id="L8"><span class="tok-kw">const</span> kbd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>).kbd;</span>
-<span class="line" id="L9"></span>
-<span class="line" id="L10"><span class="tok-comment">// error</span>
+<span class="line" id="L9"><span class="tok-kw">const</span> kbd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>).kbd;</span>
+<span class="line" id="L10"></span>
+<span class="line" id="L11"><span class="tok-comment">// error</span>
 </span>
-<span class="line" id="L11"><span class="tok-kw">const</span> dsperr = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).dsperr;</span>
-<span class="line" id="L12"></span>
-<span class="line" id="L13"><span class="tok-comment">// full delete for produc</span>
+<span class="line" id="L12"><span class="tok-kw">const</span> dsperr = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).dsperr;</span>
+<span class="line" id="L13"></span>
+<span class="line" id="L14"><span class="tok-comment">// full delete for produc</span>
 </span>
-<span class="line" id="L14"><span class="tok-kw">const</span> forms = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>);</span>
-<span class="line" id="L15"></span>
-<span class="line" id="L16"><span class="tok-comment">// frame</span>
+<span class="line" id="L15"><span class="tok-kw">const</span> forms = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>);</span>
+<span class="line" id="L16"></span>
+<span class="line" id="L17"><span class="tok-comment">// frame</span>
 </span>
-<span class="line" id="L17"><span class="tok-kw">const</span> frm = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).frm;</span>
-<span class="line" id="L18"><span class="tok-comment">// panel</span>
+<span class="line" id="L18"><span class="tok-kw">const</span> frm = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).frm;</span>
+<span class="line" id="L19"><span class="tok-comment">// panel</span>
 </span>
-<span class="line" id="L19"><span class="tok-kw">const</span> pnl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).pnl;</span>
-<span class="line" id="L20"><span class="tok-comment">// button</span>
+<span class="line" id="L20"><span class="tok-kw">const</span> pnl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).pnl;</span>
+<span class="line" id="L21"><span class="tok-comment">// button</span>
 </span>
-<span class="line" id="L21"><span class="tok-kw">const</span> btn = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).btn;</span>
-<span class="line" id="L22"><span class="tok-comment">// label</span>
+<span class="line" id="L22"><span class="tok-kw">const</span> btn = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).btn;</span>
+<span class="line" id="L23"><span class="tok-comment">// label</span>
 </span>
-<span class="line" id="L23"><span class="tok-kw">const</span> lbl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lbl;</span>
-<span class="line" id="L24"><span class="tok-comment">// menu</span>
+<span class="line" id="L24"><span class="tok-kw">const</span> lbl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lbl;</span>
+<span class="line" id="L25"><span class="tok-comment">// menu</span>
 </span>
-<span class="line" id="L25"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).mnu;</span>
-<span class="line" id="L26"><span class="tok-comment">// flied</span>
+<span class="line" id="L26"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).mnu;</span>
+<span class="line" id="L27"><span class="tok-comment">// flied</span>
 </span>
-<span class="line" id="L27"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
-<span class="line" id="L28"><span class="tok-comment">// line horizontal</span>
+<span class="line" id="L28"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
+<span class="line" id="L29"><span class="tok-comment">// line horizontal</span>
 </span>
-<span class="line" id="L29"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnh;</span>
-<span class="line" id="L30"><span class="tok-comment">// line vertival</span>
+<span class="line" id="L30"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnh;</span>
+<span class="line" id="L31"><span class="tok-comment">// line vertival</span>
 </span>
-<span class="line" id="L31"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnv;</span>
-<span class="line" id="L32"></span>
+<span class="line" id="L32"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnv;</span>
 <span class="line" id="L33"></span>
-<span class="line" id="L34"><span class="tok-comment">// grid</span>
+<span class="line" id="L34"></span>
+<span class="line" id="L35"><span class="tok-comment">// grid</span>
 </span>
-<span class="line" id="L35"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
-<span class="line" id="L36"></span>
-<span class="line" id="L37"><span class="tok-comment">// tools utility</span>
+<span class="line" id="L36"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
+<span class="line" id="L37"></span>
+<span class="line" id="L38"><span class="tok-comment">// tools utility</span>
 </span>
-<span class="line" id="L38"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;utils&quot;</span>);</span>
-<span class="line" id="L39"></span>
-<span class="line" id="L40"><span class="tok-comment">// tools regex</span>
+<span class="line" id="L39"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;utils&quot;</span>);</span>
+<span class="line" id="L40"></span>
+<span class="line" id="L41"><span class="tok-comment">// tools regex</span>
 </span>
-<span class="line" id="L41"><span class="tok-kw">const</span> reg = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;match&quot;</span>);</span>
-<span class="line" id="L42"></span>
-<span class="line" id="L43"><span class="tok-comment">// Descrption PANEL</span>
+<span class="line" id="L42"><span class="tok-kw">const</span> reg = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;match&quot;</span>);</span>
+<span class="line" id="L43"></span>
+<span class="line" id="L44"><span class="tok-comment">// Descrption PANEL</span>
 </span>
-<span class="line" id="L44"><span class="tok-kw">const</span> mdlPanel = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlPanel&quot;</span>);</span>
-<span class="line" id="L45"></span>
-<span class="line" id="L46"><span class="tok-comment">// Descrption Objet</span>
+<span class="line" id="L45"><span class="tok-kw">const</span> mdlPanel = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlPanel&quot;</span>);</span>
+<span class="line" id="L46"></span>
+<span class="line" id="L47"><span class="tok-comment">// Descrption Objet</span>
 </span>
-<span class="line" id="L47"><span class="tok-kw">const</span> mdlObjet = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlObjet&quot;</span>);</span>
-<span class="line" id="L48"></span>
+<span class="line" id="L48"><span class="tok-kw">const</span> mdlObjet = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlObjet&quot;</span>);</span>
 <span class="line" id="L49"></span>
-<span class="line" id="L50"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
-<span class="line" id="L51"></span>
-<span class="line" id="L52"><span class="tok-kw">var</span> NPANEL = std.ArrayList(pnl.PANEL).init(allocator);</span>
+<span class="line" id="L50"><span class="tok-comment">// sauvegarde JSON</span>
+</span>
+<span class="line" id="L51"><span class="tok-kw">const</span> mdlFile = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlFile&quot;</span>);</span>
+<span class="line" id="L52"></span>
 <span class="line" id="L53"></span>
-<span class="line" id="L54"></span>
-<span class="line" id="L55"><span class="tok-comment">//================================</span>
-</span>
-<span class="line" id="L56"><span class="tok-comment">// defined var global</span>
-</span>
+<span class="line" id="L54"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L55"></span>
+<span class="line" id="L56"><span class="tok-kw">var</span> NPANEL = std.ArrayList(pnl.PANEL).init(allocator);</span>
 <span class="line" id="L57"></span>
 <span class="line" id="L58"></span>
-<span class="line" id="L59"></span>
-<span class="line" id="L60"><span class="tok-kw">var</span> nopt : <span class="tok-type">usize</span>  = <span class="tok-number">0</span>;</span>
+<span class="line" id="L59"><span class="tok-comment">//================================</span>
+</span>
+<span class="line" id="L60"><span class="tok-comment">// defined var global</span>
+</span>
 <span class="line" id="L61"></span>
 <span class="line" id="L62"></span>
-<span class="line" id="L63"><span class="tok-kw">const</span> choix = <span class="tok-kw">enum</span> {</span>
-<span class="line" id="L64">  panel,</span>
-<span class="line" id="L65">  objet,</span>
-<span class="line" id="L66">  source,</span>
-<span class="line" id="L67">  exit</span>
-<span class="line" id="L68">};</span>
-<span class="line" id="L69"></span>
-<span class="line" id="L70"></span>
-<span class="line" id="L71"><span class="tok-comment">// main----------------------------------</span>
+<span class="line" id="L63"></span>
+<span class="line" id="L64"><span class="tok-kw">var</span> nopt : <span class="tok-type">usize</span>	= <span class="tok-number">0</span>;</span>
+<span class="line" id="L65"></span>
+<span class="line" id="L66"></span>
+<span class="line" id="L67"><span class="tok-kw">const</span> choix = <span class="tok-kw">enum</span> {</span>
+<span class="line" id="L68">	panel,</span>
+<span class="line" id="L69">	objet,</span>
+<span class="line" id="L70">	sjson,</span>
+<span class="line" id="L71">	rjson,</span>
+<span class="line" id="L72">	exit</span>
+<span class="line" id="L73">};</span>
+<span class="line" id="L74"></span>
+<span class="line" id="L75"></span>
+<span class="line" id="L76"><span class="tok-comment">// main----------------------------------</span>
 </span>
-<span class="line" id="L72"></span>
-<span class="line" id="L73"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">main</span>() !<span class="tok-type">void</span> {</span>
-<span class="line" id="L74">  <span class="tok-comment">//term.offscrool();</span>
+<span class="line" id="L77"></span>
+<span class="line" id="L78"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">main</span>() !<span class="tok-type">void</span> {</span>
+<span class="line" id="L79">	<span class="tok-comment">//term.offscrool();</span>
 </span>
-<span class="line" id="L75">  <span class="tok-comment">// open terminal and config and offMouse , cursHide-&gt;(cursor hide)</span>
+<span class="line" id="L80">	<span class="tok-comment">// open terminal and config and offMouse , cursHide-&gt;(cursor hide)</span>
 </span>
-<span class="line" id="L76">  term.enableRawMode();</span>
-<span class="line" id="L77">  <span class="tok-kw">defer</span> term.disableRawMode() ;</span>
-<span class="line" id="L78"></span>
-<span class="line" id="L79">  <span class="tok-comment">// Initialisation</span>
+<span class="line" id="L81">	term.enableRawMode();</span>
+<span class="line" id="L82">	<span class="tok-kw">defer</span> term.disableRawMode() ;</span>
+<span class="line" id="L83"></span>
+<span class="line" id="L84">	<span class="tok-comment">// Initialisation</span>
 </span>
-<span class="line" id="L80">  term.titleTerm(<span class="tok-str">&quot;DESIGNER&quot;</span>);</span>
-<span class="line" id="L81"></span>
-<span class="line" id="L82"></span>
-<span class="line" id="L83">  <span class="tok-comment">//term.resizeTerm(52,172);</span>
-</span>
-<span class="line" id="L84">  <span class="tok-kw">const</span> termSize = term.getSize();</span>
-<span class="line" id="L85"></span>
+<span class="line" id="L85">	term.titleTerm(<span class="tok-str">&quot;DESIGNER&quot;</span>);</span>
 <span class="line" id="L86"></span>
-<span class="line" id="L87">  fld.MouseDsp = <span class="tok-null">true</span> ; <span class="tok-comment">// active display cursor x/y mouse</span>
+<span class="line" id="L87"></span>
+<span class="line" id="L88">	<span class="tok-comment">//term.resizeTerm(52,172);</span>
 </span>
-<span class="line" id="L88"></span>
-<span class="line" id="L89">  <span class="tok-kw">var</span> base : *pnl.PANEL = pnl.newPanelC(<span class="tok-str">&quot;base&quot;</span>,</span>
-<span class="line" id="L90">                  <span class="tok-number">1</span>, <span class="tok-number">1</span>,</span>
-<span class="line" id="L91">                  termSize.height,</span>
-<span class="line" id="L92">                  termSize.width ,</span>
-<span class="line" id="L93">                  dds.CADRE.line1,</span>
-<span class="line" id="L94">                  <span class="tok-str">&quot;&quot;</span>) ;</span>
-<span class="line" id="L95">    <span class="tok-comment">//-------------------------------------------------</span>
+<span class="line" id="L89">	<span class="tok-kw">const</span> termSize = term.getSize();</span>
+<span class="line" id="L90"></span>
+<span class="line" id="L91"></span>
+<span class="line" id="L92">	fld.MouseDsp = <span class="tok-null">true</span> ; <span class="tok-comment">// active display cursor x/y mouse</span>
 </span>
-<span class="line" id="L96">  <span class="tok-comment">//the menu is not double buffered it is not a Panel</span>
+<span class="line" id="L93"></span>
+<span class="line" id="L94">	<span class="tok-kw">var</span> base : *pnl.PANEL = pnl.newPanelC(<span class="tok-str">&quot;base&quot;</span>,</span>
+<span class="line" id="L95">					<span class="tok-number">1</span>, <span class="tok-number">1</span>,</span>
+<span class="line" id="L96">					termSize.height,</span>
+<span class="line" id="L97">					termSize.width ,</span>
+<span class="line" id="L98">					dds.CADRE.line1,</span>
+<span class="line" id="L99">					<span class="tok-str">&quot;&quot;</span>) ;</span>
+<span class="line" id="L100">	<span class="tok-comment">//-------------------------------------------------</span>
 </span>
-<span class="line" id="L97"></span>
-<span class="line" id="L98">  base.menu.append(mnu.newMenu(</span>
-<span class="line" id="L99">                      <span class="tok-str">&quot;Screen&quot;</span>,               <span class="tok-comment">// name</span>
+<span class="line" id="L101">	<span class="tok-comment">//the menu is not double buffered it is not a Panel</span>
 </span>
-<span class="line" id="L100">                      <span class="tok-number">2</span>, <span class="tok-number">2</span>,                   <span class="tok-comment">// posx, posy  </span>
+<span class="line" id="L102"></span>
+<span class="line" id="L103">	base.menu.append(mnu.newMenu(</span>
+<span class="line" id="L104">					<span class="tok-str">&quot;Screen&quot;</span>,				 <span class="tok-comment">// name</span>
 </span>
-<span class="line" id="L101">                      dds.CADRE.line1,        <span class="tok-comment">// type line fram</span>
+<span class="line" id="L105">					<span class="tok-number">2</span>, <span class="tok-number">2</span>,					 <span class="tok-comment">// posx, posy	</span>
 </span>
-<span class="line" id="L102">                      dds.MNUVH.vertical,     <span class="tok-comment">// type menu vertical / horizontal</span>
+<span class="line" id="L106">					dds.CADRE.line1,		<span class="tok-comment">// type line fram</span>
 </span>
-<span class="line" id="L103">                      &amp;.{</span>
-<span class="line" id="L104">                      <span class="tok-str">&quot;Panel..&quot;</span>,              <span class="tok-comment">// item</span>
+<span class="line" id="L107">					dds.MNUVH.vertical,	 <span class="tok-comment">// type menu vertical / horizontal</span>
 </span>
-<span class="line" id="L105">                      <span class="tok-str">&quot;Objet..&quot;</span>,</span>
-<span class="line" id="L106">                      <span class="tok-str">&quot;Source.&quot;</span>,</span>
-<span class="line" id="L107">                      <span class="tok-str">&quot;Exit...&quot;</span>,</span>
-<span class="line" id="L108">                      }</span>
-<span class="line" id="L109">                      )) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L110"></span>
-<span class="line" id="L111">  <span class="tok-kw">const</span>  menu = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>)  {</span>
-<span class="line" id="L112"></span>
-<span class="line" id="L113">    Screen = <span class="tok-number">0</span> ,       <span class="tok-comment">// creat panel, objet  , source , exit</span>
+<span class="line" id="L108">					&amp;.{</span>
+<span class="line" id="L109">					<span class="tok-str">&quot;Panel..&quot;</span>,				<span class="tok-comment">// item</span>
 </span>
-<span class="line" id="L114">  };</span>
-<span class="line" id="L115"></span>
+<span class="line" id="L110">					<span class="tok-str">&quot;Objet..&quot;</span>,</span>
+<span class="line" id="L111">					<span class="tok-str">&quot;SavJson.&quot;</span>,</span>
+<span class="line" id="L112">					<span class="tok-str">&quot;RstJson&quot;</span>,</span>
+<span class="line" id="L113">					<span class="tok-str">&quot;Exit...&quot;</span>,</span>
+<span class="line" id="L114">					}</span>
+<span class="line" id="L115">					)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
 <span class="line" id="L116"></span>
-<span class="line" id="L117"></span>
-<span class="line" id="L118">  <span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
-<span class="line" id="L119"></span>
-<span class="line" id="L120">    pnl.printPanel(base);</span>
-<span class="line" id="L121">    nopt = mnu.ioMenu(base,base.menu.items[<span class="tok-builtin">@intFromEnum</span>(menu.Screen)],<span class="tok-number">0</span>);</span>
+<span class="line" id="L117">	<span class="tok-kw">const</span>	menu = <span class="tok-kw">enum</span> (<span class="tok-type">u8</span>)	{</span>
+<span class="line" id="L118"></span>
+<span class="line" id="L119">	Screen = <span class="tok-number">0</span> ,	<span class="tok-comment">// creat panel, objet	, source , exit</span>
+</span>
+<span class="line" id="L120">	};</span>
+<span class="line" id="L121"></span>
 <span class="line" id="L122"></span>
-<span class="line" id="L123">    <span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.exit )) { <span class="tok-kw">break</span>; }</span>
-<span class="line" id="L124"></span>
-<span class="line" id="L125">    <span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.panel)) mdlPanel.fnPanel(&amp;NPANEL) ;</span>
-<span class="line" id="L126">    <span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.objet)) mdlObjet.fnPanel(&amp;NPANEL) ;</span>
-<span class="line" id="L127"></span>
-<span class="line" id="L128">    <span class="tok-kw">if</span> (NPANEL.items.len == <span class="tok-number">0</span> ) dds.deinitStr();</span>
-<span class="line" id="L129"></span>
+<span class="line" id="L123"></span>
+<span class="line" id="L124">	<span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L125"></span>
+<span class="line" id="L126">	pnl.printPanel(base);</span>
+<span class="line" id="L127">	nopt = mnu.ioMenu(base,base.menu.items[<span class="tok-builtin">@intFromEnum</span>(menu.Screen)],<span class="tok-number">0</span>);</span>
+<span class="line" id="L128"></span>
+<span class="line" id="L129">	<span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.exit )) { <span class="tok-kw">break</span>; }</span>
 <span class="line" id="L130"></span>
-<span class="line" id="L131">  }</span>
-<span class="line" id="L132">  term.disableRawMode();</span>
-<span class="line" id="L133">}</span>
+<span class="line" id="L131">	<span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.panel)) mdlPanel.fnPanel(&amp;NPANEL) ;</span>
+<span class="line" id="L132">	<span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.objet)) mdlObjet.fnPanel(&amp;NPANEL) ;</span>
+<span class="line" id="L133">	<span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.sjson)) <span class="tok-kw">try</span> mdlFile.wrkJson(&amp;NPANEL,<span class="tok-null">true</span>) ;</span>
+<span class="line" id="L134">	<span class="tok-kw">if</span> (nopt == <span class="tok-builtin">@intFromEnum</span>(choix.rjson)) <span class="tok-kw">try</span> mdlFile.wrkJson(&amp;NPANEL,<span class="tok-null">false</span>) ;</span>
+<span class="line" id="L135"></span>
+<span class="line" id="L136">	<span class="tok-kw">if</span> (NPANEL.items.len == <span class="tok-number">0</span> ) dds.deinitStr();</span>
+<span class="line" id="L137"></span>
+<span class="line" id="L138"></span>
+<span class="line" id="L139">	</span>
+<span class="line" id="L140">	}</span>
+<span class="line" id="L141">	term.disableRawMode();</span>
+<span class="line" id="L142">}</span>
+<span class="line" id="L143"></span>
 </code></pre></body>
 </html>
