@@ -511,7 +511,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 							"required","please enter text",
 							"")) catch unreachable ;
 
-	Panel.lineh.append(lnh.newLine(@tagName(lp01.lnh1)	 ,9,1,156,dds.LINE.line1) ) catch unreachable ;
+	Panel.lineh.append(lnh.newLine(@tagName(lp01.lnh1)	 ,9,2,116,dds.LINE.line1) ) catch unreachable ;
 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.F_shw) ,11,9	,"show"))	 catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(lp01.F_chk) ,11,15 ,"check"))	catch unreachable ;

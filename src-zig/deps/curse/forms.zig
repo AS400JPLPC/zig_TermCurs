@@ -62,6 +62,9 @@ pub const ErrForms = error{
 
 				lbl_dltRows_Index_invalide,
 
+				line_getIndex_Name_Vertical_Invalide,
+				line_getIndex_Name_Horizontal_Invalide,
+	
 				btn_getIndex_Key_Button_Invalide,
 				btn_getName_Index_invalide,
 				btn_getKey_Index_invalide,
@@ -701,6 +704,13 @@ pub const lnv = struct {
 	};
 
 
+	pub const Elinev = enum {
+		name,
+		posx,
+		posy,
+		lng,
+		trace
+	};
 
 	/// LINE VERTICAL
 
@@ -708,8 +718,8 @@ pub const lnv = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
-		lines:	usize,
-		cadre:	dds.LINE,
+		lng:	usize,
+		trace:	dds.LINE,
 		attribut:dds.ZONATRB,
 		actif:	bool
 		};
@@ -717,16 +727,16 @@ pub const lnv = struct {
 		// define Fram 
 		pub fn newLine(vname:[]const u8,
 										vposx:usize, vposy:usize,
-										vlines:usize,
-										vcadre:dds.LINE,
+										vlng:usize,
+										vtrace:dds.LINE,
 										) LINE {
 
 					const xframe = LINE {
 							.name = vname,
 							.posx = vposx,
 							.posy = vposy,
-							.lines = vlines,
-							.cadre = vcadre,
+							.lng = vlng,
+							.trace = vtrace,
 							.attribut = AtrLine,
 							.actif = true
 					};
@@ -746,34 +756,38 @@ pub const lnv = struct {
 			const ACS_Vline2		= "║";
 
 			var row:	usize = 0 ;
-			var npos: usize = 0 ;
 
-			var n: usize = 0 ;
-			var x: usize = vline.posx	;
+			var x: usize = vline.posx - 1 ;
 
 			var trait: []const u8 = "";
+			var n : usize =	(vpnl.cols * (vline.posx - 1)) + vline.posy - 1 ;
+			while (row <= vline.lng) {
 
-			while (row < vline.lines) {
 
-
-				if ( dds.LINE.line1 == vline.cadre ) {
+				if ( dds.LINE.line1 == vline.trace ) {
 					trait = ACS_Vlines;
 				} else trait = ACS_Vline2 ;
-				npos =	vpnl.cols * x;
-				n =	npos + vline.posy;
 				vpnl.buf.items[n].ch = trait ;
 				vpnl.buf.items[n].attribut = vline.attribut;
 				vpnl.buf.items[n].on = true;
 			
 				row +=1 ;
 				x += 1;
+				n =	(vpnl.cols * x ) + vline.posy - 1 ;
 			}
 		}
+	// return index-LINE	---> arraylist panel-line
+	pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )	ErrForms ! usize {
 
+		for (vpnl.linev.items, 0..) |l, idx| {
+			if (std.mem.eql(u8, l.name, name)) return idx ;
+		}
+		return ErrForms.line_getIndex_Name_Vertical_Invalide;
+	}
 };
 
 
-// defined Line and vertical for Panel
+// defined Line and horizontal for Panel
 pub const lnh = struct {
 
 	// define attribut default FRAME
@@ -787,16 +801,22 @@ pub const lnh = struct {
 
 	};
 
+	pub const Elineh = enum {
+		name,
+		posx,
+		posy,
+		lng,
+		trace
+	};
 
-
-	/// LINE VERTICAL
+	/// LINE HORIZONTAL
 
 	pub const LINE = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
-		cols:	usize,
-		cadre:	dds.LINE,
+		lng:	usize,
+		trace:	dds.LINE,
 		attribut:dds.ZONATRB,
 		actif:	bool
 		};
@@ -804,16 +824,16 @@ pub const lnh = struct {
 		// define Fram 
 		pub fn newLine(vname:[]const u8,
 										vposx:usize, vposy:usize,
-										vcols:usize,
-										vcadre:dds.LINE,
+										vlng:usize,
+										vtrace:dds.LINE,
 										) LINE {
 
 					const xframe = LINE {
 							.name = vname,
 							.posx = vposx,
 							.posy = vposy,
-							.cols = vcols,
-							.cadre = vcadre,
+							.lng  = vlng,
+							.trace = vtrace,
 							.attribut = AtrLine,
 							.actif = true
 					};
@@ -826,38 +846,41 @@ pub const lnh = struct {
 		pub fn printLine(vpnl : *pnl.PANEL , vline: LINE) void {
 		if (vpnl.actif == false ) return ;
 		if (vline.actif == false ) return ;
-			// assigne FRAMELINE VERTICAL
+			// assigne FRAMELINE HORIZONTAL
 
 			const ACS_Hlines	= "─";
 			const ACS_Hline2	= "═";
 
 			var coln:	usize = 0 ;
-			var npos: usize = 0 ;
 
 			var n: usize = 0 ;
-			var y: usize = vline.posy	;
 
 			var trait: []const u8 = "";
 
-			npos =	vpnl.cols * vline.posx;
+			n =	(vpnl.cols * (vline.posx - 1)) + vline.posy - 1 ;
+			while (coln <= vline.lng) {
 
-			while (coln < vline.cols) {
 
-
-				if ( dds.LINE.line1 == vline.cadre ) {
+				if ( dds.LINE.line1 == vline.trace ) {
 					trait = ACS_Hlines;
 				} else trait = ACS_Hline2 ;
-
-				n =	npos + y;
 				vpnl.buf.items[n].ch = trait ;
 				vpnl.buf.items[n].attribut = vline.attribut;
 				vpnl.buf.items[n].on = true;
 			
 				coln +=1 ;
-				y += 1;
+				n += 1;
 			}
 		}
 
+	// return index-LINE	---> arraylist panel-line
+	pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )	ErrForms ! usize {
+
+		for (vpnl.lineh.items, 0..) |l, idx| {
+			if (std.mem.eql(u8, l.name, name)) return idx ;
+		}
+		return ErrForms.line_getIndex_Name_Horizontal_Invalide;
+	}
 };
 
 
@@ -3411,6 +3434,8 @@ pub const Epanel = enum {
 	button,
 	label,
 	field,
+	linev,
+	lineh,
 };
 
 	// Init Panel for arrayList exemple Gencurs modlPanel

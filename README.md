@@ -277,7 +277,7 @@ les news:<BR />
 
           - testing memoory<br />
 
-            -         [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
+            -     [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
             <br />
             <br />  
             -  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
@@ -288,7 +288,6 @@ les news:<BR />
              <br />
             -  2023-08-12 **After a big discussion, setting up the wrestling**<br />
             -  2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
-
             - 2023-08-14 Installation of a logger
               I modified the logger and redirected to a file,
               it can also be used for recording other than errors or for monitoring data, diagrams test [zig_demoJson](https://github.com/AS400JPLPC/zig_demoJson) <br />
@@ -296,21 +295,26 @@ les news:<BR />
               <br />
             - 2023-08-21 First Json test, now I will refine,
               it's too hot break.<br />
+# reprise du projet
 
+I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add module mdlSjson (save file)<br />
+* 2023-11-15 add module mdlRjson (restore file)<br />
+* 2023-11-15 add module mdlFile  (manager file)<br />
+* 2023-11-15 in the "mdlObjet" module have little reordered and deleted<br />
+* 2023-11-15 A “dspf” folder groups JSON files : Label Field<br />
+* 2023-11-15 The software runs in a terminal<br />
+* 2023-11-15 A small change F10 became F11 for convenience with the terminal<br />
+<br />
+<br />
 
-# reprise du projet  
+<u>                                                                         </u><BR />
+→ 2023-11-22 update Forms mdlObjet mdlSjon mdlRjson<br />
+→ 2023-11-22 **harmonization function line vertical & horizontal**harmomisation procedur<br />
+→ 2023-11-22 test Json save restor gencurs<br />
+<br />
 
-I had to buy a PC In the meantime I changed publisher etc...
+![](assets/20231122_012345_Gen01.png)
 
+---
 
-  * 2023-11-15 add module mdlSjson (save file)<br />
-  * 2023-11-15 add module mdlRjson (restore file)<br />
-  * 2023-11-15 add module mdlFile  (manager file)<br />
-  * 2023-11-15 in the "mdlObjet" module have little reordered and deleted<br />
-  * 2023-11-15 A “dspf” folder groups JSON files : Label Field<br />
-  * 2023-11-15 The software runs in a terminal<br />
-  * 2023-11-15 A small change F10 became F11 for convenience with the terminal
-
-
-
-
+<BR/><BR/>

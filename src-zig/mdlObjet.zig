@@ -112,7 +112,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 pub fn Panel_HELP() *pnl.PANEL {
 	var Panel : *pnl.PANEL = pnl.newPanelC("HELP",
 										1, 1,
-										4,
+										5,
 										100 ,
 										dds.CADRE.line1,
 										""
@@ -127,7 +127,12 @@ pub fn Panel_HELP() *pnl.PANEL {
 								) catch unreachable ;
 	
 
-	Panel.field.append(fld.newFieldTextFull("HELP",2,5,90,"",false,
+	Panel.field.append(fld.newFieldTextFull("HELP1",2,5,90,"",false,
+								"","",
+								"")) catch unreachable ;
+	fld.setProtect(Panel,0,true) catch unreachable;
+
+	Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
 								"","",
 								"")) catch unreachable ;
 	fld.setProtect(Panel,0,true) catch unreachable;
@@ -281,6 +286,10 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			"Label-Remove",
 			"field-Order",
 			"field-Remove",
+			"Horizontal-Order",
+			"Horizontal-Remove",
+			"Vertical-Order",
+			"Vertical-Remove"
 			}
 		)
 	) catch |err| { @panic(@errorName(err)); };
@@ -314,8 +323,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 		switch (Tkey.Key) {
 			.F1	 => {
-				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-T Title Alt-L label Alt-F Field AltW Outils")
+				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-T Title Alt-L label Alt-F Field")
 					catch unreachable;
+				fld.setText(pFmtH01,1,"Line AltH/V Horizontal Vertical AltW Outils")
+					catch unreachable;
+
 				_= pnl.ioPanel(pFmtH01);
 				pnl.rstPanel(pFmtH01,pFmt01);
 				term.gotoXY(1,1);
@@ -338,6 +350,21 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 						catch |err| { @panic(@errorName(err)); };
 				}
 
+				XPANEL.items[numPanel].lineh.clearAndFree();
+				XPANEL.items[numPanel].lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].lineh.clearRetainingCapacity();
+				for (pFmt01.lineh.items) |p| {
+					XPANEL.items[numPanel].lineh.append(p) 
+						catch |err| { @panic(@errorName(err)); };
+				}
+
+				XPANEL.items[numPanel].linev.clearAndFree();
+				XPANEL.items[numPanel].linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].linev.clearRetainingCapacity();
+				for (pFmt01.linev.items) |p| {
+					XPANEL.items[numPanel].linev.append(p) 
+						catch |err| { @panic(@errorName(err)); };
+				}
 				pnl.freePanel(pFmt01);
 				defer dds.allocatorPnl.destroy(pFmt01);
 				dds.deinitUtils();
@@ -384,10 +411,44 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					term.posCurs.y < minY or term.posCurs.y > maxY) continue;
 
 				term.writeStyled("?", pFmt01.attribut);
-				term.gotoXY(term.posCurs.x, term.posCurs.y);
+				term.gotoXY(term.posCurs.x , term.posCurs.y );
 				term.getCursor();
 				term.offMouse();
 				writefield(pFmt01);
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
+			},
+
+			// def line Horizontal
+			.altH => {
+				term.getCursor();
+				
+				if (term.posCurs.x < minX or term.posCurs.x > maxX or
+					term.posCurs.y < minY or term.posCurs.y > maxY) continue;
+
+				term.writeStyled("?", pFmt01.attribut);
+				term.gotoXY(term.posCurs.x, term.posCurs.y );
+				term.getCursor();
+				term.offMouse();
+				writeHorizontal(pFmt01);
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
+			},
+
+			// def line Vertical
+			.altV => {
+				term.getCursor();
+				
+				if (term.posCurs.x < minX or term.posCurs.x > maxX or
+					term.posCurs.y < minY or term.posCurs.y > maxY) continue;
+
+				term.writeStyled("?", pFmt01.attribut);
+				term.gotoXY(term.posCurs.x, term.posCurs.y );
+				term.getCursor();
+				term.offMouse();
+				writeVertical(pFmt01);
 				term.cls();
 				pnl.printPanel(pFmt01);
 				term.onMouse();
@@ -399,12 +460,20 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 				if (nitem == 0) orderLabel(pFmt01);	// Order  Label
 
-				if (nitem == 1) removeLabel(pFmt01);   // Remove Label
+				if (nitem == 1) removeLabel(pFmt01);   // Remove Labely
 
 				if (nitem == 2) orderField(pFmt01);	// order field
 
 				if (nitem == 3) removeField(pFmt01);   // Remove field
 
+				if (nitem == 4) orderHorizontal(pFmt01);	// order Line Horizontal
+
+				if (nitem == 5) removeHorizontal(pFmt01);   // Remove Line vertical
+
+				if (nitem == 6) orderVertical(pFmt01);	// order Line Horizontal
+
+				if (nitem == 7) removeVertical(pFmt01);   // Remove Line vertical
+					
 				term.offMouse();
 				term.cls();
 				pnl.printPanel(pFmt01);
@@ -1988,4 +2057,502 @@ fn removeField(vpnl: *pnl.PANEL) void {
 	savfield.clearAndFree();
 	savfield.deinit();
 }
+
+//------------------------------------------------------------------
+// definition line horizontal
+
+fn writeHorizontal(vpnl: *pnl.PANEL) void {
+	
+	//term.getCursor();
+	var e_count: usize = 0;
+	var tampon: []const u8 = undefined;
+	var e_LineH = std.ArrayList([]const u8).init(dds.allocatorUtils);
+	defer e_LineH.deinit();
+	defer dds.allocatorUtils.destroy(&e_LineH);
+
+	var e_posx: usize = term.posCurs.x ;
+	var e_posy: usize = term.posCurs.y ;
+	var e_curs: usize = e_posy;
+
+	// defines the receiving structure of the keyboard
+	var Tkey: term.Keyboard = undefined;
+	var pFmtH01 = Panel_HELP();
+
+	var litem: usize = 0; // type line cadre menu
  
+	vpnl.menu.append(mnu.newMenu("DefLine", // name
+			1, 1, // posx, posy
+			dds.CADRE.line1, // type line fram
+			dds.MNUVH.vertical, // type menu vertical / horizontal
+			&.{ // item
+			"Line 1",
+			"LLine 2",
+			}
+		)
+	) catch |err| { @panic(@errorName(err)); };
+
+	var nindex = mnu.getIndex(vpnl,"DefLine") catch unreachable;
+	
+	while (true) {
+		forms.dspCursor(vpnl, e_posx, e_curs,"Line Horiz.");
+
+		Tkey = kbd.getKEY();
+
+		//dspMouse(vpnl);  // active display Cursor x/y mouse
+		//std.debug.print("Key: {d}  - {d}\n\r",.{term.posCurs.x, term.posCurs.y});
+		switch (Tkey.Key) {
+			.F1	 => {
+				fld.setText(pFmtH01,0,"F12 Abort ctrl-V  ctr-l Line ") catch unreachable;
+				fld.setText(pFmtH01,1,"" ) catch unreachable;
+				_= pnl.ioPanel(pFmtH01);
+				pnl.rstPanel(pFmtH01,vpnl);
+				term.gotoXY(1,1);
+				continue;
+			},
+			
+			.F12 => return,
+			.ctrlL => {
+				litem = 0;
+				litem = mnu.ioMenu(vpnl,vpnl.menu.items[nindex], litem);
+				mnu.rstPanel(&vpnl.menu.items[nindex],vpnl);
+	 
+			},
+			.ctrlV => {
+				tampon = std.fmt.allocPrint(dds.allocatorStr, "H{d}{d}", .{ e_posx, e_posy })
+					catch |err| { @panic(@errorName(err)); };
+				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
+				vpnl.lineh.append(lnh.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
+					catch |err| { @panic(@errorName(err)); };
+
+				_ = vpnl.menu.orderedRemove(nindex);
+				return;
+			},
+			.right, .tab => {
+				if (e_curs < (vpnl.cols + vpnl.posy) - 1) {
+					e_count += 1;
+					e_curs += 1;
+				}
+			},
+			.left, .stab => {
+				if (e_curs > e_posy) {
+					e_count -= 1;
+					e_curs -= 1;
+				}
+			},
+			else => {},
+		}
+	}
+}
+
+// Order horizontal
+fn orderHorizontal(vpnl: *pnl.PANEL) void {
+	var idy: usize = 0;
+	const allocatorOrder = std.heap.page_allocator;
+	var newline = std.ArrayList(lnh.LINE).init(allocatorOrder);
+	var savline = std.ArrayList(lnh.LINE).init(allocatorOrder);
+
+	var Gkey: grd.GridSelect = undefined;
+	defer Gkey.Buf.clearAndFree();
+
+	for (vpnl.lineh.items) |p| {
+		savline.append(p)
+		catch |err| { @panic(@errorName(err)); };		
+	}
+
+	var Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Origine);
+
+	var Order: *grd.GRID = grd.newGridC(
+		"Order",
+		2,
+		70,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Order);
+
+	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Order);
+
+	while (true) {
+		grd.resetRows(Origine);
+		for (vpnl.lineh.items, 0..) |l, idx| {
+			var ridx = usizeToStr(idx);
+
+			grd.addRows(Origine, &.{ ridx, l.name});
+		}
+
+		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
+		if (Gkey.Key == kbd.esc) break;
+		if (Gkey.Key == kbd.ctrlV) break;
+		if (Gkey.Key == kbd.enter) {
+			newline.append(vpnl.lineh.items[strToUsize(Gkey.Buf.items[0])])
+				catch |err| { @panic(@errorName(err)); };
+			
+			var ridy = usizeToStr(idy);
+
+			grd.addRows(Order, &.{ ridy, Gkey.Buf.items[1]});
+			idy += 1;
+			grd.printGridHeader(Order);
+			grd.printGridRows(Order);
+			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+
+			_ = vpnl.lineh.orderedRemove(ligne);
+		}
+	}
+
+	vpnl.lineh.clearAndFree();
+	vpnl.lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+	vpnl.lineh.clearRetainingCapacity();
+	// restor and exit
+	if (Gkey.Key == kbd.esc) {
+		for (savline.items) |p| {
+			vpnl.lineh.append(p)
+						catch |err| { @panic(@errorName(err)); };
+		}
+	}
+	// new Order and exit CTRL-V
+	else {
+		for (newline.items) |p| {
+			vpnl.lineh.append(p)   
+						catch |err| { @panic(@errorName(err)); };
+				 }
+	}
+
+	grd.freeGrid(Origine);
+	grd.freeGrid(Order);
+
+	newline.clearAndFree();
+	newline.deinit();
+
+	savline.clearAndFree();
+	savline.deinit();
+
+	return;
+}
+
+// remove Horizontal
+fn removeHorizontal(vpnl: *pnl.PANEL) void {
+	const allocatorRemove = std.heap.page_allocator;
+	var savline: std.ArrayList(lnh.LINE) = std.ArrayList(lnh.LINE).init(allocatorRemove);
+
+	var Gkey: grd.GridSelect = undefined;
+	defer Gkey.Buf.clearAndFree();
+
+	for (vpnl.lineh.items) |p| {
+		savline.append(p)  
+			catch |err| { @panic(@errorName(err)); };
+	}
+
+	var Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Origine);
+
+	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+	while (true) {
+		grd.resetRows(Origine);
+		for (vpnl.lineh.items, 0..) |l, idx| {
+			var ridx =  usizeToStr(idx);
+ 
+			grd.addRows(Origine, &.{ ridx, l.name});
+		}
+
+		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
+		if (Gkey.Key == kbd.esc) break;
+		if (Gkey.Key == kbd.ctrlV) break;
+		if (Gkey.Key == kbd.enter) {
+			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+
+			_ = vpnl.lineh.orderedRemove(ligne);
+		}
+	}
+
+	// restor and exit
+	if (Gkey.Key == kbd.esc) {
+		vpnl.lineh.clearAndFree();
+		vpnl.lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+		vpnl.lineh.clearRetainingCapacity();
+
+		for (savline.items) |p| {
+			vpnl.lineh.append(p) 
+			 catch |err| { @panic(@errorName(err)); };
+		}
+	}
+
+	grd.freeGrid(Origine);
+
+	savline.clearAndFree();
+	savline.deinit();
+}
+
+
+//------------------------------------------------------------------
+// definition line horizontal
+
+fn writeVertical(vpnl: *pnl.PANEL) void {
+	
+	//term.getCursor();
+	var e_count: usize = 0;
+	var tampon: []const u8 = undefined;
+	var e_LineV = std.ArrayList([]const u8).init(dds.allocatorUtils);
+	defer e_LineV.deinit();
+	defer dds.allocatorUtils.destroy(&e_LineV);
+
+	var e_posx: usize = term.posCurs.x ;
+	var e_posy: usize = term.posCurs.y ;
+	var e_curs: usize = e_posx;
+
+	// defines the receiving structure of the keyboard
+	var Tkey: term.Keyboard = undefined;
+	var pFmtH01 = Panel_HELP();
+
+	var litem: usize = 0; // type line cadre menu
+ 
+	vpnl.menu.append(mnu.newMenu("DefLine", // name
+			1, 1, // posx, posy
+			dds.CADRE.line1, // type line fram
+			dds.MNUVH.vertical, // type menu vertical / horizontal
+			&.{ // item
+			"Line 1",
+			"LLine 2",
+			}
+		)
+	) catch |err| { @panic(@errorName(err)); };
+
+	var nindex = mnu.getIndex(vpnl,"DefLine") catch unreachable;
+	
+	while (true) {
+		forms.dspCursor(vpnl, e_curs, term.posCurs.y ,"Line Vertical.");
+		Tkey = kbd.getKEY();
+
+		//dspMouse(vpnl);  // active display Cursor x/y mouse
+		//std.debug.print("Key: {d}  - {d}\n\r",.{term.posCurs.x, term.posCurs.y});
+		switch (Tkey.Key) {
+			.F1	 => {
+				fld.setText(pFmtH01,0,"F12 Abort ctrl-V  ctr-l Line ") catch unreachable;
+				fld.setText(pFmtH01,1,"" ) catch unreachable;
+				_= pnl.ioPanel(pFmtH01);
+				pnl.rstPanel(pFmtH01,vpnl);
+				term.gotoXY(1,1);
+				continue;
+			},
+			
+			.F12 => return,
+			.ctrlL => {
+				litem = 0;
+				litem = mnu.ioMenu(vpnl,vpnl.menu.items[nindex], litem);
+				mnu.rstPanel(&vpnl.menu.items[nindex],vpnl);
+	 
+			},
+			.ctrlV => {
+				tampon = std.fmt.allocPrint(dds.allocatorStr, "V{d}{d}", .{ e_posx, e_posy })
+					catch |err| { @panic(@errorName(err)); };
+				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
+				vpnl.linev.append(lnv.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
+					catch |err| { @panic(@errorName(err)); };
+
+				_ = vpnl.menu.orderedRemove(nindex);
+				return;
+			},
+			.down => {
+				if (e_curs < (vpnl.cols + vpnl.posx) - 1) {
+					e_count += 1;
+					e_curs += 1;
+				}
+			},
+			.up => {
+				if (e_curs > e_posx) {
+					e_count -= 1;
+					e_curs -= 1;
+				}
+			},
+			else => {},
+		}
+	}
+}
+
+
+// Order horizontal
+fn orderVertical(vpnl: *pnl.PANEL) void {
+	var idy: usize = 0;
+	const allocatorOrder = std.heap.page_allocator;
+	var newline = std.ArrayList(lnv.LINE).init(allocatorOrder);
+	var savline = std.ArrayList(lnv.LINE).init(allocatorOrder);
+
+	var Gkey: grd.GridSelect = undefined;
+	defer Gkey.Buf.clearAndFree();
+
+	for (vpnl.linev.items) |p| {
+		savline.append(p)
+		catch |err| { @panic(@errorName(err)); };		
+	}
+
+	var Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Origine);
+
+	var Order: *grd.GRID = grd.newGridC(
+		"Order",
+		2,
+		70,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Order);
+
+	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Order);
+
+	while (true) {
+		grd.resetRows(Origine);
+		for (vpnl.linev.items, 0..) |l, idx| {
+			var ridx = usizeToStr(idx);
+
+			grd.addRows(Origine, &.{ ridx, l.name});
+		}
+
+		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
+		if (Gkey.Key == kbd.esc) break;
+		if (Gkey.Key == kbd.ctrlV) break;
+		if (Gkey.Key == kbd.enter) {
+			newline.append(vpnl.linev.items[strToUsize(Gkey.Buf.items[0])])
+				catch |err| { @panic(@errorName(err)); };
+			
+			var ridy = usizeToStr(idy);
+
+			grd.addRows(Order, &.{ ridy, Gkey.Buf.items[1]});
+			idy += 1;
+			grd.printGridHeader(Order);
+			grd.printGridRows(Order);
+			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+
+			_ = vpnl.linev.orderedRemove(ligne);
+		}
+	}
+
+	vpnl.linev.clearAndFree();
+	vpnl.linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+	vpnl.linev.clearRetainingCapacity();
+	// restor and exit
+	if (Gkey.Key == kbd.esc) {
+		for (savline.items) |p| {
+			vpnl.linev.append(p)
+						catch |err| { @panic(@errorName(err)); };
+		}
+	}
+	// new Order and exit CTRL-V
+	else {
+		for (newline.items) |p| {
+			vpnl.linev.append(p)   
+						catch |err| { @panic(@errorName(err)); };
+				 }
+	}
+
+	grd.freeGrid(Origine);
+	grd.freeGrid(Order);
+
+	newline.clearAndFree();
+	newline.deinit();
+
+	savline.clearAndFree();
+	savline.deinit();
+
+	return;
+}
+
+// remove Horizontal
+fn removeVertical(vpnl: *pnl.PANEL) void {
+	const allocatorRemove = std.heap.page_allocator;
+	var savline: std.ArrayList(lnv.LINE) = std.ArrayList(lnv.LINE).init(allocatorRemove);
+
+	var Gkey: grd.GridSelect = undefined;
+	defer Gkey.Buf.clearAndFree();
+
+	for (vpnl.linev.items) |p| {
+		savline.append(p)  
+			catch |err| { @panic(@errorName(err)); };
+	}
+
+	var Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		25,
+		grd.gridStyle,
+		dds.CADRE.line1,
+	);
+	defer dds.allocatorPnl.destroy(Origine);
+
+	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+	while (true) {
+		grd.resetRows(Origine);
+		for (vpnl.linev.items, 0..) |l, idx| {
+			var ridx =  usizeToStr(idx);
+ 
+			grd.addRows(Origine, &.{ ridx, l.name});
+		}
+
+		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
+		if (Gkey.Key == kbd.esc) break;
+		if (Gkey.Key == kbd.ctrlV) break;
+		if (Gkey.Key == kbd.enter) {
+			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+
+			_ = vpnl.linev.orderedRemove(ligne);
+		}
+	}
+
+	// restor and exit
+	if (Gkey.Key == kbd.esc) {
+		vpnl.linev.clearAndFree();
+		vpnl.linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+		vpnl.linev.clearRetainingCapacity();
+
+		for (savline.items) |p| {
+			vpnl.linev.append(p) 
+			 catch |err| { @panic(@errorName(err)); };
+		}
+	}
+
+	grd.freeGrid(Origine);
+
+	savline.clearAndFree();
+	savline.deinit();
+}
