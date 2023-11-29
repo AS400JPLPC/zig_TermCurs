@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>menu.zig - source view</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPNJREFUeNpi/P//PwMlgOXHUjly9E0G4hwgZmQiQZMqEK8H4v9QzUEgQSaoADK+zhH9iAGL+C0gDoAaNg9mGLoLfgA1awK9hS9gzgJxA9RQBmQDrgMxJzRMGKE4HYj/Ial5A8QmQLwCJoBsgBYW2+TR1ChDaWt4LOBxKsi/VUh8XiD+gq4IVyzwQAMJBoKwacZlAB8Qf0bi96IZhtOAe1D6LpqaEiz6rmEzQAeIzwGxCJpieFqApo/vQKyJboAaEBsAsSEupwI1MwKjGBTVHOhegMX5UajYRqiBjMgYmj400cVh0XgTiKdC0zhJgJHS7AwQYABm9EAdCKrEfAAAAABJRU5ErkJggg=="/>
+    <style>
+      body{
+        font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      pre > code {
+        display: block;
+        overflow: auto;
+        line-height: normal;
+        margin: 0em;
+      }
+      .tok-kw {
+          color: #333;
+          font-weight: bold;
+      }
+      .tok-str {
+          color: #d14;
+      }
+      .tok-builtin {
+          color: #005C7A;
+      }
+      .tok-comment {
+          color: #545454;
+          font-style: italic;
+      }
+      .tok-fn {
+          color: #900;
+          font-weight: bold;
+      }
+      .tok-null {
+          color: #005C5C;
+      }
+      .tok-number {
+          color: #005C5C;
+      }
+      .tok-type {
+          color: #458;
+          font-weight: bold;
+      }
+      pre {
+        counter-reset: line;
+      }
+      pre .line:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        padding-right: 1em;
+        width: 2em;
+        text-align: right;
+        color: #999;
+      }
+      
+      .line {
+        width: 100%;
+        display: inline-block;
+      }
+      .line:target {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        background: #fafafa;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body{
+            background:#222;
+            color: #ccc;
+        }
+        pre > code {
+            color: #ccc;
+            background: #222;
+            border: unset;
+        }
+        .line:target {
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #444;
+            background: #333;
+        }
+        .tok-kw {
+            color: #eee;
+        }
+        .tok-str {
+            color: #2e5;
+        }
+        .tok-builtin {
+            color: #ff894c;
+        }
+        .tok-comment {
+            color: #aa7;
+        }
+        .tok-fn {
+            color: #B1A0F8;
+        }
+        .tok-null {
+            color: #ff8080;
+        }
+        .tok-number {
+            color: #ff8080;
+        }
+        .tok-type {
+            color: #68f;
+        }
+      }
+    </style>
+</head>
+<body>
+<pre><code><span class="line" id="L1"><span class="tok-kw">const</span> std = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>);</span>
+<span class="line" id="L2"><span class="tok-kw">const</span> utf = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;std&quot;</span>).unicode;</span>
+<span class="line" id="L3"></span>
+<span class="line" id="L4"><span class="tok-kw">const</span> dds = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;dds&quot;</span>);</span>
+<span class="line" id="L5"></span>
+<span class="line" id="L6"><span class="tok-comment">/// terminal Fonction</span></span>
+<span class="line" id="L7"><span class="tok-kw">const</span> term = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>);</span>
+<span class="line" id="L8"><span class="tok-comment">// keyboard</span>
+</span>
+<span class="line" id="L9"><span class="tok-kw">const</span> kbd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;cursed&quot;</span>).kbd;</span>
+<span class="line" id="L10"></span>
+<span class="line" id="L11"><span class="tok-comment">// tools utility</span>
+</span>
+<span class="line" id="L12"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;utils&quot;</span>);</span>
+<span class="line" id="L13"></span>
+<span class="line" id="L14"></span>
+<span class="line" id="L15"><span class="tok-comment">// panel</span>
+</span>
+<span class="line" id="L16"><span class="tok-kw">const</span> pnl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).pnl;</span>
+<span class="line" id="L17"></span>
+<span class="line" id="L18"></span>
+<span class="line" id="L19"><span class="tok-kw">const</span> os = std.os;</span>
+<span class="line" id="L20"><span class="tok-kw">const</span> io = std.io;</span>
+<span class="line" id="L21"></span>
+<span class="line" id="L22"><span class="tok-comment">///-------------------------------</span></span>
+<span class="line" id="L23"><span class="tok-comment">/// MENU</span></span>
+<span class="line" id="L24"><span class="tok-comment">///-------------------------------</span></span>
+<span class="line" id="L25"></span>
+<span class="line" id="L26"></span>
+<span class="line" id="L27"><span class="tok-comment">/// Errors that may occur when using String</span></span>
+<span class="line" id="L28"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ErrMenu = <span class="tok-kw">error</span>{</span>
+<span class="line" id="L29"></span>
+<span class="line" id="L30">				mnu_getIndex_Name_Menu_Invalide,</span>
+<span class="line" id="L31">	</span>
+<span class="line" id="L32">				mnu_getName_Index_invalide,</span>
+<span class="line" id="L33">				mnu_getPosx_Index_invalide,</span>
+<span class="line" id="L34">				mnu_getPosy_Index_invalide,</span>
+<span class="line" id="L35">				mnu_getText_Index_invalide,</span>
+<span class="line" id="L36">				mnu_getActif_Index_invalide,</span>
+<span class="line" id="L37"></span>
+<span class="line" id="L38">				mnu_dltRows_Index_invalide,</span>
+<span class="line" id="L39">	};</span>
+<span class="line" id="L40"></span>
+<span class="line" id="L41"><span class="tok-comment">// defined Menu</span>
+</span>
+<span class="line" id="L42"><span class="tok-kw">pub</span> <span class="tok-kw">const</span>	mnu = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L43"></span>
+<span class="line" id="L44">	<span class="tok-comment">// nbr espace intercaler</span>
+</span>
+<span class="line" id="L45">	<span class="tok-kw">pub</span> <span class="tok-kw">var</span>	mnuspc : <span class="tok-type">usize</span> =<span class="tok-number">3</span> ;</span>
+<span class="line" id="L46"></span>
+<span class="line" id="L47">	<span class="tok-comment">// define attribut default CADRE</span>
+</span>
+<span class="line" id="L48">	<span class="tok-kw">pub</span> <span class="tok-kw">var</span> AtrMnu : dds.ZONATRB = .{</span>
+<span class="line" id="L49">		.styled=[_]<span class="tok-type">u32</span>{ <span class="tok-builtin">@intFromEnum</span>(dds.Style.styleDim),</span>
+<span class="line" id="L50">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle),</span>
+<span class="line" id="L51">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle),</span>
+<span class="line" id="L52">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle)},</span>
+<span class="line" id="L53">		.backgr = dds.BackgroundColor.bgBlack,</span>
+<span class="line" id="L54">		.foregr = dds.ForegroundColor.fgRed</span>
+<span class="line" id="L55"></span>
+<span class="line" id="L56">	};</span>
+<span class="line" id="L57"></span>
+<span class="line" id="L58">	<span class="tok-kw">pub</span> <span class="tok-kw">var</span> AtrBar : dds.ZONATRB = .{</span>
+<span class="line" id="L59">		.styled=[_]<span class="tok-type">u32</span>{ <span class="tok-builtin">@intFromEnum</span>(dds.Style.styleReverse),</span>
+<span class="line" id="L60">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.styleItalic),</span>
+<span class="line" id="L61">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle),</span>
+<span class="line" id="L62">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle)},</span>
+<span class="line" id="L63">		.backgr = dds.BackgroundColor.bgBlack,</span>
+<span class="line" id="L64">		.foregr = dds.ForegroundColor.fgWhite</span>
+<span class="line" id="L65"></span>
+<span class="line" id="L66">	};</span>
+<span class="line" id="L67"></span>
+<span class="line" id="L68">	<span class="tok-kw">pub</span> <span class="tok-kw">var</span> AtrCell : dds.ZONATRB= .{</span>
+<span class="line" id="L69">		.styled=[_]<span class="tok-type">u32</span>{ <span class="tok-builtin">@intFromEnum</span>(dds.Style.styleItalic),</span>
+<span class="line" id="L70">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle),</span>
+<span class="line" id="L71">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle),</span>
+<span class="line" id="L72">						<span class="tok-builtin">@intFromEnum</span>(dds.Style.notStyle)},</span>
+<span class="line" id="L73">		.backgr = dds.BackgroundColor.bgBlack,</span>
+<span class="line" id="L74">		.foregr = dds.ForegroundColor.fgWhite,</span>
+<span class="line" id="L75">	};</span>
+<span class="line" id="L76"></span>
+<span class="line" id="L77">	<span class="tok-comment">// define MENU</span>
+</span>
+<span class="line" id="L78">	<span class="tok-kw">pub</span> <span class="tok-kw">const</span> MENU = <span class="tok-kw">struct</span> {</span>
+<span class="line" id="L79"></span>
+<span class="line" id="L80">		name : [] <span class="tok-kw">const</span> <span class="tok-type">u8</span>,</span>
+<span class="line" id="L81">		posx : <span class="tok-type">usize</span>,</span>
+<span class="line" id="L82">		posy : <span class="tok-type">usize</span>,</span>
+<span class="line" id="L83">		lines: <span class="tok-type">usize</span>,</span>
+<span class="line" id="L84">		cols : <span class="tok-type">usize</span>,</span>
+<span class="line" id="L85"></span>
+<span class="line" id="L86">		cadre: dds.CADRE,</span>
+<span class="line" id="L87">		mnuvh : dds.MNUVH,</span>
+<span class="line" id="L88"></span>
+<span class="line" id="L89">		attribut: dds.ZONATRB,</span>
+<span class="line" id="L90">		attrBar: dds.ZONATRB,</span>
+<span class="line" id="L91">		attrCell: dds.ZONATRB,</span>
+<span class="line" id="L92"></span>
+<span class="line" id="L93">		xitems: []<span class="tok-kw">const</span>[]<span class="tok-kw">const</span> <span class="tok-type">u8</span>,</span>
+<span class="line" id="L94">		nbr: <span class="tok-type">usize</span>,</span>
+<span class="line" id="L95">		actif: <span class="tok-type">bool</span></span>
+<span class="line" id="L96">	};</span>
+<span class="line" id="L97"></span>
+<span class="line" id="L98">	<span class="tok-comment">// NEW MENU</span>
+</span>
+<span class="line" id="L99">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">newMenu</span>( vname: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span>,</span>
+<span class="line" id="L100">					vposx: <span class="tok-type">usize</span>, vposy: <span class="tok-type">usize</span>,</span>
+<span class="line" id="L101">					vcadre : dds.CADRE,</span>
+<span class="line" id="L102">					vmnuvh : dds.MNUVH,</span>
+<span class="line" id="L103">					vitems: []<span class="tok-kw">const</span>[]<span class="tok-kw">const</span> <span class="tok-type">u8</span></span>
+<span class="line" id="L104">					) MENU {</span>
+<span class="line" id="L105"></span>
+<span class="line" id="L106">		<span class="tok-kw">var</span> xmenu = MENU {</span>
+<span class="line" id="L107">						.name = vname,</span>
+<span class="line" id="L108">						.posx	 = vposx,</span>
+<span class="line" id="L109">						.posy	 = vposy,</span>
+<span class="line" id="L110">						.lines   = <span class="tok-number">0</span>,</span>
+<span class="line" id="L111">						.cols	 = <span class="tok-number">0</span>,</span>
+<span class="line" id="L112">						.cadre = vcadre,</span>
+<span class="line" id="L113">						.mnuvh = vmnuvh,</span>
+<span class="line" id="L114">						.attribut = AtrMnu,</span>
+<span class="line" id="L115">						.attrBar  = AtrBar,</span>
+<span class="line" id="L116">						.attrCell = AtrCell,</span>
+<span class="line" id="L117">						.xitems	= vitems,</span>
+<span class="line" id="L118">						.nbr = <span class="tok-number">0</span>,</span>
+<span class="line" id="L119">						.actif = <span class="tok-null">true</span></span>
+<span class="line" id="L120">				};</span>
+<span class="line" id="L121"></span>
+<span class="line" id="L122"></span>
+<span class="line" id="L123">				<span class="tok-kw">for</span> (xmenu.xitems) |txt| {</span>
+<span class="line" id="L124">					<span class="tok-kw">if</span> (xmenu.cols &lt; txt.len) xmenu.cols = txt.len;</span>
+<span class="line" id="L125">					xmenu.nbr +=<span class="tok-number">1</span>;</span>
+<span class="line" id="L126">				}</span>
+<span class="line" id="L127">				xmenu.lines += xmenu.nbr + <span class="tok-number">2</span>; <span class="tok-comment">//nbr ligne	+ header =cadre</span>
+</span>
+<span class="line" id="L128">				xmenu.cols	+= <span class="tok-number">2</span>;</span>
+<span class="line" id="L129">		<span class="tok-kw">return</span> xmenu;</span>
+<span class="line" id="L130">	}</span>
+<span class="line" id="L131"></span>
+<span class="line" id="L132"></span>
+<span class="line" id="L133">	<span class="tok-comment">// return index-menu	---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L134">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getIndex</span>(vmnu: *mnu.MENU , name: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> )	ErrMenu ! <span class="tok-type">usize</span> {</span>
+<span class="line" id="L135"></span>
+<span class="line" id="L136">		<span class="tok-kw">for</span> (vmnu.items, <span class="tok-number">0</span>..) |l, idx| {</span>
+<span class="line" id="L137">			<span class="tok-kw">if</span> (std.mem.eql(<span class="tok-type">u8</span>, l.name, name)) <span class="tok-kw">return</span> idx;</span>
+<span class="line" id="L138">		}</span>
+<span class="line" id="L139">		<span class="tok-kw">return</span> ErrMenu.mnu_getIndex_Name_Menu_Invalide;</span>
+<span class="line" id="L140">	}</span>
+<span class="line" id="L141"></span>
+<span class="line" id="L142">	<span class="tok-comment">// return name-menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L143">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getName</span>(vmnu: *mnu.MENU , n: <span class="tok-type">usize</span>) ErrMenu ! [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> {</span>
+<span class="line" id="L144">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) <span class="tok-kw">return</span> vmnu.items[n].name;</span>
+<span class="line" id="L145">		<span class="tok-kw">return</span> ErrMenu.mnu_getName_Index_invalide ;</span>
+<span class="line" id="L146"></span>
+<span class="line" id="L147">	}</span>
+<span class="line" id="L148"></span>
+<span class="line" id="L149">	<span class="tok-comment">// return posx-menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L150">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getPosx</span>(vmnu: *mnu.MENU , n: <span class="tok-type">usize</span>)	ErrMenu ! <span class="tok-type">usize</span> {</span>
+<span class="line" id="L151">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) <span class="tok-kw">return</span> vmnu.items[n].posx;</span>
+<span class="line" id="L152">		<span class="tok-kw">return</span> ErrMenu.mnu_getPosx_Index_invalide ;</span>
+<span class="line" id="L153">	}</span>
+<span class="line" id="L154"></span>
+<span class="line" id="L155">	<span class="tok-comment">// return posy-menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L156">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getPosy</span>(vmnu: *mnu.MENU , n: <span class="tok-type">usize</span>)	ErrMenu ! <span class="tok-type">usize</span> {</span>
+<span class="line" id="L157">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) <span class="tok-kw">return</span> vmnu.items[n].posy;</span>
+<span class="line" id="L158">		<span class="tok-kw">return</span> ErrMenu.mnu_getPosy_Index_invalide ;</span>
+<span class="line" id="L159">	}</span>
+<span class="line" id="L160"></span>
+<span class="line" id="L161">	<span class="tok-comment">// return Text-menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L162">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getText</span>(vmnu: *mnu.MENU , n: <span class="tok-type">usize</span>)	ErrMenu ! <span class="tok-type">usize</span> {</span>
+<span class="line" id="L163">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) <span class="tok-kw">return</span> vmnu.items[n].text;</span>
+<span class="line" id="L164">		<span class="tok-kw">return</span> ErrMenu.mnu_getText_Index_invalide ;</span>
+<span class="line" id="L165">	}</span>
+<span class="line" id="L166"></span>
+<span class="line" id="L167">	<span class="tok-comment">// return ON/OFF-menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L168">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">getActif</span>(vmnu: *mnu.MENU , n: <span class="tok-type">usize</span>)	ErrMenu ! <span class="tok-type">bool</span> {</span>
+<span class="line" id="L169">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) <span class="tok-kw">return</span> vmnu.items[n].actif;</span>
+<span class="line" id="L170">		<span class="tok-kw">return</span> ErrMenu.mnu_getActif_Index_invalide ;</span>
+<span class="line" id="L171">	}</span>
+<span class="line" id="L172"></span>
+<span class="line" id="L173"></span>
+<span class="line" id="L174">	<span class="tok-comment">// delete -menu ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L175">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">dltRows</span>(vmnu: *mnu.MENU,	n :<span class="tok-type">usize</span> ) ErrMenu ! <span class="tok-type">void</span> {</span>
+<span class="line" id="L176">		<span class="tok-kw">if</span> ( n &lt; vmnu.items.len) _= vmnu.orderedRemove(n)</span>
+<span class="line" id="L177">		<span class="tok-kw">else</span> <span class="tok-kw">return</span> ErrMenu.mnu_dltRows_Index_invalide ;</span>
+<span class="line" id="L178">	}</span>
+<span class="line" id="L179"></span>
+<span class="line" id="L180"></span>
+<span class="line" id="L181">	<span class="tok-comment">// assign -menu MATRIX TERMINAL	---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L182">	<span class="tok-kw">fn</span> <span class="tok-fn">printMenu</span>(vpnl: *pnl.PANEL, vmnu: MENU) <span class="tok-type">void</span> {</span>
+<span class="line" id="L183">		<span class="tok-kw">if</span> (vpnl.actif == <span class="tok-null">false</span> ) <span class="tok-kw">return</span> ;</span>
+<span class="line" id="L184">		<span class="tok-kw">const</span> ACS_Hlines	= <span class="tok-str">&quot;─&quot;</span>;</span>
+<span class="line" id="L185">		<span class="tok-kw">const</span> ACS_Vlines	= <span class="tok-str">&quot;│&quot;</span>;</span>
+<span class="line" id="L186">		<span class="tok-kw">const</span> ACS_UCLEFT	= <span class="tok-str">&quot;┌&quot;</span>;</span>
+<span class="line" id="L187">		<span class="tok-kw">const</span> ACS_UCRIGHT = <span class="tok-str">&quot;┐&quot;</span>;</span>
+<span class="line" id="L188">		<span class="tok-kw">const</span> ACS_LCLEFT	= <span class="tok-str">&quot;└&quot;</span>;</span>
+<span class="line" id="L189">		<span class="tok-kw">const</span> ACS_LCRIGHT = <span class="tok-str">&quot;┘&quot;</span>;</span>
+<span class="line" id="L190"></span>
+<span class="line" id="L191">		<span class="tok-kw">const</span> ACS_Hline2		= <span class="tok-str">&quot;═&quot;</span>;</span>
+<span class="line" id="L192">		<span class="tok-kw">const</span> ACS_Vline2		= <span class="tok-str">&quot;║&quot;</span>;</span>
+<span class="line" id="L193">		<span class="tok-kw">const</span> ACS_UCLEFT2	 = <span class="tok-str">&quot;╔&quot;</span>;</span>
+<span class="line" id="L194">		<span class="tok-kw">const</span> ACS_UCRIGHT2	= <span class="tok-str">&quot;╗&quot;</span>;</span>
+<span class="line" id="L195">		<span class="tok-kw">const</span> ACS_LCLEFT2	 = <span class="tok-str">&quot;╚&quot;</span>;</span>
+<span class="line" id="L196">		<span class="tok-kw">const</span> ACS_LCRIGHT2	= <span class="tok-str">&quot;╝&quot;</span>;</span>
+<span class="line" id="L197"></span>
+<span class="line" id="L198">		<span class="tok-kw">var</span> trait: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-str">&quot;&quot;</span>;</span>
+<span class="line" id="L199">		<span class="tok-kw">var</span> edt :<span class="tok-type">bool</span>	 = <span class="tok-null">undefined</span> ;</span>
+<span class="line" id="L200"></span>
+<span class="line" id="L201">		<span class="tok-kw">var</span> row:	<span class="tok-type">usize</span> = <span class="tok-number">1</span> ;</span>
+<span class="line" id="L202">		<span class="tok-kw">var</span> y:		<span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
+<span class="line" id="L203">		<span class="tok-kw">var</span> col:	<span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
+<span class="line" id="L204"></span>
+<span class="line" id="L205">		<span class="tok-kw">var</span> x :<span class="tok-type">usize</span> =	vmnu.posx - <span class="tok-number">1</span> ;</span>
+<span class="line" id="L206"></span>
+<span class="line" id="L207">		<span class="tok-comment">// if line 0 ex: directory tab</span>
+</span>
+<span class="line" id="L208">		<span class="tok-kw">if</span> (dds.CADRE.line0 != vmnu.cadre ) {</span>
+<span class="line" id="L209">			<span class="tok-kw">while</span> (row &lt;= vmnu.lines) : (row +=<span class="tok-number">1</span>) {</span>
+<span class="line" id="L210">				y = vmnu.posy - <span class="tok-number">1</span>;</span>
+<span class="line" id="L211">				col = <span class="tok-number">1</span>;</span>
+<span class="line" id="L212">				<span class="tok-kw">while</span> ( col &lt;= vmnu.cols ){</span>
+<span class="line" id="L213">					edt = <span class="tok-null">false</span>;</span>
+<span class="line" id="L214">					<span class="tok-kw">if</span> (row == <span class="tok-number">1</span>) {</span>
+<span class="line" id="L215">							<span class="tok-kw">if</span> (col == <span class="tok-number">1</span>) {</span>
+<span class="line" id="L216">								<span class="tok-kw">if</span> ( dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L217">										trait = ACS_UCLEFT;</span>
+<span class="line" id="L218">								} <span class="tok-kw">else</span>	trait = ACS_UCLEFT2 ;</span>
+<span class="line" id="L219">								edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L220">							}</span>
+<span class="line" id="L221">							<span class="tok-kw">if</span> ( col == vmnu.cols ) {</span>
+<span class="line" id="L222">								<span class="tok-kw">if</span> (dds.CADRE.line1 == vmnu.cadre) {</span>
+<span class="line" id="L223">									trait = ACS_UCRIGHT;</span>
+<span class="line" id="L224">								} <span class="tok-kw">else</span>	trait = ACS_UCRIGHT2 ;</span>
+<span class="line" id="L225">								edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L226">							}</span>
+<span class="line" id="L227">							<span class="tok-kw">if</span> ( col &gt; <span class="tok-number">1</span> <span class="tok-kw">and</span> col &lt; vmnu.cols ) {</span>
+<span class="line" id="L228">								<span class="tok-kw">if</span> (dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L229">									trait = ACS_Hlines;</span>
+<span class="line" id="L230">								} <span class="tok-kw">else</span>	trait = ACS_Hline2;</span>
+<span class="line" id="L231">								edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L232">							}</span>
+<span class="line" id="L233">					} <span class="tok-kw">else</span> <span class="tok-kw">if</span> ( row == vmnu.lines ) {</span>
+<span class="line" id="L234">							<span class="tok-kw">if</span> (col == <span class="tok-number">1</span>) {</span>
+<span class="line" id="L235">								<span class="tok-kw">if</span> ( dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L236">									trait = ACS_LCLEFT;</span>
+<span class="line" id="L237">								} <span class="tok-kw">else</span>	trait = ACS_LCLEFT2;</span>
+<span class="line" id="L238">								edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L239">							}</span>
+<span class="line" id="L240">							<span class="tok-kw">if</span> ( col == vmnu.cols ) {</span>
+<span class="line" id="L241">								<span class="tok-kw">if</span> ( dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L242">									trait = ACS_LCRIGHT;</span>
+<span class="line" id="L243">								} <span class="tok-kw">else</span>	trait = ACS_LCRIGHT2 ;</span>
+<span class="line" id="L244">								edt = <span class="tok-null">true</span> ;</span>
+<span class="line" id="L245">							}</span>
+<span class="line" id="L246">							<span class="tok-kw">if</span> ( col &gt; <span class="tok-number">1</span> <span class="tok-kw">and</span> col &lt; vmnu.cols ) {</span>
+<span class="line" id="L247">								<span class="tok-kw">if</span> ( dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L248">									trait = ACS_Hlines;</span>
+<span class="line" id="L249">								} <span class="tok-kw">else</span>	trait = ACS_Hline2 ;</span>
+<span class="line" id="L250">								edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L251">							}</span>
+<span class="line" id="L252">					} <span class="tok-kw">else</span> <span class="tok-kw">if</span> ( row &gt; <span class="tok-number">1</span> <span class="tok-kw">and</span> row &lt; vmnu.lines ) {</span>
+<span class="line" id="L253">						<span class="tok-kw">if</span> ( col == <span class="tok-number">1</span> <span class="tok-kw">or</span> col == vmnu.cols ) {</span>
+<span class="line" id="L254">							<span class="tok-kw">if</span> ( dds.CADRE.line1 == vmnu.cadre ) {</span>
+<span class="line" id="L255">								trait = ACS_Vlines;</span>
+<span class="line" id="L256">							} <span class="tok-kw">else</span> trait = ACS_Vline2 ;</span>
+<span class="line" id="L257">							edt = <span class="tok-null">true</span>;</span>
+<span class="line" id="L258">						}</span>
+<span class="line" id="L259">					}</span>
+<span class="line" id="L260">					<span class="tok-kw">if</span>	( edt ) {</span>
+<span class="line" id="L261">						term.gotoXY(row + vmnu.posx + vpnl.posx - <span class="tok-number">2</span>	, col + vmnu.posy + vpnl.posy - <span class="tok-number">2</span>);</span>
+<span class="line" id="L262">						term.writeStyled(trait,vmnu.attribut);</span>
+<span class="line" id="L263">					}</span>
+<span class="line" id="L264">					<span class="tok-kw">else</span> {</span>
+<span class="line" id="L265">						term.gotoXY(row + vmnu.posx + vpnl.posx - <span class="tok-number">2</span>	, col + vmnu.posy + vpnl.posy - <span class="tok-number">2</span>);</span>
+<span class="line" id="L266">						term.writeStyled(<span class="tok-str">&quot; &quot;</span>,vmnu.attribut);</span>
+<span class="line" id="L267">					}</span>
+<span class="line" id="L268"></span>
+<span class="line" id="L269">					y += <span class="tok-number">1</span>;</span>
+<span class="line" id="L270">					col += <span class="tok-number">1</span>;</span>
+<span class="line" id="L271">				}</span>
+<span class="line" id="L272">				x += <span class="tok-number">1</span>;</span>
+<span class="line" id="L273">			}</span>
+<span class="line" id="L274">		}</span>
+<span class="line" id="L275"></span>
+<span class="line" id="L276"></span>
+<span class="line" id="L277">	}</span>
+<span class="line" id="L278"></span>
+<span class="line" id="L279">	<span class="tok-comment">// display	MATRIX to terminal ---&gt; arraylist panel-menu</span>
+</span>
+<span class="line" id="L280">	<span class="tok-kw">fn</span> <span class="tok-fn">displayMenu</span>(vpnl: *pnl.PANEL, vmnu:MENU, npos: <span class="tok-type">usize</span>) <span class="tok-type">void</span> {</span>
+<span class="line" id="L281">		<span class="tok-kw">var</span> pos : <span class="tok-type">usize</span> = npos;</span>
+<span class="line" id="L282">		<span class="tok-kw">var</span> n : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L283">		<span class="tok-kw">var</span> h : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L284"></span>
+<span class="line" id="L285">		<span class="tok-kw">var</span> x :<span class="tok-type">usize</span> = vmnu.posx - <span class="tok-number">1</span>;</span>
+<span class="line" id="L286">		<span class="tok-kw">var</span> y :<span class="tok-type">usize</span> = vmnu.posy - <span class="tok-number">1</span>;</span>
+<span class="line" id="L287"></span>
+<span class="line" id="L288">		printMenu(vpnl, vmnu);</span>
+<span class="line" id="L289"></span>
+<span class="line" id="L290">		term.onMouse();</span>
+<span class="line" id="L291">		term.cursHide();</span>
+<span class="line" id="L292"></span>
+<span class="line" id="L293"></span>
+<span class="line" id="L294">		<span class="tok-kw">if</span> (npos &gt; vmnu.nbr <span class="tok-kw">or</span> npos == <span class="tok-number">0</span> )	pos = <span class="tok-number">0</span>	;</span>
+<span class="line" id="L295"></span>
+<span class="line" id="L296">		n = <span class="tok-number">0</span>;</span>
+<span class="line" id="L297">		h = <span class="tok-number">0</span>;</span>
+<span class="line" id="L298">		<span class="tok-kw">for</span> (vmnu.xitems) | cell |	{</span>
+<span class="line" id="L299">			<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.vertical) {</span>
+<span class="line" id="L300">				<span class="tok-kw">if</span> (vmnu.cadre == dds.CADRE.line0)</span>
+<span class="line" id="L301">					term.gotoXY(vpnl.posx + x + n	,		vpnl.posy + y	)</span>
+<span class="line" id="L302">				<span class="tok-kw">else</span></span>
+<span class="line" id="L303">					term.gotoXY(vpnl.posx + x + n + <span class="tok-number">1</span> , vpnl.posy + y	+ <span class="tok-number">1</span>);</span>
+<span class="line" id="L304">			}</span>
+<span class="line" id="L305">			<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal) {</span>
+<span class="line" id="L306">				<span class="tok-kw">if</span> (vmnu.cadre == dds.CADRE.line0 )</span>
+<span class="line" id="L307">					term.gotoXY(vpnl.posx + x	,		h	 + vpnl.posy + y	 )</span>
+<span class="line" id="L308">				<span class="tok-kw">else</span></span>
+<span class="line" id="L309">					term.gotoXY(vpnl.posx + x + <span class="tok-number">1</span>	, h	+ vpnl.posy + y	+ <span class="tok-number">1</span>);</span>
+<span class="line" id="L310">			}</span>
+<span class="line" id="L311">			<span class="tok-comment">//var xcell = utl.Trim(cell);</span>
+</span>
+<span class="line" id="L312">			<span class="tok-kw">if</span> (pos == n)</span>
+<span class="line" id="L313">				term.writeStyled(cell,vmnu.attrBar)</span>
+<span class="line" id="L314">			<span class="tok-kw">else</span></span>
+<span class="line" id="L315">				term.writeStyled(cell,vmnu.attrCell);</span>
+<span class="line" id="L316"></span>
+<span class="line" id="L317">			n += <span class="tok-number">1</span>;</span>
+<span class="line" id="L318">			h += utl.nbrCharStr(cell);</span>
+<span class="line" id="L319">			<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;</span>
+<span class="line" id="L320">		}</span>
+<span class="line" id="L321">	}</span>
+<span class="line" id="L322"></span>
+<span class="line" id="L323">	<span class="tok-comment">// restor -panel	MATRIX to terminal ---&gt; arraylist panel-menu </span>
+</span>
+<span class="line" id="L324">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">rstPanel</span>( vsrc : MENU , vdst : *pnl.PANEL) <span class="tok-type">void</span> {</span>
+<span class="line" id="L325">		<span class="tok-kw">if</span> (vdst.actif == <span class="tok-null">false</span>)	<span class="tok-kw">return</span> ;</span>
+<span class="line" id="L326">		<span class="tok-kw">if</span> (vsrc.posx + vsrc.lines &gt; vdst.posx + vdst.lines	)	<span class="tok-kw">return</span> ;</span>
+<span class="line" id="L327">		<span class="tok-kw">if</span> (vsrc.posy + vsrc.cols	&gt; vdst.posy + vdst.cols	)	<span class="tok-kw">return</span> ;</span>
+<span class="line" id="L328">		<span class="tok-kw">var</span> x :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L329">		<span class="tok-kw">var</span> y :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L330">		<span class="tok-kw">var</span> n :<span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L331">		<span class="tok-kw">var</span> npos : <span class="tok-type">usize</span> =	vsrc.posx - vdst.posx;</span>
+<span class="line" id="L332">		<span class="tok-kw">while</span> (x &lt;= vsrc.lines) : (x += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L333">				n = vdst.cols * npos + vsrc.posy - vdst.posy	;</span>
+<span class="line" id="L334">				y = <span class="tok-number">0</span>;</span>
+<span class="line" id="L335">				<span class="tok-kw">while</span> (y &lt;= vsrc.cols) : (y += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L336">					term.gotoXY(x + vsrc.posx	 , y + vsrc.posy	);</span>
+<span class="line" id="L337">					term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);</span>
+<span class="line" id="L338">					n += <span class="tok-number">1</span>;</span>
+<span class="line" id="L339">				}</span>
+<span class="line" id="L340">			npos += <span class="tok-number">1</span>;</span>
+<span class="line" id="L341">		}</span>
+<span class="line" id="L342">	}</span>
+<span class="line" id="L343">	<span class="tok-comment">//----------------------------------------------------------------</span>
+</span>
+<span class="line" id="L344">	<span class="tok-comment">// menu	enter = select	1..n 0 = abort (Escape)</span>
+</span>
+<span class="line" id="L345">	<span class="tok-comment">// Turning on the mouse</span>
+</span>
+<span class="line" id="L346">	<span class="tok-comment">// UP DOWN LEFT RIGHT</span>
+</span>
+<span class="line" id="L347">	<span class="tok-comment">// movement width the wheel and validation width the clik</span>
+</span>
+<span class="line" id="L348">	<span class="tok-comment">//----------------------------------------------------------------</span>
+</span>
+<span class="line" id="L349">	<span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ioMenu</span>(vpnl: *pnl.PANEL, vmnu: MENU, npos: <span class="tok-type">usize</span>) <span class="tok-type">usize</span> {</span>
+<span class="line" id="L350">		<span class="tok-kw">if</span> (vpnl.actif == <span class="tok-null">false</span> ) <span class="tok-kw">return</span> <span class="tok-number">999</span> ;</span>
+<span class="line" id="L351">		<span class="tok-kw">if</span> (vmnu.actif == <span class="tok-null">false</span> ) <span class="tok-kw">return</span> <span class="tok-number">999</span> ;</span>
+<span class="line" id="L352">		<span class="tok-kw">var</span> pos : <span class="tok-type">usize</span> = npos;</span>
+<span class="line" id="L353">		<span class="tok-kw">var</span> n	 : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L354">		<span class="tok-kw">var</span> h	 : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L355">		<span class="tok-kw">var</span> x :<span class="tok-type">usize</span> = vmnu.posx - <span class="tok-number">1</span>;</span>
+<span class="line" id="L356">		<span class="tok-kw">var</span> y :<span class="tok-type">usize</span> = vmnu.posy - <span class="tok-number">1</span>;</span>
+<span class="line" id="L357"></span>
+<span class="line" id="L358">		term.onMouse();</span>
+<span class="line" id="L359">		term.cursHide();</span>
+<span class="line" id="L360"></span>
+<span class="line" id="L361"></span>
+<span class="line" id="L362"></span>
+<span class="line" id="L363">		<span class="tok-kw">if</span> (npos &gt; vmnu.nbr <span class="tok-kw">or</span> npos == <span class="tok-number">0</span> )	pos = <span class="tok-number">0</span>;</span>
+<span class="line" id="L364"></span>
+<span class="line" id="L365"></span>
+<span class="line" id="L366">		displayMenu(vpnl,vmnu,pos);</span>
+<span class="line" id="L367"></span>
+<span class="line" id="L368"></span>
+<span class="line" id="L369">		term.flushIO();</span>
+<span class="line" id="L370">		<span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L371">			n = <span class="tok-number">0</span>;</span>
+<span class="line" id="L372">			h = <span class="tok-number">0</span>;</span>
+<span class="line" id="L373">			<span class="tok-kw">for</span> (vmnu.xitems) | cell |	{</span>
+<span class="line" id="L374"></span>
+<span class="line" id="L375">				<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.vertical) {</span>
+<span class="line" id="L376">					<span class="tok-kw">if</span> (vmnu.cadre == dds.CADRE.line0 )</span>
+<span class="line" id="L377">						term.gotoXY(vpnl.posx + x	+ n	,	 vpnl.posy + y )</span>
+<span class="line" id="L378">					<span class="tok-kw">else</span></span>
+<span class="line" id="L379">						term.gotoXY(vpnl.posx + x	+ n + <span class="tok-number">1</span>, vpnl.posy + y + <span class="tok-number">1</span>);</span>
+<span class="line" id="L380">					}</span>
+<span class="line" id="L381">				<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal) {</span>
+<span class="line" id="L382">					<span class="tok-kw">if</span> (vmnu.cadre == dds.CADRE.line0)</span>
+<span class="line" id="L383">						term.gotoXY(vpnl.posx + x	 ,	 h + vpnl.posy + y )</span>
+<span class="line" id="L384">					<span class="tok-kw">else</span></span>
+<span class="line" id="L385">						term.gotoXY(vpnl.posx + x	+ <span class="tok-number">1</span>, h + vpnl.posy + y + <span class="tok-number">1</span>);</span>
+<span class="line" id="L386">				}</span>
+<span class="line" id="L387">				<span class="tok-kw">if</span> (pos == n)</span>
+<span class="line" id="L388">					term.writeStyled(cell,vmnu.attrBar)</span>
+<span class="line" id="L389">				<span class="tok-kw">else</span></span>
+<span class="line" id="L390">					term.writeStyled(cell,vmnu.attrCell);</span>
+<span class="line" id="L391"></span>
+<span class="line" id="L392">				n += <span class="tok-number">1</span>;</span>
+<span class="line" id="L393">				h += utl.nbrCharStr(cell);</span>
+<span class="line" id="L394">				<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;</span>
+<span class="line" id="L395">			}</span>
+<span class="line" id="L396"></span>
+<span class="line" id="L397">			<span class="tok-kw">var</span> Tkey	= kbd.getKEY();</span>
+<span class="line" id="L398"></span>
+<span class="line" id="L399">			<span class="tok-kw">if</span> (Tkey.Key == kbd.char <span class="tok-kw">and</span></span>
+<span class="line" id="L400">					std.mem.eql(<span class="tok-type">u8</span>,Tkey.Char,<span class="tok-str">&quot; &quot;</span> ) ) {Tkey.Key = kbd.enter; Tkey.Char =<span class="tok-str">&quot;&quot;</span>;}</span>
+<span class="line" id="L401"></span>
+<span class="line" id="L402"></span>
+<span class="line" id="L403">			<span class="tok-kw">if</span> (Tkey.Key == kbd.mouse) {</span>
+<span class="line" id="L404">				Tkey.Key = kbd.none;</span>
+<span class="line" id="L405">				<span class="tok-kw">if</span> (term.MouseInfo.scroll ) {</span>
+<span class="line" id="L406">					<span class="tok-kw">if</span> ( term.MouseInfo.scrollDir == term.ScrollDirection.msUp ) {</span>
+<span class="line" id="L407">						<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.vertical)		Tkey.Key = kbd.up;</span>
+<span class="line" id="L408">						<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal)	Tkey.Key = kbd.left;</span>
+<span class="line" id="L409">					}</span>
+<span class="line" id="L410"></span>
+<span class="line" id="L411">					<span class="tok-kw">if</span> (term.MouseInfo.scrollDir == term.ScrollDirection.msDown) {</span>
+<span class="line" id="L412">						<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.vertical)		Tkey.Key = kbd.down;</span>
+<span class="line" id="L413">						<span class="tok-kw">if</span> (vmnu.mnuvh == dds.MNUVH.horizontal)	Tkey.Key = kbd.right;</span>
+<span class="line" id="L414">					}</span>
+<span class="line" id="L415">				}</span>
+<span class="line" id="L416">				<span class="tok-kw">else</span> {</span>
+<span class="line" id="L417">					<span class="tok-kw">if</span> (term.MouseInfo.action == term.MouseAction.maReleased ) <span class="tok-kw">continue</span>;</span>
+<span class="line" id="L418">					<span class="tok-kw">switch</span> (term.MouseInfo.button) {</span>
+<span class="line" id="L419">						term.MouseButton.mbLeft		=&gt;	Tkey.Key = kbd.enter,</span>
+<span class="line" id="L420">						term.MouseButton.mbMiddle	=&gt;	Tkey.Key = kbd.enter,</span>
+<span class="line" id="L421">						term.MouseButton.mbRight	 =&gt;	Tkey.Key = kbd.enter,</span>
+<span class="line" id="L422">						<span class="tok-kw">else</span> =&gt; {}</span>
+<span class="line" id="L423">					}</span>
+<span class="line" id="L424">				}</span>
+<span class="line" id="L425">			}</span>
+<span class="line" id="L426"></span>
+<span class="line" id="L427">			<span class="tok-kw">switch</span> (Tkey.Key) {</span>
+<span class="line" id="L428">				.none =&gt; <span class="tok-kw">continue</span>,</span>
+<span class="line" id="L429">				.esc	=&gt; {</span>
+<span class="line" id="L430">					term.offMouse();</span>
+<span class="line" id="L431">					<span class="tok-kw">return</span> <span class="tok-number">9999</span>;</span>
+<span class="line" id="L432">				},</span>
+<span class="line" id="L433">				.enter =&gt; {</span>
+<span class="line" id="L434">					term.offMouse();</span>
+<span class="line" id="L435">					<span class="tok-kw">return</span> pos ;</span>
+<span class="line" id="L436">				},</span>
+<span class="line" id="L437">				.down	=&gt; { <span class="tok-kw">if</span> (pos &lt; vmnu.nbr - <span class="tok-number">1</span> )	pos +=<span class="tok-number">1</span>; } ,</span>
+<span class="line" id="L438">				.up		=&gt; { <span class="tok-kw">if</span> (pos &gt; <span class="tok-number">0</span> ) pos -=<span class="tok-number">1</span>; },</span>
+<span class="line" id="L439">				.right =&gt; { <span class="tok-kw">if</span> (pos &lt; vmnu.nbr - <span class="tok-number">1</span> )	pos +=<span class="tok-number">1</span>; },</span>
+<span class="line" id="L440">				.left	=&gt; { <span class="tok-kw">if</span> (pos &gt; <span class="tok-number">0</span> ) pos -=<span class="tok-number">1</span>; },</span>
+<span class="line" id="L441">				<span class="tok-kw">else</span> =&gt; {},</span>
+<span class="line" id="L442">			}</span>
+<span class="line" id="L443">		}</span>
+<span class="line" id="L444">	}</span>
+<span class="line" id="L445"></span>
+<span class="line" id="L446">};</span>
+<span class="line" id="L447"></span>
+</code></pre></body>
+</html>

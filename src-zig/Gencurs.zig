@@ -22,8 +22,6 @@ const pnl = @import("forms").pnl;
 const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
-// menu
-const mnu = @import("forms").mnu;
 // flied
 const fld = @import("forms").fld;
 // line horizontal
@@ -35,6 +33,9 @@ const lnv = @import("forms").lnv;
 // grid
 const grd = @import("grid").grd;
 
+// menu
+const mnu = @import("menu").mnu;
+
 // tools utility
 const utl = @import("utils");
 
@@ -45,7 +46,7 @@ const reg = @import("match");
 const mdlPanel = @import("mdlPanel");
 
 // Descrption Objet
-const mdlObjet = @import("mdlObjet");
+const mdlForms = @import("mdlForms");
 
 // sauvegarde JSON
 const mdlFile = @import("mdlFile");
@@ -66,7 +67,9 @@ var nopt : usize	= 0;
 
 const choix = enum {
 	panel,
-	objet,
+	forms,
+	grid,
+	menu,
 	sjson,
 	rjson,
 	exit
@@ -100,36 +103,32 @@ pub fn main() !void {
 	//-------------------------------------------------
 	//the menu is not double buffered it is not a Panel
 
-	base.menu.append(mnu.newMenu(
-					"Screen",				 // name
-					2, 2,					 // posx, posy	
+	var MenuPrincipal = mnu.newMenu(
+					"Screen",				// name
+					2, 2,					// posx, posy	
 					dds.CADRE.line1,		// type line fram
-					dds.MNUVH.vertical,	 // type menu vertical / horizontal
+					dds.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
 					"Panel..",				// item
-					"Objet..",
+					"Forms..",
+					"Grid...",
+					"Menu...",
 					"SavJson.",
 					"RstJson",
 					"Exit...",
 					}
-					)) catch unreachable ;
-
-	const	menu = enum (u8)	{
-
-	Screen = 0 ,	// creat panel, objet	, source , exit
-	};
-
+					) ;
 
 
 	while (true) {
 
 	pnl.printPanel(base);
-	nopt = mnu.ioMenu(base,base.menu.items[@intFromEnum(menu.Screen)],0);
+	nopt = mnu.ioMenu(base,MenuPrincipal,0);
 
 	if (nopt == @intFromEnum(choix.exit )) { break; }
 
 	if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
-	if (nopt == @intFromEnum(choix.objet)) mdlObjet.fnPanel(&NPANEL) ;
+	if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
 	if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 	if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
 

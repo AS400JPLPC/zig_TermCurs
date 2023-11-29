@@ -64,6 +64,16 @@ pub fn build(b: *std.build) void {
 		},
 	});
 	
+	
+	const menu = b.createModule(.{
+		.source_file = .{ .path = "./deps/curse/menu.zig" },
+		.dependencies= &.{
+			.{ .name = "dds",	.module = dds },
+			.{ .name = "cursed", .module = cursed },
+			.{ .name = "utils",  .module = utils },
+			.{ .name = "forms",  .module = forms },
+		},
+	});
 
 	const mdlPanel = b.createModule(.{
 		.source_file = .{ .path = "./mdlPanel.zig" },
@@ -73,18 +83,20 @@ pub fn build(b: *std.build) void {
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
 			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
 			.{ .name = "match",  .module = match },
 		},
 	});
 
-	const mdlObjet = b.createModule(.{
-		.source_file = .{ .path = "./mdlObjet.zig" },
+	const mdlForms = b.createModule(.{
+		.source_file = .{ .path = "./mdlForms.zig" },
 		.dependencies= &.{
 			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
 			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
 			.{ .name = "match",  .module = match },
 		},
 	});
@@ -97,6 +109,7 @@ pub fn build(b: *std.build) void {
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
 			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
 			.{ .name = "match",  .module = match },
 			.{ .name = "logger", .module = logger },
 		},
@@ -111,6 +124,7 @@ pub fn build(b: *std.build) void {
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
 			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
 			.{ .name = "match",  .module = match },
 			.{ .name = "logger", .module = logger },
 		},
@@ -124,6 +138,7 @@ pub fn build(b: *std.build) void {
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
 			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
 			.{ .name = "match",  .module = match },
 			.{ .name = "mdlSjson",  .module = mdlSjson},
 			.{ .name = "mdlRjson",  .module = mdlRjson},
@@ -151,9 +166,10 @@ pub fn build(b: *std.build) void {
 	Prog.addModule("utils" , utils);
 	Prog.addModule("forms" , forms);
 	Prog.addModule("grid"  , grid);
+	Prog.addModule("menu"  , menu);
 	Prog.addModule("match" , match);
 	Prog.addModule("mdlPanel" , mdlPanel);
-	Prog.addModule("mdlObjet" , mdlObjet);
+	Prog.addModule("mdlForms" , mdlForms);
 	Prog.addModule("mdlFile" , mdlFile);
 
 	Prog.addModule("logger" , logger);
@@ -170,8 +186,8 @@ pub fn build(b: *std.build) void {
 	const docs = b.addTest(.{
 	.name = "Gencurs",
 	.root_source_file = .{ .path = "./Gencurs.zig" },
-	//.target = target,
-	//.optimize = optimize,
+	.target = target,
+	.optimize = optimize,
 	});
 
 	docs.addIncludePath(.{.path = "./lib/"});
@@ -183,18 +199,20 @@ pub fn build(b: *std.build) void {
 	docs.addModule("utils" , utils);
 	docs.addModule("forms" , forms);
 	docs.addModule("grid"  , grid);
+	docs.addModule("menu"  , menu);
 	docs.addModule("match" , match);
 	docs.addModule("mdlPanel" , mdlPanel);
-	docs.addModule("mdlObjet" , mdlObjet);
-	Prog.addModule("mdlFile" , mdlFile);
+	docs.addModule("mdlForms" , mdlForms);
+	docs.addModule("mdlFile" , mdlFile);
 
-	//docs.emit_docs = .emit;
+	docs.addModule("logger" , logger);
+
 
 
 	const install_docs = b.addInstallDirectory(.{
 		.source_dir = docs.getEmittedDocs(),
 		.install_dir = .prefix,
-		.install_subdir = "Docs_Gencurs",
+		.install_subdir = "../Docs_Gencurs",
 	});
 	
 	const docs_step = b.step("docs", "Generate docs");

@@ -128,280 +128,350 @@
 <span class="line" id="L12"><span class="tok-comment">// label</span>
 </span>
 <span class="line" id="L13"><span class="tok-kw">const</span> lbl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lbl;</span>
-<span class="line" id="L14"><span class="tok-comment">// menu</span>
+<span class="line" id="L14"><span class="tok-comment">// flied</span>
 </span>
-<span class="line" id="L15"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).mnu;</span>
-<span class="line" id="L16"><span class="tok-comment">// flied</span>
+<span class="line" id="L15"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
+<span class="line" id="L16"><span class="tok-comment">// line horizontal</span>
 </span>
-<span class="line" id="L17"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
-<span class="line" id="L18"><span class="tok-comment">// line horizontal</span>
+<span class="line" id="L17"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnh;</span>
+<span class="line" id="L18"><span class="tok-comment">// line vertival</span>
 </span>
-<span class="line" id="L19"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnh;</span>
-<span class="line" id="L20"><span class="tok-comment">// line vertival</span>
+<span class="line" id="L19"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnv;</span>
+<span class="line" id="L20"></span>
+<span class="line" id="L21"><span class="tok-comment">// grid</span>
 </span>
-<span class="line" id="L21"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnv;</span>
-<span class="line" id="L22"></span>
-<span class="line" id="L23"><span class="tok-comment">// grid</span>
+<span class="line" id="L22"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
+<span class="line" id="L23"><span class="tok-comment">// menu</span>
 </span>
-<span class="line" id="L24"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
+<span class="line" id="L24"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;menu&quot;</span>).mnu;</span>
 <span class="line" id="L25"></span>
 <span class="line" id="L26"><span class="tok-comment">// full delete for produc</span>
 </span>
 <span class="line" id="L27"><span class="tok-kw">const</span> forms = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>);</span>
 <span class="line" id="L28"></span>
-<span class="line" id="L29"> </span>
-<span class="line" id="L30"><span class="tok-kw">const</span> opn_Log = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;logger&quot;</span>).openFile;		<span class="tok-comment">// open  file</span>
-</span>
-<span class="line" id="L31"><span class="tok-kw">const</span> end_Log = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;logger&quot;</span>).closeFile;	<span class="tok-comment">// close file</span>
-</span>
-<span class="line" id="L32"><span class="tok-kw">const</span> plog = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;logger&quot;</span>).scoped;			<span class="tok-comment">// print file</span>
-</span>
-<span class="line" id="L33"></span>
-<span class="line" id="L34"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L29"></span>
+<span class="line" id="L30"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L31"></span>
+<span class="line" id="L32"></span>
+<span class="line" id="L33"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">SavJson</span>(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>) !<span class="tok-type">void</span> {</span>
+<span class="line" id="L34"></span>
 <span class="line" id="L35"></span>
 <span class="line" id="L36"></span>
-<span class="line" id="L37"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">SavJson</span>(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []<span class="tok-kw">const</span> <span class="tok-type">u8</span>) !<span class="tok-type">void</span> {</span>
-<span class="line" id="L38"></span>
-<span class="line" id="L39"></span>
+<span class="line" id="L37">	</span>
+<span class="line" id="L38">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(<span class="tok-str">&quot;dspf&quot;</span>,.{})</span>
+<span class="line" id="L39">	<span class="tok-kw">catch</span> |err| {<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open DIR.{any}\n&quot;</span>, .{err}));};</span>
 <span class="line" id="L40"></span>
-<span class="line" id="L41">	opn_Log(<span class="tok-str">&quot;ASjon.txt&quot;</span>);</span>
-<span class="line" id="L42">	plog(.Panel).debug(<span class="tok-str">&quot;{s}\n&quot;</span>,.{nameJson});</span>
-<span class="line" id="L43">	</span>
-<span class="line" id="L44">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(<span class="tok-str">&quot;dspf&quot;</span>,.{})</span>
-<span class="line" id="L45">	<span class="tok-kw">catch</span> |err| {<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open DIR.{any}\n&quot;</span>, .{err}));};</span>
+<span class="line" id="L41">	<span class="tok-kw">var</span> fjson = cDIR.openFile(nameJson, .{.mode = .read_write}) <span class="tok-kw">catch</span> |err| {</span>
+<span class="line" id="L42">				<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open FILE.{any}\n&quot;</span>, .{err}));};</span>
+<span class="line" id="L43">	<span class="tok-kw">defer</span> fjson.close();</span>
+<span class="line" id="L44"></span>
+<span class="line" id="L45">	<span class="tok-kw">const</span> out  = fjson.writer();</span>
 <span class="line" id="L46"></span>
-<span class="line" id="L47">	<span class="tok-kw">var</span> fjson = cDIR.openFile(nameJson, .{.mode = .read_write}) <span class="tok-kw">catch</span> |err| {</span>
-<span class="line" id="L48">				<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open FILE.{any}\n&quot;</span>, .{err}));};</span>
-<span class="line" id="L49">	<span class="tok-kw">defer</span> fjson.close();</span>
-<span class="line" id="L50"></span>
-<span class="line" id="L51">	<span class="tok-kw">const</span> out  = fjson.writer();</span>
-<span class="line" id="L52"></span>
-<span class="line" id="L53">	<span class="tok-kw">var</span> w = std.json.writeStream( out, .{ .whitespace = .indent_2 });</span>
-<span class="line" id="L54"></span>
+<span class="line" id="L47">	<span class="tok-kw">var</span> w = std.json.writeStream( out, .{ .whitespace = .indent_2 });</span>
+<span class="line" id="L48"></span>
+<span class="line" id="L49"></span>
+<span class="line" id="L50">	<span class="tok-kw">const</span> Ipanel = std.enums.EnumIndexer(pnl.Epanel);</span>
+<span class="line" id="L51"></span>
+<span class="line" id="L52">	</span>
+<span class="line" id="L53">	w.beginObject()   <span class="tok-kw">catch</span> |err| {</span>
+<span class="line" id="L54">				<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open FILE.{any}\n&quot;</span>, .{err}));};</span>
 <span class="line" id="L55"></span>
-<span class="line" id="L56">	<span class="tok-kw">const</span> Ipanel = std.enums.EnumIndexer(pnl.Epanel);</span>
-<span class="line" id="L57"></span>
-<span class="line" id="L58">	</span>
-<span class="line" id="L59">	w.beginObject()   <span class="tok-kw">catch</span> |err| {</span>
-<span class="line" id="L60">				<span class="tok-builtin">@panic</span>(<span class="tok-kw">try</span> std.fmt.allocPrint(allocator,<span class="tok-str">&quot;err Open FILE.{any}\n&quot;</span>, .{err}));};</span>
-<span class="line" id="L61"></span>
-<span class="line" id="L62">	</span>
-<span class="line" id="L63">	plog(.fjson).debug(<span class="tok-str">&quot;beginObject&quot;</span>,.{});</span>
-<span class="line" id="L64">	<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;PANEL&quot;</span>);</span>
-<span class="line" id="L65">	<span class="tok-kw">var</span> nbrPnl: <span class="tok-type">usize</span> = XPANEL.items.len;</span>
-<span class="line" id="L66">	<span class="tok-kw">var</span> np: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L67">	<span class="tok-kw">while</span> (np &lt; nbrPnl) : (np += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L68">		<span class="tok-kw">try</span> w.beginArray();</span>
-<span class="line" id="L69">		<span class="tok-kw">try</span> w.beginObject();</span>
-<span class="line" id="L70">		<span class="tok-kw">var</span> p: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L71">		<span class="tok-kw">while</span> (p &lt; Ipanel.count) : (p += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L72">			<span class="tok-kw">switch</span> (Ipanel.keyForIndex(p)) {</span>
-<span class="line" id="L73">				.name =&gt; {</span>
-<span class="line" id="L74">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.name));</span>
-<span class="line" id="L75">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].name});</span>
-<span class="line" id="L76">				},</span>
-<span class="line" id="L77">				.posx =&gt; {</span>
-<span class="line" id="L78">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.posx));</span>
-<span class="line" id="L79">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].posx});</span>
-<span class="line" id="L80">				},</span>
-<span class="line" id="L81">				.posy =&gt; {</span>
-<span class="line" id="L82">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.posy));</span>
-<span class="line" id="L83">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].posy});</span>
-<span class="line" id="L84">				},</span>
-<span class="line" id="L85">				.lines =&gt; {</span>
-<span class="line" id="L86">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.lines));</span>
-<span class="line" id="L87">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].lines});</span>
-<span class="line" id="L88">				},</span>
-<span class="line" id="L89">				.cols  =&gt; {</span>
-<span class="line" id="L90">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.cols));</span>
-<span class="line" id="L91">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].cols});</span>
-<span class="line" id="L92">				},</span>
-<span class="line" id="L93">				.cadre =&gt; {</span>
-<span class="line" id="L94">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.cadre));</span>
-<span class="line" id="L95">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].frame.cadre)});</span>
-<span class="line" id="L96">				},</span>
-<span class="line" id="L97">				.title =&gt; {</span>
-<span class="line" id="L98">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.title));</span>
-<span class="line" id="L99">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].frame.title});</span>
-<span class="line" id="L100">				},</span>
-<span class="line" id="L101">				.button =&gt; {</span>
-<span class="line" id="L102">					<span class="tok-kw">const</span> Ibutton = std.enums.EnumIndexer(btn.Ebutton);</span>
-<span class="line" id="L103">					<span class="tok-kw">var</span> nbrBtn: <span class="tok-type">usize</span> = XPANEL.items[np].button.items.len;</span>
-<span class="line" id="L104">					<span class="tok-kw">var</span> bp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L105">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;button&quot;</span>);</span>
-<span class="line" id="L106">					<span class="tok-kw">try</span> w.beginArray();</span>
-<span class="line" id="L107">					<span class="tok-kw">while</span> (bp &lt; nbrBtn) : (bp += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L108">						<span class="tok-kw">try</span> w.beginObject();</span>
-<span class="line" id="L109">						<span class="tok-kw">var</span> b: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L110">						<span class="tok-kw">while</span> (b &lt; Ibutton.count) : (b += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L111">							<span class="tok-kw">switch</span> (Ibutton.keyForIndex(b)) {</span>
-<span class="line" id="L112">								.name =&gt; {</span>
-<span class="line" id="L113">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.name));</span>
-<span class="line" id="L114">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].button.items[bp].name});</span>
-<span class="line" id="L115">								},</span>
-<span class="line" id="L116">								.key =&gt; {</span>
-<span class="line" id="L117">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.key));</span>
-<span class="line" id="L118">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].button.items[bp].key)});</span>
-<span class="line" id="L119">								},</span>
-<span class="line" id="L120">								.show =&gt; {</span>
-<span class="line" id="L121">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.show));</span>
-<span class="line" id="L122">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].button.items[bp].show) == <span class="tok-number">1</span>)</span>
-<span class="line" id="L123">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
-<span class="line" id="L124">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
-<span class="line" id="L125">								},</span>
-<span class="line" id="L126">								.check =&gt; {</span>
-<span class="line" id="L127">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.check));</span>
-<span class="line" id="L128">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].button.items[bp].check) == <span class="tok-number">1</span>)</span>
-<span class="line" id="L129">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;true\&quot;&quot;</span>, .{})</span>
-<span class="line" id="L130">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
-<span class="line" id="L131">								},</span>
-<span class="line" id="L132">								.title =&gt; {</span>
-<span class="line" id="L133">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.title));</span>
-<span class="line" id="L134">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].button.items[bp].title});</span>
-<span class="line" id="L135">								},</span>
-<span class="line" id="L136">							}</span>
-<span class="line" id="L137">						}</span>
-<span class="line" id="L138">						<span class="tok-kw">try</span> w.endObject();</span>
-<span class="line" id="L139">					}</span>
+<span class="line" id="L56">	</span>
+<span class="line" id="L57">	<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;PANEL&quot;</span>);</span>
+<span class="line" id="L58">	<span class="tok-kw">var</span> nbrPnl: <span class="tok-type">usize</span> = XPANEL.items.len;</span>
+<span class="line" id="L59">	<span class="tok-kw">var</span> np: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L60">	<span class="tok-kw">while</span> (np &lt; nbrPnl) : (np += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L61">		<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L62">		<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L63">		<span class="tok-kw">var</span> p: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L64">		<span class="tok-kw">while</span> (p &lt; Ipanel.count) : (p += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L65">			<span class="tok-kw">switch</span> (Ipanel.keyForIndex(p)) {</span>
+<span class="line" id="L66">				.name =&gt; {</span>
+<span class="line" id="L67">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.name));</span>
+<span class="line" id="L68">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].name});</span>
+<span class="line" id="L69">				},</span>
+<span class="line" id="L70">				.posx =&gt; {</span>
+<span class="line" id="L71">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.posx));</span>
+<span class="line" id="L72">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].posx});</span>
+<span class="line" id="L73">				},</span>
+<span class="line" id="L74">				.posy =&gt; {</span>
+<span class="line" id="L75">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.posy));</span>
+<span class="line" id="L76">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].posy});</span>
+<span class="line" id="L77">				},</span>
+<span class="line" id="L78">				.lines =&gt; {</span>
+<span class="line" id="L79">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.lines));</span>
+<span class="line" id="L80">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].lines});</span>
+<span class="line" id="L81">				},</span>
+<span class="line" id="L82">				.cols  =&gt; {</span>
+<span class="line" id="L83">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.cols));</span>
+<span class="line" id="L84">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].cols});</span>
+<span class="line" id="L85">				},</span>
+<span class="line" id="L86">				.cadre =&gt; {</span>
+<span class="line" id="L87">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.cadre));</span>
+<span class="line" id="L88">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].frame.cadre)});</span>
+<span class="line" id="L89">				},</span>
+<span class="line" id="L90">				.title =&gt; {</span>
+<span class="line" id="L91">					<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(pnl.Epanel.title));</span>
+<span class="line" id="L92">					<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].frame.title});</span>
+<span class="line" id="L93">				},</span>
+<span class="line" id="L94">				.button =&gt; {</span>
+<span class="line" id="L95">					<span class="tok-kw">const</span> Ibutton = std.enums.EnumIndexer(btn.Ebutton);</span>
+<span class="line" id="L96">					<span class="tok-kw">var</span> nbrBtn: <span class="tok-type">usize</span> = XPANEL.items[np].button.items.len;</span>
+<span class="line" id="L97">					<span class="tok-kw">var</span> bp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L98">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;button&quot;</span>);</span>
+<span class="line" id="L99">					<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L100">					<span class="tok-kw">while</span> (bp &lt; nbrBtn) : (bp += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L101">						<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L102">						<span class="tok-kw">var</span> b: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L103">						<span class="tok-kw">while</span> (b &lt; Ibutton.count) : (b += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L104">							<span class="tok-kw">switch</span> (Ibutton.keyForIndex(b)) {</span>
+<span class="line" id="L105">								.name =&gt; {</span>
+<span class="line" id="L106">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.name));</span>
+<span class="line" id="L107">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].button.items[bp].name});</span>
+<span class="line" id="L108">								},</span>
+<span class="line" id="L109">								.key =&gt; {</span>
+<span class="line" id="L110">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.key));</span>
+<span class="line" id="L111">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].button.items[bp].key)});</span>
+<span class="line" id="L112">								},</span>
+<span class="line" id="L113">								.show =&gt; {</span>
+<span class="line" id="L114">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.show));</span>
+<span class="line" id="L115">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].button.items[bp].show) == <span class="tok-number">1</span>)</span>
+<span class="line" id="L116">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
+<span class="line" id="L117">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
+<span class="line" id="L118">								},</span>
+<span class="line" id="L119">								.check =&gt; {</span>
+<span class="line" id="L120">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.check));</span>
+<span class="line" id="L121">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].button.items[bp].check) == <span class="tok-number">1</span>)</span>
+<span class="line" id="L122">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;true\&quot;&quot;</span>, .{})</span>
+<span class="line" id="L123">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
+<span class="line" id="L124">								},</span>
+<span class="line" id="L125">								.title =&gt; {</span>
+<span class="line" id="L126">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(btn.Ebutton.title));</span>
+<span class="line" id="L127">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].button.items[bp].title});</span>
+<span class="line" id="L128">								},</span>
+<span class="line" id="L129">							}</span>
+<span class="line" id="L130">						}</span>
+<span class="line" id="L131">						<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L132">					}</span>
+<span class="line" id="L133"></span>
+<span class="line" id="L134">					<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L135">				},</span>
+<span class="line" id="L136">				.label =&gt; {</span>
+<span class="line" id="L137">					<span class="tok-kw">const</span> Ilabel = std.enums.EnumIndexer(lbl.Elabel);</span>
+<span class="line" id="L138">					<span class="tok-kw">var</span> l: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L139">					<span class="tok-kw">var</span> nbrLbl: <span class="tok-type">usize</span> = XPANEL.items[np].label.items.len;</span>
 <span class="line" id="L140"></span>
-<span class="line" id="L141">					<span class="tok-kw">try</span> w.endArray();</span>
-<span class="line" id="L142">				},</span>
-<span class="line" id="L143">				.label =&gt; {</span>
-<span class="line" id="L144">					<span class="tok-kw">const</span> Ilabel = std.enums.EnumIndexer(lbl.Elabel);</span>
-<span class="line" id="L145">					<span class="tok-kw">var</span> l: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L146">					<span class="tok-kw">var</span> nbrLbl: <span class="tok-type">usize</span> = XPANEL.items[np].label.items.len;</span>
-<span class="line" id="L147"></span>
-<span class="line" id="L148">					<span class="tok-kw">var</span> lp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L149">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;label&quot;</span>);</span>
-<span class="line" id="L150">					<span class="tok-kw">try</span> w.beginArray();</span>
-<span class="line" id="L151">					<span class="tok-kw">while</span> (lp &lt; nbrLbl) : (lp += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L152">						<span class="tok-kw">try</span> w.beginObject();</span>
-<span class="line" id="L153">						l = <span class="tok-number">0</span>;</span>
-<span class="line" id="L154">						<span class="tok-kw">while</span> (l &lt; Ilabel.count) : (l += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L155">							<span class="tok-kw">switch</span> (Ilabel.keyForIndex(l)) {</span>
-<span class="line" id="L156">								.name =&gt; {</span>
-<span class="line" id="L157">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.name));</span>
-<span class="line" id="L158">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].label.items[lp].name});</span>
-<span class="line" id="L159">								},</span>
-<span class="line" id="L160">								.posx =&gt; {</span>
-<span class="line" id="L161">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.posx));</span>
-<span class="line" id="L162">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].label.items[lp].posx});</span>
-<span class="line" id="L163">								},</span>
-<span class="line" id="L164">								.posy =&gt; {</span>
-<span class="line" id="L165">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.posy));</span>
-<span class="line" id="L166">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].label.items[lp].posy});</span>
-<span class="line" id="L167">								},</span>
-<span class="line" id="L168">								.text =&gt; {</span>
-<span class="line" id="L169">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.text));</span>
-<span class="line" id="L170">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].label.items[lp].text});</span>
+<span class="line" id="L141">					<span class="tok-kw">var</span> lp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L142">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;label&quot;</span>);</span>
+<span class="line" id="L143">					<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L144">					<span class="tok-kw">while</span> (lp &lt; nbrLbl) : (lp += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L145">						<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L146">						l = <span class="tok-number">0</span>;</span>
+<span class="line" id="L147">						<span class="tok-kw">while</span> (l &lt; Ilabel.count) : (l += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L148">							<span class="tok-kw">switch</span> (Ilabel.keyForIndex(l)) {</span>
+<span class="line" id="L149">								.name =&gt; {</span>
+<span class="line" id="L150">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.name));</span>
+<span class="line" id="L151">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].label.items[lp].name});</span>
+<span class="line" id="L152">								},</span>
+<span class="line" id="L153">								.posx =&gt; {</span>
+<span class="line" id="L154">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.posx));</span>
+<span class="line" id="L155">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].label.items[lp].posx});</span>
+<span class="line" id="L156">								},</span>
+<span class="line" id="L157">								.posy =&gt; {</span>
+<span class="line" id="L158">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.posy));</span>
+<span class="line" id="L159">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].label.items[lp].posy});</span>
+<span class="line" id="L160">								},</span>
+<span class="line" id="L161">								.text =&gt; {</span>
+<span class="line" id="L162">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.text));</span>
+<span class="line" id="L163">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].label.items[lp].text});</span>
+<span class="line" id="L164">								},</span>
+<span class="line" id="L165">								.title =&gt; {</span>
+<span class="line" id="L166">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.title));</span>
+<span class="line" id="L167">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].label.items[lp].title) == <span class="tok-number">1</span>)</span>
+<span class="line" id="L168">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
+<span class="line" id="L169">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
+<span class="line" id="L170"></span>
 <span class="line" id="L171">								},</span>
-<span class="line" id="L172">								.title =&gt; {</span>
-<span class="line" id="L173">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lbl.Elabel.title));</span>
-<span class="line" id="L174">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].label.items[lp].title) == <span class="tok-number">1</span>)</span>
-<span class="line" id="L175">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
-<span class="line" id="L176">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
-<span class="line" id="L177"></span>
-<span class="line" id="L178">								},</span>
-<span class="line" id="L179">							}</span>
-<span class="line" id="L180">						}</span>
-<span class="line" id="L181">						<span class="tok-kw">try</span> w.endObject();</span>
-<span class="line" id="L182">					}</span>
+<span class="line" id="L172">							}</span>
+<span class="line" id="L173">						}</span>
+<span class="line" id="L174">						<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L175">					}</span>
+<span class="line" id="L176"></span>
+<span class="line" id="L177">					<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L178">				},</span>
+<span class="line" id="L179">				.field =&gt; {</span>
+<span class="line" id="L180">					<span class="tok-kw">const</span> Ifield = std.enums.EnumIndexer(fld.Efield);</span>
+<span class="line" id="L181">					<span class="tok-kw">var</span> f: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L182">					<span class="tok-kw">var</span> nbrFld: <span class="tok-type">usize</span> = XPANEL.items[np].field.items.len;</span>
 <span class="line" id="L183"></span>
-<span class="line" id="L184">					<span class="tok-kw">try</span> w.endArray();</span>
-<span class="line" id="L185">				},</span>
-<span class="line" id="L186">				.field =&gt; {</span>
-<span class="line" id="L187">					<span class="tok-kw">const</span> Ifield = std.enums.EnumIndexer(fld.Efield);</span>
-<span class="line" id="L188">					<span class="tok-kw">var</span> f: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L189">					<span class="tok-kw">var</span> nbrFld: <span class="tok-type">usize</span> = XPANEL.items[np].field.items.len;</span>
-<span class="line" id="L190"></span>
-<span class="line" id="L191">					<span class="tok-kw">var</span> fp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L192">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;field&quot;</span>);</span>
-<span class="line" id="L193">					<span class="tok-kw">try</span> w.beginArray();</span>
-<span class="line" id="L194">					<span class="tok-kw">while</span> (fp &lt; nbrFld) : (fp += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L195">						<span class="tok-kw">try</span> w.beginObject();</span>
-<span class="line" id="L196">						f = <span class="tok-number">0</span>;</span>
-<span class="line" id="L197">						<span class="tok-kw">while</span> (f &lt; Ifield.count) : (f += <span class="tok-number">1</span>) {</span>
-<span class="line" id="L198">							<span class="tok-kw">switch</span> (Ifield.keyForIndex(f)) {</span>
-<span class="line" id="L199">								.name =&gt; {</span>
-<span class="line" id="L200">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.name));</span>
-<span class="line" id="L201">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].name});</span>
-<span class="line" id="L202">								},</span>
-<span class="line" id="L203">								.posx =&gt; {</span>
-<span class="line" id="L204">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.posx));</span>
-<span class="line" id="L205">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].posx});</span>
-<span class="line" id="L206">								},</span>
-<span class="line" id="L207">								.posy =&gt; {</span>
-<span class="line" id="L208">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.posy));</span>
-<span class="line" id="L209">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].posy});</span>
-<span class="line" id="L210">								},</span>
-<span class="line" id="L211">								.reftyp =&gt; {</span>
-<span class="line" id="L212">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.reftyp));</span>
-<span class="line" id="L213">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].field.items[fp].reftyp)});</span>
-<span class="line" id="L214">								},</span>
-<span class="line" id="L215">								.width =&gt; {</span>
-<span class="line" id="L216">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.width));</span>
-<span class="line" id="L217">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].width});</span>
-<span class="line" id="L218">								},</span>
-<span class="line" id="L219">								.scal =&gt; {</span>
-<span class="line" id="L220">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.scal));</span>
-<span class="line" id="L221">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].scal});</span>
-<span class="line" id="L222">								},</span>
-<span class="line" id="L223">								.text =&gt; {</span>
-<span class="line" id="L224">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.text));</span>
-<span class="line" id="L225">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;\&quot;&quot;</span>, .{});</span>
-<span class="line" id="L226">								},</span>
-<span class="line" id="L227">								.requier =&gt; {</span>
-<span class="line" id="L228">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.requier));</span>
-<span class="line" id="L229">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].field.items[fp].requier) == <span class="tok-number">1</span>)</span>
-<span class="line" id="L230">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
-<span class="line" id="L231">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
-<span class="line" id="L232">								},</span>
-<span class="line" id="L233">								.protect =&gt; {</span>
-<span class="line" id="L234">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.protect));</span>
-<span class="line" id="L235">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].field.items[fp].protect) == <span class="tok-number">1</span>)</span>
-<span class="line" id="L236">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
-<span class="line" id="L237">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
-<span class="line" id="L238">								},</span>
-<span class="line" id="L239">								.edtcar =&gt; {</span>
-<span class="line" id="L240">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.edtcar));</span>
-<span class="line" id="L241">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].edtcar});</span>
-<span class="line" id="L242">								},</span>
-<span class="line" id="L243">								.errmsg =&gt; {</span>
-<span class="line" id="L244">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.errmsg));</span>
-<span class="line" id="L245">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].errmsg});</span>
-<span class="line" id="L246">								},</span>
-<span class="line" id="L247">								.help =&gt; {</span>
-<span class="line" id="L248">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.help));</span>
-<span class="line" id="L249">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].help});</span>
-<span class="line" id="L250">								},</span>
-<span class="line" id="L251">								.procfunc =&gt; {</span>
-<span class="line" id="L252">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.procfunc));</span>
-<span class="line" id="L253">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].procfunc});</span>
-<span class="line" id="L254">								},</span>
-<span class="line" id="L255">								.proctask =&gt; {</span>
-<span class="line" id="L256">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.proctask));</span>
-<span class="line" id="L257">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].proctask});</span>
-<span class="line" id="L258">								},</span>
-<span class="line" id="L259">								.regex=&gt; {</span>
-<span class="line" id="L260">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.regex));</span>
-<span class="line" id="L261">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;\&quot;&quot;</span>, .{});</span>
-<span class="line" id="L262">								},</span>
-<span class="line" id="L263"></span>
-<span class="line" id="L264">							}</span>
-<span class="line" id="L265">						}</span>
-<span class="line" id="L266">						<span class="tok-kw">try</span> w.endObject();</span>
-<span class="line" id="L267">					}</span>
+<span class="line" id="L184">					<span class="tok-kw">var</span> fp: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L185">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;field&quot;</span>);</span>
+<span class="line" id="L186">					<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L187">					<span class="tok-kw">while</span> (fp &lt; nbrFld) : (fp += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L188">						<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L189">						f = <span class="tok-number">0</span>;</span>
+<span class="line" id="L190">						<span class="tok-kw">while</span> (f &lt; Ifield.count) : (f += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L191">							<span class="tok-kw">switch</span> (Ifield.keyForIndex(f)) {</span>
+<span class="line" id="L192">								.name =&gt; {</span>
+<span class="line" id="L193">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.name));</span>
+<span class="line" id="L194">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].name});</span>
+<span class="line" id="L195">								},</span>
+<span class="line" id="L196">								.posx =&gt; {</span>
+<span class="line" id="L197">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.posx));</span>
+<span class="line" id="L198">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].posx});</span>
+<span class="line" id="L199">								},</span>
+<span class="line" id="L200">								.posy =&gt; {</span>
+<span class="line" id="L201">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.posy));</span>
+<span class="line" id="L202">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].posy});</span>
+<span class="line" id="L203">								},</span>
+<span class="line" id="L204">								.reftyp =&gt; {</span>
+<span class="line" id="L205">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.reftyp));</span>
+<span class="line" id="L206">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{<span class="tok-builtin">@tagName</span>(XPANEL.items[np].field.items[fp].reftyp)});</span>
+<span class="line" id="L207">								},</span>
+<span class="line" id="L208">								.width =&gt; {</span>
+<span class="line" id="L209">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.width));</span>
+<span class="line" id="L210">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].width});</span>
+<span class="line" id="L211">								},</span>
+<span class="line" id="L212">								.scal =&gt; {</span>
+<span class="line" id="L213">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.scal));</span>
+<span class="line" id="L214">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].field.items[fp].scal});</span>
+<span class="line" id="L215">								},</span>
+<span class="line" id="L216">								.text =&gt; {</span>
+<span class="line" id="L217">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.text));</span>
+<span class="line" id="L218">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;\&quot;&quot;</span>, .{});</span>
+<span class="line" id="L219">								},</span>
+<span class="line" id="L220">								.requier =&gt; {</span>
+<span class="line" id="L221">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.requier));</span>
+<span class="line" id="L222">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].field.items[fp].requier) == <span class="tok-number">1</span>)</span>
+<span class="line" id="L223">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
+<span class="line" id="L224">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
+<span class="line" id="L225">								},</span>
+<span class="line" id="L226">								.protect =&gt; {</span>
+<span class="line" id="L227">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.protect));</span>
+<span class="line" id="L228">									<span class="tok-kw">if</span> (<span class="tok-builtin">@intFromBool</span>(XPANEL.items[np].field.items[fp].protect) == <span class="tok-number">1</span>)</span>
+<span class="line" id="L229">													<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;true&quot;</span>, .{})</span>
+<span class="line" id="L230">									<span class="tok-kw">else</span> <span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;false&quot;</span>, .{});</span>
+<span class="line" id="L231">								},</span>
+<span class="line" id="L232">								.edtcar =&gt; {</span>
+<span class="line" id="L233">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.edtcar));</span>
+<span class="line" id="L234">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].edtcar});</span>
+<span class="line" id="L235">								},</span>
+<span class="line" id="L236">								.errmsg =&gt; {</span>
+<span class="line" id="L237">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.errmsg));</span>
+<span class="line" id="L238">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].errmsg});</span>
+<span class="line" id="L239">								},</span>
+<span class="line" id="L240">								.help =&gt; {</span>
+<span class="line" id="L241">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.help));</span>
+<span class="line" id="L242">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].help});</span>
+<span class="line" id="L243">								},</span>
+<span class="line" id="L244">								.procfunc =&gt; {</span>
+<span class="line" id="L245">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.procfunc));</span>
+<span class="line" id="L246">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].procfunc});</span>
+<span class="line" id="L247">								},</span>
+<span class="line" id="L248">								.proctask =&gt; {</span>
+<span class="line" id="L249">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.proctask));</span>
+<span class="line" id="L250">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].field.items[fp].proctask});</span>
+<span class="line" id="L251">								},</span>
+<span class="line" id="L252">								.regex=&gt; {</span>
+<span class="line" id="L253">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(fld.Efield.regex));</span>
+<span class="line" id="L254">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;\&quot;&quot;</span>, .{});</span>
+<span class="line" id="L255">								},</span>
+<span class="line" id="L256"></span>
+<span class="line" id="L257">							}</span>
+<span class="line" id="L258">						}</span>
+<span class="line" id="L259">						<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L260">					}</span>
+<span class="line" id="L261"></span>
+<span class="line" id="L262">					<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L263">				},</span>
+<span class="line" id="L264">				.linev =&gt; {</span>
+<span class="line" id="L265">					<span class="tok-kw">const</span> Ilinev = std.enums.EnumIndexer(lnv.Elinev);</span>
+<span class="line" id="L266">					<span class="tok-kw">var</span> lx: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L267">					<span class="tok-kw">var</span> nbrLineh: <span class="tok-type">usize</span> = XPANEL.items[np].linev.items.len;</span>
 <span class="line" id="L268"></span>
-<span class="line" id="L269">					<span class="tok-kw">try</span> w.endArray();</span>
-<span class="line" id="L270">				},</span>
-<span class="line" id="L271">			}</span>
-<span class="line" id="L272">		}</span>
-<span class="line" id="L273">		<span class="tok-kw">try</span> w.endObject();</span>
-<span class="line" id="L274">		<span class="tok-kw">try</span> w.endArray();</span>
-<span class="line" id="L275">	}</span>
-<span class="line" id="L276">	<span class="tok-kw">try</span> w.endObject();</span>
-<span class="line" id="L277"><span class="tok-kw">return</span> ;</span>
-<span class="line" id="L278">}</span>
-<span class="line" id="L279"></span>
+<span class="line" id="L269">					<span class="tok-kw">var</span> lv: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L270">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;linev&quot;</span>);</span>
+<span class="line" id="L271">					<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L272">					<span class="tok-kw">while</span> (lv &lt; nbrLineh) : (lv += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L273">						<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L274">						lx = <span class="tok-number">0</span>;</span>
+<span class="line" id="L275">						<span class="tok-kw">while</span> (lx &lt; Ilinev.count) : (lx += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L276">							<span class="tok-kw">switch</span> (Ilinev.keyForIndex(lx)) {</span>
+<span class="line" id="L277">								.name =&gt; {</span>
+<span class="line" id="L278">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnv.Elinev.name));</span>
+<span class="line" id="L279">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].linev.items[lv].name});</span>
+<span class="line" id="L280">								},</span>
+<span class="line" id="L281">								.posx =&gt; {</span>
+<span class="line" id="L282">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnv.Elinev.posx));</span>
+<span class="line" id="L283">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].linev.items[lv].posx});</span>
+<span class="line" id="L284">								},</span>
+<span class="line" id="L285">								.posy =&gt; {</span>
+<span class="line" id="L286">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnv.Elinev.posy));</span>
+<span class="line" id="L287">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].linev.items[lv].posy});</span>
+<span class="line" id="L288">								},</span>
+<span class="line" id="L289">								.lng =&gt; {</span>
+<span class="line" id="L290">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnv.Elinev.lng));</span>
+<span class="line" id="L291">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].linev.items[lv].lng});</span>
+<span class="line" id="L292">								},</span>
+<span class="line" id="L293">								.trace =&gt; {</span>
+<span class="line" id="L294">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnv.Elinev.trace));</span>
+<span class="line" id="L295">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{</span>
+<span class="line" id="L296">											<span class="tok-builtin">@tagName</span>(XPANEL.items[np].linev.items[lv].trace)});</span>
+<span class="line" id="L297">								},</span>
+<span class="line" id="L298">							}</span>
+<span class="line" id="L299">						}</span>
+<span class="line" id="L300">						<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L301">					}</span>
+<span class="line" id="L302">					<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L303">				},</span>
+<span class="line" id="L304">				.lineh =&gt; {</span>
+<span class="line" id="L305">					<span class="tok-kw">const</span> Ilineh = std.enums.EnumIndexer(lnh.Elineh);</span>
+<span class="line" id="L306">					<span class="tok-kw">var</span> ly: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L307">					<span class="tok-kw">var</span> nbrLineh: <span class="tok-type">usize</span> = XPANEL.items[np].lineh.items.len;</span>
+<span class="line" id="L308"></span>
+<span class="line" id="L309">					<span class="tok-kw">var</span> lh: <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
+<span class="line" id="L310">					<span class="tok-kw">try</span> w.objectField(<span class="tok-str">&quot;lineh&quot;</span>);</span>
+<span class="line" id="L311">					<span class="tok-kw">try</span> w.beginArray();</span>
+<span class="line" id="L312">					<span class="tok-kw">while</span> (lh &lt; nbrLineh) : (lh += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L313">						<span class="tok-kw">try</span> w.beginObject();</span>
+<span class="line" id="L314">						ly = <span class="tok-number">0</span>;</span>
+<span class="line" id="L315">						<span class="tok-kw">while</span> (ly &lt; Ilineh.count) : (ly += <span class="tok-number">1</span>) {</span>
+<span class="line" id="L316">							<span class="tok-kw">switch</span> (Ilineh.keyForIndex(ly)) {</span>
+<span class="line" id="L317">								.name =&gt; {</span>
+<span class="line" id="L318">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnh.Elineh.name));</span>
+<span class="line" id="L319">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{XPANEL.items[np].lineh.items[lh].name});</span>
+<span class="line" id="L320">								},</span>
+<span class="line" id="L321">								.posx =&gt; {</span>
+<span class="line" id="L322">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnh.Elineh.posx));</span>
+<span class="line" id="L323">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].lineh.items[lh].posx});</span>
+<span class="line" id="L324">								},</span>
+<span class="line" id="L325">								.posy =&gt; {</span>
+<span class="line" id="L326">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnh.Elineh.posy));</span>
+<span class="line" id="L327">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].lineh.items[lh].posy});</span>
+<span class="line" id="L328">								},</span>
+<span class="line" id="L329">								.lng =&gt; {</span>
+<span class="line" id="L330">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnh.Elineh.lng));</span>
+<span class="line" id="L331">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;{d}&quot;</span>, .{XPANEL.items[np].lineh.items[lh].lng});</span>
+<span class="line" id="L332">								},</span>
+<span class="line" id="L333">								.trace =&gt; {</span>
+<span class="line" id="L334">									<span class="tok-kw">try</span> w.objectField(<span class="tok-builtin">@tagName</span>(lnh.Elineh.trace));</span>
+<span class="line" id="L335">									<span class="tok-kw">try</span> w.print(<span class="tok-str">&quot;\&quot;{s}\&quot;&quot;</span>, .{</span>
+<span class="line" id="L336">											<span class="tok-builtin">@tagName</span>(XPANEL.items[np].lineh.items[lh].trace)});</span>
+<span class="line" id="L337">								},</span>
+<span class="line" id="L338">							}</span>
+<span class="line" id="L339">						}</span>
+<span class="line" id="L340">						<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L341">					}</span>
+<span class="line" id="L342">					<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L343">				},</span>
+<span class="line" id="L344">			}</span>
+<span class="line" id="L345">		}</span>
+<span class="line" id="L346">		<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L347">		<span class="tok-kw">try</span> w.endArray();</span>
+<span class="line" id="L348">	}</span>
+<span class="line" id="L349">	<span class="tok-kw">try</span> w.endObject();</span>
+<span class="line" id="L350"><span class="tok-kw">return</span> ;</span>
+<span class="line" id="L351">}</span>
+<span class="line" id="L352"></span>
 </code></pre></body>
 </html>

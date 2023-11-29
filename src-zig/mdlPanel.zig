@@ -22,8 +22,6 @@ const pnl = @import("forms").pnl;
 const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
-// menu
-const mnu = @import("forms").mnu;
 // flied
 const fld = @import("forms").fld;
 // line horizontal
@@ -33,6 +31,9 @@ const lnv = @import("forms").lnv;
 
 // grid
 const grd = @import("grid").grd;
+// menu
+const mnu = @import("menu").mnu;
+
 
 // tools utility
 const utl = @import("utils");
@@ -1200,21 +1201,10 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
 
 
-
-
-	Panel.menu.append(mnu.newMenu(
-									"cadre",				// name
-									8, 12,					// posx, posy	
-									dds.CADRE.line1,		// type line fram
-									dds.MNUVH.vertical,		// type menu vertical / horizontal
-									&.{						// item
-									"Noline",
-									"Line 1",
-									"Line 2",
-									}
-									)) catch unreachable ;
 	return Panel;
 }
+
+
 
 //=================================================
 // description Function
@@ -1275,19 +1265,27 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var pos:usize = 1;
 
-	var i = mnu.getIndex(vpnl, vpnl.field.items[vpnl.idxfld].name) catch |err| {dsperr.errorForms(vpnl, err); return;};
-
+	var mCadre = mnu.newMenu(
+							"cadre",				// name
+							8, 12,					// posx, posy	
+							dds.CADRE.line1,		// type line fram
+							dds.MNUVH.vertical,		// type menu vertical / horizontal
+							&.{						// item
+							"Noline",
+							"Line 1",
+							"Line 2",
+							});
 	var nitem	:usize = 0;
 	if (std.mem.eql(u8, vfld.text, "0")) pos = 0;
 	if (std.mem.eql(u8, vfld.text, "1")) pos = 1;
 	if (std.mem.eql(u8, vfld.text, "2")) pos = 2;
 	while (true) {
-		nitem	= mnu.ioMenu(vpnl,vpnl.menu.items[i],pos);
+		nitem	= mnu.ioMenu(vpnl,mCadre,pos);
 		if (nitem != 9999) break;
 	}
 
 	vfld.text = std.fmt.allocPrint(dds.allocatorUtils,"{d}",.{nitem}) catch unreachable; 
-	mnu.rstPanel(&vpnl.menu.items[i],vpnl);
+	mnu.rstPanel(mCadre,vpnl);
 }
 
 //=================================================
@@ -1925,6 +1923,5 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 	vXPANEL.cols	 = panel.cols;
 	vXPANEL.frame	= panel.frame;
 	vXPANEL.button = panel.button;
-	vXPANEL.buf.clearAndFree();
 	
 }

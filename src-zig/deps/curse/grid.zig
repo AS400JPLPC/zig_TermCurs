@@ -179,20 +179,20 @@ pub const	grd = struct {
 	}
 
 	/// substring String
-fn subStrGrid(a: []const u8,pos: usize, n:usize) []const u8 {
-	if (n == 0 or n > a.len)	@panic("Invalide_subStrGrid_Index");
+	fn subStrGrid(a: []const u8,pos: usize, n:usize) []const u8 {
+		if (n == 0 or n > a.len)	@panic("Invalide_subStrGrid_Index");
 
-	if (pos > a.len) @panic("ErrGrid.Invalide_subStr_Index");
+		if (pos > a.len) @panic("ErrGrid.Invalide_subStr_Index");
 
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, n - pos) 
-		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+		const allocator = std.heap.page_allocator;
+		const result = allocator.alloc(u8, n - pos) 
+			catch |err| { @panic(@errorName(err));};
+		defer allocator.free(result);
 
-	std.mem.copy(u8, result, a[pos..n]);
-	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
-		catch |err| { @panic(@errorName(err));};
-}
+		std.mem.copy(u8, result, a[pos..n]);
+		return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+			catch |err| { @panic(@errorName(err));};
+	}
 
 
 	// pading Cell 

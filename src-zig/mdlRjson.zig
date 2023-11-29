@@ -11,8 +11,6 @@ const pnl = @import("forms").pnl;
 const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
-// menu
-const mnu = @import("forms").mnu;
 // flied
 const fld = @import("forms").fld;
 // line horizontal
@@ -22,6 +20,8 @@ const lnv = @import("forms").lnv;
 
 // grid
 const grd = @import("grid").grd;
+// menu
+const mnu = @import("menu").mnu;
 
 // full delete for produc
 const forms = @import("forms");

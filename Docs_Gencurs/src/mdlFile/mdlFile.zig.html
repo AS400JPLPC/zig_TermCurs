@@ -142,279 +142,273 @@
 <span class="line" id="L23"><span class="tok-comment">// label</span>
 </span>
 <span class="line" id="L24"><span class="tok-kw">const</span> lbl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lbl;</span>
-<span class="line" id="L25"><span class="tok-comment">// menu</span>
+<span class="line" id="L25"><span class="tok-comment">// flied</span>
 </span>
-<span class="line" id="L26"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).mnu;</span>
-<span class="line" id="L27"><span class="tok-comment">// flied</span>
+<span class="line" id="L26"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
+<span class="line" id="L27"></span>
+<span class="line" id="L28"></span>
+<span class="line" id="L29"><span class="tok-comment">// grid</span>
 </span>
-<span class="line" id="L28"><span class="tok-kw">const</span> fld = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).fld;</span>
-<span class="line" id="L29"><span class="tok-comment">// line horizontal</span>
+<span class="line" id="L30"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
+<span class="line" id="L31"><span class="tok-comment">// menu</span>
 </span>
-<span class="line" id="L30"><span class="tok-kw">const</span> lnh = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnh;</span>
-<span class="line" id="L31"><span class="tok-comment">// line vertival</span>
-</span>
-<span class="line" id="L32"><span class="tok-kw">const</span> lnv = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;forms&quot;</span>).lnv;</span>
+<span class="line" id="L32"><span class="tok-kw">const</span> mnu = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;menu&quot;</span>).mnu;</span>
 <span class="line" id="L33"></span>
-<span class="line" id="L34"></span>
-<span class="line" id="L35"><span class="tok-comment">// grid</span>
+<span class="line" id="L34"><span class="tok-comment">// tools utility</span>
 </span>
-<span class="line" id="L36"><span class="tok-kw">const</span> grd = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;grid&quot;</span>).grd;</span>
-<span class="line" id="L37"></span>
-<span class="line" id="L38"><span class="tok-comment">// tools utility</span>
+<span class="line" id="L35"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;utils&quot;</span>);</span>
+<span class="line" id="L36"></span>
+<span class="line" id="L37"><span class="tok-comment">// tools regex</span>
 </span>
-<span class="line" id="L39"><span class="tok-kw">const</span> utl = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;utils&quot;</span>);</span>
+<span class="line" id="L38"><span class="tok-kw">const</span> reg = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;match&quot;</span>);</span>
+<span class="line" id="L39"></span>
 <span class="line" id="L40"></span>
-<span class="line" id="L41"><span class="tok-comment">// tools regex</span>
+<span class="line" id="L41"></span>
+<span class="line" id="L42"><span class="tok-comment">// sauvegarde JSON</span>
 </span>
-<span class="line" id="L42"><span class="tok-kw">const</span> reg = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;match&quot;</span>);</span>
-<span class="line" id="L43"></span>
+<span class="line" id="L43"><span class="tok-kw">const</span> mdlSjson = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlSjson&quot;</span>);</span>
 <span class="line" id="L44"></span>
-<span class="line" id="L45"></span>
-<span class="line" id="L46"><span class="tok-comment">// sauvegarde JSON</span>
+<span class="line" id="L45"><span class="tok-comment">// Restore JSON</span>
 </span>
-<span class="line" id="L47"><span class="tok-kw">const</span> mdlSjson = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlSjson&quot;</span>);</span>
-<span class="line" id="L48"></span>
-<span class="line" id="L49"><span class="tok-comment">// Restore JSON</span>
-</span>
-<span class="line" id="L50"><span class="tok-kw">const</span> mdlRjson = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlRjson&quot;</span>);</span>
-<span class="line" id="L51"></span>
-<span class="line" id="L52"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L46"><span class="tok-kw">const</span> mdlRjson = <span class="tok-builtin">@import</span>(<span class="tok-str">&quot;mdlRjson&quot;</span>);</span>
+<span class="line" id="L47"></span>
+<span class="line" id="L48"><span class="tok-kw">const</span> allocator = std.heap.page_allocator;</span>
+<span class="line" id="L49"></span>
+<span class="line" id="L50"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">Panel_Fmt01</span>(title: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span>) *pnl.PANEL {</span>
+<span class="line" id="L51">	<span class="tok-kw">const</span> termSize = term.getSize() ;</span>
+<span class="line" id="L52"></span>
 <span class="line" id="L53"></span>
-<span class="line" id="L54"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">Panel_Fmt01</span>(title: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span>) *pnl.PANEL {</span>
-<span class="line" id="L55">	<span class="tok-kw">const</span> termSize = term.getSize() ;</span>
-<span class="line" id="L56"></span>
-<span class="line" id="L57"></span>
-<span class="line" id="L58">	<span class="tok-kw">var</span> Panel : *pnl.PANEL = pnl.newPanelC(<span class="tok-str">&quot;FRAM01&quot;</span>,</span>
-<span class="line" id="L59">										<span class="tok-number">1</span>, <span class="tok-number">1</span>,</span>
-<span class="line" id="L60">										termSize.height,</span>
-<span class="line" id="L61">										termSize.width ,</span>
-<span class="line" id="L62">										dds.CADRE.line1,</span>
-<span class="line" id="L63">										title,</span>
-<span class="line" id="L64">										);</span>
-<span class="line" id="L65"></span>
-<span class="line" id="L66">	Panel.button.append(btn.newButton(</span>
-<span class="line" id="L67">									kbd.F3,			<span class="tok-comment">// function</span>
+<span class="line" id="L54">	<span class="tok-kw">var</span> Panel : *pnl.PANEL = pnl.newPanelC(<span class="tok-str">&quot;FRAM01&quot;</span>,</span>
+<span class="line" id="L55">										<span class="tok-number">1</span>, <span class="tok-number">1</span>,</span>
+<span class="line" id="L56">										termSize.height,</span>
+<span class="line" id="L57">										termSize.width ,</span>
+<span class="line" id="L58">										dds.CADRE.line1,</span>
+<span class="line" id="L59">										title,</span>
+<span class="line" id="L60">										);</span>
+<span class="line" id="L61"></span>
+<span class="line" id="L62">	Panel.button.append(btn.newButton(</span>
+<span class="line" id="L63">									kbd.F3,			<span class="tok-comment">// function</span>
 </span>
-<span class="line" id="L68">									<span class="tok-null">true</span>,			<span class="tok-comment">// show</span>
+<span class="line" id="L64">									<span class="tok-null">true</span>,			<span class="tok-comment">// show</span>
 </span>
-<span class="line" id="L69">									<span class="tok-null">false</span>,			<span class="tok-comment">// check field</span>
+<span class="line" id="L65">									<span class="tok-null">false</span>,			<span class="tok-comment">// check field</span>
 </span>
-<span class="line" id="L70">									<span class="tok-str">&quot;Exit&quot;</span>,			<span class="tok-comment">// title </span>
+<span class="line" id="L66">									<span class="tok-str">&quot;Exit&quot;</span>,			<span class="tok-comment">// title </span>
 </span>
-<span class="line" id="L71">									)</span>
-<span class="line" id="L72">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L73"></span>
-<span class="line" id="L74"></span>
-<span class="line" id="L75"></span>
-<span class="line" id="L76">	Panel.button.append(btn.newButton(</span>
-<span class="line" id="L77">									kbd.F9,				<span class="tok-comment">// function</span>
+<span class="line" id="L67">									)</span>
+<span class="line" id="L68">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L69"></span>
+<span class="line" id="L70"></span>
+<span class="line" id="L71"></span>
+<span class="line" id="L72">	Panel.button.append(btn.newButton(</span>
+<span class="line" id="L73">									kbd.F9,				<span class="tok-comment">// function</span>
 </span>
-<span class="line" id="L78">									<span class="tok-null">true</span>,				<span class="tok-comment">// show</span>
+<span class="line" id="L74">									<span class="tok-null">true</span>,				<span class="tok-comment">// show</span>
 </span>
-<span class="line" id="L79">									<span class="tok-null">true</span>,				<span class="tok-comment">// check field</span>
+<span class="line" id="L75">									<span class="tok-null">true</span>,				<span class="tok-comment">// check field</span>
 </span>
-<span class="line" id="L80">									<span class="tok-str">&quot;Creat File Json&quot;</span>,	<span class="tok-comment">// title </span>
+<span class="line" id="L76">									<span class="tok-str">&quot;Creat File Json&quot;</span>,	<span class="tok-comment">// title </span>
 </span>
-<span class="line" id="L81">									)</span>
-<span class="line" id="L82">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L83"></span>
-<span class="line" id="L84"></span>
-<span class="line" id="L85"></span>
-<span class="line" id="L86">	Panel.button.append(btn.newButton(</span>
-<span class="line" id="L87">									kbd.F11,			<span class="tok-comment">// function</span>
+<span class="line" id="L77">									)</span>
+<span class="line" id="L78">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L79"></span>
+<span class="line" id="L80"></span>
+<span class="line" id="L81"></span>
+<span class="line" id="L82">	Panel.button.append(btn.newButton(</span>
+<span class="line" id="L83">									kbd.F11,			<span class="tok-comment">// function</span>
 </span>
-<span class="line" id="L88">										<span class="tok-null">true</span>,			<span class="tok-comment">// show</span>
+<span class="line" id="L84">										<span class="tok-null">true</span>,			<span class="tok-comment">// show</span>
 </span>
-<span class="line" id="L89">										<span class="tok-null">false</span>,			<span class="tok-comment">// check field</span>
+<span class="line" id="L85">										<span class="tok-null">false</span>,			<span class="tok-comment">// check field</span>
 </span>
-<span class="line" id="L90">									<span class="tok-str">&quot;File recovery&quot;</span>,	<span class="tok-comment">// title </span>
+<span class="line" id="L86">									<span class="tok-str">&quot;File recovery&quot;</span>,	<span class="tok-comment">// title </span>
 </span>
-<span class="line" id="L91">									)</span>
-<span class="line" id="L92">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L93"></span>
+<span class="line" id="L87">									)</span>
+<span class="line" id="L88">								) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L89"></span>
+<span class="line" id="L90"></span>
+<span class="line" id="L91"></span>
+<span class="line" id="L92"></span>
+<span class="line" id="L93">	Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;nameJson&quot;</span>	 ,<span class="tok-number">2</span>,<span class="tok-number">2</span>, <span class="tok-str">&quot;name.....:&quot;</span>) ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
 <span class="line" id="L94"></span>
 <span class="line" id="L95"></span>
 <span class="line" id="L96"></span>
-<span class="line" id="L97">	Panel.label.append(lbl.newLabel(<span class="tok-str">&quot;nameJson&quot;</span>	 ,<span class="tok-number">2</span>,<span class="tok-number">2</span>, <span class="tok-str">&quot;name.....:&quot;</span>) ) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
-<span class="line" id="L98"></span>
-<span class="line" id="L99"></span>
+<span class="line" id="L97">	Panel.field.append(fld.newFieldAlphaNumeric(<span class="tok-str">&quot;nameJson&quot;</span>,<span class="tok-number">2</span>,<span class="tok-number">12</span>,<span class="tok-number">20</span>,<span class="tok-str">&quot;&quot;</span>,<span class="tok-null">false</span>,</span>
+<span class="line" id="L98">								<span class="tok-str">&quot;required&quot;</span>,<span class="tok-str">&quot;please enter text ex:Panel09&quot;</span>,</span>
+<span class="line" id="L99">								<span class="tok-str">&quot;^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$&quot;</span>)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
 <span class="line" id="L100"></span>
-<span class="line" id="L101">	Panel.field.append(fld.newFieldAlphaNumeric(<span class="tok-str">&quot;nameJson&quot;</span>,<span class="tok-number">2</span>,<span class="tok-number">12</span>,<span class="tok-number">20</span>,<span class="tok-str">&quot;&quot;</span>,<span class="tok-null">false</span>,</span>
-<span class="line" id="L102">								<span class="tok-str">&quot;required&quot;</span>,<span class="tok-str">&quot;please enter text ex:Panel09&quot;</span>,</span>
-<span class="line" id="L103">								<span class="tok-str">&quot;^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$&quot;</span>)) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span> ;</span>
+<span class="line" id="L101">	<span class="tok-kw">return</span> Panel;</span>
+<span class="line" id="L102">}</span>
+<span class="line" id="L103"></span>
 <span class="line" id="L104"></span>
-<span class="line" id="L105">	<span class="tok-kw">return</span> Panel;</span>
-<span class="line" id="L106">}</span>
+<span class="line" id="L105"><span class="tok-kw">const</span> vdir = <span class="tok-str">&quot;dspf&quot;</span>;</span>
+<span class="line" id="L106"></span>
 <span class="line" id="L107"></span>
-<span class="line" id="L108"></span>
-<span class="line" id="L109"><span class="tok-kw">const</span> vdir = <span class="tok-str">&quot;dspf&quot;</span>;</span>
-<span class="line" id="L110"></span>
-<span class="line" id="L111"></span>
-<span class="line" id="L112"><span class="tok-kw">fn</span> <span class="tok-fn">isFile</span>(name: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> ) <span class="tok-type">bool</span> {</span>
-<span class="line" id="L113"></span>
-<span class="line" id="L114">	</span>
-<span class="line" id="L115">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(vdir,.{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
-<span class="line" id="L116">	</span>
-<span class="line" id="L117">	<span class="tok-kw">var</span> file = cDIR.createFile(name, .{ .read = <span class="tok-null">true</span> }) <span class="tok-kw">catch</span> |e|</span>
-<span class="line" id="L118">		<span class="tok-kw">switch</span> (e) {</span>
-<span class="line" id="L119">			<span class="tok-kw">error</span>.PathAlreadyExists =&gt; <span class="tok-kw">return</span> <span class="tok-null">true</span>,</span>
-<span class="line" id="L120">			<span class="tok-kw">else</span> =&gt;<span class="tok-kw">return</span> <span class="tok-null">false</span>,</span>
-<span class="line" id="L121">		};</span>
+<span class="line" id="L108"><span class="tok-kw">fn</span> <span class="tok-fn">isFile</span>(name: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> ) <span class="tok-type">bool</span> {</span>
+<span class="line" id="L109"></span>
+<span class="line" id="L110">	</span>
+<span class="line" id="L111">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(vdir,.{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L112">	</span>
+<span class="line" id="L113">	<span class="tok-kw">var</span> file = cDIR.createFile(name, .{ .read = <span class="tok-null">true</span> }) <span class="tok-kw">catch</span> |e|</span>
+<span class="line" id="L114">		<span class="tok-kw">switch</span> (e) {</span>
+<span class="line" id="L115">			<span class="tok-kw">error</span>.PathAlreadyExists =&gt; <span class="tok-kw">return</span> <span class="tok-null">true</span>,</span>
+<span class="line" id="L116">			<span class="tok-kw">else</span> =&gt;<span class="tok-kw">return</span> <span class="tok-null">false</span>,</span>
+<span class="line" id="L117">		};</span>
+<span class="line" id="L118"></span>
+<span class="line" id="L119">	<span class="tok-kw">defer</span> file.close();</span>
+<span class="line" id="L120">	<span class="tok-kw">return</span> <span class="tok-null">false</span>;</span>
+<span class="line" id="L121">}</span>
 <span class="line" id="L122"></span>
-<span class="line" id="L123">	<span class="tok-kw">defer</span> file.close();</span>
-<span class="line" id="L124">	<span class="tok-kw">return</span> <span class="tok-null">false</span>;</span>
-<span class="line" id="L125">}</span>
-<span class="line" id="L126"></span>
-<span class="line" id="L127"><span class="tok-kw">fn</span> <span class="tok-fn">newFile</span>(name: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> ) <span class="tok-type">void</span> {</span>
-<span class="line" id="L128"></span>
-<span class="line" id="L129">	</span>
-<span class="line" id="L130">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(vdir,.{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
-<span class="line" id="L131">	</span>
-<span class="line" id="L132">	<span class="tok-kw">var</span> file = cDIR.openFile(name, .{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
-<span class="line" id="L133">	cDIR.deleteFile(name) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
-<span class="line" id="L134">	file= cDIR.createFile(name, .{ .read = <span class="tok-null">true</span> }) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;	</span>
-<span class="line" id="L135">	<span class="tok-kw">defer</span> file.close();</span>
-<span class="line" id="L136">}</span>
-<span class="line" id="L137"></span>
+<span class="line" id="L123"><span class="tok-kw">fn</span> <span class="tok-fn">newFile</span>(name: []<span class="tok-kw">const</span> <span class="tok-type">u8</span> ) <span class="tok-type">void</span> {</span>
+<span class="line" id="L124"></span>
+<span class="line" id="L125">	</span>
+<span class="line" id="L126">	<span class="tok-kw">const</span> cDIR = std.fs.cwd().openDir(vdir,.{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L127">	</span>
+<span class="line" id="L128">	<span class="tok-kw">var</span> file = cDIR.openFile(name, .{}) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L129">	cDIR.deleteFile(name) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;</span>
+<span class="line" id="L130">	file= cDIR.createFile(name, .{ .read = <span class="tok-null">true</span> }) <span class="tok-kw">catch</span> <span class="tok-kw">unreachable</span>;	</span>
+<span class="line" id="L131">	<span class="tok-kw">defer</span> file.close();</span>
+<span class="line" id="L132">}</span>
+<span class="line" id="L133"></span>
+<span class="line" id="L134"></span>
+<span class="line" id="L135"></span>
+<span class="line" id="L136"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">wrkJson</span> (XPANEL: *std.ArrayList(pnl.PANEL), wrk: <span class="tok-type">bool</span>) !<span class="tok-type">void</span> {</span>
+<span class="line" id="L137">	</span>
 <span class="line" id="L138"></span>
-<span class="line" id="L139"></span>
-<span class="line" id="L140"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">wrkJson</span> (XPANEL: *std.ArrayList(pnl.PANEL), wrk: <span class="tok-type">bool</span>) !<span class="tok-type">void</span> {</span>
+<span class="line" id="L139">	_= std.fs.cwd().openDir(vdir,.{})</span>
+<span class="line" id="L140">		<span class="tok-kw">catch</span> <span class="tok-kw">try</span> std.fs.cwd().makeDir(vdir); </span>
 <span class="line" id="L141">	</span>
-<span class="line" id="L142"></span>
-<span class="line" id="L143">	_= std.fs.cwd().openDir(vdir,.{})</span>
-<span class="line" id="L144">		<span class="tok-kw">catch</span> <span class="tok-kw">try</span> std.fs.cwd().makeDir(vdir); </span>
-<span class="line" id="L145">	</span>
+<span class="line" id="L142">	</span>
+<span class="line" id="L143">	<span class="tok-kw">var</span> twork: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L144">	<span class="tok-kw">if</span> (wrk)  twork = <span class="tok-str">&quot;Save-File-JSON&quot;</span> </span>
+<span class="line" id="L145">	<span class="tok-kw">else</span> twork = <span class="tok-str">&quot;Recovery-File-Json&quot;</span>;</span>
 <span class="line" id="L146">	</span>
-<span class="line" id="L147">	<span class="tok-kw">var</span> twork: [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
-<span class="line" id="L148">	<span class="tok-kw">if</span> (wrk)  twork = <span class="tok-str">&quot;Save-File-JSON&quot;</span> </span>
-<span class="line" id="L149">	<span class="tok-kw">else</span> twork = <span class="tok-str">&quot;Recovery-File-Json&quot;</span>;</span>
-<span class="line" id="L150">	</span>
-<span class="line" id="L151">	<span class="tok-kw">var</span> pFmt01 = Panel_Fmt01(twork);</span>
-<span class="line" id="L152">	<span class="tok-kw">var</span> Tkey : term.Keyboard = <span class="tok-null">undefined</span> ; </span>
+<span class="line" id="L147">	<span class="tok-kw">var</span> pFmt01 = Panel_Fmt01(twork);</span>
+<span class="line" id="L148">	<span class="tok-kw">var</span> Tkey : term.Keyboard = <span class="tok-null">undefined</span> ; </span>
+<span class="line" id="L149"></span>
+<span class="line" id="L150">	<span class="tok-kw">var</span> err: <span class="tok-type">bool</span> = <span class="tok-null">true</span> ;</span>
+<span class="line" id="L151">	<span class="tok-kw">var</span> nameJson : [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
+<span class="line" id="L152"></span>
 <span class="line" id="L153"></span>
-<span class="line" id="L154">	<span class="tok-kw">var</span> err: <span class="tok-type">bool</span> = <span class="tok-null">true</span> ;</span>
-<span class="line" id="L155">	<span class="tok-kw">var</span> nameJson : [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-null">undefined</span>;</span>
-<span class="line" id="L156"></span>
-<span class="line" id="L157"></span>
-<span class="line" id="L158">	<span class="tok-comment">// Grid ---------------------------------------------------------------</span>
+<span class="line" id="L154">	<span class="tok-comment">// Grid ---------------------------------------------------------------</span>
 </span>
-<span class="line" id="L159">	<span class="tok-kw">var</span> Grid01 : *grd.GRID =	grd.newGridC(</span>
-<span class="line" id="L160">					<span class="tok-str">&quot;Grid01&quot;</span>,			<span class="tok-comment">// Name</span>
+<span class="line" id="L155">	<span class="tok-kw">var</span> Grid01 : *grd.GRID =	grd.newGridC(</span>
+<span class="line" id="L156">					<span class="tok-str">&quot;Grid01&quot;</span>,			<span class="tok-comment">// Name</span>
 </span>
-<span class="line" id="L161">					<span class="tok-number">4</span>, <span class="tok-number">2</span>,				<span class="tok-comment">// posx, posy</span>
+<span class="line" id="L157">					<span class="tok-number">4</span>, <span class="tok-number">2</span>,				<span class="tok-comment">// posx, posy</span>
 </span>
-<span class="line" id="L162">					<span class="tok-number">20</span>,					<span class="tok-comment">// numbers lines</span>
+<span class="line" id="L158">					<span class="tok-number">20</span>,					<span class="tok-comment">// numbers lines</span>
 </span>
-<span class="line" id="L163">					grd.gridStyle,		<span class="tok-comment">// separator | or	space</span>
+<span class="line" id="L159">					grd.gridStyle,		<span class="tok-comment">// separator | or	space</span>
 </span>
-<span class="line" id="L164">					dds.CADRE.line1,	<span class="tok-comment">// type line 1</span>
+<span class="line" id="L160">					dds.CADRE.line1,	<span class="tok-comment">// type line 1</span>
 </span>
-<span class="line" id="L165">					);</span>
-<span class="line" id="L166"></span>
-<span class="line" id="L167"></span>
-<span class="line" id="L168">	<span class="tok-kw">if</span> (!wrk) <span class="tok-kw">try</span> btn.setActif(pFmt01,<span class="tok-kw">try</span> btn.getIndex(pFmt01,kbd.F9),<span class="tok-null">false</span>);</span>
-<span class="line" id="L169"></span>
-<span class="line" id="L170">	<span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
-<span class="line" id="L171">			<span class="tok-comment">//Tkey = kbd.getKEY();</span>
+<span class="line" id="L161">					);</span>
+<span class="line" id="L162"></span>
+<span class="line" id="L163"></span>
+<span class="line" id="L164">	<span class="tok-kw">if</span> (!wrk) <span class="tok-kw">try</span> btn.setActif(pFmt01,<span class="tok-kw">try</span> btn.getIndex(pFmt01,kbd.F9),<span class="tok-null">false</span>);</span>
+<span class="line" id="L165"></span>
+<span class="line" id="L166">	<span class="tok-kw">while</span> (<span class="tok-null">true</span>) {</span>
+<span class="line" id="L167">			<span class="tok-comment">//Tkey = kbd.getKEY();</span>
 </span>
+<span class="line" id="L168"></span>
+<span class="line" id="L169">			Tkey.Key = pnl.ioPanel(pFmt01);</span>
+<span class="line" id="L170">	</span>
+<span class="line" id="L171">		<span class="tok-kw">switch</span> (Tkey.Key) {</span>
 <span class="line" id="L172"></span>
-<span class="line" id="L173">			Tkey.Key = pnl.ioPanel(pFmt01);</span>
-<span class="line" id="L174">	</span>
-<span class="line" id="L175">		<span class="tok-kw">switch</span> (Tkey.Key) {</span>
+<span class="line" id="L173">			<span class="tok-comment">// creat Panel</span>
+</span>
+<span class="line" id="L174">			.F9 =&gt; {</span>
+<span class="line" id="L175">				<span class="tok-kw">for</span> (pFmt01.field.items , <span class="tok-number">0</span>..) |f , idx| {</span>
 <span class="line" id="L176"></span>
-<span class="line" id="L177">			<span class="tok-comment">// creat Panel</span>
+<span class="line" id="L177">					pFmt01.idxfld = idx ;</span>
+<span class="line" id="L178">					pFmt01.keyField = kbd.none;</span>
+<span class="line" id="L179">					err =<span class="tok-null">false</span>;</span>
+<span class="line" id="L180">					</span>
+<span class="line" id="L181">					<span class="tok-kw">if</span> (f.text.len == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L182">						pnl.msgErr(pFmt01, <span class="tok-str">&quot;Name Json incorrect &quot;</span>);</span>
+<span class="line" id="L183">						err =<span class="tok-null">true</span>;</span>
+<span class="line" id="L184">						<span class="tok-kw">continue</span>;</span>
+<span class="line" id="L185">					}</span>
+<span class="line" id="L186">					<span class="tok-kw">else</span> {</span>
+<span class="line" id="L187">						nameJson = <span class="tok-kw">try</span> fld.getText(pFmt01,<span class="tok-kw">try</span> fld.getIndex(pFmt01,<span class="tok-str">&quot;nameJson&quot;</span>));</span>
+<span class="line" id="L188"></span>
+<span class="line" id="L189">						err = isFile(nameJson);</span>
+<span class="line" id="L190">						</span>
+<span class="line" id="L191">						<span class="tok-kw">if</span> (err) pnl.msgErr(pFmt01, <span class="tok-str">&quot;Name Json incorrect allready exist &quot;</span>)</span>
+<span class="line" id="L192">						<span class="tok-kw">else</span> {</span>
+<span class="line" id="L193">							pnl.msgErr(pFmt01, <span class="tok-kw">try</span> std.fmt.allocPrint(allocator, <span class="tok-str">&quot;Save {s} Json&quot;</span>, .{nameJson})) ;</span>
+<span class="line" id="L194">							<span class="tok-kw">try</span> mdlSjson.SavJson(XPANEL,nameJson);</span>
+<span class="line" id="L195">							 </span>
+<span class="line" id="L196">							<span class="tok-kw">return</span>;</span>
+<span class="line" id="L197">						}</span>
+<span class="line" id="L198">					}</span>
+<span class="line" id="L199">				}</span>
+<span class="line" id="L200">			},</span>
+<span class="line" id="L201"></span>
+<span class="line" id="L202">			</span>
+<span class="line" id="L203">			<span class="tok-comment">// creat Panel</span>
 </span>
-<span class="line" id="L178">			.F9 =&gt; {</span>
-<span class="line" id="L179">				<span class="tok-kw">for</span> (pFmt01.field.items , <span class="tok-number">0</span>..) |f , idx| {</span>
-<span class="line" id="L180"></span>
-<span class="line" id="L181">					pFmt01.idxfld = idx ;</span>
-<span class="line" id="L182">					pFmt01.keyField = kbd.none;</span>
-<span class="line" id="L183">					err =<span class="tok-null">false</span>;</span>
-<span class="line" id="L184">					</span>
-<span class="line" id="L185">					<span class="tok-kw">if</span> (f.text.len == <span class="tok-number">0</span>) {</span>
-<span class="line" id="L186">						pnl.msgErr(pFmt01, <span class="tok-str">&quot;Name Json incorrect &quot;</span>);</span>
-<span class="line" id="L187">						err =<span class="tok-null">true</span>;</span>
-<span class="line" id="L188">						<span class="tok-kw">continue</span>;</span>
-<span class="line" id="L189">					}</span>
-<span class="line" id="L190">					<span class="tok-kw">else</span> {</span>
-<span class="line" id="L191">						nameJson = <span class="tok-kw">try</span> fld.getText(pFmt01,<span class="tok-kw">try</span> fld.getIndex(pFmt01,<span class="tok-str">&quot;nameJson&quot;</span>));</span>
-<span class="line" id="L192"></span>
-<span class="line" id="L193">						err = isFile(nameJson);</span>
-<span class="line" id="L194">						</span>
-<span class="line" id="L195">						<span class="tok-kw">if</span> (err) pnl.msgErr(pFmt01, <span class="tok-str">&quot;Name Json incorrect allready exist &quot;</span>)</span>
-<span class="line" id="L196">						<span class="tok-kw">else</span> {</span>
-<span class="line" id="L197">							pnl.msgErr(pFmt01, <span class="tok-kw">try</span> std.fmt.allocPrint(allocator, <span class="tok-str">&quot;Save {s} Json&quot;</span>, .{nameJson})) ;</span>
-<span class="line" id="L198">							<span class="tok-kw">try</span> mdlSjson.SavJson(XPANEL,nameJson);</span>
-<span class="line" id="L199">							 </span>
-<span class="line" id="L200">							<span class="tok-kw">return</span>;</span>
-<span class="line" id="L201">						}</span>
-<span class="line" id="L202">					}</span>
-<span class="line" id="L203">				}</span>
-<span class="line" id="L204">			},</span>
-<span class="line" id="L205"></span>
-<span class="line" id="L206">			</span>
-<span class="line" id="L207">			<span class="tok-comment">// creat Panel</span>
-</span>
-<span class="line" id="L208">			.F11 =&gt; {</span>
-<span class="line" id="L209">				<span class="tok-kw">const</span> iter_dir = <span class="tok-kw">try</span> std.fs.cwd().openIterableDir(vdir,.{}) ;</span>
+<span class="line" id="L204">			.F11 =&gt; {</span>
+<span class="line" id="L205">				<span class="tok-kw">const</span> iter_dir = <span class="tok-kw">try</span> std.fs.cwd().openIterableDir(vdir,.{}) ;</span>
+<span class="line" id="L206"></span>
+<span class="line" id="L207">				<span class="tok-kw">var</span> iterator = iter_dir.iterate();</span>
+<span class="line" id="L208">				<span class="tok-kw">var</span> ok_file= <span class="tok-null">false</span>;</span>
+<span class="line" id="L209">				<span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
 <span class="line" id="L210"></span>
-<span class="line" id="L211">				<span class="tok-kw">var</span> iterator = iter_dir.iterate();</span>
-<span class="line" id="L212">				<span class="tok-kw">var</span> ok_file= <span class="tok-null">false</span>;</span>
-<span class="line" id="L213">				<span class="tok-kw">var</span> Gkey :grd.GridSelect = <span class="tok-null">undefined</span> ;</span>
-<span class="line" id="L214"></span>
-<span class="line" id="L215">				grd.resetRows(Grid01);</span>
-<span class="line" id="L216"></span>
-<span class="line" id="L217">				<span class="tok-kw">if</span> (grd.countColumns(Grid01) == <span class="tok-number">0</span>) {</span>
-<span class="line" id="L218">					grd.newCell(Grid01,<span class="tok-str">&quot;Name&quot;</span>,<span class="tok-number">25</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);</span>
-<span class="line" id="L219">					grd.setHeaders(Grid01);</span>
-<span class="line" id="L220">					grd.printGridHeader(Grid01);</span>
-<span class="line" id="L221">				}</span>
-<span class="line" id="L222">				</span>
-<span class="line" id="L223">				<span class="tok-kw">while</span> (<span class="tok-kw">try</span> iterator.next()) |path| {</span>
-<span class="line" id="L224">					ok_file = <span class="tok-null">true</span>;</span>
-<span class="line" id="L225">					grd.addRows(Grid01, &amp;.{path.name});</span>
-<span class="line" id="L226">				}	</span>
+<span class="line" id="L211">				grd.resetRows(Grid01);</span>
+<span class="line" id="L212"></span>
+<span class="line" id="L213">				<span class="tok-kw">if</span> (grd.countColumns(Grid01) == <span class="tok-number">0</span>) {</span>
+<span class="line" id="L214">					grd.newCell(Grid01,<span class="tok-str">&quot;Name&quot;</span>,<span class="tok-number">25</span>,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);</span>
+<span class="line" id="L215">					grd.setHeaders(Grid01);</span>
+<span class="line" id="L216">					grd.printGridHeader(Grid01);</span>
+<span class="line" id="L217">				}</span>
+<span class="line" id="L218">				</span>
+<span class="line" id="L219">				<span class="tok-kw">while</span> (<span class="tok-kw">try</span> iterator.next()) |path| {</span>
+<span class="line" id="L220">					ok_file = <span class="tok-null">true</span>;</span>
+<span class="line" id="L221">					grd.addRows(Grid01, &amp;.{path.name});</span>
+<span class="line" id="L222">				}	</span>
+<span class="line" id="L223"></span>
+<span class="line" id="L224">				<span class="tok-kw">if</span> (!ok_file) { pnl.msgErr(pFmt01, <span class="tok-str">&quot;no file available&quot;</span>); <span class="tok-kw">continue</span>; }</span>
+<span class="line" id="L225">				<span class="tok-kw">while</span> (<span class="tok-null">true</span> ){</span>
+<span class="line" id="L226">					Gkey =grd.ioGrid(Grid01,<span class="tok-null">false</span>);</span>
 <span class="line" id="L227"></span>
-<span class="line" id="L228">				<span class="tok-kw">if</span> (!ok_file) { pnl.msgErr(pFmt01, <span class="tok-str">&quot;no file available&quot;</span>); <span class="tok-kw">continue</span>; }</span>
-<span class="line" id="L229">				<span class="tok-kw">while</span> (<span class="tok-null">true</span> ){</span>
-<span class="line" id="L230">					Gkey =grd.ioGrid(Grid01,<span class="tok-null">false</span>);</span>
-<span class="line" id="L231"></span>
-<span class="line" id="L232">					pnl.displayPanel(pFmt01);</span>
-<span class="line" id="L233">					<span class="tok-kw">if</span> ( Gkey.Key == kbd.esc) {pnl.displayPanel(pFmt01); <span class="tok-kw">break</span>;}</span>
+<span class="line" id="L228">					pnl.displayPanel(pFmt01);</span>
+<span class="line" id="L229">					<span class="tok-kw">if</span> ( Gkey.Key == kbd.esc) {pnl.displayPanel(pFmt01); <span class="tok-kw">break</span>;}</span>
+<span class="line" id="L230"></span>
+<span class="line" id="L231">					<span class="tok-kw">if</span> ( Gkey.Key == kbd.enter) {</span>
+<span class="line" id="L232">						nameJson =Gkey.Buf.items[<span class="tok-number">0</span>];</span>
+<span class="line" id="L233">						pnl.msgErr(pFmt01, <span class="tok-kw">try</span> std.fmt.allocPrint(allocator, <span class="tok-str">&quot;Working {s} Json&quot;</span>, .{nameJson})) ;</span>
 <span class="line" id="L234"></span>
-<span class="line" id="L235">					<span class="tok-kw">if</span> ( Gkey.Key == kbd.enter) {</span>
-<span class="line" id="L236">						nameJson =Gkey.Buf.items[<span class="tok-number">0</span>];</span>
-<span class="line" id="L237">						pnl.msgErr(pFmt01, <span class="tok-kw">try</span> std.fmt.allocPrint(allocator, <span class="tok-str">&quot;Working {s} Json&quot;</span>, .{nameJson})) ;</span>
-<span class="line" id="L238"></span>
-<span class="line" id="L239">						<span class="tok-kw">if</span> (wrk){</span>
-<span class="line" id="L240">							newFile(nameJson);</span>
-<span class="line" id="L241">							<span class="tok-kw">try</span> mdlSjson.SavJson(XPANEL, nameJson);</span>
-<span class="line" id="L242">						} </span>
-<span class="line" id="L243">						<span class="tok-kw">else</span> <span class="tok-kw">try</span> mdlRjson.RstJson(XPANEL, nameJson) ;</span>
-<span class="line" id="L244">					</span>
-<span class="line" id="L245">						<span class="tok-kw">break</span>;</span>
-<span class="line" id="L246">					}</span>
-<span class="line" id="L247">				}</span>
-<span class="line" id="L248"></span>
-<span class="line" id="L249">				<span class="tok-kw">if</span> ( Gkey.Key == kbd.enter) <span class="tok-kw">return</span>;</span>
-<span class="line" id="L250">			},</span>
-<span class="line" id="L251">			</span>
-<span class="line" id="L252">			<span class="tok-comment">// exit module panel </span>
+<span class="line" id="L235">						<span class="tok-kw">if</span> (wrk){</span>
+<span class="line" id="L236">							newFile(nameJson);</span>
+<span class="line" id="L237">							<span class="tok-kw">try</span> mdlSjson.SavJson(XPANEL, nameJson);</span>
+<span class="line" id="L238">						} </span>
+<span class="line" id="L239">						<span class="tok-kw">else</span> <span class="tok-kw">try</span> mdlRjson.RstJson(XPANEL, nameJson) ;</span>
+<span class="line" id="L240">					</span>
+<span class="line" id="L241">						<span class="tok-kw">break</span>;</span>
+<span class="line" id="L242">					}</span>
+<span class="line" id="L243">				}</span>
+<span class="line" id="L244"></span>
+<span class="line" id="L245">				<span class="tok-kw">if</span> ( Gkey.Key == kbd.enter) <span class="tok-kw">return</span>;</span>
+<span class="line" id="L246">			},</span>
+<span class="line" id="L247">			</span>
+<span class="line" id="L248">			<span class="tok-comment">// exit module panel </span>
 </span>
-<span class="line" id="L253">			.F3 =&gt; {</span>
-<span class="line" id="L254">				pnl.freePanel(pFmt01);</span>
-<span class="line" id="L255">				dds.deinitUtils();</span>
-<span class="line" id="L256">				<span class="tok-kw">defer</span> dds.allocatorPnl.destroy(pFmt01); </span>
-<span class="line" id="L257"></span>
-<span class="line" id="L258">				grd.freeGrid(Grid01);</span>
-<span class="line" id="L259">				dds.allocatorPnl.destroy(Grid01);</span>
-<span class="line" id="L260">				<span class="tok-kw">return</span> ; </span>
-<span class="line" id="L261">			},</span>
-<span class="line" id="L262"></span>
-<span class="line" id="L263">			<span class="tok-kw">else</span> =&gt; {}</span>
-<span class="line" id="L264">		}</span>
-<span class="line" id="L265">	}</span>
-<span class="line" id="L266">}</span>
-<span class="line" id="L267"></span>
+<span class="line" id="L249">			.F3 =&gt; {</span>
+<span class="line" id="L250">				pnl.freePanel(pFmt01);</span>
+<span class="line" id="L251">				dds.deinitUtils();</span>
+<span class="line" id="L252">				<span class="tok-kw">defer</span> dds.allocatorPnl.destroy(pFmt01); </span>
+<span class="line" id="L253"></span>
+<span class="line" id="L254">				grd.freeGrid(Grid01);</span>
+<span class="line" id="L255">				dds.allocatorPnl.destroy(Grid01);</span>
+<span class="line" id="L256">				<span class="tok-kw">return</span> ; </span>
+<span class="line" id="L257">			},</span>
+<span class="line" id="L258"></span>
+<span class="line" id="L259">			<span class="tok-kw">else</span> =&gt; {}</span>
+<span class="line" id="L260">		}</span>
+<span class="line" id="L261">	}</span>
+<span class="line" id="L262">}</span>
+<span class="line" id="L263"></span>
 </code></pre></body>
 </html>

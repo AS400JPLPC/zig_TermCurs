@@ -25,9 +25,6 @@ const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
 
-// menu
-const mnu = @import("forms").mnu;
-
 // flied
 const fld = @import("forms").fld;
 
@@ -40,7 +37,8 @@ const lnv = @import("forms").lnv;
 // grid
 const grd = @import("grid").grd;
 
-
+// menu
+const mnu = @import("menu").mnu;
 
 // tools utility
 const utl = @import("utils");
@@ -66,7 +64,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	// nbr Lines, nbr columns
 	// Attribut Panel
 	// Type frame, Attribut frame
-	// Title Panel, Attribut Title
+	// Title Panel, Attribut: Title
 	var Panel	: *pnl.PANEL = pnl.newPanelC("Fmt01",
 					1, 1,
 					32,
@@ -355,23 +353,6 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	) catch unreachable ;
 
 
-	//-------------------------------------------------
-	//the menu is not double buffered it is not a Panel
-
-	Panel.menu.append(mnu.newMenu(
-						"Menu01",				 // name
-						2, 2,					 // posx, posy	
-						dds.CADRE.line1,		// type line fram
-						dds.MNUVH.vertical,		// type menu vertical / horizontal
-						&.{"Open..",			// item
-						"List..",
-						"View..",
-						"Delete",
-						"New..",
-						"Src...",
-						"Exit.."}
-						)) catch unreachable ;
-
 	// button--------------------------------------------------
 	Panel.button.append(btn.newButton(
 						kbd.F3,					// function
@@ -406,6 +387,25 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 		) catch unreachable ;
 
 	return Panel;
+}
+
+//-------------------------------------------------
+//the menu is not double buffered it is not a Panel
+pub fn Menu01() mnu.MENU {
+	var  m01 = mnu.newMenu(
+					"Menu01",				 // name
+					2, 2,					 // posx, posy	
+					dds.CADRE.line1,		// type line fram
+					dds.MNUVH.vertical,		// type menu vertical / horizontal
+					&.{"Open..",			// item
+					"List..",
+					"View..",
+					"Delete",
+					"New..",
+					"Src...",
+					"Exit.."}
+					);
+	return m01;
 }
 
 
@@ -536,7 +536,7 @@ pub fn main() !void {
 	// define Panel
 	var pFmt01 = Panel_Fmt01();
 
-
+	var mMenu01:mnu.MENU = Menu01();
 
 
 	// defines the receiving structure of the keyboard
@@ -565,8 +565,8 @@ pub fn main() !void {
 				pnl.msgErr(pFmt01,"le test de la saisie est OK");
 			},
 			.F5 => {
-				var nitem = mnu.ioMenu(pFmt01,pFmt01.menu.items[0],0);
-				mnu.rstPanel(&pFmt01.menu.items[0], pFmt01);
+				var nitem = mnu.ioMenu(pFmt01,mMenu01,0);
+				mnu.rstPanel(mMenu01, pFmt01);
 				std.debug.print("n°item {}",.{nitem});
 			},
 			.F8 => {

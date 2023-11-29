@@ -309,10 +309,18 @@ I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add mod
 
 <u>                                                                         </u><BR />
 → 2023-11-22 update Forms mdlObjet mdlSjon mdlRjson<br />
-→ 2023-11-22 harmonization function line vertical & horizontal<br />
+→ 2023-11-22 **harmonization function line vertical & horizontal**harmomisation procedur<br />
 → 2023-11-22 test Json save restor gencurs<br />
 <br />
-
+→ 2023-11-29 **restructuring**:<br />
+new source ./deps/menu.zig
+deletion in forms.zig of menu processing
+change mdlObject name -> mdlForms<br />  
+→ 2023-11-29 Still testing, mdlPanel update, mdlForms due to reorganization<br />
+→ 2023-11-29 Gencurs update preparation Grid/Menu generation <br />
+<br />
+![](assets/20231129_012345_Gen00.png)
+<br />
 ![](assets/20231122_012345_Gen01.png)
 
 ---

@@ -22,18 +22,14 @@ const pnl = @import("forms").pnl;
 const btn = @import("forms").btn;
 // label
 const lbl = @import("forms").lbl;
-// menu
-const mnu = @import("forms").mnu;
 // flied
 const fld = @import("forms").fld;
-// line horizontal
-const lnh = @import("forms").lnh;
-// line vertival
-const lnv = @import("forms").lnv;
 
 
 // grid
 const grd = @import("grid").grd;
+// menu
+const mnu = @import("menu").mnu;
 
 // tools utility
 const utl = @import("utils");
