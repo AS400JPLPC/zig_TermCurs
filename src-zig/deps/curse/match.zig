@@ -16,10 +16,8 @@ pub fn isMatch(strVal : [] const	u8, regVal : [] const	u8 ) bool {
 	
 	const regex: *re.regex_t = @ptrCast(slice );
 
-	
 
 	defer re.pcre2_regfree(regex); // IMPORTANT!!
-
 
 	const creg: []u8 = allocator.alloc(u8, regVal.len ,	) catch |err| { @panic(@errorName(err));};
 	defer allocator.free(creg);
@@ -38,7 +36,5 @@ pub fn isMatch(strVal : [] const	u8, regVal : [] const	u8 ) bool {
 	
 
 	var vBool = re.isMatch(regex, @ptrCast(cval));
-
-
 	return vBool;
 }

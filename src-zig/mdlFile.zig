@@ -145,6 +145,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 	else twork = "Recovery-File-Json";
 	
 	var pFmt01 = Panel_Fmt01(twork);
+
 	var Tkey : term.Keyboard = undefined ; 
 
 	var err: bool = true ;
@@ -160,17 +161,21 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 					dds.CADRE.line1,	// type line 1
 					);
 
+	defer dds.allocatorPnl.destroy(pFmt01);
+	defer pnl.freePanel(pFmt01);
+	defer dds.deinitUtils();
+	// defer grd.freeGrid(Grid01);
+	defer grd.allocatorGrid.destroy(Grid01);
 
+	
 	if (!wrk) try btn.setActif(pFmt01,try btn.getIndex(pFmt01,kbd.F9),false);
 
 	while (true) {
 			//Tkey = kbd.getKEY();
 
-			Tkey.Key = pnl.ioPanel(pFmt01);
+		Tkey.Key = pnl.ioPanel(pFmt01);
 	
 		switch (Tkey.Key) {
-
-			// creat Panel
 			.F9 => {
 				for (pFmt01.field.items , 0..) |f , idx| {
 
@@ -185,22 +190,19 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 					}
 					else {
 						nameJson = try fld.getText(pFmt01,try fld.getIndex(pFmt01,"nameJson"));
-
 						err = isFile(nameJson);
 						
 						if (err) pnl.msgErr(pFmt01, "Name Json incorrect allready exist ")
 						else {
 							pnl.msgErr(pFmt01, try std.fmt.allocPrint(allocator, "Save {s} Json", .{nameJson})) ;
 							try mdlSjson.SavJson(XPANEL,nameJson);
-							 
+							grd.freeGrid(Grid01);
 							return;
 						}
 					}
 				}
 			},
-
 			
-			// creat Panel
 			.F11 => {
 				const iter_dir = try std.fs.cwd().openIterableDir(vdir,.{}) ;
 
@@ -226,7 +228,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 					Gkey =grd.ioGrid(Grid01,false);
 
 					pnl.displayPanel(pFmt01);
-					if ( Gkey.Key == kbd.esc) {pnl.displayPanel(pFmt01); break;}
+					if ( Gkey.Key == kbd.esc) {pnl.displayPanel(pFmt01); break; }
 
 					if ( Gkey.Key == kbd.enter) {
 						nameJson =Gkey.Buf.items[0];
@@ -242,17 +244,15 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 					}
 				}
 
-				if ( Gkey.Key == kbd.enter) return;
+				if ( Gkey.Key == kbd.enter) {
+					grd.freeGrid(Grid01);
+					return ; 
+				}
 			},
 			
 			// exit module panel 
 			.F3 => {
-				pnl.freePanel(pFmt01);
-				dds.deinitUtils();
-				defer dds.allocatorPnl.destroy(pFmt01); 
-
 				grd.freeGrid(Grid01);
-				dds.allocatorPnl.destroy(Grid01);
 				return ; 
 			},
 

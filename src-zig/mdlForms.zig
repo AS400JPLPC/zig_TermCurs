@@ -77,7 +77,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
 
 	grd.newCell(Xcombo, "ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
 	grd.newCell(Xcombo, "Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -324,7 +324,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
-				pnl.rstPanel(pFmtH01,pFmt01);
+				pnl.rstPanel(pnl.PANEL,pFmtH01,pFmt01);
 				term.gotoXY(1,1);
 				continue;
 			},
@@ -362,12 +362,16 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				}
 				pnl.freePanel(pFmt01);
 				defer dds.allocatorPnl.destroy(pFmt01);
+				pnl.freePanel(pFmtH01);
+				defer dds.allocatorPnl.destroy(pFmtH01);
 				dds.deinitUtils();
 				return;
 			},
 			.F12 => {
 				pnl.freePanel(pFmt01);
 				defer dds.allocatorPnl.destroy(pFmt01);
+				pnl.freePanel(pFmtH01);
+				defer dds.allocatorPnl.destroy(pFmtH01);
 				dds.deinitUtils();
 				return;
 			},
@@ -451,9 +455,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			// Order / Remove
 			.altW => {
 				var nitem: usize = 0;
-				nitem = mnu.ioMenu(pFmt01, mChoix, nitem);
+				nitem = mnu.ioMenu(mChoix, nitem);
 				term.offMouse();
-				mnu.rstPanel(mChoix,pFmt01);
+				pnl.rstPanel(mnu.MENU,&mChoix,pFmt01);
 				term.onMouse();
 
 				if (nitem == 0) orderLabel(pFmt01);	// Order  Label
@@ -518,7 +522,7 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 			.F1	 => {
 				fld.setText(pFmtH01,0,"F12 Abort  ctrl-V") catch unreachable;
 				_= pnl.ioPanel(pFmtH01);
-				pnl.rstPanel(pFmtH01,vpnl);
+				pnl.rstPanel(pnl.PANEL,pFmtH01,vpnl);
 				term.gotoXY(1,1);
 				continue;
 			},
@@ -603,7 +607,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	var Order: *grd.GRID = grd.newGridC(
 		"Order",
@@ -613,7 +617,9 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Order);
+
+	defer grd.allocatorGrid.destroy(Order);
+
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -704,7 +710,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -1023,7 +1029,7 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
 	grd.newCell(Xcombo, "Ref.Type", 19, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo);
 	grd.addRows(Xcombo, &.{"TEXT_FREE"}); // Free
@@ -1072,7 +1078,7 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		Gkey = grd.ioCombo(Xcombo, pos);
 
 		if (Gkey.Key == kbd.enter) {
-			grd.rstPanel(Xcombo, vpnl);
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 			grd.freeGrid(Xcombo);
 			fld.setText(vpnl, @intFromEnum(fp02.ftype), Gkey.Buf.items[0]) 
 				catch |err| { @panic(@errorName(err)); }; 
@@ -1080,7 +1086,7 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		}
 
 		if (Gkey.Key == kbd.esc) {
-			grd.rstPanel(Xcombo, vpnl);
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 			grd.freeGrid(Xcombo);
 			return;
 		}
@@ -1893,7 +1899,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	var Order: *grd.GRID = grd.newGridC(
 		"Order",
@@ -1903,7 +1909,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Order);
+	defer grd.allocatorGrid.destroy(Order);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -2004,7 +2010,7 @@ fn removeField(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -2100,7 +2106,7 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 				fld.setText(pFmtH01,0,"F12 Abort ctrl-V  ctr-l Line ") catch unreachable;
 				fld.setText(pFmtH01,1,"" ) catch unreachable;
 				_= pnl.ioPanel(pFmtH01);
-				pnl.rstPanel(pFmtH01,vpnl);
+				pnl.rstPanel(pnl.PANEL,pFmtH01,vpnl);
 				term.gotoXY(1,1);
 				continue;
 			},
@@ -2108,8 +2114,8 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 			.F12 => return,
 			.ctrlL => {
 				litem = 0;
-				litem = mnu.ioMenu(vpnl,mDefline, litem);
-				mnu.rstPanel(mDefline,vpnl);
+				litem = mnu.ioMenu(mDefline, litem);
+				pnl.rstPanel(mnu.MENU,&mDefline,vpnl);
 	 
 			},
 			.ctrlV => {
@@ -2160,7 +2166,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	var Order: *grd.GRID = grd.newGridC(
 		"Order",
@@ -2170,7 +2176,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Order);
+	defer grd.allocatorGrid.destroy(Order);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -2258,7 +2264,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -2344,7 +2350,7 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 				fld.setText(pFmtH01,0,"F12 Abort ctrl-V  ctr-l Line ") catch unreachable;
 				fld.setText(pFmtH01,1,"" ) catch unreachable;
 				_= pnl.ioPanel(pFmtH01);
-				pnl.rstPanel(pFmtH01,vpnl);
+				pnl.rstPanel(pnl.PANEL,pFmtH01,vpnl);
 				term.gotoXY(1,1);
 				continue;
 			},
@@ -2352,8 +2358,8 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 			.F12 => return,
 			.ctrlL => {
 				litem = 0;
-				litem = mnu.ioMenu(vpnl,mDefline, litem);
-				mnu.rstPanel(mDefline,vpnl);
+				litem = mnu.ioMenu(mDefline, litem);
+				pnl.rstPanel(mnu.MENU,&mDefline,vpnl);
 	 
 			},
 			.ctrlV => {
@@ -2405,7 +2411,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	var Order: *grd.GRID = grd.newGridC(
 		"Order",
@@ -2415,7 +2421,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Order);
+	defer grd.allocatorGrid.destroy(Order);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -2503,7 +2509,7 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 		grd.gridStyle,
 		dds.CADRE.line1,
 	);
-	defer dds.allocatorPnl.destroy(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
 
 	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);

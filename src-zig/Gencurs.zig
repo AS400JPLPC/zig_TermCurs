@@ -42,11 +42,14 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("match");
 
-// Descrption PANEL
+// Description PANEL
 const mdlPanel = @import("mdlPanel");
 
-// Descrption Objet
+// Description FORMULAIRE
 const mdlForms = @import("mdlForms");
+
+// Description GRID
+const mdlGrids = @import("mdlGrids");
 
 // sauvegarde JSON
 const mdlFile = @import("mdlFile");
@@ -55,7 +58,7 @@ const mdlFile = @import("mdlFile");
 const allocator = std.heap.page_allocator;
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-
+var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
 
 //================================
 // defined var global
@@ -109,7 +112,7 @@ pub fn main() !void {
 					dds.CADRE.line1,		// type line fram
 					dds.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
-					"Panel..",				// item
+					"Panel..",
 					"Forms..",
 					"Grid...",
 					"Menu...",
@@ -123,16 +126,19 @@ pub fn main() !void {
 	while (true) {
 
 	pnl.printPanel(base);
-	nopt = mnu.ioMenu(base,MenuPrincipal,0);
+	nopt = mnu.ioMenu(MenuPrincipal,0);
 
 	if (nopt == @intFromEnum(choix.exit )) { break; }
 
 	if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
 	if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
+	// if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
+	// if (nopt == @intFromEnum(choix.menu)){ dds.deinitStr();NPANEL.clearAndFree();NPANEL.deinit();
+	// 		NGRID.clearAndFree(); NGRID.deinit();}
 	if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 	if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
 
-	if (NPANEL.items.len == 0 ) dds.deinitStr();
+	if (NPANEL.items.len == 0 )  dds.deinitStr(); 
 
 
 	

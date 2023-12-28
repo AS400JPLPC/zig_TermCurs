@@ -31,10 +31,6 @@ const allocator = std.heap.page_allocator;
 // tools utility
 const utl = @import("utils");
 
-const opn_Log = @import("logger").openFile;		// open  file
-const end_Log = @import("logger").closeFile;	// close file
-const plog = @import("logger").scoped;			// print file
-
 
 //..............................//
 // define Ctype JSON

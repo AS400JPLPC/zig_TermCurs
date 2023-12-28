@@ -34,9 +34,8 @@ pub fn ToStr(text : [] const u8 ) []const u8 {
 pub const iteratStr = struct {
 	var strbuf:[] const u8 = undefined;
 
-	var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	//defer arena.deinit();
-	const allocator = arenastr.allocator();
+	const allocstr = std.heap.page_allocator;
+
 
 	/// Errors that may occur when using String
 	pub const ErrNbrch = error{
@@ -51,7 +50,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocator.alloc(u8, size) catch {
+			var buf = allocstr.alloc(u8, size) catch {
 				return ErrNbrch.InvalideAllocBuffer;
 			};
 			return buf;
@@ -59,7 +58,7 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocator.free(self.buf);
+			if (self.buf.len > 0)	allocstr.free(self.buf);
 		}
 
 		pub fn next(it: *StringIterator) ?[]const u8 {

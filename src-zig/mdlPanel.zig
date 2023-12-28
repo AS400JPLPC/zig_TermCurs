@@ -1222,7 +1222,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 				dds.CADRE.line1,
 		);
 
-		defer dds.allocatorPnl.destroy(Xcombo);
+		defer grd.allocatorGrid.destroy(Xcombo);
 
 		grd.newCell(Xcombo,"ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
 		grd.newCell(Xcombo,"Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
@@ -1280,12 +1280,12 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	if (std.mem.eql(u8, vfld.text, "1")) pos = 1;
 	if (std.mem.eql(u8, vfld.text, "2")) pos = 2;
 	while (true) {
-		nitem	= mnu.ioMenu(vpnl,mCadre,pos);
+		nitem	= mnu.ioMenu(mCadre,pos);
 		if (nitem != 9999) break;
 	}
 
 	vfld.text = std.fmt.allocPrint(dds.allocatorUtils,"{d}",.{nitem}) catch unreachable; 
-	mnu.rstPanel(mCadre,vpnl);
+	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
 
 //=================================================
@@ -1427,7 +1427,7 @@ fn TaskF9(	VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD
 }
 
 
-fn TaskF10( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD, panelNum: usize) void {
+fn TaskF11( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIELD, panelNum: usize) void {
 	vpnl.keyField = kbd.none;
 
 	for (VPANEL.items ,0..) |f ,idx | {
@@ -1456,7 +1456,7 @@ pub const TaskEnum = enum {
 	TaskCadre,
 	TaskPanel,
 	TaskF9,
-	TaskF10,
+	TaskF11,
 	none,
 
 	pub fn run(self: TaskEnum, VPANEL: *std.ArrayList(pnl.PANEL),
@@ -1473,7 +1473,7 @@ pub const TaskEnum = enum {
 				.TaskPanel => TaskPanel(VPANEL,vpnl,vfld, panelNum),
 
 				.TaskF9	=> TaskF9(VPANEL,vpnl,vfld,panelNum),
-				.TaskF10 => TaskF10(VPANEL,vpnl,vfld, panelNum),
+				.TaskF11 => TaskF11(VPANEL,vpnl,vfld, panelNum),
 
 				else => dsperr.errorForms(vpnl,	ErrMain.main_run_EnumTask_invalide),
 				}
@@ -1611,7 +1611,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 						if (f.proctask.len > 0) {
 							pFmt01.idxfld = idx ;
 							pFmt01.keyField = kbd.none;
-							if (idx == @intFromEnum(fp01.name))	callTask = TaskEnum.searchFn("TaskF10")
+							if (idx == @intFromEnum(fp01.name))	callTask = TaskEnum.searchFn("TaskF11")
 							else callTask = TaskEnum.searchFn(f.proctask);
 							
 							callTask.run(&NPANEL, pFmt01, &pFmt01.field.items[pFmt01.idxfld],numPanel);
@@ -1621,12 +1621,12 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					if (pFmt01.keyField == kbd.task) continue;
 					pFmt01.idxfld =9999;
 					updPanel(pFmt01, &NPANEL.items[numPanel] , &XPANEL.items[numPanel] );
-					pnl.msgErr(pFmt01,"The update is correct F10 OK");
+					pnl.msgErr(pFmt01,"The update is correct F11 OK");
 					pnl.clearPanel(pFmt01);
 					dds.deinitUtils();
 					loadPanel(&NPANEL.items[numPanel], pFmt01);
 				} 
-				else	pnl.msgErr(pFmt01,"You are in creation mode Bad F10");
+				else	pnl.msgErr(pFmt01,"You are in creation mode Bad F11");
 			},
 
 			// exit module panel 

@@ -60,7 +60,6 @@ pub fn build(b: *std.build) void {
 			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
-			.{ .name = "forms",  .module = forms },
 		},
 	});
 	
@@ -71,7 +70,6 @@ pub fn build(b: *std.build) void {
 			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
-			.{ .name = "forms",  .module = forms },
 		},
 	});
 
@@ -90,6 +88,19 @@ pub fn build(b: *std.build) void {
 
 	const mdlForms = b.createModule(.{
 		.source_file = .{ .path = "./mdlForms.zig" },
+		.dependencies= &.{
+			.{ .name = "dds",	.module = dds },
+			.{ .name = "cursed", .module = cursed },
+			.{ .name = "utils",  .module = utils },
+			.{ .name = "forms",  .module = forms },
+			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
+			.{ .name = "match",  .module = match },
+		},
+	});
+
+	const mdlGrids = b.createModule(.{
+		.source_file = .{ .path = "./mdlGrids.zig" },
 		.dependencies= &.{
 			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
@@ -170,6 +181,7 @@ pub fn build(b: *std.build) void {
 	Prog.addModule("match" , match);
 	Prog.addModule("mdlPanel" , mdlPanel);
 	Prog.addModule("mdlForms" , mdlForms);
+	Prog.addModule("mdlGrids" , mdlGrids);
 	Prog.addModule("mdlFile" , mdlFile);
 
 	Prog.addModule("logger" , logger);
@@ -203,6 +215,7 @@ pub fn build(b: *std.build) void {
 	docs.addModule("match" , match);
 	docs.addModule("mdlPanel" , mdlPanel);
 	docs.addModule("mdlForms" , mdlForms);
+	docs.addModule("mdlGrids" , mdlGrids);
 	docs.addModule("mdlFile" , mdlFile);
 
 	docs.addModule("logger" , logger);

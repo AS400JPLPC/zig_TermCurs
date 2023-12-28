@@ -20,9 +20,7 @@ var use_termios: os.linux.termios = undefined;
 pub const iteratStr = struct {
 	var strbuf:[] const u8 = undefined;
 
-	var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	//defer arena.deinit();
-	const allocator = arenastr.allocator();
+	const allocstr = std.heap.page_allocator;
 
 	/// Errors that may occur when using String
 	pub const ErrNbrch = error{
@@ -37,7 +35,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocator.alloc(u8, size) catch {
+			var buf = allocstr.alloc(u8, size) catch {
 							return ErrNbrch.InvalideAllocBuffer;
 					};
 			return buf;
@@ -45,7 +43,7 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocator.free(self.buf);
+			if (self.buf.len > 0)	allocstr.free(self.buf);
 		}
 
 		pub fn next(it: *StringIterator) ?[]const u8 {
@@ -605,6 +603,7 @@ pub const kbd = enum {
 	pub fn toEnum(name: []const u8) kbd {
 		var vlen: usize = 0;
 		var iter = iteratStr.iterator(name);
+		defer iter.deinit();
 		var result: usize = 0;
 		while (iter.next()) |_| {
 			vlen += 1;
@@ -686,7 +685,6 @@ pub const kbd = enum {
 		// variable --> Event.Char
 		var vUnicode: []u8 = undefined;
 		vUnicode = dds.allocatorPnl.alloc(u8, 4) catch unreachable;
-
 		// TODO: Check buffer size
 		var keybuf: [13]u8 = undefined;
 		flushIO();
@@ -819,12 +817,12 @@ pub const kbd = enum {
 
 		switch (csibuf[0]) {
 			// keys
-			'A' => { Event.Key = kbd.up;		 return Event; },
+			'A' => { Event.Key = kbd.up;	 return Event; },
 			'B' => { Event.Key = kbd.down;	 return Event; },
-			'C' => { Event.Key = kbd.right;	return Event; },
+			'C' => { Event.Key = kbd.right;	 return Event; },
 			'D' => { Event.Key = kbd.left;	 return Event; },
 			'H' => { Event.Key = kbd.home;	 return Event; },
-			'F' => { Event.Key = kbd.end;		return Event; },
+			'F' => { Event.Key = kbd.end;	 return Event; },
 			'3' => { Event.Key = kbd.delete; return Event; },
 			'Z' => { Event.Key = kbd.stab;	 return Event; },
 
@@ -838,11 +836,11 @@ pub const kbd = enum {
 
 				if (csibuf[2] == 126) {
 					switch (csibuf[1]) { // f5..f12
-						'5' => { Event.Key = kbd.F5;	return Event; },
-						'7' => { Event.Key = kbd.F6;	return Event; },
-						'8' => { Event.Key = kbd.F7;	return Event; },
-						'9' => { Event.Key = kbd.F8;	return Event; },
-						'0' => { Event.Key = kbd.F9;	return Event; },
+						'5' => { Event.Key = kbd.F5;  return Event; },
+						'7' => { Event.Key = kbd.F6;  return Event; },
+						'8' => { Event.Key = kbd.F7;  return Event; },
+						'9' => { Event.Key = kbd.F8;  return Event; },
+						'0' => { Event.Key = kbd.F9;  return Event; },
 						'1' => { Event.Key = kbd.F10; return Event; },
 						'3' => { Event.Key = kbd.F11; return Event; },
 						'4' => { Event.Key = kbd.F12; return Event; },
@@ -852,46 +850,46 @@ pub const kbd = enum {
 
 				if (csibuf[2] == 50) { // f11..f14 and // shift
 					switch (csibuf[3]) {
-						'P' => { Event.Key = kbd.F13;		 return Event; },
-						'Q' => { Event.Key = kbd.F14;		 return Event; },
-						'R' => { Event.Key = kbd.F15;		 return Event; },
-						'S' => { Event.Key = kbd.F16;		 return Event; },
-						'A' => { Event.Key = kbd.up;			return Event; },
-						'B' => { Event.Key = kbd.down;		return Event; },
+						'P' => { Event.Key = kbd.F13;	 return Event; },
+						'Q' => { Event.Key = kbd.F14;	 return Event; },
+						'R' => { Event.Key = kbd.F15;	 return Event; },
+						'S' => { Event.Key = kbd.F16;	 return Event; },
+						'A' => { Event.Key = kbd.up;	 return Event; },
+						'B' => { Event.Key = kbd.down;	 return Event; },
 						'C' => { Event.Key = kbd.right;	 return Event; },
-						'D' => { Event.Key = kbd.left;		return Event; },
-						'H' => { Event.Key = kbd.home;		return Event; },
-						'F' => { Event.Key = kbd.end;		 return Event; },
-						'3' => { Event.Key = kbd.delete;	 return Event; },
-						'5' => { Event.Key = kbd.pageUp;	 return Event; },
+						'D' => { Event.Key = kbd.left;	 return Event; },
+						'H' => { Event.Key = kbd.home;	 return Event; },
+						'F' => { Event.Key = kbd.end;	 return Event; },
+						'3' => { Event.Key = kbd.delete; return Event; },
+						'5' => { Event.Key = kbd.pageUp; return Event; },
 						'6' => { Event.Key = kbd.pageDown; return Event; },
-						else => { Event.Key = kbd.none;		return Event; },
+						else => { Event.Key = kbd.none;	 return Event; },
 					}
 				}
 
 				if (csibuf[2] == 53) { //	sihft ctrl
 					switch (csibuf[3]) {
-						'A' => { Event.Key = kbd.up;			 return Event; },
-						'B' => { Event.Key = kbd.down;		 return Event; },
-						'C' => { Event.Key = kbd.right;		return Event; },
-						'D' => { Event.Key = kbd.left;		 return Event; },
-						'H' => { Event.Key = kbd.home;		 return Event; },
-						'5' => { Event.Key = kbd.pageUp;	 return Event; },
+						'A' => { Event.Key = kbd.up;	 return Event; },
+						'B' => { Event.Key = kbd.down;	 return Event; },
+						'C' => { Event.Key = kbd.right;	 return Event; },
+						'D' => { Event.Key = kbd.left;	 return Event; },
+						'H' => { Event.Key = kbd.home;	 return Event; },
+						'5' => { Event.Key = kbd.pageUp; return Event; },
 						'6' => { Event.Key = kbd.pageDown; return Event; },
-						else => { Event.Key = kbd.none;		return Event; },
+						else => { Event.Key = kbd.none;	 return Event; },
 					}
 				}
 
 				if (csibuf[2] == 54) { //	sihft / controle
 					switch (csibuf[3]) {
-						'A' => {Event.Key = kbd.up;				return Event; },
-						'B' => {Event.Key = kbd.down;			return Event; },
-						'C' => {Event.Key = kbd.right;		 return Event; },
-						'D' => {Event.Key = kbd.left;			return Event; },
-						'H' => {Event.Key = kbd.home;			return Event; },
-						'5' => {Event.Key = kbd.pageUp;		return Event; },
-						'6' => {Event.Key = kbd.pageDown;	return Event; },
-						else => {Event.Key = kbd.none;		 return Event; },
+						'A' => {Event.Key = kbd.up;		 return Event; },
+						'B' => {Event.Key = kbd.down;	 return Event; },
+						'C' => {Event.Key = kbd.right;	 return Event; },
+						'D' => {Event.Key = kbd.left;	 return Event; },
+						'H' => {Event.Key = kbd.home;	 return Event; },
+						'5' => {Event.Key = kbd.pageUp;	 return Event; },
+						'6' => {Event.Key = kbd.pageDown; return Event; },
+						else => {Event.Key = kbd.none;	 return Event; },
 					}
 				}
 
@@ -901,7 +899,7 @@ pub const kbd = enum {
 						'Q' => { Event.Key = kbd.F14;	 return Event; },
 						'R' => { Event.Key = kbd.F15;	 return Event; },
 						'S' => { Event.Key = kbd.F16;	 return Event; },
-						else => { Event.Key = kbd.none; return Event; },
+						else => { Event.Key = kbd.none;  return Event; },
 					}
 				}
 
@@ -915,7 +913,7 @@ pub const kbd = enum {
 						'1' => { Event.Key = kbd.F22;	 return Event; },
 						'3' => { Event.Key = kbd.F23;	 return Event; },
 						'4' => { Event.Key = kbd.F24;	 return Event; },
-						else => { Event.Key = kbd.none; return Event; },
+						else => { Event.Key = kbd.none;  return Event; },
 					}
 				}
 			},
@@ -923,17 +921,17 @@ pub const kbd = enum {
 			'5'...'6' => {
 				if (csibuf[1] == 126) {
 					switch (csibuf[0]) {
-						'5' => { Event.Key = kbd.pageUp;	 return Event; },
+						'5' => { Event.Key = kbd.pageUp;   return Event; },
 						'6' => { Event.Key = kbd.pageDown; return Event; },
-						else => { Event.Key = kbd.none;		return Event; },
+						else => { Event.Key = kbd.none;	   return Event; },
 					}
 				}
 
 				if (csibuf[3] == 126) {
 					switch (csibuf[2]) {
-						'5' => { Event.Key = kbd.pageUp;	 return Event; },
+						'5' => { Event.Key = kbd.pageUp;   return Event; },
 						'6' => { Event.Key = kbd.pageDown; return Event; },
-						else => { Event.Key = kbd.none;		return Event; },
+						else => { Event.Key = kbd.none;	   return Event; },
 					}
 				}
 			},

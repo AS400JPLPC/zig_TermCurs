@@ -55,7 +55,6 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "dds",	.module = dds },
 		.{ .name = "cursed", .module = cursed },
 		.{ .name = "utils",  .module = utils },
-		.{ .name = "forms",  .module = forms },
 		},
 	});
 	
@@ -66,7 +65,6 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "dds",	.module = dds },
 		.{ .name = "cursed", .module = cursed },
 		.{ .name = "utils",  .module = utils },
-		.{ .name = "forms",  .module = forms },
 		},
 	});
 

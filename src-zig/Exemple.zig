@@ -371,6 +371,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	) catch unreachable ;
 
 	Panel.button.append(btn.newButton(
+						kbd.F4,					// function
+						true,					// show
+						true,					// check field
+						"test window"			// title 
+						)
+	) catch unreachable ;
+
+	Panel.button.append(btn.newButton(
 						kbd.F5,					// function
 						true,					// show
 						false,					// check field
@@ -379,22 +387,60 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	) catch unreachable ;
 
 	Panel.button.append(btn.newButton(
-							kbd.F8,					// function
-							true,					// show 
-							false,					// check control to Field 
-							"Grid"					// title
-							)
-		) catch unreachable ;
+						kbd.F8,					// function
+						true,					// show 
+						false,					// check control to Field 
+						"Grid"					// title
+						)
+	) catch unreachable ;
 
 	return Panel;
 }
 
+
+
+pub fn Panel_Fmt0X() *pnl.PANEL {
+
+	//-------------------------------------------------
+	// Panel
+	// Name Panel, Pos X, Pos Y,
+	// nbr Lines, nbr columns
+	// Attribut Panel
+	// Type frame, Attribut frame
+	// Title Panel, Attribut: Title
+	var Panel	: *pnl.PANEL = pnl.newPanelC("Fmt01",
+					1, 1,
+					8,
+					70,
+					dds.CADRE.line1,
+					"TEST WINDOW");
+
+	//-------------------------------------------------
+	// Label
+	// Name , pos X, pos Y,
+	// Text , Attribut Text
+	Panel.label.append(lbl.newLabel("free",2,2,"Text-Free...................:")
+	) catch unreachable ;
+
+	Panel.label.append(lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
+	) catch unreachable ;
+
+	// button--------------------------------------------------
+	Panel.button.append(btn.newButton(
+						kbd.F12,				// function
+						true,					// show 
+						false,					// check field
+						"Return"				// title
+						)
+	) catch unreachable ;
+	return Panel;
+}
 //-------------------------------------------------
 //the menu is not double buffered it is not a Panel
 pub fn Menu01() mnu.MENU {
 	var  m01 = mnu.newMenu(
-					"Menu01",				 // name
-					2, 2,					 // posx, posy	
+					"Menu01",				// name
+					2, 2,					// posx, posy	
 					dds.CADRE.line1,		// type line fram
 					dds.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{"Open..",			// item
@@ -415,12 +461,12 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
 	var Xcombo : *grd.GRID =	grd.newGridC(
 					"Combo01",
-					4, 76,
+					3, 75,
 					4 ,
 					grd.gridStyle,
 					dds.CADRE.line1,
 					);
-	defer dds.allocatorPnl.destroy(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
 
 	grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo) ;
@@ -440,11 +486,12 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	var Gkey :grd.GridSelect = undefined ;
 
 	Gkey =grd.ioCombo(Xcombo,cellPos);
-	grd.rstPanel(Xcombo, vpnl);
+	pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 
 
 	grd.freeGrid(Xcombo);
 
+	
 	if ( Gkey.Key == kbd.esc )	 return ;
 	vfld.text = Gkey.Buf.items[0];
 	return ;
@@ -455,12 +502,12 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	
 	var Xcombo : *grd.GRID =	grd.newGridC(
 										"Combo02",
-										5, 76,
+										4, 75,
 										4 ,	
 										grd.gridStyle,
 										dds.CADRE.line1,
 										);
-	defer dds.allocatorPnl.destroy(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
 
 
 	grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
@@ -478,11 +525,11 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	var Gkey :grd.GridSelect = undefined ;
 
 	Gkey =grd.ioCombo(Xcombo,cellPos);
-	grd.rstPanel(Xcombo, vpnl);
+	pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 
 
 	grd.freeGrid(Xcombo);
-
+	
 	if ( Gkey.Key == kbd.esc )	return ;
 	vfld.text = Gkey.Buf.items[0];
 	return ;
@@ -536,6 +583,7 @@ pub fn main() !void {
 	// define Panel
 	var pFmt01 = Panel_Fmt01();
 
+	
 	var mMenu01:mnu.MENU = Menu01();
 
 
@@ -564,9 +612,17 @@ pub fn main() !void {
 				// test control chek field
 				pnl.msgErr(pFmt01,"le test de la saisie est OK");
 			},
+			.F4 => {
+				var pFmt0X = Panel_Fmt0X();
+				_= pnl.ioPanel(pFmt0X);
+				pnl.rstPanel(pnl.PANEL,pFmt0X, pFmt01);
+				pnl.freePanel(pFmt0X);
+				dds.deinitUtils();
+				dds.allocatorPnl.destroy(pFmt0X);
+			},
 			.F5 => {
-				var nitem = mnu.ioMenu(pFmt01,mMenu01,0);
-				mnu.rstPanel(mMenu01, pFmt01);
+				var nitem = mnu.ioMenu(mMenu01,0);
+				pnl.rstPanel(mnu.MENU,&mMenu01, pFmt01);
 				std.debug.print("n°item {}",.{nitem});
 			},
 			.F8 => {
@@ -645,11 +701,11 @@ pub fn main() !void {
 				grd.addRows(Grid01 , &.{"11", "Bleu11", "poisson","100,00","0","tictac"});
 				}
 			}
-			grd.rstPanel(Grid01, pFmt01);
+			pnl.rstPanel(grd.GRID,Grid01, pFmt01);
 			// if you have several grids please do a freeGrid on exit and a reloadGrid on enter
 			grd.freeGrid(Grid01);
 
-			dds.allocatorPnl.destroy(Grid01);
+			grd.allocatorGrid.destroy(Grid01);
 
 			// for debug control memoire in test CODELLDB
 			// _= kbd.getKEY();

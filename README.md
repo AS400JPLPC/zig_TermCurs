@@ -277,7 +277,7 @@ les news:<BR />
 
           - testing memoory<br />
 
-            -     [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
+            - [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
             <br />
             <br />  
             -  2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
@@ -297,15 +297,15 @@ les news:<BR />
               it's too hot break.<br />
 # reprise du projet
 
-I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add module mdlSjson (save file)<br />
-* 2023-11-15 add module mdlRjson (restore file)<br />
+I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add module mdlSjson (save file)<br />* 2023-11-15 add module mdlRjson (restore file)<br />
 * 2023-11-15 add module mdlFile  (manager file)<br />
 * 2023-11-15 in the "mdlObjet" module have little reordered and deleted<br />
 * 2023-11-15 A “dspf” folder groups JSON files : Label Field<br />
 * 2023-11-15 The software runs in a terminal<br />
 * 2023-11-15 A small change F10 became F11 for convenience with the terminal<br />
-<br />
-<br />
+  <br />
+  <br />
+
 
 <u>                                                                         </u><BR />
 → 2023-11-22 update Forms mdlObjet mdlSjon mdlRjson<br />
@@ -315,13 +315,29 @@ I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add mod
 → 2023-11-29 **restructuring**:<br />
 new source ./deps/menu.zig
 deletion in forms.zig of menu processing
-change mdlObject name -> mdlForms<br />  
+change mdlObject name -> mdlForms<br />
 → 2023-11-29 Still testing, mdlPanel update, mdlForms due to reorganization<br />
 → 2023-11-29 Gencurs update preparation Grid/Menu generation <br />
 <br />
 ![](assets/20231129_012345_Gen00.png)
 <br />
 ![](assets/20231122_012345_Gen01.png)
+
+
+* [ ] 2023-12-28
+  I just made my first 'COMPTIME,' I finally understood what it's for and how to approach it.
+  Introduction to comptime rstPanel example pnl; rstPanel(grd.GRID,Xcombo, pfmt001);
+  example: restore(type grid, gridX, panelX) This
+  function restores the part of the panel that was hidden by the grid.
+* [ ] 2023-12-18
+  I removed the dependencies on forms(panel) for the menu and grid.
+* [ ] 2023-12-28
+  (forms- grid - menu) They are deeply modified to make them independent.
+* [ ] 2023-12-28
+  Corrections in mdlPanel F10 -> F11. Corrections in mdlFile Minor correction
+* [ ] 2023-12-28
+  I take my time because I have heart problems (fatigue with medications),
+  and I am still studying to understand and grasp the ZIG-LANG language. (I am 72 years old.)
 
 ---
 

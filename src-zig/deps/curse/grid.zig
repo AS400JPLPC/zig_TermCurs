@@ -13,7 +13,7 @@ const utl = @import("utils");
 
 
 // panel
-const pnl = @import("forms").pnl;
+// const pnl = @import("forms").pnl;
 
 
 const os = std.os;
@@ -68,13 +68,10 @@ const TERMINAL_CHAR = struct {
 };
 
 
-const allocatorGrid = std.heap.page_allocator;
-
-
 pub const	grd = struct {
 
 
-
+	pub const allocatorGrid = std.heap.page_allocator;
 
 	// define attribut default GRID
 	pub var AtrGrid : dds.ZONATRB = .{
@@ -263,7 +260,7 @@ pub const	grd = struct {
 		vcadre		: dds.CADRE
 		) *GRID {
 
-		var device = dds.allocatorPnl.create(GRID) 
+		var device = allocatorGrid.create(GRID) 
 			catch |err| { @panic(@errorName(err));};
 
 		device.name	= vname;
@@ -572,7 +569,7 @@ pub const	grd = struct {
 		var x :usize = self.posx - 1 ;
 
 		while (row <= self.lines) {
-			y = self.posy - 1;
+			y = self.posy ;
 			col = 1;
 			while ( col <= cols ){
 				edt = false;
@@ -714,7 +711,7 @@ pub const	grd = struct {
 			while (x <= self.lines) : (x += 1) {
 				y = 1;
 				while (y <= getLenHeaders(self)) : (y += 1) {
-					term.gotoXY(x + self.posx - 1	, y + self.posy - 1 );
+					term.gotoXY(x + self.posx , y + self.posy );
 					term.writeStyled(self.buf.items[n].ch,self.buf.items[n].attribut);
 					n += 1;
 				}
@@ -775,7 +772,7 @@ pub const	grd = struct {
 			y = 1;
 			while (y <= self.cols ) : (y += 1) {
 				if (self.buf.items[n].on == true ) {
-					term.gotoXY(x + self.posx - 1	, y + self.posy - 1 );
+					term.gotoXY(x + self.posx , y + self.posy  );
 					term.writeStyled(self.buf.items[n].ch,self.buf.items[n].attribut);
 				}
 				n += 1;
@@ -1203,23 +1200,23 @@ pub const	grd = struct {
 	}
 
 	// restor -panel	MATRIX to terminal ---> arraylist panel-grid 
-	pub fn rstPanel( vsrc : *GRID , vdst : *pnl.PANEL) void {
-		if (vdst.actif == false)	return ;
-		if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
-		if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
-		var x :usize = 0;
-		var y :usize = 0;
-		var n :usize = 0;
-		var npos : usize =	vsrc.posx - vdst.posx;
-		while (x <= vsrc.lines) : (x += 1) {
-			n = vdst.cols * npos + vsrc.posy - vdst.posy	;
-			y = 0;
-			while (y <= vsrc.cols) : (y += 1) {
-				term.gotoXY(x + vsrc.posx	 , y + vsrc.posy	);
-				term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
-				n += 1;
-			}
-			npos += 1;
-		}
-	}
+	// pub fn rstPanel( vsrc : *GRID , vdst : *pnl.PANEL) void {
+	// 	if (vdst.actif == false)	return ;
+	// 	if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
+	// 	if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
+	// 	var x :usize = 0;
+	// 	var y :usize = 0;
+	// 	var n :usize = 0;
+	// 	var npos : usize =	vsrc.posx - vdst.posx;
+	// 	while (x <= vsrc.lines) : (x += 1) {
+	// 		n = vdst.cols * npos + vsrc.posy - vdst.posy	;
+	// 		y = 0;
+	// 		while (y <= vsrc.cols) : (y += 1) {
+	// 			term.gotoXY(x + vsrc.posx	 , y + vsrc.posy	);
+	// 			term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+	// 			n += 1;
+	// 		}
+	// 		npos += 1;
+	// 	}
+	// }
 };

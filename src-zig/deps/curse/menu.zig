@@ -179,8 +179,8 @@ pub const	mnu = struct {
 
 
 	// assign -menu MATRIX TERMINAL	---> arraylist panel-menu
-	fn printMenu(vpnl: *pnl.PANEL, vmnu: MENU) void {
-		if (vpnl.actif == false ) return ;
+	fn printMenu(vmnu: MENU) void {
+		if (vmnu.actif == false ) return ;
 		const ACS_Hlines	= "─";
 		const ACS_Vlines	= "│";
 		const ACS_UCLEFT	= "┌";
@@ -202,12 +202,12 @@ pub const	mnu = struct {
 		var y:		usize = 0 ;
 		var col:	usize = 0 ;
 
-		var x :usize =	vmnu.posx - 1 ;
+		var x :usize =	vmnu.posx ;
 
 		// if line 0 ex: directory tab
 		if (dds.CADRE.line0 != vmnu.cadre ) {
 			while (row <= vmnu.lines) : (row +=1) {
-				y = vmnu.posy - 1;
+				y = vmnu.posy ;
 				col = 1;
 				while ( col <= vmnu.cols ){
 					edt = false;
@@ -258,11 +258,11 @@ pub const	mnu = struct {
 						}
 					}
 					if	( edt ) {
-						term.gotoXY(row + vmnu.posx + vpnl.posx - 2	, col + vmnu.posy + vpnl.posy - 2);
+						term.gotoXY(row + vmnu.posx , col + vmnu.posy );
 						term.writeStyled(trait,vmnu.attribut);
 					}
 					else {
-						term.gotoXY(row + vmnu.posx + vpnl.posx - 2	, col + vmnu.posy + vpnl.posy - 2);
+						term.gotoXY(row + vmnu.posx , col + vmnu.posy );
 						term.writeStyled(" ",vmnu.attribut);
 					}
 
@@ -277,15 +277,15 @@ pub const	mnu = struct {
 	}
 
 	// display	MATRIX to terminal ---> arraylist panel-menu
-	fn displayMenu(vpnl: *pnl.PANEL, vmnu:MENU, npos: usize) void {
+	fn displayMenu(vmnu:MENU, npos: usize) void {
 		var pos : usize = npos;
 		var n : usize = 0;
 		var h : usize = 0;
 
-		var x :usize = vmnu.posx - 1;
-		var y :usize = vmnu.posy - 1;
+		var x :usize = vmnu.posx + 1;
+		var y :usize = vmnu.posy + 1;
 
-		printMenu(vpnl, vmnu);
+		printMenu(vmnu);
 
 		term.onMouse();
 		term.cursHide();
@@ -298,15 +298,15 @@ pub const	mnu = struct {
 		for (vmnu.xitems) | cell |	{
 			if (vmnu.mnuvh == dds.MNUVH.vertical) {
 				if (vmnu.cadre == dds.CADRE.line0)
-					term.gotoXY(vpnl.posx + x + n	,		vpnl.posy + y	)
+					term.gotoXY(x + n	, y	)
 				else
-					term.gotoXY(vpnl.posx + x + n + 1 , vpnl.posy + y	+ 1);
+					term.gotoXY( x + n + 1 , y	+ 1);
 			}
 			if (vmnu.mnuvh == dds.MNUVH.horizontal) {
 				if (vmnu.cadre == dds.CADRE.line0 )
-					term.gotoXY(vpnl.posx + x	,		h	 + vpnl.posy + y	 )
+					term.gotoXY(x	,	h + y	 )
 				else
-					term.gotoXY(vpnl.posx + x + 1	, h	+ vpnl.posy + y	+ 1);
+					term.gotoXY(x + 1, h + y + 1);
 			}
 			//var xcell = utl.Trim(cell);
 			if (pos == n)
@@ -320,40 +320,19 @@ pub const	mnu = struct {
 		}
 	}
 
-	// restor -panel	MATRIX to terminal ---> arraylist panel-menu 
-	pub fn rstPanel( vsrc : MENU , vdst : *pnl.PANEL) void {
-		if (vdst.actif == false)	return ;
-		if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
-		if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
-		var x :usize = 0;
-		var y :usize = 0;
-		var n :usize = 0;
-		var npos : usize =	vsrc.posx - vdst.posx;
-		while (x <= vsrc.lines) : (x += 1) {
-				n = vdst.cols * npos + vsrc.posy - vdst.posy	;
-				y = 0;
-				while (y <= vsrc.cols) : (y += 1) {
-					term.gotoXY(x + vsrc.posx	 , y + vsrc.posy	);
-					term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
-					n += 1;
-				}
-			npos += 1;
-		}
-	}
 	//----------------------------------------------------------------
 	// menu	enter = select	1..n 0 = abort (Escape)
 	// Turning on the mouse
 	// UP DOWN LEFT RIGHT
 	// movement width the wheel and validation width the clik
 	//----------------------------------------------------------------
-	pub fn ioMenu(vpnl: *pnl.PANEL, vmnu: MENU, npos: usize) usize {
-		if (vpnl.actif == false ) return 999 ;
+	pub fn ioMenu(vmnu: MENU, npos: usize) usize {
 		if (vmnu.actif == false ) return 999 ;
 		var pos : usize = npos;
 		var n	 : usize = 0;
 		var h	 : usize = 0;
-		var x :usize = vmnu.posx - 1;
-		var y :usize = vmnu.posy - 1;
+		var x :usize = vmnu.posx + 1;
+		var y :usize = vmnu.posy + 1;
 
 		term.onMouse();
 		term.cursHide();
@@ -363,7 +342,7 @@ pub const	mnu = struct {
 		if (npos > vmnu.nbr or npos == 0 )	pos = 0;
 
 
-		displayMenu(vpnl,vmnu,pos);
+		displayMenu(vmnu,pos);
 
 
 		term.flushIO();
@@ -374,15 +353,15 @@ pub const	mnu = struct {
 
 				if (vmnu.mnuvh == dds.MNUVH.vertical) {
 					if (vmnu.cadre == dds.CADRE.line0 )
-						term.gotoXY(vpnl.posx + x	+ n	,	 vpnl.posy + y )
+						term.gotoXY(x + n ,y )
 					else
-						term.gotoXY(vpnl.posx + x	+ n + 1, vpnl.posy + y + 1);
+						term.gotoXY(x + n + 1, y + 1);
 					}
 				if (vmnu.mnuvh == dds.MNUVH.horizontal) {
 					if (vmnu.cadre == dds.CADRE.line0)
-						term.gotoXY(vpnl.posx + x	 ,	 h + vpnl.posy + y )
+						term.gotoXY(x ,h + y )
 					else
-						term.gotoXY(vpnl.posx + x	+ 1, h + vpnl.posy + y + 1);
+						term.gotoXY(x + 1, h + y + 1);
 				}
 				if (pos == n)
 					term.writeStyled(cell,vmnu.attrBar)

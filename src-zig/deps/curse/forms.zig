@@ -38,7 +38,6 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
 	_=term.kbd.getKEY();
 	term.gotoXY(term.posCurs.x,term.posCurs.y);
 	allocator.free(msg);
-						
 }
 
 
@@ -2275,7 +2274,7 @@ pub const	fld = struct {
 			if ( n != idx) e_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
 			if ( n == idx) { 
 				e_FIELD.append(c)	catch |err| { @panic(@errorName(err));};
-				e_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
+				e_FIELD.append(ch)	catch |err| { @panic(@errorName(err));};
 			} 
 		}
 	}
@@ -3029,18 +3028,18 @@ pub const Epanel = enum {
 					.name	 = vname,
 					.posx	 = vposx,
 					.posy	 = vposy,
-					.lines	= vlines,
+					.lines   = vlines,
 					.cols	 = vcols,
 					.attribut = AtrPanel,
-					.frame = undefined,
+					.frame  = undefined,
 					.label	= std.ArrayList(lbl.LABEL).init(dds.allocatorPnl),
 					.button = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl),
 					.field	= std.ArrayList(fld.FIELD).init(dds.allocatorPnl),
 					.linev	= std.ArrayList(lnv.LINE).init(dds.allocatorPnl),
 					.lineh	= std.ArrayList(lnh.LINE).init(dds.allocatorPnl),
-					.buf		= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl),
+					.buf	= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl),
 					.idxfld = 9999,
-					.key		=	kbd.none,
+					.key	=	kbd.none,
 					.keyField = kbd.none,
 					.actif	= true,
 		};
@@ -3084,17 +3083,17 @@ pub const Epanel = enum {
 		device.name	 = vname;
 		device.posx	 = vposx;
 		device.posy	 = vposy;
-		device.lines	= vlines;
+		device.lines = vlines;
 		device.cols	 = vcols;
 		device.attribut = AtrPanel;
 		device.frame = undefined;
 		device.label	= std.ArrayList(lbl.LABEL).init(dds.allocatorPnl);
-		device.button = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl);
+		device.button   = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl);
 		device.field	= std.ArrayList(fld.FIELD).init(dds.allocatorPnl);
 		device.linev	= std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
 		device.lineh	= std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
 		device.buf		= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl);
-		device.idxfld = 9999;
+		device.idxfld   = 9999;
 		device.key		=	kbd.none;
 		device.keyField = kbd.none;
 		device.actif	= true;
@@ -3242,21 +3241,21 @@ pub const Epanel = enum {
 
 		}
 	}
-	// restor -panel	MATRIX to terminal ---> arraylist panel
-	pub fn rstPanel( vsrc : *PANEL , vdst : *PANEL) void {
+	// restor -panel	MATRIX to terminal
+	pub fn rstPanel(comptime T: type , vsrc: *T , vdst : *PANEL) void {
 		if (vdst.actif == false)	return ;
 		if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
 		if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
 		var x :usize = 0;
 		var y :usize = 0;
 		var n :usize = 0;
-		var npos : usize =	vdst.posx - vsrc.posx;
+		var npos : usize =	 vsrc.posx - 1 ;
 		
-		while (x < vsrc.lines) : (x += 1) {
-				n = (vdst.cols * npos) + (vdst.posy - vsrc.posy) ;
+		while (x <= vsrc.lines) : (x += 1) {
+				n = (vdst.cols * npos) + vsrc.posy - 1 ;
 				y = 0;
-				while (y < vsrc.cols) : (y += 1) {
-					term.gotoXY(x + vsrc.posx	 , (y + vsrc.posy) );
+				while (y <= vsrc.cols ) : (y += 1) {
+					term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );
 					term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
 					n += 1;
 				}
