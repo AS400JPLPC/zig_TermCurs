@@ -32,7 +32,6 @@ pub fn build(b: *std.Build) void {
 	const utils = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/utils.zig" },
 		.dependencies= &.{
-		.{ .name = "dds", .module = dds },
 		.{ .name = "cursed", .module = cursed },
 		}
 	});
@@ -86,8 +85,6 @@ pub fn build(b: *std.Build) void {
 	Prog.addModule("forms" , forms);
 	Prog.addModule("grid"  , grid);
 	Prog.addModule("menu"  , menu);
-	Prog.addModule("match" , match);
-
 	const install_exe = b.addInstallArtifact(Prog, .{});
 	b.getInstallStep().dependOn(&install_exe.step); 
 
@@ -111,7 +108,6 @@ pub fn build(b: *std.Build) void {
 	tests.addModule("forms" , forms);
 	tests.addModule("grid"  , grid);
 	tests.addModule("menu"  , menu);
-	tests.addModule("match" , match);
 
 
 
@@ -138,7 +134,6 @@ pub fn build(b: *std.Build) void {
 	docs.addModule("forms" , forms);
 	docs.addModule("grid"  , grid);
 	docs.addModule("menu"  , menu);
-	docs.addModule("match" , match);
 
 	
 	const install_docs = b.addInstallDirectory(.{

@@ -62,7 +62,7 @@ fn strToUsize(v: []const u8) usize{
 
 fn usizeToStr(v: usize ) []const u8{
 
-	return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v})
+	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
 	catch |err| { @panic(@errorName(err));};
 }
 
@@ -1284,7 +1284,7 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		if (nitem != 9999) break;
 	}
 
-	vfld.text = std.fmt.allocPrint(dds.allocatorUtils,"{d}",.{nitem}) catch unreachable; 
+	vfld.text = std.fmt.allocPrint(dds.allocatorStr,"{d}",.{nitem}) catch unreachable; 
 	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
 
@@ -1323,7 +1323,7 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	var posx =	 strToUsize(vfld.text);
 	
 	if (termSize.height < posx or posx	== 0 ) {
-		const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position X is out of bounds",.{termSize.height})
+		const msg = std.fmt.allocPrint(dds.allocatorStr,"{d} Position X is out of bounds",.{termSize.height})
 					catch unreachable;
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
@@ -1336,7 +1336,7 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	var posy	=	strToUsize(vfld.text);
 	
 	if (termSize.width < posy or posy == 0 ) {
-		const msg = std.fmt.allocPrint(dds.allocatorUtils,"{d} Position Y is out of bounds",.{termSize.width})
+		const msg = std.fmt.allocPrint(dds.allocatorStr,"{d} Position Y is out of bounds",.{termSize.width})
 					catch unreachable;
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
@@ -1351,7 +1351,7 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		
 		if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
 			const msg = std.fmt.allocPrint(
-			dds.allocatorUtils,"{d} The number of rows is out of range",
+			dds.allocatorStr,"{d} The number of rows is out of range",
 			.{termSize.height}) catch unreachable;
 			pnl.msgErr(vpnl, msg);
 			vpnl.keyField = kbd.task;
@@ -1366,7 +1366,7 @@ fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) { 
 		const msg = std.fmt.allocPrint(
-			dds.allocatorUtils,"{d} The number of columns is out of range",
+			dds.allocatorStr,"{d} The number of columns is out of range",
 			.{termSize.width }) catch unreachable;
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
@@ -1380,7 +1380,7 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	var cadre =	strToUsize(vfld.text);
 	
 	if (termSize.width < cadre or cadre == 0 ) { 
-		const msg = std.fmt.allocPrint(dds.allocatorUtils,
+		const msg = std.fmt.allocPrint(dds.allocatorStr,
 			"{d} The number of Lines Cadre is out of range",.{termSize.width }) catch unreachable;
 
 		pnl.msgErr(vpnl, msg);
@@ -1415,7 +1415,7 @@ fn TaskF9(	VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD
 			std.mem.eql(u8, f.name, vfld.text)	and	idx == panelNum	) {
 			vpnl.keyField = kbd.task;
 			vpnl.idxfld = @intFromEnum(fp01.name); 
-			const msg = std.fmt.allocPrint(dds.allocatorUtils,"Name: {s} lready existing invalide",.{vfld.text})
+			const msg = std.fmt.allocPrint(dds.allocatorStr,"Name: {s} lready existing invalide",.{vfld.text})
 						catch unreachable;
 			pnl.msgErr(vpnl,msg);
 			return ;
@@ -1434,7 +1434,7 @@ fn TaskF11( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIEL
 		if (std.mem.eql(u8, f.name, vfld.text) and ( idx != panelNum)	 ) {
 			vpnl.keyField = kbd.task;
 			vpnl.idxfld = @intFromEnum(fp01.name);
-			const msg = std.fmt.allocPrint(dds.allocatorUtils,"{s} lready existing invalide",.{vfld.text})
+			const msg = std.fmt.allocPrint(dds.allocatorStr,"{s} lready existing invalide",.{vfld.text})
 						catch unreachable;
 			pnl.msgErr(vpnl,msg);
 			return ;
@@ -1534,7 +1534,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 	while (true) {
 		//Tkey = kbd.getKEY();
-
+		utl.deinitUStr();
 		Tkey.Key = pnl.ioPanel(pFmt01);
 
 		
@@ -1599,7 +1599,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.msgErr(pFmt01,"You are in creation correct F9 OK");
 				pnl.clearPanel(pFmt01);
 				numPanel = NPANEL.items.len - 1;// last panel
-				dds.deinitUtils();
+				utl.deinitUStr();
+				//dds.deinitStr();
 				loadPanel(&XPANEL.items[numPanel], pFmt01);
 			},
 
@@ -1623,7 +1624,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					updPanel(pFmt01, &NPANEL.items[numPanel] , &XPANEL.items[numPanel] );
 					pnl.msgErr(pFmt01,"The update is correct F11 OK");
 					pnl.clearPanel(pFmt01);
-					dds.deinitUtils();
+					utl.deinitUStr();
+					//dds.deinitStr();
 					loadPanel(&NPANEL.items[numPanel], pFmt01);
 				} 
 				else	pnl.msgErr(pFmt01,"You are in creation mode Bad F11");
@@ -1634,7 +1636,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.freePanel(pFmt01);
 				NPANEL.clearAndFree();
 				NPANEL.deinit();
-				dds.deinitUtils();
+				utl.deinitUStr();
+				//dds.deinitStr();
 				defer dds.allocatorPnl.destroy(pFmt01); 
 				return ; 
 			},

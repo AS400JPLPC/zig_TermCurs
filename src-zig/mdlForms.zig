@@ -58,7 +58,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-	return std.fmt.allocPrint(dds.allocatorUtils, "{d}", .{v}) catch |err| {
+	return std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v}) catch |err| {
 		@panic(@errorName(err));
 	};
 }
@@ -154,6 +154,7 @@ var Y: usize = 0;
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 	term.cls();
 
+	utl.deinitUStr();
 	numPanel = qryPanel(XPANEL);
 
 	if (numPanel == 999) return;
@@ -191,7 +192,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					@memset(vText[0..p.width], '0');
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
@@ -199,11 +200,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				dds.REFTYP.DIGIT =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 1) catch unreachable;
 					@memset(vText[0..p.width], '0');
-					vText = std.fmt.allocPrint(dds.allocatorUtils, "+{s}", .{vText[0..p.width]})
+					vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}", .{vText[0..p.width]})
 							catch unreachable;
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
@@ -211,11 +212,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				dds.REFTYP.UDECIMAL =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 1 + p.scal) catch unreachable;
 					@memset(vText[0..(p.width + p.scal)] , '0');
-					vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+					vText = std.fmt.allocPrint(dds.allocatorStr, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
 							catch unreachable;
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
@@ -223,21 +224,21 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				dds.REFTYP.DECIMAL =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 2 + p.scal) catch unreachable;
 					@memset(vText[0..(p.width + p.scal)], '0');
-					vText = std.fmt.allocPrint(dds.allocatorUtils, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+					vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
 							catch unreachable;
 				//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
 			
-				dds.REFTYP.DATE_ISO =>	vText = std.fmt.allocPrint(dds.allocatorUtils, "YYYY-MM-DD", .{})
+				dds.REFTYP.DATE_ISO =>	vText = std.fmt.allocPrint(dds.allocatorStr, "YYYY-MM-DD", .{})
 												catch unreachable,
-				dds.REFTYP.DATE_FR  =>	vText = std.fmt.allocPrint(dds.allocatorUtils, "DD/MM/YYYY", .{})
+				dds.REFTYP.DATE_FR  =>	vText = std.fmt.allocPrint(dds.allocatorStr, "DD/MM/YYYY", .{})
 												catch unreachable,
 
-				dds.REFTYP.DATE_US  =>	vText = std.fmt.allocPrint(dds.allocatorUtils, "MM/DD/YYYY", .{})
+				dds.REFTYP.DATE_US  =>	vText = std.fmt.allocPrint(dds.allocatorStr, "MM/DD/YYYY", .{})
 												catch unreachable,
 
 				dds.REFTYP.TELEPHONE =>{
@@ -249,7 +250,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], '@');
 				} ,
-				dds.REFTYP.SWITCH   =>	vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}", .{dds.CTRUE})
+				dds.REFTYP.SWITCH   =>	vText = std.fmt.allocPrint(dds.allocatorStr, "{s}", .{dds.CTRUE})
 												catch unreachable,
 
 				dds.REFTYP.FUNC  =>{
@@ -289,7 +290,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			}
 		);
  
- 
+	utl.deinitUStr();
+
 	pnl.printPanel(pFmt01);
 
 	maxY = pFmt01.cols + pFmt01.posy;
@@ -364,7 +366,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				defer dds.allocatorPnl.destroy(pFmt01);
 				pnl.freePanel(pFmtH01);
 				defer dds.allocatorPnl.destroy(pFmtH01);
-				dds.deinitUtils();
+				dds.deinitStr();
+				utl.deinitUStr();
 				return;
 			},
 			.F12 => {
@@ -372,7 +375,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				defer dds.allocatorPnl.destroy(pFmt01);
 				pnl.freePanel(pFmtH01);
 				defer dds.allocatorPnl.destroy(pFmtH01);
-				dds.deinitUtils();
+				dds.deinitStr();
+				utl.deinitUStr();
 				return;
 			},
 
@@ -493,9 +497,9 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
 	var text: []const u8 = undefined;
-	var e_LABEL = std.ArrayList([]const u8).init(dds.allocatorUtils);
+	var e_LABEL = std.ArrayList([]const u8).init(dds.allocatorStr);
 	defer e_LABEL.deinit();
-	defer dds.allocatorUtils.destroy(&e_LABEL);
+	defer dds.allocatorStr.destroy(&e_LABEL);
 
 	var e_posx: usize = term.posCurs.x;
 	var e_posy: usize = term.posCurs.y;
@@ -1198,7 +1202,7 @@ fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	var val = strToUsize(vfld.text);
 
 	if (val + vfld.posx >= vpnl.cols) {
-		const msg = std.fmt.allocPrint(dds.allocatorUtils,
+		const msg = std.fmt.allocPrint(dds.allocatorStr,
 			"{d} the length of the zone is excessive", .{val})
 			catch |err| { @panic(@errorName(err)); };			
 		pnl.msgErr(vpnl, msg);
@@ -1217,7 +1221,7 @@ fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 	
 		if (vscal + width + vfld.posx >= vpnl.cols) {
-			const msg = std.fmt.allocPrint(dds.allocatorUtils,
+			const msg = std.fmt.allocPrint(dds.allocatorStr,
 				"{d} the Scal of the zone is excessive", .{vscal}) 
 				catch |err| { @panic(@errorName(err)); }; 
 				
@@ -1240,7 +1244,7 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		var scal = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fscal))  catch unreachable);
 
 		if (width + scal + vfld.posx >= vpnl.cols) {
-			const msg = std.fmt.allocPrint(dds.allocatorUtils,
+			const msg = std.fmt.allocPrint(dds.allocatorStr,
 				"the length of the zone is excessive", .{})
 				catch |err| { @panic(@errorName(err)); };			
 			pnl.msgErr(vpnl, msg);
@@ -1320,9 +1324,9 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 
 	v_posx = term.posCurs.x;
 	// init zone field
-	fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(dds.allocatorUtils, "{d}", .{v_posx})
+	fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v_posx})
 		catch unreachable) catch unreachable;
-	fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(dds.allocatorUtils, "{d}", .{v_posy})
+	fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v_posy})
 		catch unreachable) catch unreachable;
 
 	// init struct key
@@ -1555,7 +1559,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 
 						// editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{
+							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 								 catch |err| { @panic(@errorName(err)); };
 						}
@@ -1584,11 +1588,11 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText[0..vlen], '0');
 
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "+{s}", .{vText})
+						vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}", .{vText})
 								catch |err| { @panic(@errorName(err)); };
 						//editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{
+							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text }
 							) catch |err| { @panic(@errorName(err)); };
 						}
@@ -1623,13 +1627,13 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText2[0..vlen], '0');
 						
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "{s},{s}", .{ vText, vText2 })
+						vText = std.fmt.allocPrint(dds.allocatorStr, "{s},{s}", .{ vText, vText2 })
 							catch |err| { @panic(@errorName(err)); };
 
 						// editcar
 
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{
+							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 							catch |err| { @panic(@errorName(err)); };
 						}
@@ -1666,12 +1670,12 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText2[0..vlen], '0');
 						
-						vText = std.fmt.allocPrint(dds.allocatorUtils, "+{s},{s}", .{ vText, vText2 })
+						vText = std.fmt.allocPrint(dds.allocatorStr, "+{s},{s}", .{ vText, vText2 })
 							catch unreachable;
 
 						// editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorUtils, "{s}{s}", .{
+							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 							catch |err| { @panic(@errorName(err)); };
 						}
@@ -2069,9 +2073,9 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 	//term.getCursor();
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
-	var e_LineH = std.ArrayList([]const u8).init(dds.allocatorUtils);
+	var e_LineH = std.ArrayList([]const u8).init(dds.allocatorStr);
 	defer e_LineH.deinit();
-	defer dds.allocatorUtils.destroy(&e_LineH);
+	defer dds.allocatorStr.destroy(&e_LineH);
 
 	var e_posx: usize = term.posCurs.x ;
 	var e_posy: usize = term.posCurs.y ;
@@ -2315,9 +2319,9 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 	//term.getCursor();
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
-	var e_LineV = std.ArrayList([]const u8).init(dds.allocatorUtils);
+	var e_LineV = std.ArrayList([]const u8).init(dds.allocatorStr);
 	defer e_LineV.deinit();
-	defer dds.allocatorUtils.destroy(&e_LineV);
+	defer dds.allocatorStr.destroy(&e_LineV);
 
 	var e_posx: usize = term.posCurs.x ;
 	var e_posy: usize = term.posCurs.y ;

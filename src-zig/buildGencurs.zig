@@ -38,7 +38,6 @@ pub fn build(b: *std.build) void {
 	const utils = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/utils.zig" },
 			.dependencies= &.{
-			.{ .name = "dds", .module = dds },
 			.{ .name = "cursed", .module = cursed },
 		}
 	});

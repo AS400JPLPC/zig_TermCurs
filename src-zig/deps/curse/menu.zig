@@ -12,9 +12,6 @@ const kbd = @import("cursed").kbd;
 const utl = @import("utils");
 
 
-// panel
-const pnl = @import("forms").pnl;
-
 
 const os = std.os;
 const io = std.io;

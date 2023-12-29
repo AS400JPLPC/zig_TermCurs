@@ -2,7 +2,7 @@
 const std = @import("std");
 
 
-// for panel all arraylist (forms.pnl grid)
+// for panel all arraylist (forms.pnl)
 pub const allocatorPnl = std.heap.page_allocator;
 
 //free memory  output archive JSON or Field
@@ -12,17 +12,6 @@ pub fn deinitStr() void {
 	arenaStr.deinit();
 	arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 	allocatorStr = arenaStr.allocator();
-}
-
-
-//free memory on module output (allocprint ... divers fonction)
-pub var arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorUtils = arenaUtils.allocator();
-pub fn deinitUtils() void {
-	arenaUtils.deinit();
-	arenaUtils = undefined;
-	arenaUtils = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	allocatorUtils = arenaUtils.allocator();
 }
 
 
@@ -134,10 +123,10 @@ pub const REFTYP = enum {
 
 
 
-pub const ALIGNS = enum {
-	left ,
-	rigth
-	};
+// pub const ALIGNS = enum {
+// 	left ,
+// 	rigth
+// 	};
 
 
 pub const CMP = enum {

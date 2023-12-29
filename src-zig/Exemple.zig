@@ -394,6 +394,13 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 						)
 	) catch unreachable ;
 
+	Panel.button.append(btn.newButton(
+						kbd.F23,				// function
+						true,					// show 
+						false,					// check control to Field 
+						"Refresh"					// title
+						)
+	) catch unreachable ;
 	return Panel;
 }
 
@@ -467,6 +474,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 					dds.CADRE.line1,
 					);
 	defer grd.allocatorGrid.destroy(Xcombo);
+	defer grd.freeGrid(Xcombo);
 
 	grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo) ;
@@ -483,15 +491,15 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	if (std.mem.eql(u8,vfld.text,"Professionel") == true) cellPos = 3;
 	if (std.mem.eql(u8,vfld.text,"Docteur") == true)	cellPos = 4;
 
+
+	// Interrogation
 	var Gkey :grd.GridSelect = undefined ;
+	defer Gkey.Buf.deinit();
 
 	Gkey =grd.ioCombo(Xcombo,cellPos);
 	pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 
 
-	grd.freeGrid(Xcombo);
-
-	
 	if ( Gkey.Key == kbd.esc )	 return ;
 	vfld.text = Gkey.Buf.items[0];
 	return ;
@@ -508,7 +516,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 										dds.CADRE.line1,
 										);
 	defer grd.allocatorGrid.destroy(Xcombo);
-
+	defer grd.freeGrid(Xcombo);
 
 	grd.newCell(Xcombo,"Choix",15,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo) ;
@@ -521,15 +529,13 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	if (std.mem.eql(u8,vfld.text,"Informaticien") == true)	cellPos = 1;
 	if (std.mem.eql(u8,vfld.text,"sportif") == true)	 cellPos = 2;
 
-
+	// Interrogation
 	var Gkey :grd.GridSelect = undefined ;
+	defer Gkey.Buf.deinit();
 
 	Gkey =grd.ioCombo(Xcombo,cellPos);
 	pnl.rstPanel(grd.GRID,Xcombo, vpnl);
 
-
-	grd.freeGrid(Xcombo);
-	
 	if ( Gkey.Key == kbd.esc )	return ;
 	vfld.text = Gkey.Buf.items[0];
 	return ;
@@ -578,8 +584,9 @@ pub fn main() !void {
 	// open terminal and config and offMouse , cursHide->(cursor hide)
 	term.enableRawMode();
 	defer term.disableRawMode() ;
-	
 
+	// clean works
+	utl.deinitUStr();dds.deinitStr();
 	// define Panel
 	var pFmt01 = Panel_Fmt01();
 
@@ -595,11 +602,7 @@ pub fn main() !void {
 
 
 	while (true) {
-
-
 		Tkey.Key = pnl.ioPanel(pFmt01);
-	
-		dds.deinitUtils();
 
 		switch (Tkey.Key) {
 
@@ -617,7 +620,6 @@ pub fn main() !void {
 				_= pnl.ioPanel(pFmt0X);
 				pnl.rstPanel(pnl.PANEL,pFmt0X, pFmt01);
 				pnl.freePanel(pFmt0X);
-				dds.deinitUtils();
 				dds.allocatorPnl.destroy(pFmt0X);
 			},
 			.F5 => {
@@ -704,9 +706,8 @@ pub fn main() !void {
 			pnl.rstPanel(grd.GRID,Grid01, pFmt01);
 			// if you have several grids please do a freeGrid on exit and a reloadGrid on enter
 			grd.freeGrid(Grid01);
-
 			grd.allocatorGrid.destroy(Grid01);
-
+			Gkey.Buf.deinit();
 			// for debug control memoire in test CODELLDB
 			// _= kbd.getKEY();
 			},

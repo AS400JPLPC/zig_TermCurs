@@ -163,7 +163,6 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 
 	defer dds.allocatorPnl.destroy(pFmt01);
 	defer pnl.freePanel(pFmt01);
-	defer dds.deinitUtils();
 	// defer grd.freeGrid(Grid01);
 	defer grd.allocatorGrid.destroy(Grid01);
 

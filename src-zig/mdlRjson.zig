@@ -1220,7 +1220,5 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 	}
 
 	ENRG.clearAndFree();
-
-	dds.deinitUtils();
 return ;
 }

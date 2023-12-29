@@ -2,12 +2,31 @@ const std = @import("std");
 
 const utf = @import("std").unicode;
 
-const dds = @import("dds");
-
 /// terminal Fonction
 const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
+
+// display grid
+pub const CTRUE  = "✔";
+pub const CFALSE = " ";
+// input   field
+pub const STRUE  = "✔";
+pub const SFALSE = "◉";
+
+
+
+pub const CMP = enum {
+	LT,
+	EQ,
+	GT
+};
+
+
+pub const ALIGNS = enum {
+	left ,
+	rigth
+	};
 
 
 ///------------------------------------
@@ -21,20 +40,22 @@ pub const ErrUtils = error{
 
 
 /// Tools for internal variables
-
-// write to buffer struct and file 
-pub fn ToStr(text : [] const u8 ) []const u8 {
-	return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{text})	
-				catch |err| { @panic(@errorName(err));};
+//free memory 
+var arenaUStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocStr = arenaUStr.allocator();
+pub fn deinitUStr() void {
+	arenaUStr.deinit();
+	arenaUStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	allocStr = arenaUStr.allocator();
 }
 
 
 
+//const allocstr = std.heap.page_allocator;
 /// Iterator support iteration string
 pub const iteratStr = struct {
 	var strbuf:[] const u8 = undefined;
 
-	const allocstr = std.heap.page_allocator;
 
 
 	/// Errors that may occur when using String
@@ -50,7 +71,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocstr.alloc(u8, size) catch {
+			var buf = allocStr.alloc(u8, size) catch {
 				return ErrNbrch.InvalideAllocBuffer;
 			};
 			return buf;
@@ -58,15 +79,15 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocstr.free(self.buf);
+			if (self.buf.len > 0)	allocStr.free(self.buf); 
+			strbuf = "";
 		}
 
 		pub fn next(it: *StringIterator) ?[]const u8 {
 			var optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
-			
-			it.buf= optional_buf orelse "";
-			var idx : usize = 0;
 
+ 			it.buf= optional_buf orelse "";
+			var idx : usize = 0;
 			while (true) {
 				if (idx >= strbuf.len) break;
 				it.buf[idx] = strbuf[idx];
@@ -133,10 +154,9 @@ pub fn trimStr(str:[] const u8) [] const u8{
 /// is String isAlphabetic Latin
 pub fn isAlphabeticStr(str:[] const u8) bool {
 	
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, str.len ) 
+	const result = allocStr.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+	defer allocStr.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -153,10 +173,9 @@ pub fn isAlphabeticStr(str:[] const u8) bool {
 /// is String Upper Latin
 pub fn isUpperStr(str:[] const u8) bool {
 
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, str.len ) 
+	const result = allocStr.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+	defer allocStr.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -173,10 +192,9 @@ pub fn isUpperStr(str:[] const u8) bool {
 /// is String Lower Latin
 pub fn isLowerStr(str:[] const u8) bool {
 	
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, str.len ) 
+	const result = allocStr.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+	defer allocStr.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -561,17 +579,16 @@ pub fn isMailStr(str:[] const u8) bool {
 
 /// upper-case String Latin
 pub fn upperStr(str:[] const u8) [] const u8 {
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, str.len )
+	const result = allocStr.alloc(u8, str.len )
 		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+	defer allocStr.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
 		result[idx] = std.ascii.toUpper(result[idx]);
 		}
-	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+	return std.fmt.allocPrint(allocStr,"{s}",.{result},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -580,17 +597,16 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 
 /// Lower String Latin
 pub fn lowerStr(str:[] const u8) [] const u8 {
-	const allocator = std.heap.page_allocator;
-	const result = allocator.alloc(u8, str.len )
+	const result = allocStr.alloc(u8, str.len )
 		catch |err| { @panic(@errorName(err));};
-	defer allocator.free(result);
+	defer allocStr.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
 		result[idx] = std.ascii.toLower(result[idx]);
 		}
-	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+	return std.fmt.allocPrint(allocStr,"{s}",.{result},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -599,7 +615,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 
 /// concat String
 pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
-	return std.fmt.allocPrint(dds.allocatorUtils,"{s}{s}",.{a,b},)
+	return std.fmt.allocPrint(allocStr,"{s}{s}",.{a,b},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -611,12 +627,12 @@ pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
 
 /// comp string
 /// LT EQ GT -> enum CMP
-pub fn compStr( str1 : [] const u8 , str2 : [] const u8) dds.CMP {
+pub fn compStr( str1 : [] const u8 , str2 : [] const u8) CMP {
 
 	var c1 = std.fmt.count("{s}",.{str1});
 	var c2 = std.fmt.count("{s}",.{str2});
 
-	if (c1 > c2)	return dds.CMP.GT ;
+	if (c1 > c2)	return CMP.GT ;
 	if (c1 == c2) {
 		var idx: u8 = 0;
 		var n: i32 = 0;
@@ -624,18 +640,18 @@ pub fn compStr( str1 : [] const u8 , str2 : [] const u8) dds.CMP {
 			if ( str1[idx] < str2[idx]) n -= 1 ;
 			if ( str1[idx] > str2[idx]) n += 1 ;
 		}
-		if ( n < 0 ) return dds.CMP.LT ; 
-		if ( n > 0 ) return dds.CMP.GT 
-		else return dds.CMP.EQ;
+		if ( n < 0 ) return CMP.LT ; 
+		if ( n > 0 ) return CMP.GT 
+		else return CMP.EQ;
 	}
-	return dds.CMP.LT ;
+	return CMP.LT ;
 }
 
 
 
 
 /// aligned string 
-pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
+pub fn alignStr(text: []const u8,aligns :ALIGNS, wlen : usize ) []const u8 {
 
 	var idx : usize =0;
 	var iter = iteratStr.iterator(text);
@@ -651,13 +667,13 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 		}
 	}
 
-	if (aligns == dds.ALIGNS.left) {
+	if (aligns == ALIGNS.left) {
 		while (idx < wlen)	: (idx += 1) {
 			string =	concatStr(string," ");
 		}
 	}
 
-	if (aligns == dds.ALIGNS.rigth) {
+	if (aligns == ALIGNS.rigth) {
 		while (idx < wlen)	: (idx +=1) {
 			string =	concatStr(" ",string);
 		}
@@ -675,8 +691,7 @@ pub fn alignStr(text: []const u8,aligns :dds.ALIGNS, wlen : usize ) []const u8 {
 /// Delete Items ArrayList
 pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void{
 
-	//const allocator = std.heap.page_allocator;
-	var LIST = std.ArrayList([] const u8).init(dds.allocatorUtils);
+	var LIST = std.ArrayList([] const u8).init(allocStr);
 	var idx : usize = 0;
 	for (self.items) | val| {
 		if ( idx != i-1 ) LIST.append(val) catch |err| { @panic(@errorName(err));};
@@ -736,20 +751,20 @@ pub fn strToBool(v: []const u8) bool {
 
 /// str to switch STRUE/SFALSE bool
 pub fn strToCbool(v: []const u8) []const u8 {
-	return if (std.mem.eql(u8,v, "1")) dds.STRUE	else dds.SFALSE;
+	return if (std.mem.eql(u8,v, "1")) STRUE	else SFALSE;
 }
 
 /// bool to switch STRUE/SFALSE 
 pub fn boolToCbool(v: bool) []const u8 {
-	return if	(v == true ) dds.STRUE	else dds.SFALSE;
+	return if	(v == true ) STRUE	else SFALSE;
 }
 
 /// switch STRUE/SFALSE bool to bool
 pub fn cboolToBool(v: []const u8) bool {
-	return if ( std.mem.eql(u8,v, dds.STRUE) ) true	else	false;
+	return if ( std.mem.eql(u8,v, STRUE) ) true	else	false;
 }
 
 // switch STRUE / SFALSE bool to str
 pub fn cboolToStr(v: []const u8) []const u8 {
-	return if ( std.mem.eql(u8,v, dds.STRUE) ) "1"	else	"0";
+	return if ( std.mem.eql(u8,v, STRUE) ) "1"	else	"0";
 }

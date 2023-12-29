@@ -133,13 +133,12 @@ pub fn main() !void {
 	if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
 	if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
 	// if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
-	// if (nopt == @intFromEnum(choix.menu)){ dds.deinitStr();NPANEL.clearAndFree();NPANEL.deinit();
-	// 		NGRID.clearAndFree(); NGRID.deinit();}
+	// if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NMENU) ;
 	if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 	if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
 
-	if (NPANEL.items.len == 0 )  dds.deinitStr(); 
-
+	dds.deinitStr(); 
+	utl.deinitUStr();
 
 	
 	}

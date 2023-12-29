@@ -12,10 +12,6 @@ const kbd = @import("cursed").kbd;
 const utl = @import("utils");
 
 
-// panel
-// const pnl = @import("forms").pnl;
-
-
 const os = std.os;
 const io = std.io;
 
@@ -181,13 +177,12 @@ pub const	grd = struct {
 
 		if (pos > a.len) @panic("ErrGrid.Invalide_subStr_Index");
 
-		const allocator = std.heap.page_allocator;
-		const result = allocator.alloc(u8, n - pos) 
+		const result = allocatorGrid.alloc(u8, n - pos) 
 			catch |err| { @panic(@errorName(err));};
-		defer allocator.free(result);
+		defer allocatorGrid.free(result);
 
 		std.mem.copy(u8, result, a[pos..n]);
-		return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+		return std.fmt.allocPrint(utl.allocStr,"{s}",.{result},)
 			catch |err| { @panic(@errorName(err));};
 	}
 
@@ -216,7 +211,7 @@ pub const	grd = struct {
 						e_signed = subStrGrid(text,0,1);
 					}
 
-					e_FIELD = utl.alignStr(e_FIELD,dds.ALIGNS.rigth,cell.long);
+					e_FIELD = utl.alignStr(e_FIELD,utl.ALIGNS.rigth,cell.long);
 
 					if (cell.reftyp == dds.REFTYP.DIGIT or cell.reftyp == dds.REFTYP.DECIMAL) {
 
@@ -227,7 +222,7 @@ pub const	grd = struct {
 
 					}
 				}
-		else	e_FIELD = utl.alignStr(e_FIELD,dds.ALIGNS.left,cell.long);
+		else	e_FIELD = utl.alignStr(e_FIELD,utl.ALIGNS.left,cell.long);
 
 
 		if (cell.reftyp == dds.REFTYP.SWITCH) {
@@ -650,16 +645,20 @@ pub const	grd = struct {
 		for (self.headers.items) |cellx| {
 			if (std.mem.eql(u8,cellx.edtcar , "") == true )
 				buf = std.fmt.allocPrint(allocatorGrid,
-					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long) }) 
+					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",utl.ALIGNS.left,cellx.long) }) 
 					catch |err| { @panic(@errorName(err));}
 			else
 				buf = std.fmt.allocPrint(allocatorGrid,
-					"{s}{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",dds.ALIGNS.left,cellx.long),Blanc })
+					"{s}{s}{s}{s}", .{ buf,self.separator, utl.alignStr(" ",utl.ALIGNS.left,cellx.long),Blanc })
 					catch |err| { @panic(@errorName(err));};
 		}
 		buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,self.separator}) 
 			catch |err| { @panic(@errorName(err));};
+		
+		defer allocatorGrid.free(buf);
 
+
+		
 		var x :usize = 1;
 		var y :usize = 0;
 		var n :usize = 0;
@@ -683,11 +682,11 @@ pub const	grd = struct {
 				cellx.reftyp == dds.REFTYP.DECIMAL)
 
 					buf = std.fmt.allocPrint(allocatorGrid,
-					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.rigth,cellx.long) }) 
+					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,utl.ALIGNS.rigth,cellx.long) }) 
 						catch |err| { @panic(@errorName(err));}
 
 			else buf = std.fmt.allocPrint(allocatorGrid,
-					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,dds.ALIGNS.left,cellx.long) }) 
+					"{s}{s}{s}", .{ buf,self.separator, utl.alignStr(cellx.text,utl.ALIGNS.left,cellx.long) }) 
 						catch |err| { @panic(@errorName(err));};
 
 			if (std.mem.eql(u8,cellx.edtcar , "") == false ) buf = std.fmt.allocPrint(allocatorGrid,"{s}{s}", .{ buf,Blanc}) 
@@ -810,8 +809,7 @@ pub const	grd = struct {
 		if ( self.actif == false ) return gSelect ; 
 
 		gSelect.Key = term.kbd.none;
-
-
+	
 		var CountLigne : usize = 0;
 		self.cursligne = 0;
 		printGridHeader(self) ;
@@ -1199,24 +1197,4 @@ pub const	grd = struct {
 		}
 	}
 
-	// restor -panel	MATRIX to terminal ---> arraylist panel-grid 
-	// pub fn rstPanel( vsrc : *GRID , vdst : *pnl.PANEL) void {
-	// 	if (vdst.actif == false)	return ;
-	// 	if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
-	// 	if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
-	// 	var x :usize = 0;
-	// 	var y :usize = 0;
-	// 	var n :usize = 0;
-	// 	var npos : usize =	vsrc.posx - vdst.posx;
-	// 	while (x <= vsrc.lines) : (x += 1) {
-	// 		n = vdst.cols * npos + vsrc.posy - vdst.posy	;
-	// 		y = 0;
-	// 		while (y <= vsrc.cols) : (y += 1) {
-	// 			term.gotoXY(x + vsrc.posx	 , y + vsrc.posy	);
-	// 			term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
-	// 			n += 1;
-	// 		}
-	// 		npos += 1;
-	// 	}
-	// }
 };

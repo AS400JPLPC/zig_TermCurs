@@ -202,7 +202,7 @@ pub fn subStr( vpnl: *pnl.PANEL, a: []const u8,pos: usize, n:usize) []const u8 {
 	defer allocator.free(result);
 
 	std.mem.copy(u8, result, a[pos..n]);
-	return std.fmt.allocPrint(dds.allocatorUtils,"{s}",.{result},)
+	return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{result},)
 								catch |err| { @panic(@errorName(err));};
 }
 
@@ -215,7 +215,7 @@ fn strToUsize( v : []const u8 ) usize{
 
 fn usizeToStr( v : usize ) []const u8{
 
-	return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v})
+	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
 	catch |err| { @panic(@errorName(err));};
 }
 
@@ -246,7 +246,7 @@ return std.fmt.parseUnsigned(u64, str,10)
 
 pub fn UintToStr(v: usize ) []const u8{
 
-	return std.fmt.allocPrint(dds.allocatorUtils,"{d}", .{v})
+	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
 	catch |err| { @panic(@errorName(err));};
 }
 
@@ -271,7 +271,8 @@ pub fn UintToStr(v: usize ) []const u8{
 // function special for developpeur
 pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize, text:[] const u8) void {
 		const AtrDebug: dds.ZONATRB = .{
-				.styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
+				.styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle),
+								 @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
 				.backgr = dds.BackgroundColor.bgBlack,
 				.foregr = dds.ForegroundColor.fgRed,
 		};
@@ -1096,7 +1097,7 @@ pub const	fld = struct {
 
 
 	pub fn ToStr(text : [] const u8 ) []const u8 {
-		return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{text}) 
+		return std.fmt.allocPrint(dds.allocatorPnl,"{s}",.{text}) 
 									catch |err| { @panic(@errorName(err));};
 	}
 
@@ -1170,21 +1171,21 @@ pub const	fld = struct {
 		reftyp: dds.REFTYP,
 		width:	usize,
 		scal:	 usize,
-		nbrcar: usize,				// nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =	ALPA..DIGIT..
+		nbrcar: usize,	// nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =	ALPA..DIGIT..
 
-		requier: bool,					// requier or FULL
-		protect: bool,				// only display
+		requier: bool,	// requier or FULL
+		protect: bool,	// only display
 
-		pading: bool,				 // pading blank
-		edtcar: []const u8,	 // edtcar for monnaie		€ $ ¥ ₪ £ or %
+		pading: bool,	// pading blank
+		edtcar: []const u8,	// edtcar for monnaie		€ $ ¥ ₪ £ or %
 
-		regex: []const u8,		//contrôle regex
-		errmsg: []const u8,	 //message this field
+		regex: []const u8,	//contrôle regex
+		errmsg: []const u8,	//message this field
 
-		help: []const u8,		 //help this field
+		help: []const u8,	//help this field
 
 		text: []const u8,
-		zwitch: bool,				 // CTRUE CFALSE
+		zwitch: bool,		// CTRUE CFALSE
 
 		procfunc: []const u8,	//name proc
 
@@ -1462,22 +1463,22 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.SWITCH ,
-				.width	= 1,
+				.reftyp  = dds.REFTYP.SWITCH ,
+				.width	 = 1,
 				.scal	 = 0,
-				.nbrcar = 1,
-				.requier	= false,
+				.nbrcar  = 1,
+				.requier = false,
 				.protect = false,
-				.pading	= false,
-				.edtcar = "",
-				.regex	= "",
-				.errmsg = verrmsg,
+				.pading	 = false,
+				.edtcar  = "",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = "",
-				.zwitch = vzwitch,
-				.procfunc	="",
-				.proctask	="",
-				.attribut	= AtrField,
+				.zwitch  = vzwitch,
+				.procfunc ="",
+				.proctask ="",
+				.attribut = AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
 		};
@@ -1509,19 +1510,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.DATE_FR,
-				.width	= 10,
+				.reftyp  = dds.REFTYP.DATE_FR,
+				.width	 = 10,
 				.scal	 = 0,
-				.nbrcar = 10,
-				.requier	= vrequier,
+				.nbrcar  = 10,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= false,
-				.edtcar ="",
-				.regex	= "",				 
-				.errmsg = verrmsg,
+				.pading	 = false,
+				.edtcar  ="",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1558,19 +1559,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.DATE_US,
-				.width	= 10,
+				.reftyp  = dds.REFTYP.DATE_US,
+				.width	 = 10,
 				.scal	 = 0,
-				.nbrcar = 10,
-				.requier	= vrequier,
+				.nbrcar  = 10,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= false,
-				.edtcar ="",
-				.regex	= "",				 
-				.errmsg = verrmsg,
+				.pading	 = false,
+				.edtcar  ="",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1607,19 +1608,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.DATE_ISO,
-				.width	= 10,
+				.reftyp  = dds.REFTYP.DATE_ISO,
+				.width	 = 10,
 				.scal	 = 0,
-				.nbrcar = 10,
-				.requier	= vrequier,
+				.nbrcar  = 10,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= false,
-				.edtcar ="",
-				.regex	= "",				 
-				.errmsg = verrmsg,
+				.pading	 = false,
+				.edtcar  ="",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1655,19 +1656,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.MAIL_ISO,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.MAIL_ISO,
+				.width	 = vwidth,
 				.scal	 = 0,
-				.nbrcar = vwidth,
-				.requier	= vrequier,
+				.nbrcar  = vwidth,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	="",
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 ="",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1706,16 +1707,16 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.TELEPHONE,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.TELEPHONE,
+				.width	 = vwidth,
 				.scal	 = 0,
-				.nbrcar = vwidth,
-				.requier	= vrequier,
+				.nbrcar  = vwidth,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	= "",
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
 				.zwitch = false,
@@ -1755,19 +1756,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.UDIGIT,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.UDIGIT,
+				.width	 = vwidth,
 				.scal	 = 0,
-				.nbrcar = vwidth,
-				.requier	= vrequier,
+				.nbrcar  = vwidth,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	= vregex,
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 = vregex,
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1800,19 +1801,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.DIGIT,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.DIGIT,
+				.width	 = vwidth,
 				.scal	 = 0,
-				.nbrcar = 0,
-				.requier	= vrequier,
+				.nbrcar  = 0,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	= vregex,
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 = vregex,
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1846,19 +1847,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.UDECIMAL,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.UDECIMAL,
+				.width	 = vwidth,
 				.scal	 = vscal,
-				.nbrcar = 0,
-				.requier	= vrequier,
+				.nbrcar  = 0,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	= vregex,
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 = vregex,
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1900,19 +1901,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.DECIMAL,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.DECIMAL,
+				.width	 = vwidth,
 				.scal	 = vscal,
-				.nbrcar = 0,
-				.requier	= vrequier,
+				.nbrcar  = 0,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= true,
-				.edtcar ="",
-				.regex	= vregex,
-				.errmsg = verrmsg,
+				.pading	 = true,
+				.edtcar  ="",
+				.regex	 = vregex,
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
 				.attribut	= AtrField,
@@ -1955,19 +1956,19 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp = dds.REFTYP.FUNC,
-				.width	= vwidth,
+				.reftyp  = dds.REFTYP.FUNC,
+				.width	 = vwidth,
 				.scal	 = 0,
-				.nbrcar = vwidth,
-				.requier	= vrequier,
+				.nbrcar  = vwidth,
+				.requier = vrequier,
 				.protect = false,
-				.pading	= false,
-				.edtcar = "",
-				.regex	= "",
-				.errmsg = verrmsg,
+				.pading	 = false,
+				.edtcar  = "",
+				.regex	 = "",
+				.errmsg  = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
+				.zwitch  = false,
 				.procfunc	=vprocfunc,
 				.proctask	="",
 				.attribut	= AtrField,
@@ -2460,6 +2461,7 @@ pub const	fld = struct {
 
 		const allocator = std.heap.page_allocator;
 		e_FIELD = std.ArrayList([] const u8).init(allocator);
+		e_FIELD.clearAndFree();
 		defer e_FIELD.deinit();
 		
 		e_switch = vfld.zwitch;
@@ -3225,7 +3227,7 @@ pub const Epanel = enum {
 					n += 1;
 				}
 			}
-		displayPanel(vpnl);
+		//displayPanel(vpnl);
 	}
 	
 	// clear Panel
@@ -3469,6 +3471,7 @@ pub const Epanel = enum {
 
 		while (true) {
 
+		
 			if (nbrFieldIO == 0 or vpnl.field.items.len == 0 )	{
 				var vKey= kbd.getKEY();
 
