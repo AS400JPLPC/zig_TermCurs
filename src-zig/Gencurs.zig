@@ -1,7 +1,6 @@
 const std = @import("std");
 
 
-const dds = @import("dds");
 
 /// terminal Fonction
 const term = @import("cursed");
@@ -75,6 +74,7 @@ const choix = enum {
 	menu,
 	sjson,
 	rjson,
+	clean,
 	exit
 };
 
@@ -101,7 +101,7 @@ pub fn main() !void {
 					1, 1,
 					termSize.height,
 					termSize.width ,
-					dds.CADRE.line1,
+					forms.CADRE.line1,
 					"") ;
 	//-------------------------------------------------
 	//the menu is not double buffered it is not a Panel
@@ -109,8 +109,8 @@ pub fn main() !void {
 	var MenuPrincipal = mnu.newMenu(
 					"Screen",				// name
 					2, 2,					// posx, posy	
-					dds.CADRE.line1,		// type line fram
-					dds.MNUVH.vertical,		// type menu vertical / horizontal
+					mnu.CADRE.line1,		// type line fram
+					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
 					"Panel..",
 					"Forms..",
@@ -118,6 +118,7 @@ pub fn main() !void {
 					"Menu...",
 					"SavJson.",
 					"RstJson",
+					"Testclean",
 					"Exit...",
 					}
 					) ;
@@ -126,6 +127,11 @@ pub fn main() !void {
 	while (true) {
 
 	pnl.printPanel(base);
+	term.deinitTerm();
+	grd.deinitGrid();
+	utl.deinitUtl();
+
+
 	nopt = mnu.ioMenu(MenuPrincipal,0);
 
 	if (nopt == @intFromEnum(choix.exit )) { break; }
@@ -136,10 +142,31 @@ pub fn main() !void {
 	// if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NMENU) ;
 	if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 	if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
+	// simulation for test clean allocator
+	if (nopt == @intFromEnum(choix.clean)) {
+		pnl.freePanel(base);
 
-	dds.deinitStr(); 
-	utl.deinitUStr();
+		term.deinitTerm();
+		grd.deinitGrid();
+		utl.deinitUtl();
+		forms.deinitForms();
 
+		if (NPANEL.items.len > 0) {
+		NPANEL.clearAndFree();
+		NPANEL.deinit();
+		}
+		if (NGRID.items.len > 0) {
+		NGRID.clearAndFree();
+		NGRID.deinit();
+		}
+		base = pnl.newPanelC("base",
+					1, 1,
+					termSize.height,
+					termSize.width ,
+					forms.CADRE.line1,
+					"") ;
+
+	}
 	
 	}
 	term.disableRawMode();

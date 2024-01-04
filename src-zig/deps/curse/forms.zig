@@ -1,7 +1,5 @@
 const std = @import("std");
 const utf = @import("std").unicode;
-
-const dds = @import("dds");
 const kbd = @import("cursed").kbd;
 const term= @import("cursed");
 const utl = @import("utils");
@@ -16,16 +14,78 @@ const io = std.io;
 
 
 
+// for panel all arraylist (forms. label button line field pnl:)
+ var arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorForms = arenaForms.allocator();
+pub fn deinitForms() void {
+	arenaForms.deinit();
+	arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	allocatorForms = arenaForms.allocator();
+}
+
+// //free memory String
+// var arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+// pub var  allocatorStr = arenaStr.allocator();
+// pub fn deinitStr() void {
+// 	arenaStr.deinit();
+// 	arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+// 	allocatorStr = arenaStr.allocator();
+// }
+
+
+
+pub const CTRUE  = "✔";
+pub const CFALSE = "◉";
+
+pub const LINE = enum {
+	line1,
+	line2
+};
+
+pub const CADRE = enum  {
+	line0,
+	line1,
+	line2
+};
+
+
+pub const REFTYP = enum {
+	TEXT_FREE,			// Free
+	TEXT_FULL,			// Letter Digit Char-special
+	ALPHA,				// Letter
+	ALPHA_UPPER,		// Letter
+	ALPHA_NUMERIC,		// Letter Digit espace -
+	ALPHA_NUMERIC_UPPER,// Letter Digit espace -
+	PASSWORD,			// Letter Digit and normaliz char-special
+	YES_NO,				// 'y' or 'Y' / 'o' or 'O'
+	UDIGIT,				// Digit unsigned
+	DIGIT,				// Digit signed 
+	UDECIMAL,			// Decimal unsigned
+	DECIMAL,			// Decimal signed
+	DATE_ISO,			// YYYY/MM/DD
+	DATE_FR,			// DD/MM/YYYY
+	DATE_US,			// MM/DD/YYYY
+	TELEPHONE,			// (+123) 6 00 01 00 02 
+	MAIL_ISO,			// normalize regex
+	SWITCH,				// CTRUE CFALSE
+	FUNC,				// call Function
+};
+
+
+
+
+
+
 // function special for developpeur
 pub fn debeug(vline : usize, buf: [] const u8) void {
 	
-	const AtrDebug : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgYellow
+	const AtrDebug : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgYellow
 	};
 
 	term.getCursor();
@@ -114,9 +174,9 @@ pub const ErrForms = error{
 
 				fld_dltRows_Index_invalide,
 
-				Invalide_subStr_Index,
+				Invalide_subStrForms_Index,
+				Invlide_subStrForms_pos
 
-				char_not_digital,
 		};
 
 
@@ -124,13 +184,13 @@ pub const ErrForms = error{
 pub const	dsperr = struct {		
 	pub fn errorForms(vpnl: *pnl.PANEL, errpgm :anyerror ) void { 
 		// define attribut default MSG Error
-		const MsgErr : dds.ZONATRB = .{
-				.styled=[_]u32{@intFromEnum(dds.Style.styleBlink),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle)},
-				.backgr = dds.BackgroundColor.bgBlack,
-				.foregr = dds.ForegroundColor.fgYellow,
+		const MsgErr : term.ZONATRB = .{
+				.styled=[_]u32{@intFromEnum(term.Style.styleBlink),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle)},
+				.backgr = term.BackgroundColor.bgBlack,
+				.foregr = term.ForegroundColor.fgYellow,
 		};
 
 		const allocator = std.heap.page_allocator;
@@ -147,7 +207,7 @@ pub const	dsperr = struct {
 		var msgerr:[]const u8 = utl.concatStr("Info : ", errTxt) ;
 		var boucle : bool= true ;
 
-		if (vpnl.cols < (msgerr.len) )	msgerr = subStr(vpnl, msgerr, 0,	vpnl.cols - 2);
+		if (vpnl.cols < (msgerr.len) )	msgerr = subStrForms(msgerr, 0,	vpnl.cols - 2);
 
 		// clear line button 
 		while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -181,20 +241,13 @@ pub const	dsperr = struct {
 // buffer terminal MATRIX
 const TERMINAL_CHAR = struct {
 	ch :	 [] const u8,
-	attribut:dds.ZONATRB,
+	attribut:term.ZONATRB,
 	on:bool
 };
 
-//----------------------------
-// OUTIL 
-//----------------------------
-
-
-/// intern solution substring String
-pub fn subStr( vpnl: *pnl.PANEL, a: []const u8,pos: usize, n:usize) []const u8 {
-	if (n == 0 or n > a.len) {dsperr.errorForms(vpnl, ErrForms.Invalide_subStr_Index);return " " ;}
-
-	if (pos > a.len) {dsperr.errorForms(vpnl, ErrForms.Invalide_subStr_Index);return " " ;}
+pub fn subStrForms( a: []const u8,pos: usize, n:usize) []const u8 {
+	if (n == 0 or n > a.len) {@panic(@errorName(ErrForms.Invalide_subStrForms_Index));}
+	if (pos > a.len) {@panic(@errorName(ErrForms.Invlide_subStrForms_pos));}
 
 	const allocator = std.heap.page_allocator;
 	const result = allocator.alloc(u8, n - pos) 
@@ -202,62 +255,20 @@ pub fn subStr( vpnl: *pnl.PANEL, a: []const u8,pos: usize, n:usize) []const u8 {
 	defer allocator.free(result);
 
 	std.mem.copy(u8, result, a[pos..n]);
-	return std.fmt.allocPrint(dds.allocatorStr,"{s}",.{result},)
+	return std.fmt.allocPrint(allocator ,"{s}",.{result},)
 								catch |err| { @panic(@errorName(err));};
 }
 
 
-// interne soltion
-fn strToUsize( v : []const u8 ) usize{
-	return std.fmt.parseUnsigned(u64, v,10) 
-				catch |err| { @panic(@errorName(err));};
-}
-
-fn usizeToStr( v : usize ) []const u8{
-
-	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
-	catch |err| { @panic(@errorName(err));};
-}
-
-
-
-pub fn strToUint( str : []const u8) usize{
-
-if( str.len == 0) return 0 ;
-
-var digit: [1][] u8 = undefined;
-var buffer : [100] u8 =	[_]u8{0} ** 100;
-
-digit [0]	= std.fmt.bufPrint(buffer[0..], "{s}",.{str}) 
-									catch |err| { @panic(@errorName(err));};
-
-			for ( digit, 0..) |d, idx| {
-
-				if ( !std.ascii.isDigit(d[idx])) {
-						dsperr(ErrForms.char_not_digital_invalide);
-						return 0 ;
-				}
-			}
-
-return std.fmt.parseUnsigned(u64, str,10) 
-				catch |err| { @panic(@errorName(err));};
-}
-
-
-pub fn UintToStr(v: usize ) []const u8{
-
-	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
-	catch |err| { @panic(@errorName(err));};
-}
 
 // function special for developpeur
 // activat fld.myMouse = true
 // read ioField -> getKEY()
  pub fn dspMouse(vpnl: *pnl.PANEL) void {
-		const AtrDebug: dds.ZONATRB = .{
-				.styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
-				.backgr = dds.BackgroundColor.bgBlack,
-				.foregr = dds.ForegroundColor.fgRed,
+		const AtrDebug: term.ZONATRB = .{
+				.styled = [_]u32{ @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) },
+				.backgr = term.BackgroundColor.bgBlack,
+				.foregr = term.ForegroundColor.fgRed,
 		};
 		const allocator = std.heap.page_allocator;
 		var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) 
@@ -270,11 +281,11 @@ pub fn UintToStr(v: usize ) []const u8{
 
 // function special for developpeur
 pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize, text:[] const u8) void {
-		const AtrDebug: dds.ZONATRB = .{
-				.styled = [_]u32{ @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle),
-								 @intFromEnum(dds.Style.notStyle), @intFromEnum(dds.Style.notStyle) },
-				.backgr = dds.BackgroundColor.bgBlack,
-				.foregr = dds.ForegroundColor.fgRed,
+		const AtrDebug: term.ZONATRB = .{
+				.styled = [_]u32{ @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle),
+								 @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) },
+				.backgr = term.BackgroundColor.bgBlack,
+				.foregr = term.ForegroundColor.fgRed,
 		};
 
 		if (std.mem.eql(u8, text, "") == false ) {
@@ -295,30 +306,30 @@ pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize, text:[] const u
 pub const	lbl = struct {
 
 	// define attribut default LABEL
-	pub var AtrLabel : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.styleItalic),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgGreen,
+	pub var AtrLabel : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.styleItalic),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgGreen,
 	};
 
 	// define attribut default TITLE
-	pub var AtrTitle : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleBold),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgGreen,
+	pub var AtrTitle : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleBold),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgGreen,
 	};
 
 	pub const LABEL = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
-		attribut:dds.ZONATRB,
+		attribut:term.ZONATRB,
 		text:	 []const u8,
 		title:	bool,
 		actif:	bool
@@ -443,7 +454,7 @@ pub const	lbl = struct {
 
 		while (iter.next()) |ch| {
 			if (vlbl.actif == true) {
-				vpnl.buf.items[n].ch = ch ;
+				vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
 				vpnl.buf.items[n].attribut = vlbl.attribut;
 				vpnl.buf.items[n].on = true;
 			}
@@ -500,24 +511,24 @@ pub const	lbl = struct {
 pub const frm = struct {
 
 	// define attribut default FRAME
-	pub var AtrFrame : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgRed
+	pub var AtrFrame : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgRed
 
 	};
 
 	// define attribut default TITLE FRAME
-	pub var AtrTitle : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleBold),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgWhite,
-			.foregr = dds.ForegroundColor.fgBlue
+	pub var AtrTitle : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleBold),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgWhite,
+			.foregr = term.ForegroundColor.fgBlue
 	};
 
 
@@ -525,14 +536,14 @@ pub const frm = struct {
 
 	pub const FRAME = struct {
 		name :	[]const u8,
-		posx:	 usize,
-		posy:	 usize,
+		posx:	usize,
+		posy:	usize,
 		lines:	usize,
-		cols:	 usize,
-		cadre:	dds.CADRE,
-		attribut:dds.ZONATRB,
+		cols:	usize,
+		cadre:	CADRE,
+		attribut:term.ZONATRB,
 		title:	[]const u8,
-		titleAttribut: dds.ZONATRB,
+		titleAttribut: term.ZONATRB,
 		actif:	bool
 		};
 
@@ -541,10 +552,10 @@ pub const frm = struct {
 										vposx:usize, vposy:usize,
 										vlines:usize,
 										vcols:usize,
-										vcadre:dds.CADRE,
-										vattribut:dds.ZONATRB,
+										vcadre:CADRE,
+										vattribut:term.ZONATRB,
 										vtitle:[]const u8,
-										vtitleAttribut:dds.ZONATRB,
+										vtitleAttribut:term.ZONATRB,
 										) FRAME {
 
 					const xframe = FRAME {
@@ -568,7 +579,7 @@ pub const frm = struct {
 		pub fn printFrame(vpnl : *pnl.PANEL , vfram: FRAME) void {
 
 			// assigne FRAME to init matrice for display
-			if (dds.CADRE.line0 == vfram.cadre ) return ;
+			if (CADRE.line0 == vfram.cadre ) return ;
 
 			const ACS_Hlines	= "─";
 			const ACS_Vlines	= "│";
@@ -604,45 +615,45 @@ pub const frm = struct {
 					edt = false;
 					if (row == 1) {
 							if (col == 1) {
-								if ( dds.CADRE.line1 == vfram.cadre ) {
+								if ( CADRE.line1 == vfram.cadre ) {
 										trait = ACS_UCLEFT;
 								} else	trait = ACS_UCLEFT2 ;
 								edt = true;
 							}
 							if ( col == vfram.cols ) {
-								if (dds.CADRE.line1 == vfram.cadre) {
+								if (CADRE.line1 == vfram.cadre) {
 									trait = ACS_UCRIGHT;
 								} else	trait = ACS_UCRIGHT2 ;
 								edt = true;
 							}
 							if ( col > 1 and col < vfram.cols ) {
-								if (dds.CADRE.line1 == vfram.cadre ) {
+								if (CADRE.line1 == vfram.cadre ) {
 									trait = ACS_Hlines;
 								} else	trait = ACS_Hline2;
 								edt = true;
 							}
 					} else if ( row == vfram.lines ) {
 							if (col == 1) {
-								if ( dds.CADRE.line1 == vfram.cadre ) {
+								if ( CADRE.line1 == vfram.cadre ) {
 									trait = ACS_LCLEFT;
 								} else	trait = ACS_LCLEFT2;
 								edt = true;
 							}
 							if ( col == vfram.cols ) {
-								if ( dds.CADRE.line1 == vfram.cadre ) {
+								if ( CADRE.line1 == vfram.cadre ) {
 									trait = ACS_LCRIGHT;
 								} else	trait = ACS_LCRIGHT2 ;
 								edt = true ;
 							}
 							if ( col > 1 and col < vfram.cols ) {
-								if ( dds.CADRE.line1 == vfram.cadre ) {
+								if ( CADRE.line1 == vfram.cadre ) {
 									trait = ACS_Hlines;
 								} else	trait = ACS_Hline2 ;
 								edt = true;
 							}
 					} else if ( row > 1 and row < vfram.lines ) {
 						if ( col == 1 or col == vfram.cols ) {
-							if ( dds.CADRE.line1 == vfram.cadre ) {
+							if ( CADRE.line1 == vfram.cadre ) {
 								trait = ACS_Vlines;
 							} else trait = ACS_Vline2 ;
 							edt = true;
@@ -669,7 +680,7 @@ pub const frm = struct {
 				var iter = utl.iteratStr.iterator(vfram.title);
 				defer iter.deinit();
 				while (iter.next()) |ch| {
-					vpnl.buf.items[n].ch = ch ;
+					vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
 					vpnl.buf.items[n].attribut = vfram.titleAttribut;
 					vpnl.buf.items[n].on = true;
 					n +=1;
@@ -684,13 +695,13 @@ pub const frm = struct {
 pub const lnv = struct {
 
 	// define attribut default FRAME
-	pub var AtrLine : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgYellow
+	pub var AtrLine : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgYellow
 
 	};
 
@@ -705,13 +716,13 @@ pub const lnv = struct {
 
 	/// LINE VERTICAL
 
-	pub const LINE = struct {
+	pub const LINEV = struct {
 		name :	[]const u8,
-		posx:	 usize,
-		posy:	 usize,
+		posx:	usize,
+		posy:	usize,
 		lng:	usize,
-		trace:	dds.LINE,
-		attribut:dds.ZONATRB,
+		trace:	LINE,
+		attribut:term.ZONATRB,
 		actif:	bool
 		};
 
@@ -719,10 +730,10 @@ pub const lnv = struct {
 		pub fn newLine(vname:[]const u8,
 										vposx:usize, vposy:usize,
 										vlng:usize,
-										vtrace:dds.LINE,
-										) LINE {
+										vtrace:LINE,
+										) LINEV {
 
-					const xframe = LINE {
+					const xframe = LINEV {
 							.name = vname,
 							.posx = vposx,
 							.posy = vposy,
@@ -737,7 +748,7 @@ pub const lnv = struct {
 
 
 		// write MATRIX TERMINAL	---> arraylist panel-line
-		pub fn printLine(vpnl : *pnl.PANEL , vline: LINE) void {
+		pub fn printLine(vpnl : *pnl.PANEL , vline: LINEV) void {
 		if (vpnl.actif == false ) return ;
 		if (vline.actif == false ) return ;
 
@@ -755,7 +766,7 @@ pub const lnv = struct {
 			while (row <= vline.lng) {
 
 
-				if ( dds.LINE.line1 == vline.trace ) {
+				if ( LINE.line1 == vline.trace ) {
 					trait = ACS_Vlines;
 				} else trait = ACS_Vline2 ;
 				vpnl.buf.items[n].ch = trait ;
@@ -782,13 +793,13 @@ pub const lnv = struct {
 pub const lnh = struct {
 
 	// define attribut default FRAME
-	pub var AtrLine : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgYellow
+	pub var AtrLine : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgYellow
 
 	};
 
@@ -802,13 +813,13 @@ pub const lnh = struct {
 
 	/// LINE HORIZONTAL
 
-	pub const LINE = struct {
+	pub const LINEH = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
 		lng:	usize,
-		trace:	dds.LINE,
-		attribut:dds.ZONATRB,
+		trace:	LINE,
+		attribut:term.ZONATRB,
 		actif:	bool
 		};
 
@@ -816,10 +827,10 @@ pub const lnh = struct {
 		pub fn newLine(vname:[]const u8,
 										vposx:usize, vposy:usize,
 										vlng:usize,
-										vtrace:dds.LINE,
-										) LINE {
+										vtrace:LINE,
+										) LINEH {
 
-					const xframe = LINE {
+					const xframe = LINEH {
 							.name = vname,
 							.posx = vposx,
 							.posy = vposy,
@@ -834,7 +845,7 @@ pub const lnh = struct {
 
 
 		// write MATRIX TERMINAL	---> arraylist panel-line
-		pub fn printLine(vpnl : *pnl.PANEL , vline: LINE) void {
+		pub fn printLine(vpnl : *pnl.PANEL , vline: LINEH) void {
 		if (vpnl.actif == false ) return ;
 		if (vline.actif == false ) return ;
 			// assigne FRAMELINE HORIZONTAL
@@ -852,7 +863,7 @@ pub const lnh = struct {
 			while (coln <= vline.lng) {
 
 
-				if ( dds.LINE.line1 == vline.trace ) {
+				if ( LINE.line1 == vline.trace ) {
 					trait = ACS_Hlines;
 				} else trait = ACS_Hline2 ;
 				vpnl.buf.items[n].ch = trait ;
@@ -882,21 +893,21 @@ pub const btn = struct{
 	// nbr espace intercaler
 	pub var btnspc : usize =3 ;
 	// define attribut default PANEL
-	pub var AtrButton : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgRed
+	pub var AtrButton : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgRed
 	};
-	pub var AtrTitle : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.styleItalic),
-										@intFromEnum(dds.Style.styleUnderscore),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgdCyan,
+	pub var AtrTitle : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.styleItalic),
+										@intFromEnum(term.Style.styleUnderscore),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgdCyan,
 	};
 
 
@@ -908,8 +919,8 @@ pub const btn = struct{
 		show: bool,
 		check: bool,
 		title: []const u8,
-		attribut:dds.ZONATRB,
-		titleAttribut: dds.ZONATRB,
+		attribut:term.ZONATRB,
+		titleAttribut: term.ZONATRB,
 		actif: bool,
 	};
 
@@ -1032,7 +1043,7 @@ pub const btn = struct{
 		var x :usize = 0;
 		var y :usize = 0;
 
-		if (vpnl.frame.cadre == dds.CADRE.line0 ) {
+		if (vpnl.frame.cadre == CADRE.line0 ) {
 			x = vpnl.lines - 1;
 			y = 1;
 		}
@@ -1053,7 +1064,8 @@ pub const btn = struct{
 				defer iter.deinit();
 				while (iter.next()) |ch| {
 					if (button.actif == true) {
-						vpnl.buf.items[n].ch = ch ;
+						vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+
 						vpnl.buf.items[n].attribut = button.attribut;
 						vpnl.buf.items[n].on = true;
 					}
@@ -1071,7 +1083,8 @@ pub const btn = struct{
 
 				while (iter.next()) |ch| {
 					if (button.actif == true) {
-						vpnl.buf.items[n].ch = ch ;
+						vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+
 						vpnl.buf.items[n].attribut = button.titleAttribut;
 						vpnl.buf.items[n].on = true;
 					}
@@ -1097,67 +1110,67 @@ pub const	fld = struct {
 
 
 	pub fn ToStr(text : [] const u8 ) []const u8 {
-		return std.fmt.allocPrint(dds.allocatorPnl,"{s}",.{text}) 
+		return std.fmt.allocPrint(allocatorForms,"{s}",.{text}) 
 									catch |err| { @panic(@errorName(err));};
 	}
 
 	// define attribut default Fiel
-	pub var AtrField : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgWhite
+	pub var AtrField : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgWhite
 	};
 
 	// field not input
-	pub var AtrNil : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgdWhite
+	pub var AtrNil : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgdWhite
 	};
 
 	// define attribut default func ioField
-	pub var AtrIO : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleReverse),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgWhite,
+	pub var AtrIO : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleReverse),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgWhite,
 	};
 
 	// define attribut default Field protect
-	pub var AtrProtect : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleItalic),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgCyan,
+	pub var AtrProtect : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleItalic),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgCyan,
 	};
 
-	pub var AtrCursor : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgCyan,
+	pub var AtrCursor : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgCyan,
 	};
 
 
-	pub var MsgErr : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgRed
+	pub var MsgErr : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgRed
 	};
 
 
@@ -1166,9 +1179,9 @@ pub const	fld = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
-		attribut:dds.ZONATRB,
-		atrProtect:dds.ZONATRB,
-		reftyp: dds.REFTYP,
+		attribut:term.ZONATRB,
+		atrProtect:term.ZONATRB,
+		reftyp: REFTYP,
 		width:	usize,
 		scal:	 usize,
 		nbrcar: usize,	// nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =	ALPA..DIGIT..
@@ -1233,7 +1246,7 @@ pub const	fld = struct {
 						vname: [] const u8,
 						vposx: usize,
 						vposy: usize,
-						vreftyp: dds.REFTYP,
+						vreftyp: REFTYP,
 						vwidth:	usize,
 						vtext: []const u8,
 						vrequier: bool,
@@ -1264,7 +1277,7 @@ pub const	fld = struct {
 			.atrProtect = AtrProtect,
 			.actif	= true
 		};
-		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
+		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
 		return xfield;
 
@@ -1288,7 +1301,7 @@ pub const	fld = struct {
 								vname,
 								vposx,
 								vposy,
-								dds.REFTYP.TEXT_FREE,
+								REFTYP.TEXT_FREE,
 								vwidth,
 								vtext,
 								vrequier,
@@ -1316,7 +1329,7 @@ pub const	fld = struct {
 							vname,
 							vposx,
 							vposy,
-							dds.REFTYP.TEXT_FULL,
+							REFTYP.TEXT_FULL,
 							vwidth,
 							vtext,
 							vrequier,
@@ -1338,7 +1351,7 @@ pub const	fld = struct {
 										vregex: []const u8) FIELD {
 		
 		return initFieldString(vname,	vposx, vposy,
-													dds.REFTYP.ALPHA,
+													REFTYP.ALPHA,
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
@@ -1355,7 +1368,7 @@ pub const	fld = struct {
 										vregex: []const u8) FIELD {
 
 		return initFieldString(vname,	vposx, vposy,
-													dds.REFTYP.ALPHA_UPPER,
+													REFTYP.ALPHA_UPPER,
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
@@ -1372,7 +1385,7 @@ pub const	fld = struct {
 										vregex: []const u8) FIELD {
 
 		return initFieldString(vname,	vposx, vposy,
-													dds.REFTYP.ALPHA_NUMERIC,
+													REFTYP.ALPHA_NUMERIC,
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
@@ -1389,7 +1402,7 @@ pub const	fld = struct {
 										vregex: []const u8) FIELD {
 
 		return initFieldString(vname,	vposx, vposy,
-													dds.REFTYP.ALPHA_NUMERIC_UPPER,
+													REFTYP.ALPHA_NUMERIC_UPPER,
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
@@ -1406,7 +1419,7 @@ pub const	fld = struct {
 										vregex: []const u8) FIELD {
 
 		return initFieldString(vname,	vposx, vposy,
-													dds.REFTYP.PASSWORD,
+													REFTYP.PASSWORD,
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
@@ -1425,7 +1438,7 @@ pub const	fld = struct {
 						.name	 = vname,
 						.posx	 = vposx,
 						.posy	 = vposy,
-						.reftyp = dds.REFTYP.YES_NO ,
+						.reftyp = REFTYP.YES_NO ,
 						.width	= 1,
 						.scal	 = 0,
 						.nbrcar = 1,
@@ -1463,7 +1476,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.SWITCH ,
+				.reftyp  = REFTYP.SWITCH ,
 				.width	 = 1,
 				.scal	 = 0,
 				.nbrcar  = 1,
@@ -1485,8 +1498,8 @@ pub const	fld = struct {
 
 		if (xfield.help.len == 0 ) xfield.help = "check ok= ✔ not= ◉  : Select espace bar " ;
 
-		if (xfield.zwitch == true ) xfield.text = dds.STRUE
-		else xfield.text = dds.SFALSE;
+		if (xfield.zwitch == true ) xfield.text = CTRUE
+		else xfield.text = CFALSE;
 
 		return xfield;
 
@@ -1510,7 +1523,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.DATE_FR,
+				.reftyp  = REFTYP.DATE_FR,
 				.width	 = 10,
 				.scal	 = 0,
 				.nbrcar  = 10,
@@ -1531,7 +1544,7 @@ pub const	fld = struct {
 		};
 
 
-		xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
+		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 		,.{"^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$"}) 
 		catch |err| { @panic(@errorName(err));};
 
@@ -1559,7 +1572,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.DATE_US,
+				.reftyp  = REFTYP.DATE_US,
 				.width	 = 10,
 				.scal	 = 0,
 				.nbrcar  = 10,
@@ -1579,7 +1592,7 @@ pub const	fld = struct {
 				.actif	= true
 		};
 
-		xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
+		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 		,.{"^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" })
 		catch |err| { @panic(@errorName(err));};
 
@@ -1608,7 +1621,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.DATE_ISO,
+				.reftyp  = REFTYP.DATE_ISO,
 				.width	 = 10,
 				.scal	 = 0,
 				.nbrcar  = 10,
@@ -1629,7 +1642,7 @@ pub const	fld = struct {
 		};
 
 
-		xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
+		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 		,.{"^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$"})
 		catch |err| { @panic(@errorName(err));};
 
@@ -1656,7 +1669,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.MAIL_ISO,
+				.reftyp  = REFTYP.MAIL_ISO,
 				.width	 = vwidth,
 				.scal	 = 0,
 				.nbrcar  = vwidth,
@@ -1679,7 +1692,7 @@ pub const	fld = struct {
 
 			// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 			// chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.
-			xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
+			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 			,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"})
 			catch |err| { @panic(@errorName(err));};
 			
@@ -1707,7 +1720,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.TELEPHONE,
+				.reftyp  = REFTYP.TELEPHONE,
 				.width	 = vwidth,
 				.scal	 = 0,
 				.nbrcar  = vwidth,
@@ -1727,10 +1740,10 @@ pub const	fld = struct {
 				.actif	= true
 			};
 
-			if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
+			if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"^{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
 			// regex standar
-			if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"{s}"
+			if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 			,.{"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"})
 			catch |err| { @panic(@errorName(err));};
 
@@ -1756,7 +1769,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.UDIGIT,
+				.reftyp  = REFTYP.UDIGIT,
 				.width	 = vwidth,
 				.scal	 = 0,
 				.nbrcar  = vwidth,
@@ -1777,7 +1790,7 @@ pub const	fld = struct {
 		};
 
 			if (vregex.len == 0 ) {
-				xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[0-9]{{1,{d}}}$",.{xfield.width})
+				xfield.regex = std.fmt.allocPrint(allocatorForms,"^[0-9]{{1,{d}}}$",.{xfield.width})
 				catch |err| { @panic(@errorName(err));};
 			}
 			if (xfield.help.len == 0 ) xfield.help = "ex: 0..9" ;
@@ -1801,7 +1814,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.DIGIT,
+				.reftyp  = REFTYP.DIGIT,
 				.width	 = vwidth,
 				.scal	 = 0,
 				.nbrcar  = 0,
@@ -1822,7 +1835,7 @@ pub const	fld = struct {
 		};
 			xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
 			if (vregex.len == 0 ) {
-				xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,"^[+-][0-9]{{1,{d}}}$",.{xfield.width})
+				xfield.regex = std.fmt.allocPrint(allocatorForms,"^[+-][0-9]{{1,{d}}}$",.{xfield.width})
 				catch |err| { @panic(@errorName(err));};
 			}
 			if (xfield.help.len == 0 ) xfield.help = "ex: +0..9" ;
@@ -1847,7 +1860,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.UDECIMAL,
+				.reftyp  = REFTYP.UDECIMAL,
 				.width	 = vwidth,
 				.scal	 = vscal,
 				.nbrcar  = 0,
@@ -1872,10 +1885,10 @@ pub const	fld = struct {
 		else xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
 
 		if (vregex.len == 0 ) {
-			if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
+			if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"^[0-9]{{1,{d}}}$",.{vwidth})	catch |err| { @panic(@errorName(err));}
 
-			else xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
+			else xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"^[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal,})
 			catch |err| { @panic(@errorName(err));};
 		}
@@ -1901,7 +1914,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.DECIMAL,
+				.reftyp  = REFTYP.DECIMAL,
 				.width	 = vwidth,
 				.scal	 = vscal,
 				.nbrcar  = 0,
@@ -1926,10 +1939,10 @@ pub const	fld = struct {
 		else xfield.nbrcar = xfield.width + xfield.scal	+ 2 ;
 		if (vregex.len == 0 ) {
 
-			if (vscal == 0 ) xfield.regex =	std.fmt.allocPrint(dds.allocatorPnl,
+			if (vscal == 0 ) xfield.regex =	std.fmt.allocPrint(allocatorForms,
 			"^[+-][0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
 
-			else xfield.regex = std.fmt.allocPrint(dds.allocatorPnl,
+			else xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"^[+-][0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) 
 			catch |err| { @panic(@errorName(err));};
 
@@ -1956,7 +1969,7 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = dds.REFTYP.FUNC,
+				.reftyp  = REFTYP.FUNC,
 				.width	 = vwidth,
 				.scal	 = 0,
 				.nbrcar  = vwidth,
@@ -2002,7 +2015,7 @@ pub const	fld = struct {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].posy;
 		return ErrForms.fld_getPosy_Index_invalide ;
 	}
-	pub fn getRefType(vpnl: *pnl.PANEL , n: usize)	ErrForms ! dds.REFTYP {
+	pub fn getRefType(vpnl: *pnl.PANEL , n: usize)	ErrForms ! REFTYP {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].reftyp;
 		return ErrForms.fld_getRefType_Index_invalide ;
 	}
@@ -2067,11 +2080,11 @@ pub const	fld = struct {
 		return ErrForms.fld_getTask_Index_invalide ;
 	}
 
-	pub fn getAttribut(vpnl: *pnl.PANEL , n: usize)	ErrForms ! dds.ZONATRB {
+	pub fn getAttribut(vpnl: *pnl.PANEL , n: usize)	ErrForms ! term.ZONATRB {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].atribut;
 		return ErrForms.fld_getAttribut_Index_invalide ;
 	}
-	pub fn getAtrProtect(vpnl: *pnl.PANEL , n: usize)	ErrForms ! dds.ZONATRB {
+	pub fn getAtrProtect(vpnl: *pnl.PANEL , n: usize)	ErrForms ! term.ZONATRB {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].atrProtect;
 		return ErrForms.fld_AtrProtect_Index_invalide ;
 	}
@@ -2178,7 +2191,7 @@ pub const	fld = struct {
 				vpnl.buf.items[n].on = true;
 			}
 			else {
-				vpnl.buf.items[n].ch = "";
+				vpnl.buf.items[n].ch = " ";
 				vpnl.buf.items[n].attribut	= vpnl.attribut;
 				vpnl.buf.items[n].on = false;
 			}
@@ -2191,24 +2204,25 @@ pub const	fld = struct {
 		var nfld = vfld.text;
 		var nile = false ;
 		if (nfld.len == 0 and !vfld.protect ) {
-			nfld ="_";
+			nfld = "_";
 			nile = true;
 		}
-		if (vfld.reftyp == dds.REFTYP.SWITCH) {
-			nile = false;
-			if ( vfld.zwitch ) nfld = dds.STRUE
-			else nfld= dds.SFALSE;
-		} 
+		if (vfld.reftyp == REFTYP.SWITCH) {
+			if ( vfld.zwitch ) nfld = CTRUE
+			else nfld= CFALSE;
+		}
+		
 		var iter = utl.iteratStr.iterator(nfld);
 		defer iter.deinit();
 		while (iter.next()) |ch| {
 			if (vfld.actif == true ) {
-				if (vfld.reftyp == dds.REFTYP.PASSWORD) vpnl.buf.items[n].ch = "*" 
-				else vpnl.buf.items[n].ch = ch ;
+				if (vfld.reftyp == REFTYP.PASSWORD) vpnl.buf.items[n].ch = "*" 
+				else vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+
 
 				vpnl.buf.items[n].on = true;
 
-				if (vfld.protect) vpnl.buf.items[n].attribut	= vfld.atrProtect
+				if (vfld.protect) vpnl.buf.items[n].attribut = vfld.atrProtect
 				else {
 						if (nile)vpnl.buf.items[n].attribut	= AtrNil
 						else vpnl.buf.items[n].attribut = vfld.attribut;
@@ -2328,11 +2342,11 @@ pub const	fld = struct {
 	/// the buffer displays field the text and completes with blanks
 	fn initData(f:FIELD) void {
 		e_FIELD.clearRetainingCapacity();
-		if ( f.reftyp == dds.REFTYP.SWITCH) {
+		if ( f.reftyp == REFTYP.SWITCH) {
 			if (e_switch == true ) 
-				utl.addListStr(&e_FIELD	, dds.STRUE) 
+				utl.addListStr(&e_FIELD	, CTRUE) 
 			else
-				utl.addListStr(&e_FIELD	, dds.SFALSE);
+				utl.addListStr(&e_FIELD	, CFALSE);
 		}
 		else {
 				utl.addListStr(&e_FIELD	, f.text);
@@ -2347,13 +2361,13 @@ pub const	fld = struct {
 	fn msgHelp(vpnl: *pnl.PANEL, f : FIELD ) void {
 
 		// define attribut default MSG Error
-		const MsgHelp : dds.ZONATRB = .{
-				.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle)},
-				.backgr = dds.BackgroundColor.bgBlack,
-				.foregr = dds.ForegroundColor.fgRed
+		const MsgHelp : term.ZONATRB = .{
+				.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle)},
+				.backgr = term.BackgroundColor.bgBlack,
+				.foregr = term.ForegroundColor.fgRed
 		};
 
 
@@ -2364,7 +2378,7 @@ pub const	fld = struct {
 		var msghlp:[]const u8 = utl.concatStr("Help : ", f.help) ;
 		var boucle : bool= true ;
 
-		if (vpnl.cols < (msghlp.len) )	msghlp = subStr(vpnl, msghlp,0,	vpnl.cols - 2);
+		if (vpnl.cols < (msghlp.len) )	msghlp = subStrForms( msghlp,0,	vpnl.cols - 2);
 
 		// clear line button 
 		while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -2414,7 +2428,7 @@ pub const	fld = struct {
 		var msgerr:[]const u8 = utl.concatStr("Info : ", info) ;
 		var boucle : bool= true ;
 
-		if (vpnl.cols < (msgerr.len) )	msgerr = subStr(vpnl, msgerr, 0,	vpnl.cols - 2);
+		if (vpnl.cols < (msgerr.len) )	msgerr = subStrForms( msgerr, 0,	vpnl.cols - 2);
 
 		// clear line button 
 		while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -2479,7 +2493,7 @@ pub const	fld = struct {
 		var Fkey : term.Keyboard = undefined ;
 		var boucle : bool= true ;
 
-		term.defCursor(dds.typeCursor.cBlink);
+		term.defCursor(term.typeCursor.cBlink);
 
 		term.onMouse();
 
@@ -2493,15 +2507,15 @@ pub const	fld = struct {
 			term.gotoXY(e_posx ,e_posy);
 			switch(e_reftyp) {
 				.PASSWORD =>	term.writeStyled(password(e_FIELD),AtrIO) ,
-				.SWITCH	 =>	if (e_switch) term.writeStyled(dds.STRUE,AtrIO)
-							else term.writeStyled(dds.SFALSE,AtrIO),
+				.SWITCH	 =>	if (e_switch) term.writeStyled(CTRUE,AtrIO)
+							else term.writeStyled(CFALSE,AtrIO),
 				else => term.writeStyled(utl.listToStr(e_FIELD),AtrIO)
 			}
 
 			term.gotoXY(e_posx,e_curs);
 
-			if (statusCursInsert) term.defCursor(dds.typeCursor.cSteadyBar)	
-			else term.defCursor(dds.typeCursor.cBlink); // CHANGE CURSOR FORM BAR/BLOCK
+			if (statusCursInsert) term.defCursor(term.typeCursor.cSteadyBar)	
+			else term.defCursor(term.typeCursor.cBlink); // CHANGE CURSOR FORM BAR/BLOCK
 
 			switch(e_reftyp) {
 				.PASSWORD => { 
@@ -2586,7 +2600,7 @@ pub const	fld = struct {
 						}
 					},
 					.backspace => {
-						if( e_reftyp != dds.REFTYP.SWITCH) {
+						if( e_reftyp != REFTYP.SWITCH) {
 							delete(e_count);
 							tampon	= utl.listToStr(e_FIELD);
 							if( e_count > 0 ) {
@@ -2597,12 +2611,12 @@ pub const	fld = struct {
 						}
 					},
 					.delete=> {
-						if( e_reftyp != dds.REFTYP.SWITCH) {
+						if( e_reftyp != REFTYP.SWITCH) {
 							if( e_count >= 0) {
-								if (e_reftyp == dds.REFTYP.DIGIT	and e_count >= 0 or	e_reftyp == dds.REFTYP.DECIMAL and e_count >= 0 ) {
+								if (e_reftyp == REFTYP.DIGIT	and e_count >= 0 or	e_reftyp == REFTYP.DECIMAL and e_count >= 0 ) {
 										delete(e_count);
 									}
-									else if (e_reftyp != dds.REFTYP.DIGIT	 and	e_reftyp != dds.REFTYP.DECIMAL)	{
+									else if (e_reftyp != REFTYP.DIGIT	 and	e_reftyp != REFTYP.DECIMAL)	{
 													delete(e_count);
 												}
 							}
@@ -2636,7 +2650,7 @@ pub const	fld = struct {
 						//write value keyboard to field.text return key
 						nfield = getIndex(vpnl,vfld.name) catch |err| { @panic(@errorName(err));};
 
-						if (vfld.reftyp == dds.REFTYP.SWITCH) setSwitch(vpnl, nfield, e_switch ) 
+						if (vfld.reftyp == REFTYP.SWITCH) setSwitch(vpnl, nfield, e_switch ) 
 							catch |err| { @panic(@errorName(err));}
 						
 						else {
@@ -2912,11 +2926,11 @@ pub const	fld = struct {
 									if (isSpace(Fkey.Char)) {
 										
 										if (e_switch == false) {
-											e_FIELD.items[e_count] = dds.STRUE;
+											e_FIELD.items[e_count] = CTRUE;
 											e_switch = true;
 										}
 										else {
-											e_FIELD.items[e_count] = dds.SFALSE;
+											e_FIELD.items[e_count] = CFALSE;
 											e_switch = false;
 										}
 									}
@@ -2944,24 +2958,24 @@ pub const	fld = struct {
 // defined Panel
 pub const	pnl = struct {
 
-	// define attribut default PANELallocatorPnl
-	pub var AtrPanel : dds.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(dds.Style.styleDim),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle),
-										@intFromEnum(dds.Style.notStyle)},
-			.backgr = dds.BackgroundColor.bgBlack,
-			.foregr = dds.ForegroundColor.fgWhite
+	// define attribut default PANELallocatorForms
+	pub var AtrPanel : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgWhite
 	};
 
 
-	pub var MsgErr : dds.ZONATRB = .{
-				.styled=[_]u32{@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle),
-											@intFromEnum(dds.Style.notStyle)},
-				.backgr = dds.BackgroundColor.bgBlack,
-				.foregr = dds.ForegroundColor.fgRed
+	pub var MsgErr : term.ZONATRB = .{
+				.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle),
+											@intFromEnum(term.Style.notStyle)},
+				.backgr = term.BackgroundColor.bgBlack,
+				.foregr = term.ForegroundColor.fgRed
 		};
 
 
@@ -2977,7 +2991,7 @@ pub const	pnl = struct {
 		lines:	usize,
 		cols:	 usize,
 
-		attribut: dds.ZONATRB,
+		attribut: term.ZONATRB,
 
 		frame: frm.FRAME ,
 
@@ -2987,9 +3001,9 @@ pub const	pnl = struct {
 
 		field: std.ArrayList(fld.FIELD),
 
-		linev: std.ArrayList(lnv.LINE),
+		linev: std.ArrayList(lnv.LINEV),
 
-		lineh: std.ArrayList(lnh.LINE),
+		lineh: std.ArrayList(lnh.LINEH),
 
 		// double buffer screen
 		buf:std.ArrayList(TERMINAL_CHAR),
@@ -3023,7 +3037,7 @@ pub const Epanel = enum {
 					vposx: usize, vposy: usize,
 					vlines: usize,
 					vcols: usize,
-					vcadre : dds.CADRE,
+					vcadre : CADRE,
 					vtitle: [] const u8 ) PANEL {
 
 		var xpanel = PANEL {
@@ -3034,12 +3048,12 @@ pub const Epanel = enum {
 					.cols	 = vcols,
 					.attribut = AtrPanel,
 					.frame  = undefined,
-					.label	= std.ArrayList(lbl.LABEL).init(dds.allocatorPnl),
-					.button = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl),
-					.field	= std.ArrayList(fld.FIELD).init(dds.allocatorPnl),
-					.linev	= std.ArrayList(lnv.LINE).init(dds.allocatorPnl),
-					.lineh	= std.ArrayList(lnh.LINE).init(dds.allocatorPnl),
-					.buf	= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl),
+					.label	= std.ArrayList(lbl.LABEL).init(allocatorForms),
+					.button = std.ArrayList(btn.BUTTON).init(allocatorForms),
+					.field	= std.ArrayList(fld.FIELD).init(allocatorForms),
+					.linev	= std.ArrayList(lnv.LINEV).init(allocatorForms),
+					.lineh	= std.ArrayList(lnh.LINEH).init(allocatorForms),
+					.buf	= std.ArrayList(TERMINAL_CHAR).init(allocatorForms),
 					.idxfld = 9999,
 					.key	=	kbd.none,
 					.keyField = kbd.none,
@@ -3076,10 +3090,10 @@ pub const Epanel = enum {
 					vposx: usize, vposy: usize,
 					vlines: usize,
 					vcols: usize,
-					vcadre : dds.CADRE,
+					vcadre : CADRE,
 					vtitle: [] const u8 ) *PANEL {
 
-		var device = dds.allocatorPnl.create(PANEL) 
+		var device = allocatorForms.create(PANEL) 
 									catch |err| { @panic(@errorName(err)) ; };
 
 		device.name	 = vname;
@@ -3089,12 +3103,12 @@ pub const Epanel = enum {
 		device.cols	 = vcols;
 		device.attribut = AtrPanel;
 		device.frame = undefined;
-		device.label	= std.ArrayList(lbl.LABEL).init(dds.allocatorPnl);
-		device.button   = std.ArrayList(btn.BUTTON).init(dds.allocatorPnl);
-		device.field	= std.ArrayList(fld.FIELD).init(dds.allocatorPnl);
-		device.linev	= std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
-		device.lineh	= std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
-		device.buf		= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl);
+		device.label	= std.ArrayList(lbl.LABEL).init(allocatorForms);
+		device.button   = std.ArrayList(btn.BUTTON).init(allocatorForms);
+		device.field	= std.ArrayList(fld.FIELD).init(allocatorForms);
+		device.linev	= std.ArrayList(lnv.LINEV).init(allocatorForms);
+		device.lineh	= std.ArrayList(lnh.LINEH).init(allocatorForms);
+		device.buf		= std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
 		device.idxfld   = 9999;
 		device.key		=	kbd.none;
 		device.keyField = kbd.none;
@@ -3128,7 +3142,7 @@ pub const Epanel = enum {
 
 	pub fn initMatrix(vpnl: *PANEL) void {
 		vpnl.buf.deinit();
-		vpnl.buf		= std.ArrayList(TERMINAL_CHAR).init(dds.allocatorPnl);
+		vpnl.buf		= std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
 
 				// INIT doublebuffer
 		var i:usize = (vpnl.lines+1) * (vpnl.cols+1);
@@ -3320,7 +3334,7 @@ pub const Epanel = enum {
 
 		var msgerr:[]const u8 = utl.concatStr("Info : ", info);
 
-		if (vpnl.cols < (msgerr.len) )	msgerr = subStr(vpnl, msgerr, 0, vpnl.cols - 2) ;
+		if (vpnl.cols < (msgerr.len) )	msgerr = subStrForms( msgerr, 0, vpnl.cols - 2) ;
 
 
 		while (y <= (vpnl.cols - 2) ) : (y += 1) {
@@ -3333,6 +3347,7 @@ pub const Epanel = enum {
 
 		while (true) {
 			var e_key = kbd.getKEY();
+
 			switch ( e_key.Key ) {
 				.esc => break,
 			else =>	{},

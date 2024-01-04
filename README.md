@@ -134,6 +134,7 @@ GRID<BR/>
 | down     | next   ligne |
 | pageUp   | prior  page  |
 | pageDown | next   page  |
+| return   | Arg          |
 
 <BR/>
 
@@ -182,7 +183,7 @@ and the utf8 keyboard is a lot.<br />
 <u>--styling-------------------------------------------------</u><BR />
 make it compatible as close as possible to IBM 400 ex:<br />
 <br />
-pub const AtrLabel : stl.ZONATRB = .{<br />
+ex: pub const AtrLabel : stl.ZONATRB = .{<br />
 &nbsp;&nbsp;&nbsp;.styled=[_]i32{@enumToInt(stl.Style.styleBright),<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.styleItalic),<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@enumToInt(stl.Style.notstyle),<br />
@@ -206,150 +207,65 @@ Please wait, if there are bugs everything is not fixed.<br />
 &rarr;&nbsp; inspiration `<br />`
 
 * [nim-termcurs](https://github.com/AS400JPLPC)<br />
-  &rarr;&nbsp; panel.zig  <br />
-  &rarr;&nbsp; label.zig  <br />
-  &rarr;&nbsp; field.zig  <br />
-  &rarr;&nbsp; menu.zig   <br />
-  &rarr;&nbsp; grid.zig   <br />
-  &rarr;&nbsp; button.zig <br />
 
 <u>---------------------------------------------------------</u><BR />
-<br />
-<br />
-<br />
-<br />
-
-<br />
 <br />
 |   for information|
 →  2023-02-28<br />
 Hello, it is now possible to use a terminal without leaving a trace, I added in "curse" the "reset" function,
-on the other hand, i included in the cls function the underlying cleanup of the terminal, i put here the terminal start function for, you help ( xfce4-terminal --hide-menubar --hide-scrollbar --hide -toolbar --geometry="158x42" --font="DejaVu Sans Mono 12") just add -e ./...program <br />
+on the other hand, i included in the cls function the underlying cleanup of the terminal, i put here the terminal start function for, you help ( xfce4-terminal --hide-menubar --hide-scrollbar --hide -toolbar --geometry="158x42" --font="DejaVu Sans Mono 12" just add -e ./...program <br />
 →  2023-02-28<br />
 **Applications no longer need lib-GTK VTE**
 in general to debug well, to use the console, it is advisable to deactivate preferences F10 and ALT... ,
 then compile with SMALL and to ensure violation of ALT-F4 use the cpp program gtk-vte an example is there.
 But in terminal mode the application is viable (to do with the commit data-base)<br />
 <u>I wish the friend google translate my french slang correctly </u>
-
-les news:<BR />
-
 →  2023-02-05 Doc version 0.11.1
-[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Docs_Gencurs/index.html) <br />
+[READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Docs_Exemples/index.html) <br />
 <BR/>
 
-<BR/>
-
-<br />
-→  2023-05-22  changed regex processing, discontinued use of GO, and introduced regex.zig (https://github.com/tiehuis/zig-regex) <br />
-<br />
-→  2023-05-22  <s>add function match (match.zig) updating controls in forms with regex</s><br />
-→  2023-05-22  **add function isMatch regex.h libc  updating controls in forms with regex**<br />
-→  2023-05-22  controls conform standard <br />
-→  2023-05-22  ex: https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression<br />
-→  2023-05-22  chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.<br />
-<br />
-
-- 2023-08-1  I am preparing for the version change in order to take advantage of advancements and modify the code if necessary.
-  My experience, you have to review the "FOR" loop the "ENUM" and "BUILD" functions what I did<br />
-  <BR/>
-- 2023-08-1  Studies of memory cleaning and various functions   0.11<br />
-- 2023-08-1  Add func Grid  ioGridKey  (parm,parm, button KEY return) for management grid to grid ex: modlObjet fn Order <br />
-  <br />
-- 2023-08-1  <u>Adjustment for 0.11 test  A lot of changes since version 0.10.1 </u> <br />
-  <br />
-- 2023-08-1  look at the build has changed a lot. <br />
-- 2023-08-1  Gencurs modlPanel OK <br />
-- 2023-08-1  Gencurs modlObjet testing "label define  - order remove" OK <br />
-- 2023-08-1  modlObjet alt-T Title alt-L Label  alt-w Menu(order/remove) <br />
-- 2023-08-1  modlObjet ESC abord ctrl-V valide   F11 write all Objet for Panel ... F12 abord and return <br />
-  <br />
-  <br />
-- 2023-08-1  Changing and reorganizing the code:<br />
-- new "grid.zig"<br />
-  - the "forms.zig" no longer includes grid management<br />
-
-    - I reviewed the initialization of the panel and grid<br />
-
-      - with create mode to better manage memory and make memory allocation more consistent<br />
-
-        - [ziggit](https://ziggit.dev/t/philosophical-question-about-memory/1343)<br />
-
-          - testing memoory<br />
-
-            - [zulipchat](https://zig-lang.zulipchat.com/#narrow/stream/346105-FR-General/topic/.E2.9C.94.20Debeuger)<br />
-              <br />
-              <br />
-            - 2023-08-4 Watch the build version zig 0.11.0 new formula to generate documentation<br />
-              <br />
-            - 2023-08-09 small update project due to version change<br />
-            - 2023-08-09 modlObjet alt-F start of field processing <br />
-            - 2023-08-09 Json studies to encapsulate the generation (IN/OUT) <br />
-              <br />
-            - 2023-08-12 **After a big discussion, setting up the wrestling**<br />
-            - 2023-08-12 Pause: preparing JSON this will help me control the values... more settings<br />
-            - 2023-08-14 Installation of a logger
-              I modified the logger and redirected to a file,
-              it can also be used for recording other than errors or for monitoring data, diagrams test [zig_demoJson](https://github.com/AS400JPLPC/zig_demoJson) <br />
-              <br />
-              <br />
-            - 2023-08-21 First Json test, now I will refine,
-              it's too hot break.<br />
-
-# reprise du projet
-
-I had to buy a PC In the meantime I changed publisher etc...* 2023-11-15 add module mdlSjson (save file)<br />* 2023-11-15 add module mdlRjson (restore file)<br />
-
-* 2023-11-15 add module mdlFile  (manager file)<br />
-* 2023-11-15 in the "mdlObjet" module have little reordered and deleted<br />
-* 2023-11-15 A “dspf” folder groups JSON files : Label Field<br />
-* 2023-11-15 The software runs in a terminal<br />
-* 2023-11-15 A small change F10 became F11 for convenience with the terminal<br />
-  <br />
-  <br />
-
-<u>                                                                         </u><BR />
-→ 2023-11-22 update Forms mdlObjet mdlSjon mdlRjson<br />
-→ 2023-11-22 **harmonization function line vertical & horizontal**harmomisation procedur<br />
-→ 2023-11-22 test Json save restor gencurs<br />
-<br />
-→ 2023-11-29 **restructuring**:<br />
-new source ./deps/menu.zig
-deletion in forms.zig of menu processing
-change mdlObject name -> mdlForms<br />
-→ 2023-11-29 Still testing, mdlPanel update, mdlForms due to reorganization<br />
-→ 2023-11-29 Gencurs update preparation Grid/Menu generation <br />
 <br />
 ![](assets/20231129_012345_Gen00.png)
 <br />
 ![](assets/20231122_012345_Gen01.png)
-
-* [ ] 2023-12-28
-  I just made my first 'COMPTIME,' I finally understood what it's for and how to approach it.
-  Introduction to comptime rstPanel example pnl; rstPanel(grd.GRID,Xcombo, pfmt001);
-  example: restore(type grid, gridX, panelX) This
-  function restores the part of the panel that was hidden by the grid.
-* [ ] 2023-12-18
-  I removed the dependencies on forms(panel) for the menu and grid.
-* [ ] 2023-12-28
-  (forms- grid - menu) They are deeply modified to make them independent.
-* [ ] 2023-12-28
-  Corrections in mdlPanel F10 -> F11. Corrections in mdlFile Minor correction
-* [ ] 2023-12-28
-  I take my time because I have heart problems (fatigue with medications),
-  and I am still studying to understand and grasp the ZIG-LANG language. (I am 72 years old.)
-* [ ] 2023-12-29<BR/>
-  * [a] Cursed: a background module that manages terminal access. It has been
-    revised to enhance smoothness; I've explored other modules on the web
-    that delve into the issue and have provided me with certain ideas.
-  * [b] The Grid and Menu modules are completely independent of Forms.
-  * [c] The utils (tools) module has been simplified and includes its own ArenaAllocator.
-  * [d] Huge work on memory management; the Example program serves as a model.
-  * [e] For your information, I initially thought it was the double buffer
-    causing the program to bloat. After conducting a real test, I
-    encountered the same issue. I removed some entanglements and
-    reconsidered the allocation mode. The user-facing functions remain
-    unchanged; there's just a deinitUstr function in place of deinitUtils.
+<BR />
+<BR />
+les news:<BR />
+<br />
+→  2024-01-04<br />
+LINUX<br />
+Should it work with MAC?<br />
+TRADUCTOR chatgpt<br />
+Hello, there are very significant changes, why?<br />
+Firstly, for better memory management.<br />
+Greater coherence.<br />
+All modules have their own allocators.<br />
+Avoiding back-and-forth between modules.<br />
+Removal of the DDS module (originally intended to contain all structure definitions).<br />
+"CURSED" (named in memory of "NCURSEW"):<br />
+Encompasses everything needed for writing to a terminal, including reading keyboard codes, mouse management, cursor handling, UTF8 work. I may introduce the "termios" concept for META codes. I took advantage of the restructuring to bring clarification.<br /><br />
+"FORMS":<br />
+Includes management for:<br />
+LABEL - BUTTON - LINEV - LINEH - FIELD - FRAME - PANEL<br />
+Works with a matrix corresponding to the terminal surface so that the window can be restored. The FORMS allocator is designed for Fields and panel initialization. FORMS no longer includes GRID management, which is autonomous, nor MENU, which is autonomous<br /><br />
+"GRID":<br />
+Functions similarly to forms, allowing the display and retrieval of arguments either from a database or working as a combo. It is autonomous, but you must consider that it should be included in your Panel, as it positions itself within the terminal window.<br /><br />
+"MENU":<br />
+Operates like GRID but is much simplified; the returned argument is usize.which doesn't work with the matrix but directly with the terminal.<br /><br />
+"UTILS": (various tools and functions)<br />
+Contains various functions to manage the control needs of FIELD or STRING management ([] u8 const).<br /><br />
+The Example program demonstrates how to manage and use these functions. A tip: the first Panel can serve as the definition of the terminal window.
+<br /><br />
+"INFO"<br />
+Display attributes are in CURSED, e.g., term.ZONATRB, the CURSOR type.<br />
+REFTYP is in Forms and Grid.<br />
+CTRUE/CFALSE are in Forms and Grid.<br />
+CADRE is in Forms and Grid.<br />
+LINE is in Forms.<br />
+"CURSED" and "UTILS" are being called within "Forms," "Grid," and "Menu,"<br />
+<br /><br />
+All these modifications aim to make it more flexible after long hours of studying others' work through publications and my understanding of ZIG-LANG. I had a hard time grasping memory cleanup, especially how to use allocators (not the order) and the repercussions of module nesting to have only the fluctuating data.<br /><br />
+Excuse me for those who have already used TERMCURS, but the resumption isn't too significant. However, it was a necessary step to advance in the code generator and enhance flexibility.<br /><br />
 
 <BR/>
 

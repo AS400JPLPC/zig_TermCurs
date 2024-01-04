@@ -1,7 +1,5 @@
 const std = @import("std");
 
-const dds = @import("dds");
-
 // keyboard
 const kbd = @import("cursed").kbd;
 
@@ -61,7 +59,7 @@ pub const DEFFIELD = struct {
 	name: []const u8,
 	posx: usize,
 	posy: usize,
-	reftyp: dds.REFTYP,
+	reftyp: forms.REFTYP,
 	width: usize,
 	scal: usize,
 	requier: bool, // requier or FULL
@@ -106,7 +104,7 @@ const Jfield = enum {
 // define LINEV JSON
 //..............................//
 
-const DEFLINEV = struct { name: []const u8, posx: usize, posy: usize, lng: usize, trace: dds.LINE };
+const DEFLINEV = struct { name: []const u8, posx: usize, posy: usize, lng: usize, trace: forms.LINE };
 
 const Jlinev = enum { name, posx, posy, lng, trace };
 
@@ -114,7 +112,7 @@ const Jlinev = enum { name, posx, posy, lng, trace };
 // define LINEH JSON
 //..............................//
 
-const DEFLINEH = struct { name: []const u8, posx: usize, posy: usize, lng: usize, trace: dds.LINE };
+const DEFLINEH = struct { name: []const u8, posx: usize, posy: usize, lng: usize, trace: forms.LINE };
 
 const Jlineh = enum { name, posx, posy, lng, trace };
 
@@ -127,7 +125,7 @@ const RPANEL = struct {
 	posy: usize,
 	lines: usize,
 	cols: usize,
-	cadre: dds.CADRE,
+	cadre: forms.CADRE,
 	title: []const u8,
 	button: std.ArrayList(DEFBUTTON),
 	label: std.ArrayList(DEFLABEL),
@@ -309,7 +307,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 			.posy=0,
 			.lines=0,
 			.cols=0,
-			.cadre=dds.CADRE.line0,
+			.cadre=forms.CADRE.line0,
 			.title="",
 			.button=std.ArrayList(DEFBUTTON).init(allocator),
 			.label=std.ArrayList(DEFLABEL).init(allocator),
@@ -379,7 +377,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.string)) {
-						ENRG.items[p].cadre = strToEnum(dds.CADRE, val.x.?.string);
+						ENRG.items[p].cadre = strToEnum(forms.CADRE, val.x.?.string);
 					} else @panic(try std.fmt.allocPrint(allocator,
 						"Json  err_Field :{s}\n", .{@tagName(Rpanel.keyForIndex(n))}));
 				},
@@ -584,7 +582,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 												@tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v))
 											}));
 
-										lf.reftyp = strToEnum(dds.REFTYP ,sreftyp);
+										lf.reftyp = strToEnum(forms.REFTYP ,sreftyp);
 								},
 
 								Jfield.width => {if (val.ctrlPack(Ctype.integer)) {
@@ -736,7 +734,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 								},
 								Jlinev.trace => {
 									if (val.ctrlPack(Ctype.string)) {
-										lv.trace = strToEnum(dds.LINE, val.x.?.string);
+										lv.trace = strToEnum(forms.LINE, val.x.?.string);
 									}
 									else @panic(try std.fmt.allocPrint(allocator,
 										"Json  err_Field :{s}\n", .{@tagName(Rlinev.keyForIndex(n))}));
@@ -804,7 +802,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 								},
 								Jlineh.trace => {
 									if (val.ctrlPack(Ctype.string)) {
-										lh.trace = strToEnum(dds.LINE, val.x.?.string);
+										lh.trace = strToEnum(forms.LINE, val.x.?.string);
 									}
 									else @panic(try std.fmt.allocPrint(allocator,
 										"Json  err_Field :{s}\n", .{@tagName(Rlineh.keyForIndex(n))}));
@@ -893,7 +891,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 			var vField: fld.FIELD= undefined;
 			switch(p.reftyp){
 
-				dds.REFTYP.TEXT_FREE => {
+				forms.REFTYP.TEXT_FREE => {
 					vField = fld.newFieldTextFree(
 						p.name,
 						p.posx,
@@ -909,7 +907,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.TEXT_FULL => {
+				forms.REFTYP.TEXT_FULL => {
 					vField = fld.newFieldTextFull(
 						p.name,
 						p.posx,
@@ -925,7 +923,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.ALPHA => {
+				forms.REFTYP.ALPHA => {
 					vField = fld.newFieldAlpha(
 						p.name,
 						p.posx,
@@ -941,7 +939,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.ALPHA_UPPER => {
+				forms.REFTYP.ALPHA_UPPER => {
 					vField = fld.newFieldAlphaUpper(
 						p.name,
 						p.posx,
@@ -957,7 +955,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.ALPHA_NUMERIC => {
+				forms.REFTYP.ALPHA_NUMERIC => {
 					vField = fld.newFieldAlphaNumeric(
 						p.name,
 						p.posx,
@@ -973,7 +971,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.ALPHA_NUMERIC_UPPER => {
+				forms.REFTYP.ALPHA_NUMERIC_UPPER => {
 					vField = fld.newFieldAlphaNumericUpper(
 						p.name,
 						p.posx,
@@ -989,7 +987,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.PASSWORD => {
+				forms.REFTYP.PASSWORD => {
 					vField = fld.newFieldPassword(
 						p.name,
 						p.posx,
@@ -1005,7 +1003,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.YES_NO => {
+				forms.REFTYP.YES_NO => {
 					vField = fld.newFieldYesNo(
 						p.name,
 						p.posx,
@@ -1020,7 +1018,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 
 				},
 
-				dds.REFTYP.SWITCH => {
+				forms.REFTYP.SWITCH => {
 					vField = fld.newFieldSwitch(
 						p.name,
 						p.posx,
@@ -1033,7 +1031,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.DATE_FR => {
+				forms.REFTYP.DATE_FR => {
 					vField = fld.newFieldDateFR(
 						p.name,
 						p.posx,
@@ -1047,7 +1045,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.DATE_US => {
+				forms.REFTYP.DATE_US => {
 					vField = fld.newFieldDateUS(
 						p.name,
 						p.posx,
@@ -1061,7 +1059,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.DATE_ISO => {
+				forms.REFTYP.DATE_ISO => {
 					vField = fld.newFieldDateISO(
 						p.name,
 						p.posx,
@@ -1075,7 +1073,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.MAIL_ISO => {
+				forms.REFTYP.MAIL_ISO => {
 					vField = fld.newFieldMail(
 						p.name,
 						p.posx,
@@ -1090,7 +1088,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.TELEPHONE => {
+				forms.REFTYP.TELEPHONE => {
 					vField = fld.newFieldTelephone(
 						p.name,
 						p.posx,
@@ -1106,7 +1104,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.protect= p.protect;
 				},
 
-				dds.REFTYP.DIGIT => {
+				forms.REFTYP.DIGIT => {
 					vField = fld.newFieldDigit(
 						p.name,
 						p.posx,
@@ -1123,7 +1121,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.edtcar= p.edtcar;
 				},
 
-				dds.REFTYP.UDIGIT => {
+				forms.REFTYP.UDIGIT => {
 					vField = fld.newFieldUDigit(
 						p.name,
 						p.posx,
@@ -1140,7 +1138,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.edtcar= p.edtcar;
 				},
 
-				dds.REFTYP.DECIMAL => {
+				forms.REFTYP.DECIMAL => {
 					vField = fld.newFieldDecimal(
 						p.name,
 						p.posx,
@@ -1158,7 +1156,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.edtcar= p.edtcar;
 				},
 
-				dds.REFTYP.UDECIMAL => {
+				forms.REFTYP.UDECIMAL => {
 					vField = fld.newFieldUDecimal(
 						p.name,
 						p.posx,
@@ -1176,7 +1174,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 					vField.edtcar= p.edtcar;
 				},
 
-				dds.REFTYP.FUNC => {
+				forms.REFTYP.FUNC => {
 					vField = fld.newFieldFunc(
 						p.name,
 						p.posx,
@@ -1199,7 +1197,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 		
 	
 		for (pnlx.linev.items) |p| {
-			var vlinev: lnv.LINE= undefined;
+			var vlinev: lnv.LINEV= undefined;
 
 			vlinev = lnv.newLine(p.name,p.posx,p.posy,p.lng,p.trace);
 
@@ -1208,7 +1206,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 		}
 	
 		for (pnlx.lineh.items) |p| {
-			var vlineh: lnh.LINE= undefined;
+			var vlineh: lnh.LINEH= undefined;
 
 			vlineh = lnh.newLine(p.name,p.posx,p.posy,p.lng,p.trace);
 

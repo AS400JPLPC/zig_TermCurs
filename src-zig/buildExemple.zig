@@ -17,41 +17,27 @@ pub fn build(b: *std.Build) void {
 		const match = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/match.zig" },
 	});
-	// data commune
-		const dds = b.createModule(.{
-		.source_file = .{ .path = "./deps/curse/dds.zig" },
-	});
-
+	
 	const cursed = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/cursed.zig" },
-		.dependencies= &.{
-		.{ .name = "dds", .module = dds },
-		},
 	});
-  
+	
 	const utils = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/utils.zig" },
-		.dependencies= &.{
-		.{ .name = "cursed", .module = cursed },
-		}
 	});
 
 	const forms = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/forms.zig" },
 		.dependencies= &.{
-		.{ .name = "dds",	.module = dds },
 		.{ .name = "cursed", .module = cursed },
 		.{ .name = "utils",  .module = utils },
 		.{ .name = "match",  .module = match },
 		},
 	});
 
-	
-
 	const grid = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/grid.zig" },
 		.dependencies= &.{
-		.{ .name = "dds",	.module = dds },
 		.{ .name = "cursed", .module = cursed },
 		.{ .name = "utils",  .module = utils },
 		},
@@ -61,7 +47,6 @@ pub fn build(b: *std.Build) void {
 	const menu = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/menu.zig" },
 		.dependencies= &.{
-		.{ .name = "dds",	.module = dds },
 		.{ .name = "cursed", .module = cursed },
 		.{ .name = "utils",  .module = utils },
 		},
@@ -79,7 +64,6 @@ pub fn build(b: *std.Build) void {
 	Prog.addIncludePath(.{.path = "./lib/"});
 	Prog.linkLibC();
 	Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
-	Prog.addModule("dds"   , dds);
 	Prog.addModule("cursed", cursed);
 	Prog.addModule("utils" , utils);
 	Prog.addModule("forms" , forms);
@@ -102,7 +86,6 @@ pub fn build(b: *std.Build) void {
 	tests.addIncludePath(.{.path = "./lib/"});
 	tests.linkLibC();
 	tests.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
-	tests.addModule("dds"   , dds);
 	tests.addModule("cursed", cursed);
 	tests.addModule("utils" , utils);
 	tests.addModule("forms" , forms);
@@ -128,7 +111,6 @@ pub fn build(b: *std.Build) void {
 	docs.addIncludePath(.{.path = "./lib/"});
 	docs.linkLibC();
 	docs.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
-	docs.addModule("dds"   , dds);
 	docs.addModule("cursed", cursed);
 	docs.addModule("utils" , utils);
 	docs.addModule("forms" , forms);

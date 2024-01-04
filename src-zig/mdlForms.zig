@@ -1,5 +1,4 @@
 const std = @import("std");
-const dds = @import("dds");
 
 /// terminal Fonction
 const term = @import("cursed");
@@ -58,7 +57,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-	return std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v}) catch |err| {
+	return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
 		@panic(@errorName(err));
 	};
 }
@@ -75,13 +74,13 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 		1,
 		20,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Xcombo);
 
-	grd.newCell(Xcombo, "ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
-	grd.newCell(Xcombo, "Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Xcombo, "Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+	grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Xcombo, "Title", 15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo);
 
 	for (vpnl.items, 0..) |p, idx| {
@@ -114,7 +113,7 @@ pub fn Panel_HELP() *pnl.PANEL {
 										1, 1,
 										5,
 										100 ,
-										dds.CADRE.line1,
+										forms.CADRE.line1,
 										""
 										);
 
@@ -154,7 +153,6 @@ var Y: usize = 0;
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 	term.cls();
 
-	utl.deinitUStr();
 	numPanel = qryPanel(XPANEL);
 
 	if (numPanel == 999) return;
@@ -180,80 +178,80 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 		
  
 			switch(p.reftyp) {
-				dds.REFTYP.TEXT_FREE, dds.REFTYP.TEXT_FULL ,	dds.REFTYP.ALPHA ,
-				dds.REFTYP.ALPHA_UPPER,	dds.REFTYP.ALPHA_NUMERIC, dds.REFTYP.ALPHA_NUMERIC_UPPER,
-				dds.REFTYP.PASSWORD, dds.REFTYP.YES_NO  =>{
+				forms.REFTYP.TEXT_FREE, forms.REFTYP.TEXT_FULL ,	forms.REFTYP.ALPHA ,
+				forms.REFTYP.ALPHA_UPPER,	forms.REFTYP.ALPHA_NUMERIC, forms.REFTYP.ALPHA_NUMERIC_UPPER,
+				forms.REFTYP.PASSWORD, forms.REFTYP.YES_NO  =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], '#');
 				} ,
 
-				dds.REFTYP.UDIGIT =>{
+				forms.REFTYP.UDIGIT =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], '0');
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
 			
-				dds.REFTYP.DIGIT =>{
+				forms.REFTYP.DIGIT =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 1) catch unreachable;
 					@memset(vText[0..p.width], '0');
-					vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}", .{vText[0..p.width]})
+					vText = std.fmt.allocPrint(utl.allocUtl, "+{s}", .{vText[0..p.width]})
 							catch unreachable;
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
 			
-				dds.REFTYP.UDECIMAL =>{
+				forms.REFTYP.UDECIMAL =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 1 + p.scal) catch unreachable;
 					@memset(vText[0..(p.width + p.scal)] , '0');
-					vText = std.fmt.allocPrint(dds.allocatorStr, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+					vText = std.fmt.allocPrint(utl.allocUtl, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
 							catch unreachable;
 					//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
 			
-				dds.REFTYP.DECIMAL =>{
+				forms.REFTYP.DECIMAL =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width + 2 + p.scal) catch unreachable;
 					@memset(vText[0..(p.width + p.scal)], '0');
-					vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+					vText = std.fmt.allocPrint(utl.allocUtl, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
 							catch unreachable;
 				//editcar
 					if (p.edtcar.len > 0) {
-						vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{vText, p.edtcar }
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
 						) catch unreachable;
 					}
 				} ,
 			
-				dds.REFTYP.DATE_ISO =>	vText = std.fmt.allocPrint(dds.allocatorStr, "YYYY-MM-DD", .{})
+				forms.REFTYP.DATE_ISO =>	vText = std.fmt.allocPrint(utl.allocUtl, "YYYY-MM-DD", .{})
 												catch unreachable,
-				dds.REFTYP.DATE_FR  =>	vText = std.fmt.allocPrint(dds.allocatorStr, "DD/MM/YYYY", .{})
-												catch unreachable,
-
-				dds.REFTYP.DATE_US  =>	vText = std.fmt.allocPrint(dds.allocatorStr, "MM/DD/YYYY", .{})
+				forms.REFTYP.DATE_FR  =>	vText = std.fmt.allocPrint(utl.allocUtl, "DD/MM/YYYY", .{})
 												catch unreachable,
 
-				dds.REFTYP.TELEPHONE =>{
+				forms.REFTYP.DATE_US  =>	vText = std.fmt.allocPrint(utl.allocUtl, "MM/DD/YYYY", .{})
+												catch unreachable,
+
+				forms.REFTYP.TELEPHONE =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], '*');
 				} ,
 
-				dds.REFTYP.MAIL_ISO  =>{
+				forms.REFTYP.MAIL_ISO  =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], '@');
 				} ,
-				dds.REFTYP.SWITCH   =>	vText = std.fmt.allocPrint(dds.allocatorStr, "{s}", .{dds.CTRUE})
+				forms.REFTYP.SWITCH   =>	vText = std.fmt.allocPrint(utl.allocUtl, "{s}", .{forms.CTRUE})
 												catch unreachable,
 
-				dds.REFTYP.FUNC  =>{
+				forms.REFTYP.FUNC  =>{
 					vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
 					@memset(vText[0..p.width], 'F');
 				} ,
@@ -276,8 +274,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 	var mChoix = mnu.newMenu("Choix", // name
 			1, 1, // posx, posy
-			dds.CADRE.line1, // type line fram
-			dds.MNUVH.vertical, // type menu vertical / horizontal
+			mnu.CADRE.line1, // type line fram
+			mnu.MNUVH.vertical, // type menu vertical / horizontal
 			&.{ // item
 			"Label-Order",
 			"Label-Remove",
@@ -290,21 +288,20 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			}
 		);
  
-	utl.deinitUStr();
 
 	pnl.printPanel(pFmt01);
 
 	maxY = pFmt01.cols + pFmt01.posy;
-	if (pFmt01.frame.cadre != dds.CADRE.line0) maxY -= 0;
+	if (pFmt01.frame.cadre != forms.CADRE.line0) maxY -= 0;
 	
 	minY = pFmt01.posy;
-	if (pFmt01.frame.cadre != dds.CADRE.line0) minY += 1;
+	if (pFmt01.frame.cadre != forms.CADRE.line0) minY += 1;
 
 	maxX = pFmt01.lines + pFmt01.posx;
-	if (pFmt01.frame.cadre != dds.CADRE.line0) maxX -= 2;
+	if (pFmt01.frame.cadre != forms.CADRE.line0) maxX -= 2;
 	
 	minX = pFmt01.posx;
-	if (pFmt01.frame.cadre != dds.CADRE.line0) minX += 1;
+	if (pFmt01.frame.cadre != forms.CADRE.line0) minX += 1;
 
 	term.onMouse();
 	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
@@ -332,7 +329,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			},
 			.F11 => {
 				XPANEL.items[numPanel].label.clearAndFree();
-				XPANEL.items[numPanel].label = std.ArrayList(lbl.LABEL).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].label = std.ArrayList(lbl.LABEL).init(forms.allocatorForms);
 				XPANEL.items[numPanel].label.clearRetainingCapacity();
 				for (pFmt01.label.items) |p| {
 					XPANEL.items[numPanel].label.append(p)
@@ -340,7 +337,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				}
 
 				XPANEL.items[numPanel].field.clearAndFree();
-				XPANEL.items[numPanel].field = std.ArrayList(fld.FIELD).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].field = std.ArrayList(fld.FIELD).init(forms.allocatorForms);
 				XPANEL.items[numPanel].field.clearRetainingCapacity();
 				for (pFmt01.field.items) |p| {
 					XPANEL.items[numPanel].field.append(p) 
@@ -348,7 +345,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				}
 
 				XPANEL.items[numPanel].lineh.clearAndFree();
-				XPANEL.items[numPanel].lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].lineh = std.ArrayList(lnh.LINEH).init(forms.allocatorForms);
 				XPANEL.items[numPanel].lineh.clearRetainingCapacity();
 				for (pFmt01.lineh.items) |p| {
 					XPANEL.items[numPanel].lineh.append(p) 
@@ -356,27 +353,31 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				}
 
 				XPANEL.items[numPanel].linev.clearAndFree();
-				XPANEL.items[numPanel].linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+				XPANEL.items[numPanel].linev = std.ArrayList(lnv.LINEV).init(forms.allocatorForms);
 				XPANEL.items[numPanel].linev.clearRetainingCapacity();
 				for (pFmt01.linev.items) |p| {
 					XPANEL.items[numPanel].linev.append(p) 
 						catch |err| { @panic(@errorName(err)); };
 				}
 				pnl.freePanel(pFmt01);
-				defer dds.allocatorPnl.destroy(pFmt01);
+				defer forms.allocatorForms.destroy(pFmt01);
 				pnl.freePanel(pFmtH01);
-				defer dds.allocatorPnl.destroy(pFmtH01);
-				dds.deinitStr();
-				utl.deinitUStr();
+				defer forms.allocatorForms.destroy(pFmtH01);
+				term.deinitTerm();
+				grd.deinitGrid();
+				utl.deinitUtl();
+				// forms.deinitForms();
 				return;
 			},
 			.F12 => {
 				pnl.freePanel(pFmt01);
-				defer dds.allocatorPnl.destroy(pFmt01);
+				defer forms.allocatorForms.destroy(pFmt01);
 				pnl.freePanel(pFmtH01);
-				defer dds.allocatorPnl.destroy(pFmtH01);
-				dds.deinitStr();
-				utl.deinitUStr();
+				defer forms.allocatorForms.destroy(pFmtH01);
+				term.deinitTerm();
+				grd.deinitGrid();
+				utl.deinitUtl();
+				// forms.deinitForms();
 				return;
 			},
 
@@ -497,9 +498,9 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
 	var text: []const u8 = undefined;
-	var e_LABEL = std.ArrayList([]const u8).init(dds.allocatorStr);
+	var e_LABEL = std.ArrayList([]const u8).init(utl.allocUtl);
 	defer e_LABEL.deinit();
-	defer dds.allocatorStr.destroy(&e_LABEL);
+	defer utl.allocUtl.destroy(&e_LABEL);
 
 	var e_posx: usize = term.posCurs.x;
 	var e_posy: usize = term.posCurs.y;
@@ -534,7 +535,7 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 			.F12 => return,
 
 			.ctrlV => {
-				tampon = std.fmt.allocPrint(dds.allocatorStr, "L{d}{d}", .{ e_posx, e_posy })
+				tampon = std.fmt.allocPrint(utl.allocUtl, "L{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
 				
 				text = utl.trimStr(utl.listToStr(e_LABEL));
@@ -591,9 +592,8 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 // Order label
 fn orderLabel(vpnl: *pnl.PANEL) void {
 	var idy: usize = 0;
-	const allocatorOrder = std.heap.page_allocator;
-	var newlabel = std.ArrayList(lbl.LABEL).init(allocatorOrder);
-	var savlabel = std.ArrayList(lbl.LABEL).init(allocatorOrder);
+	var newlabel = std.ArrayList(lbl.LABEL).init(grd.allocatorGrid);
+	var savlabel = std.ArrayList(lbl.LABEL).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -609,7 +609,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
@@ -619,20 +619,20 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 		70,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 
 	defer grd.allocatorGrid.destroy(Order);
 
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "text", 40, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "text", 40, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Origine);
 
-	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Order, "text", 40, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Order, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Order, "text", 40, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Order);
 
 	while (true) {
@@ -664,7 +664,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 	}
 
 	vpnl.label.clearAndFree();
-	vpnl.label = std.ArrayList(lbl.LABEL).init(dds.allocatorPnl);
+	vpnl.label = std.ArrayList(lbl.LABEL).init(forms.allocatorForms);
 	vpnl.label.clearRetainingCapacity();
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
@@ -689,15 +689,13 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 
 	savlabel.clearAndFree();
 	savlabel.deinit();
-
+	grd.deinitGrid();
 	return;
 }
 
 // remove Label
 fn removeLabel(vpnl: *pnl.PANEL) void {
-	const allocatorRemove = std.heap.page_allocator;
-	var savlabel: std.ArrayList(lbl.LABEL) = std.ArrayList(lbl.LABEL).init(allocatorRemove);
-
+	var savlabel: std.ArrayList(lbl.LABEL) = std.ArrayList(lbl.LABEL).init(grd.allocatorGrid);
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
 
@@ -712,13 +710,13 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "text", 40, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "text", 40, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Origine);
 
 	while (true) {
@@ -743,7 +741,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
 		vpnl.label.clearAndFree();
-		vpnl.label = std.ArrayList(lbl.LABEL).init(dds.allocatorPnl);
+		vpnl.label = std.ArrayList(lbl.LABEL).init(forms.allocatorForms);
 		vpnl.label.clearRetainingCapacity();
 
 		for (savlabel.items) |p| {
@@ -756,6 +754,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 
 	savlabel.clearAndFree();
 	savlabel.deinit();
+	grd.deinitGrid();
 }
 
 //==========================================
@@ -792,7 +791,7 @@ fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
 
 // panel for field
 fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
-	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM01", nposx, 2, 12, 62, dds.CADRE.line1, "Def.field");
+	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM01", nposx, 2, 12, 62, forms.CADRE.line1, "Def.field");
 
 	Panel.button.append(btn.newButton(
 		kbd.F9, // function
@@ -1031,10 +1030,10 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		vpnl.posy + 1,
 		7,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Xcombo);
-	grd.newCell(Xcombo, "Ref.Type", 19, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	grd.newCell(Xcombo, "Ref.Type", 19, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Xcombo);
 	grd.addRows(Xcombo, &.{"TEXT_FREE"}); // Free
 	grd.addRows(Xcombo, &.{"TEXT_FULL"}); // Letter Digit Char-special
@@ -1138,7 +1137,7 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 }
 
 fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	var vReftype = strToEnum(dds.REFTYP, vfld.text);
+	var vReftype = strToEnum(forms.REFTYP, vfld.text);
 
 	for (vpnl.field.items, 0..) |f, idx| {
 		if (std.mem.eql(u8, f.name, @tagName(fp02.fscal))) {
@@ -1157,16 +1156,16 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	
 	for (vpnl.field.items, 0..) |f, idx| {
 		
-		if (vReftype == dds.REFTYP.DECIMAL or
-			vReftype == dds.REFTYP.UDECIMAL) {
+		if (vReftype == forms.REFTYP.DECIMAL or
+			vReftype == forms.REFTYP.UDECIMAL) {
 			if (std.mem.eql(u8, f.name, @tagName(fp02.fscal))) {
 				vpnl.field.items[idx].protect = false;
 			}
 		}
-		if (vReftype == dds.REFTYP.DIGIT or
-			vReftype == dds.REFTYP.UDIGIT or
-			vReftype == dds.REFTYP.DECIMAL or
-			vReftype == dds.REFTYP.UDECIMAL)
+		if (vReftype == forms.REFTYP.DIGIT or
+			vReftype == forms.REFTYP.UDIGIT or
+			vReftype == forms.REFTYP.DECIMAL or
+			vReftype == forms.REFTYP.UDECIMAL)
 		{
 			if (std.mem.eql(u8, f.name, @tagName(fp02.fedtcar))) {
 				vpnl.field.items[idx].protect = false;
@@ -1175,9 +1174,9 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	}
 
 
-	if (vReftype == dds.REFTYP.DATE_ISO or
-		vReftype == dds.REFTYP.DATE_FR or
-		vReftype == dds.REFTYP.DATE_US)
+	if (vReftype == forms.REFTYP.DATE_ISO or
+		vReftype == forms.REFTYP.DATE_FR or
+		vReftype == forms.REFTYP.DATE_US)
 	{
 		for (vpnl.field.items, 0..) |f, idx| {
 			if (std.mem.eql(u8, f.name, @tagName(fp02.fwidth))) {
@@ -1187,7 +1186,7 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		}
 	}
 
-	if (vReftype == dds.REFTYP.YES_NO or vReftype == dds.REFTYP.SWITCH) {
+	if (vReftype == forms.REFTYP.YES_NO or vReftype == forms.REFTYP.SWITCH) {
 		for (vpnl.field.items, 0..) |f, idx| {
 			if (std.mem.eql(u8, f.name, @tagName(fp02.fwidth))) {
 				vpnl.field.items[idx].text = "1";
@@ -1202,7 +1201,7 @@ fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	var val = strToUsize(vfld.text);
 
 	if (val + vfld.posx >= vpnl.cols) {
-		const msg = std.fmt.allocPrint(dds.allocatorStr,
+		const msg = std.fmt.allocPrint(utl.allocUtl,
 			"{d} the length of the zone is excessive", .{val})
 			catch |err| { @panic(@errorName(err)); };			
 		pnl.msgErr(vpnl, msg);
@@ -1221,7 +1220,7 @@ fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 	
 		if (vscal + width + vfld.posx >= vpnl.cols) {
-			const msg = std.fmt.allocPrint(dds.allocatorStr,
+			const msg = std.fmt.allocPrint(utl.allocUtl,
 				"{d} the Scal of the zone is excessive", .{vscal}) 
 				catch |err| { @panic(@errorName(err)); }; 
 				
@@ -1244,7 +1243,7 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		var scal = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fscal))  catch unreachable);
 
 		if (width + scal + vfld.posx >= vpnl.cols) {
-			const msg = std.fmt.allocPrint(dds.allocatorStr,
+			const msg = std.fmt.allocPrint(utl.allocUtl,
 				"the length of the zone is excessive", .{})
 				catch |err| { @panic(@errorName(err)); };			
 			pnl.msgErr(vpnl, msg);
@@ -1324,15 +1323,15 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 
 	v_posx = term.posCurs.x;
 	// init zone field
-	fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v_posx})
+	fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(utl.allocUtl, "{d}", .{v_posx})
 		catch unreachable) catch unreachable;
-	fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(dds.allocatorStr, "{d}", .{v_posy})
+	fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(utl.allocUtl, "{d}", .{v_posy})
 		catch unreachable) catch unreachable;
 
 	// init struct key
 	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
 	var idx: usize = 0;
-	var vReftyp: dds.REFTYP = undefined;
+	var vReftyp: forms.REFTYP = undefined;
 	var vText: []u8 = undefined;
 	var vlen: usize = 0;
 	var vText2: []u8 = undefined;
@@ -1357,11 +1356,11 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 				vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
 				vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 				
-				vReftyp = strToEnum(dds.REFTYP, pFmt02.field.items[@intFromEnum(fp02.ftype)].text);
+				vReftyp = strToEnum(forms.REFTYP, pFmt02.field.items[@intFromEnum(fp02.ftype)].text);
 				@memset(vText[0..vlen], '#');
 
 				switch (vReftyp) {
-					dds.REFTYP.TEXT_FREE => {
+					forms.REFTYP.TEXT_FREE => {
 						vpnl.field.append(fld.newFieldTextFree(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							 strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1384,7 +1383,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.TEXT_FULL => {
+					forms.REFTYP.TEXT_FULL => {
 						vpnl.field.append(fld.newFieldTextFull(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1406,7 +1405,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.ALPHA => {
+					forms.REFTYP.ALPHA => {
 						vpnl.field.append(fld.newFieldAlpha(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1429,7 +1428,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.ALPHA_UPPER => {
+					forms.REFTYP.ALPHA_UPPER => {
 						vpnl.field.append(fld.newFieldAlphaUpper(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1452,7 +1451,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.ALPHA_NUMERIC => {
+					forms.REFTYP.ALPHA_NUMERIC => {
 						vpnl.field.append(fld.newFieldAlphaNumeric(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1473,7 +1472,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.ALPHA_NUMERIC_UPPER => {
+					forms.REFTYP.ALPHA_NUMERIC_UPPER => {
 						vpnl.field.append(fld.newFieldAlphaNumericUpper(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1496,7 +1495,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.PASSWORD => {
+					forms.REFTYP.PASSWORD => {
 						vpnl.field.append(fld.newFieldPassword(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1518,7 +1517,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.YES_NO => {
+					forms.REFTYP.YES_NO => {
 						vpnl.field.append(fld.newFieldYesNo(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1540,7 +1539,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.UDIGIT => {
+					forms.REFTYP.UDIGIT => {
 						vpnl.field.append(fld.newFieldUDigit(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1559,7 +1558,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 
 						// editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 								 catch |err| { @panic(@errorName(err)); };
 						}
@@ -1573,7 +1572,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.DIGIT => {
+					forms.REFTYP.DIGIT => {
 						vpnl.field.append(fld.newFieldDigit(pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
@@ -1588,11 +1587,11 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText[0..vlen], '0');
 
-						vText = std.fmt.allocPrint(dds.allocatorStr, "+{s}", .{vText})
+						vText = std.fmt.allocPrint(utl.allocUtl, "+{s}", .{vText})
 								catch |err| { @panic(@errorName(err)); };
 						//editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text }
 							) catch |err| { @panic(@errorName(err)); };
 						}
@@ -1607,7 +1606,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.UDECIMAL => {
+					forms.REFTYP.UDECIMAL => {
 						vpnl.field.append(fld.newFieldUDecimal(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1627,13 +1626,13 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText2[0..vlen], '0');
 						
-						vText = std.fmt.allocPrint(dds.allocatorStr, "{s},{s}", .{ vText, vText2 })
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s},{s}", .{ vText, vText2 })
 							catch |err| { @panic(@errorName(err)); };
 
 						// editcar
 
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 							catch |err| { @panic(@errorName(err)); };
 						}
@@ -1648,7 +1647,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.DECIMAL => {
+					forms.REFTYP.DECIMAL => {
 						vpnl.field.append(fld.newFieldDecimal(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1670,12 +1669,12 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
 						@memset(vText2[0..vlen], '0');
 						
-						vText = std.fmt.allocPrint(dds.allocatorStr, "+{s},{s}", .{ vText, vText2 })
+						vText = std.fmt.allocPrint(utl.allocUtl, "+{s},{s}", .{ vText, vText2 })
 							catch unreachable;
 
 						// editcar
 						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
-							vText = std.fmt.allocPrint(dds.allocatorStr, "{s}{s}", .{
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
 								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
 							catch |err| { @panic(@errorName(err)); };
 						}
@@ -1690,7 +1689,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.DATE_ISO => {
+					forms.REFTYP.DATE_ISO => {
 						vpnl.field.append(fld.newFieldDateISO(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1711,7 +1710,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 							"YYYY/MM/DD",
 						) catch |err| { @panic(@errorName(err)); };
 					},
-					dds.REFTYP.DATE_FR => {
+					forms.REFTYP.DATE_FR => {
 						vpnl.field.append(fld.newFieldDateFR(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1733,7 +1732,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.DATE_US => {
+					forms.REFTYP.DATE_US => {
 						vpnl.field.append(fld.newFieldDateUS(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1755,7 +1754,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.TELEPHONE => {
+					forms.REFTYP.TELEPHONE => {
 						vpnl.field.append(fld.newFieldTelephone(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1781,7 +1780,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.MAIL_ISO => {
+					forms.REFTYP.MAIL_ISO => {
 						vpnl.field.append(fld.newFieldMail(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1808,7 +1807,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.SWITCH => {
+					forms.REFTYP.SWITCH => {
 						vpnl.field.append(fld.newFieldSwitch(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1825,11 +1824,11 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 						fld.setText(
 							vpnl,
 							idx,
-							dds.CTRUE,
+							forms.CTRUE,
 						) catch |err| { @panic(@errorName(err)); };
 					},
 
-					dds.REFTYP.FUNC => {
+					forms.REFTYP.FUNC => {
 						vpnl.field.append(fld.newFieldFunc(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
@@ -1865,14 +1864,14 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 					catch |err| { @panic(@errorName(err)); };
 					
 				pnl.freePanel(pFmt02);
-				defer dds.allocatorPnl.destroy(pFmt02);
+				defer forms.allocatorForms.destroy(pFmt02);
 				return;
 			},
 
 			// exit panel field
 			.F12 => {
 				pnl.freePanel(pFmt02);
-				defer dds.allocatorPnl.destroy(pFmt02);
+				defer forms.allocatorForms.destroy(pFmt02);
 				return;
 			},
 			else => {},
@@ -1883,9 +1882,8 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 // Order field
 pub fn orderField(vpnl: *pnl.PANEL) void {
 	var idxligne: usize = 0;
-	const allocatorOrder = std.heap.page_allocator;
-	var newfield = std.ArrayList(fld.FIELD).init(allocatorOrder);
-	var savfield = std.ArrayList(fld.FIELD).init(allocatorOrder);
+	var newfield = std.ArrayList(fld.FIELD).init(grd.allocatorGrid);
+	var savfield = std.ArrayList(fld.FIELD).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -1901,7 +1899,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 		2,
 		32,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
@@ -1911,26 +1909,26 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 		70,
 		32,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Order);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "reftype", 20, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "X", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Y", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "width", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "scal", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "reftype", 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "X", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "Y", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "width", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "scal", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Origine);
 
-	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Order, "reftype", 20, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "X", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgCyan);
-	grd.newCell(Order, "Y", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgCyan);
-	grd.newCell(Order, "width", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "scal", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
+	grd.newCell(Order, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Order, "reftype", 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "X", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgCyan);
+	grd.newCell(Order, "Y", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgCyan);
+	grd.newCell(Order, "width", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "scal", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Order);
 
 	while (true) {
@@ -1967,7 +1965,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 	}
 
 	vpnl.field.clearAndFree();
-	vpnl.field = std.ArrayList(fld.FIELD).init(dds.allocatorPnl);
+	vpnl.field = std.ArrayList(fld.FIELD).init(forms.allocatorForms);
 	vpnl.field.clearRetainingCapacity();
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
@@ -1990,13 +1988,12 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 
 	savfield.clearAndFree();
 	savfield.deinit();
-
+	grd.deinitGrid();
 	return;
 }
 // remove Field
 fn removeField(vpnl: *pnl.PANEL) void {
-	const allocatorRemove = std.heap.page_allocator;
-	var savfield: std.ArrayList(fld.FIELD) = std.ArrayList(fld.FIELD).init(allocatorRemove);
+	var savfield: std.ArrayList(fld.FIELD) = std.ArrayList(fld.FIELD).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -2012,17 +2009,17 @@ fn removeField(vpnl: *pnl.PANEL) void {
 		2,
 		32,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "reftype", 20, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "X", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Y", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "width", 3, dds.REFTYP.UDIGIT , dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "scal", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "reftype", 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "X", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "Y", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "width", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "scal", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
 	grd.setHeaders(Origine);
 
 	while (true) {
@@ -2050,7 +2047,7 @@ fn removeField(vpnl: *pnl.PANEL) void {
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
 		vpnl.field.clearAndFree();
-		vpnl.field = std.ArrayList(fld.FIELD).init(dds.allocatorPnl);
+		vpnl.field = std.ArrayList(fld.FIELD).init(forms.allocatorForms);
 		vpnl.field.clearRetainingCapacity();
 
 		for (savfield.items) |p| {
@@ -2063,6 +2060,7 @@ fn removeField(vpnl: *pnl.PANEL) void {
 
 	savfield.clearAndFree();
 	savfield.deinit();
+	grd.deinitGrid();
 }
 
 //------------------------------------------------------------------
@@ -2073,9 +2071,9 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 	//term.getCursor();
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
-	var e_LineH = std.ArrayList([]const u8).init(dds.allocatorStr);
+	var e_LineH = std.ArrayList([]const u8).init(utl.allocUtl);
 	defer e_LineH.deinit();
-	defer dds.allocatorStr.destroy(&e_LineH);
+	defer utl.allocUtl.destroy(&e_LineH);
 
 	var e_posx: usize = term.posCurs.x ;
 	var e_posy: usize = term.posCurs.y ;
@@ -2089,8 +2087,8 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
  
 	var mDefline = mnu.newMenu("DefLine", // name
 			1, 1, // posx, posy
-			dds.CADRE.line1, // type line fram
-			dds.MNUVH.vertical, // type menu vertical / horizontal
+			mnu.CADRE.line1, // type line fram
+			mnu.MNUVH.vertical, // type menu vertical / horizontal
 			&.{ // item
 			"Line 1",
 			"LLine 2",
@@ -2123,7 +2121,7 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 	 
 			},
 			.ctrlV => {
-				tampon = std.fmt.allocPrint(dds.allocatorStr, "H{d}{d}", .{ e_posx, e_posy })
+				tampon = std.fmt.allocPrint(utl.allocUtl, "H{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
 				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
 				vpnl.lineh.append(lnh.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
@@ -2150,9 +2148,8 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 // Order horizontal
 fn orderHorizontal(vpnl: *pnl.PANEL) void {
 	var idy: usize = 0;
-	const allocatorOrder = std.heap.page_allocator;
-	var newline = std.ArrayList(lnh.LINE).init(allocatorOrder);
-	var savline = std.ArrayList(lnh.LINE).init(allocatorOrder);
+	var newline = std.ArrayList(lnh.LINEH).init(grd.allocatorGrid);
+	var savline = std.ArrayList(lnh.LINEH).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -2168,7 +2165,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
@@ -2178,16 +2175,16 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 		70,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Order);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Origine);
 
-	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Order, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Order);
 
 	while (true) {
@@ -2218,7 +2215,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 	}
 
 	vpnl.lineh.clearAndFree();
-	vpnl.lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+	vpnl.lineh = std.ArrayList(lnh.LINEH).init(forms.allocatorForms);
 	vpnl.lineh.clearRetainingCapacity();
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
@@ -2243,14 +2240,13 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-
+	grd.deinitGrid();
 	return;
 }
 
 // remove Horizontal
 fn removeHorizontal(vpnl: *pnl.PANEL) void {
-	const allocatorRemove = std.heap.page_allocator;
-	var savline: std.ArrayList(lnh.LINE) = std.ArrayList(lnh.LINE).init(allocatorRemove);
+	var savline = std.ArrayList(lnh.LINEH).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -2266,12 +2262,12 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Origine);
 
 	while (true) {
@@ -2295,7 +2291,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
 		vpnl.lineh.clearAndFree();
-		vpnl.lineh = std.ArrayList(lnh.LINE).init(dds.allocatorPnl);
+		vpnl.lineh = std.ArrayList(lnh.LINEH).init(forms.allocatorForms);
 		vpnl.lineh.clearRetainingCapacity();
 
 		for (savline.items) |p| {
@@ -2308,6 +2304,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
+	grd.deinitGrid();
 }
 
 
@@ -2319,9 +2316,9 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 	//term.getCursor();
 	var e_count: usize = 0;
 	var tampon: []const u8 = undefined;
-	var e_LineV = std.ArrayList([]const u8).init(dds.allocatorStr);
+	var e_LineV = std.ArrayList([]const u8).init(utl.allocUtl);
 	defer e_LineV.deinit();
-	defer dds.allocatorStr.destroy(&e_LineV);
+	defer utl.allocUtl.destroy(&e_LineV);
 
 	var e_posx: usize = term.posCurs.x ;
 	var e_posy: usize = term.posCurs.y ;
@@ -2335,8 +2332,8 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
  
 	var mDefline = mnu.newMenu("DefLine", // name
 			1, 1, // posx, posy
-			dds.CADRE.line1, // type line fram
-			dds.MNUVH.vertical, // type menu vertical / horizontal
+			mnu.CADRE.line1, // type line fram
+			mnu.MNUVH.vertical, // type menu vertical / horizontal
 			&.{ // item
 			"Line 1",
 			"LLine 2",
@@ -2367,7 +2364,7 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 	 
 			},
 			.ctrlV => {
-				tampon = std.fmt.allocPrint(dds.allocatorStr, "V{d}{d}", .{ e_posx, e_posy })
+				tampon = std.fmt.allocPrint(utl.allocUtl, "V{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
 				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
 				vpnl.linev.append(lnv.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
@@ -2395,9 +2392,9 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 // Order horizontal
 fn orderVertical(vpnl: *pnl.PANEL) void {
 	var idy: usize = 0;
-	const allocatorOrder = std.heap.page_allocator;
-	var newline = std.ArrayList(lnv.LINE).init(allocatorOrder);
-	var savline = std.ArrayList(lnv.LINE).init(allocatorOrder);
+	var newline = std.ArrayList(lnv.LINEV).init(grd.allocatorGrid);
+	var savline = std.ArrayList(lnv.LINEV).init(grd.allocatorGrid);
+
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -2413,7 +2410,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
@@ -2423,16 +2420,16 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 		70,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Order);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Origine);
 
-	grd.newCell(Order, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Order, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Order, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Order, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Order);
 
 	while (true) {
@@ -2463,7 +2460,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 	}
 
 	vpnl.linev.clearAndFree();
-	vpnl.linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+	vpnl.linev = std.ArrayList(lnv.LINEV).init(forms.allocatorForms);
 	vpnl.linev.clearRetainingCapacity();
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
@@ -2488,14 +2485,13 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-
+	grd.deinitGrid();
 	return;
 }
 
 // remove Horizontal
 fn removeVertical(vpnl: *pnl.PANEL) void {
-	const allocatorRemove = std.heap.page_allocator;
-	var savline: std.ArrayList(lnv.LINE) = std.ArrayList(lnv.LINE).init(allocatorRemove);
+	var savline: std.ArrayList(lnv.LINEV) = std.ArrayList(lnv.LINEV).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.clearAndFree();
@@ -2511,12 +2507,12 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 		2,
 		25,
 		grd.gridStyle,
-		dds.CADRE.line1,
+		grd.CADRE.line1,
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	grd.newCell(Origine, "col", 3, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "name", 6, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "col", 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "name", 6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Origine);
 
 	while (true) {
@@ -2540,7 +2536,7 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
 		vpnl.linev.clearAndFree();
-		vpnl.linev = std.ArrayList(lnv.LINE).init(dds.allocatorPnl);
+		vpnl.linev = std.ArrayList(lnv.LINEV).init(forms.allocatorForms);
 		vpnl.linev.clearRetainingCapacity();
 
 		for (savline.items) |p| {
@@ -2553,4 +2549,5 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
+	grd.deinitGrid();
 }

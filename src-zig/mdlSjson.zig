@@ -1,7 +1,5 @@
 const std = @import("std");
 
-const dds = @import("dds");
-
 // keyboard
 const kbd = @import("cursed").kbd;
 

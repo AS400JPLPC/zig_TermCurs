@@ -2,17 +2,9 @@ const std = @import("std");
 
 const utf = @import("std").unicode;
 
-/// terminal Fonction
-const term = @import("cursed");
-// keyboard
-const kbd = @import("cursed").kbd;
-
 // display grid
 pub const CTRUE  = "✔";
 pub const CFALSE = " ";
-// input   field
-pub const STRUE  = "✔";
-pub const SFALSE = "◉";
 
 
 
@@ -32,26 +24,66 @@ pub const ALIGNS = enum {
 ///------------------------------------
 /// utility
 ///------------------------------------
+//free memory 
+var arenaUtl = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocUtl  = arenaUtl .allocator();
+pub fn deinitUtl () void {
+	arenaUtl .deinit();
+	arenaUtl  = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	allocUtl = arenaUtl.allocator();
+}
+
 
 /// Errors that may occur when using String
 pub const ErrUtils = error{
-				Invalide_subStr_Index,
+				char_not_digital_invalide
 };
 
 
-/// Tools for internal variables
-//free memory 
-var arenaUStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocStr = arenaUStr.allocator();
-pub fn deinitUStr() void {
-	arenaUStr.deinit();
-	arenaUStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	allocStr = arenaUStr.allocator();
+
+pub fn strToUint( str : []const u8) usize{
+
+if( str.len == 0) return 0 ;
+
+var digit: [1][] u8 = undefined;
+var buffer : [100] u8 =	[_]u8{0} ** 100;
+
+digit [0]	= std.fmt.bufPrint(buffer[0..], "{s}",.{str}) 
+									catch |err| { @panic(@errorName(err));};
+
+			for ( digit, 0..) |d, idx| {
+
+				if ( !std.ascii.isDigit(d[idx])) {
+						@panic(@errorName(ErrUtils.char_not_digital_invalide));
+				}
+			}
+
+return std.fmt.parseUnsigned(u64, str,10) 
+				catch |err| { @panic(@errorName(err));};
 }
 
 
 
-//const allocstr = std.heap.page_allocator;
+pub fn UintToStr(v: usize ) []const u8{
+
+	return std.fmt.allocPrint(allocUtl,"{d}", .{v})
+	catch |err| { @panic(@errorName(err));};
+}
+
+
+
+pub fn strToUsize( v : []const u8 ) usize{
+	return std.fmt.parseUnsigned(u64, v,10) 
+				catch |err| { @panic(@errorName(err));};
+}
+pub fn usizeToStr( v : usize ) []const u8{
+
+	return std.fmt.allocPrint(allocUtl,"{d}", .{v})
+	catch |err| { @panic(@errorName(err));};
+}
+
+
+
 /// Iterator support iteration string
 pub const iteratStr = struct {
 	var strbuf:[] const u8 = undefined;
@@ -71,7 +103,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocStr.alloc(u8, size) catch {
+			var buf = allocUtl.alloc(u8, size) catch {
 				return ErrNbrch.InvalideAllocBuffer;
 			};
 			return buf;
@@ -79,7 +111,7 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocStr.free(self.buf); 
+			if (self.buf.len > 0)	allocUtl.free(self.buf); 
 			strbuf = "";
 		}
 
@@ -94,7 +126,7 @@ pub const iteratStr = struct {
 				idx += 1;
 			}
 
-			if (it.index == it.buf.len) return null;
+			if (it.index >= it.buf.len) return null;
 			idx = it.index;
 			it.index += getUTF8Size(it.buf[idx]);
 			return it.buf[idx..it.index];
@@ -135,6 +167,15 @@ pub const iteratStr = struct {
 };
 
 
+
+
+
+
+
+
+
+
+
 /// number characters String
 pub fn nbrCharStr(str:[] const u8) usize {
 	return std.fmt.count("{s}",.{str});
@@ -154,9 +195,9 @@ pub fn trimStr(str:[] const u8) [] const u8{
 /// is String isAlphabetic Latin
 pub fn isAlphabeticStr(str:[] const u8) bool {
 	
-	const result = allocStr.alloc(u8, str.len ) 
+	const result = allocUtl.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocStr.free(result);
+	defer allocUtl.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -173,9 +214,9 @@ pub fn isAlphabeticStr(str:[] const u8) bool {
 /// is String Upper Latin
 pub fn isUpperStr(str:[] const u8) bool {
 
-	const result = allocStr.alloc(u8, str.len ) 
+	const result = allocUtl.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocStr.free(result);
+	defer allocUtl.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -192,9 +233,9 @@ pub fn isUpperStr(str:[] const u8) bool {
 /// is String Lower Latin
 pub fn isLowerStr(str:[] const u8) bool {
 	
-	const result = allocStr.alloc(u8, str.len ) 
+	const result = allocUtl.alloc(u8, str.len ) 
 		catch |err| { @panic(@errorName(err));};
-	defer allocStr.free(result);
+	defer allocUtl.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
@@ -507,7 +548,7 @@ pub fn isPassword(str:[] const u8) bool {
 	while (iter.next()) |ch| {
 
 		var x = utf.utf8Decode(ch) 
-						catch |err| { @panic(@errorName(err));};
+			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'!' => continue ,
 			'#' => continue ,
@@ -538,7 +579,6 @@ pub fn isPassword(str:[] const u8) bool {
 				b = false ;
 			},
 		}
-		
 	}
 	return b;
 }
@@ -579,16 +619,16 @@ pub fn isMailStr(str:[] const u8) bool {
 
 /// upper-case String Latin
 pub fn upperStr(str:[] const u8) [] const u8 {
-	const result = allocStr.alloc(u8, str.len )
+	const result = allocUtl.alloc(u8, str.len )
 		catch |err| { @panic(@errorName(err));};
-	defer allocStr.free(result);
+	defer allocUtl.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
 		result[idx] = std.ascii.toUpper(result[idx]);
 		}
-	return std.fmt.allocPrint(allocStr,"{s}",.{result},)
+	return std.fmt.allocPrint(allocUtl,"{s}",.{result},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -597,16 +637,16 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 
 /// Lower String Latin
 pub fn lowerStr(str:[] const u8) [] const u8 {
-	const result = allocStr.alloc(u8, str.len )
+	const result = allocUtl.alloc(u8, str.len )
 		catch |err| { @panic(@errorName(err));};
-	defer allocStr.free(result);
+	defer allocUtl.free(result);
 
 	std.mem.copy(u8, result, str);
 	var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
 		result[idx] = std.ascii.toLower(result[idx]);
 		}
-	return std.fmt.allocPrint(allocStr,"{s}",.{result},)
+	return std.fmt.allocPrint(allocUtl,"{s}",.{result},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -615,7 +655,7 @@ pub fn lowerStr(str:[] const u8) [] const u8 {
 
 /// concat String
 pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
-	return std.fmt.allocPrint(allocStr,"{s}{s}",.{a,b},)
+	return std.fmt.allocPrint(allocUtl,"{s}{s}",.{a,b},)
 		catch |err| { @panic(@errorName(err));};
 }
 
@@ -691,7 +731,7 @@ pub fn alignStr(text: []const u8,aligns :ALIGNS, wlen : usize ) []const u8 {
 /// Delete Items ArrayList
 pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void{
 
-	var LIST = std.ArrayList([] const u8).init(allocStr);
+	var LIST = std.ArrayList([] const u8).init(allocUtl);
 	var idx : usize = 0;
 	for (self.items) | val| {
 		if ( idx != i-1 ) LIST.append(val) catch |err| { @panic(@errorName(err));};
@@ -751,20 +791,20 @@ pub fn strToBool(v: []const u8) bool {
 
 /// str to switch STRUE/SFALSE bool
 pub fn strToCbool(v: []const u8) []const u8 {
-	return if (std.mem.eql(u8,v, "1")) STRUE	else SFALSE;
+	return if (std.mem.eql(u8,v, "1")) CTRUE	else CFALSE;
 }
 
 /// bool to switch STRUE/SFALSE 
 pub fn boolToCbool(v: bool) []const u8 {
-	return if	(v == true ) STRUE	else SFALSE;
+	return if	(v == true ) CTRUE	else CFALSE;
 }
 
 /// switch STRUE/SFALSE bool to bool
 pub fn cboolToBool(v: []const u8) bool {
-	return if ( std.mem.eql(u8,v, STRUE) ) true	else	false;
+	return if ( std.mem.eql(u8,v, CTRUE) ) true	else	false;
 }
 
 // switch STRUE / SFALSE bool to str
 pub fn cboolToStr(v: []const u8) []const u8 {
-	return if ( std.mem.eql(u8,v, STRUE) ) "1"	else	"0";
+	return if ( std.mem.eql(u8,v, CTRUE) ) "1"	else	"0";
 }

@@ -23,29 +23,18 @@ pub fn build(b: *std.build) void {
 	const match = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/match.zig"},
 	});
-	// data commune
-	const dds = b.createModule(.{
-		.source_file = .{ .path = "./deps/curse/dds.zig" },
-	});
 	
 	const cursed = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/cursed.zig" },
-		.dependencies= &.{
-			.{ .name = "dds", .module = dds },
-		},
 	});
 
 	const utils = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/utils.zig" },
-			.dependencies= &.{
-			.{ .name = "cursed", .module = cursed },
-		}
 	});
 
 	const forms = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/forms.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "match",  .module = match },
@@ -56,7 +45,6 @@ pub fn build(b: *std.build) void {
 	const grid = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/grid.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 		},
@@ -66,7 +54,6 @@ pub fn build(b: *std.build) void {
 	const menu = b.createModule(.{
 		.source_file = .{ .path = "./deps/curse/menu.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 		},
@@ -75,7 +62,6 @@ pub fn build(b: *std.build) void {
 	const mdlPanel = b.createModule(.{
 		.source_file = .{ .path = "./mdlPanel.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
@@ -88,7 +74,6 @@ pub fn build(b: *std.build) void {
 	const mdlForms = b.createModule(.{
 		.source_file = .{ .path = "./mdlForms.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
@@ -98,23 +83,21 @@ pub fn build(b: *std.build) void {
 		},
 	});
 
-	const mdlGrids = b.createModule(.{
-		.source_file = .{ .path = "./mdlGrids.zig" },
-		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
-			.{ .name = "cursed", .module = cursed },
-			.{ .name = "utils",  .module = utils },
-			.{ .name = "forms",  .module = forms },
-			.{ .name = "grid",   .module = grid  },
-			.{ .name = "menu",   .module = menu  },
-			.{ .name = "match",  .module = match },
-		},
-	});
+	// const mdlGrids = b.createModule(.{
+	// 	.source_file = .{ .path = "./mdlGrids.zig" },
+	// 	.dependencies= &.{
+	// 		.{ .name = "cursed", .module = cursed },
+	// 		.{ .name = "utils",  .module = utils },
+	// 		.{ .name = "forms",  .module = forms },
+	// 		.{ .name = "grid",   .module = grid  },
+	// 		.{ .name = "menu",   .module = menu  },
+	// 		.{ .name = "match",  .module = match },
+	// 	},
+	// });
 
 	const mdlSjson = b.createModule(.{
 		.source_file = .{ .path = "./mdlSjson.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
@@ -129,7 +112,6 @@ pub fn build(b: *std.build) void {
 	const mdlRjson = b.createModule(.{
 		.source_file = .{ .path = "./mdlRjson.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
@@ -143,7 +125,6 @@ pub fn build(b: *std.build) void {
 	const mdlFile = b.createModule(.{
 		.source_file = .{ .path = "./mdlFile.zig" },
 		.dependencies= &.{
-			.{ .name = "dds",	.module = dds },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
@@ -171,7 +152,6 @@ pub fn build(b: *std.build) void {
 	Prog.addIncludePath(.{.path = "./lib/"});
 	Prog.linkLibC();
 	Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
-	Prog.addModule("dds"   , dds);
 	Prog.addModule("cursed", cursed); 
 	Prog.addModule("utils" , utils);
 	Prog.addModule("forms" , forms);
@@ -180,7 +160,7 @@ pub fn build(b: *std.build) void {
 	Prog.addModule("match" , match);
 	Prog.addModule("mdlPanel" , mdlPanel);
 	Prog.addModule("mdlForms" , mdlForms);
-	Prog.addModule("mdlGrids" , mdlGrids);
+	// Prog.addModule("mdlGrids" , mdlGrids);
 	Prog.addModule("mdlFile" , mdlFile);
 
 	Prog.addModule("logger" , logger);
@@ -205,7 +185,6 @@ pub fn build(b: *std.build) void {
 	docs.linkLibC();
 	docs.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
 
-	docs.addModule("dds"   , dds);
 	docs.addModule("cursed", cursed);
 	docs.addModule("utils" , utils);
 	docs.addModule("forms" , forms);
@@ -214,7 +193,7 @@ pub fn build(b: *std.build) void {
 	docs.addModule("match" , match);
 	docs.addModule("mdlPanel" , mdlPanel);
 	docs.addModule("mdlForms" , mdlForms);
-	docs.addModule("mdlGrids" , mdlGrids);
+	// docs.addModule("mdlGrids" , mdlGrids);
 	docs.addModule("mdlFile" , mdlFile);
 
 	docs.addModule("logger" , logger);

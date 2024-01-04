@@ -1,7 +1,6 @@
 const std = @import("std");
 const utf = @import("std").unicode;
 
-const dds = @import("dds");
 
 /// terminal Fonction
 const term = @import("cursed");
@@ -20,7 +19,6 @@ const io = std.io;
 /// MENU
 ///-------------------------------
 
-
 /// Errors that may occur when using String
 pub const ErrMenu = error{
 
@@ -37,38 +35,48 @@ pub const ErrMenu = error{
 
 // defined Menu
 pub const	mnu = struct {
+	pub const CADRE = enum  {
+		line0,
+		line1,
+		line2
+	};
 
+
+	pub const MNUVH = enum {
+	vertical ,
+	horizontal
+	};
 	// nbr espace intercaler
 	pub var	mnuspc : usize =3 ;
 
 	// define attribut default CADRE
-	pub var AtrMnu : dds.ZONATRB = .{
-		.styled=[_]u32{ @intFromEnum(dds.Style.styleDim),
-						@intFromEnum(dds.Style.notStyle),
-						@intFromEnum(dds.Style.notStyle),
-						@intFromEnum(dds.Style.notStyle)},
-		.backgr = dds.BackgroundColor.bgBlack,
-		.foregr = dds.ForegroundColor.fgRed
+	pub var AtrMnu : term.ZONATRB = .{
+		.styled=[_]u32{ @intFromEnum(term.Style.styleDim),
+						@intFromEnum(term.Style.notStyle),
+						@intFromEnum(term.Style.notStyle),
+						@intFromEnum(term.Style.notStyle)},
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgRed
 
 	};
 
-	pub var AtrBar : dds.ZONATRB = .{
-		.styled=[_]u32{ @intFromEnum(dds.Style.styleReverse),
-						@intFromEnum(dds.Style.styleItalic),
-						@intFromEnum(dds.Style.notStyle),
-						@intFromEnum(dds.Style.notStyle)},
-		.backgr = dds.BackgroundColor.bgBlack,
-		.foregr = dds.ForegroundColor.fgWhite
+	pub var AtrBar : term.ZONATRB = .{
+		.styled=[_]u32{ @intFromEnum(term.Style.styleReverse),
+						@intFromEnum(term.Style.styleItalic),
+						@intFromEnum(term.Style.notStyle),
+						@intFromEnum(term.Style.notStyle)},
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgWhite
 
 	};
 
-	pub var AtrCell : dds.ZONATRB= .{
-		.styled=[_]u32{ @intFromEnum(dds.Style.styleItalic),
-						@intFromEnum(dds.Style.notStyle),
-						@intFromEnum(dds.Style.notStyle),
-						@intFromEnum(dds.Style.notStyle)},
-		.backgr = dds.BackgroundColor.bgBlack,
-		.foregr = dds.ForegroundColor.fgWhite,
+	pub var AtrCell : term.ZONATRB= .{
+		.styled=[_]u32{ @intFromEnum(term.Style.styleItalic),
+						@intFromEnum(term.Style.notStyle),
+						@intFromEnum(term.Style.notStyle),
+						@intFromEnum(term.Style.notStyle)},
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgWhite,
 	};
 
 	// define MENU
@@ -80,12 +88,12 @@ pub const	mnu = struct {
 		lines: usize,
 		cols : usize,
 
-		cadre: dds.CADRE,
-		mnuvh : dds.MNUVH,
+		cadre: CADRE,
+		mnuvh :MNUVH,
 
-		attribut: dds.ZONATRB,
-		attrBar: dds.ZONATRB,
-		attrCell: dds.ZONATRB,
+		attribut: term.ZONATRB,
+		attrBar:  term.ZONATRB,
+		attrCell: term.ZONATRB,
 
 		xitems: []const[]const u8,
 		nbr: usize,
@@ -95,8 +103,8 @@ pub const	mnu = struct {
 	// NEW MENU
 	pub fn newMenu( vname: [] const u8,
 					vposx: usize, vposy: usize,
-					vcadre : dds.CADRE,
-					vmnuvh : dds.MNUVH,
+					vcadre : CADRE,
+					vmnuvh : MNUVH,
 					vitems: []const[]const u8
 					) MENU {
 
@@ -202,7 +210,7 @@ pub const	mnu = struct {
 		var x :usize =	vmnu.posx ;
 
 		// if line 0 ex: directory tab
-		if (dds.CADRE.line0 != vmnu.cadre ) {
+		if (CADRE.line0 != vmnu.cadre ) {
 			while (row <= vmnu.lines) : (row +=1) {
 				y = vmnu.posy ;
 				col = 1;
@@ -210,45 +218,45 @@ pub const	mnu = struct {
 					edt = false;
 					if (row == 1) {
 							if (col == 1) {
-								if ( dds.CADRE.line1 == vmnu.cadre ) {
+								if ( CADRE.line1 == vmnu.cadre ) {
 										trait = ACS_UCLEFT;
 								} else	trait = ACS_UCLEFT2 ;
 								edt = true;
 							}
 							if ( col == vmnu.cols ) {
-								if (dds.CADRE.line1 == vmnu.cadre) {
+								if (CADRE.line1 == vmnu.cadre) {
 									trait = ACS_UCRIGHT;
 								} else	trait = ACS_UCRIGHT2 ;
 								edt = true;
 							}
 							if ( col > 1 and col < vmnu.cols ) {
-								if (dds.CADRE.line1 == vmnu.cadre ) {
+								if (CADRE.line1 == vmnu.cadre ) {
 									trait = ACS_Hlines;
 								} else	trait = ACS_Hline2;
 								edt = true;
 							}
 					} else if ( row == vmnu.lines ) {
 							if (col == 1) {
-								if ( dds.CADRE.line1 == vmnu.cadre ) {
+								if (CADRE.line1 == vmnu.cadre ) {
 									trait = ACS_LCLEFT;
 								} else	trait = ACS_LCLEFT2;
 								edt = true;
 							}
 							if ( col == vmnu.cols ) {
-								if ( dds.CADRE.line1 == vmnu.cadre ) {
+								if (CADRE.line1 == vmnu.cadre ) {
 									trait = ACS_LCRIGHT;
 								} else	trait = ACS_LCRIGHT2 ;
 								edt = true ;
 							}
 							if ( col > 1 and col < vmnu.cols ) {
-								if ( dds.CADRE.line1 == vmnu.cadre ) {
+								if (CADRE.line1 == vmnu.cadre ) {
 									trait = ACS_Hlines;
 								} else	trait = ACS_Hline2 ;
 								edt = true;
 							}
 					} else if ( row > 1 and row < vmnu.lines ) {
 						if ( col == 1 or col == vmnu.cols ) {
-							if ( dds.CADRE.line1 == vmnu.cadre ) {
+							if (CADRE.line1 == vmnu.cadre ) {
 								trait = ACS_Vlines;
 							} else trait = ACS_Vline2 ;
 							edt = true;
@@ -293,14 +301,14 @@ pub const	mnu = struct {
 		n = 0;
 		h = 0;
 		for (vmnu.xitems) | cell |	{
-			if (vmnu.mnuvh == dds.MNUVH.vertical) {
-				if (vmnu.cadre == dds.CADRE.line0)
+			if (vmnu.mnuvh == MNUVH.vertical) {
+				if (vmnu.cadre == CADRE.line0)
 					term.gotoXY(x + n	, y	)
 				else
 					term.gotoXY( x + n + 1 , y	+ 1);
 			}
-			if (vmnu.mnuvh == dds.MNUVH.horizontal) {
-				if (vmnu.cadre == dds.CADRE.line0 )
+			if (vmnu.mnuvh == MNUVH.horizontal) {
+				if (vmnu.cadre == CADRE.line0 )
 					term.gotoXY(x	,	h + y	 )
 				else
 					term.gotoXY(x + 1, h + y + 1);
@@ -313,7 +321,7 @@ pub const	mnu = struct {
 
 			n += 1;
 			h += utl.nbrCharStr(cell);
-			if (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;
+			if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
 		}
 	}
 
@@ -348,14 +356,14 @@ pub const	mnu = struct {
 			h = 0;
 			for (vmnu.xitems) | cell |	{
 
-				if (vmnu.mnuvh == dds.MNUVH.vertical) {
-					if (vmnu.cadre == dds.CADRE.line0 )
+				if (vmnu.mnuvh == MNUVH.vertical) {
+					if (vmnu.cadre == CADRE.line0 )
 						term.gotoXY(x + n ,y )
 					else
 						term.gotoXY(x + n + 1, y + 1);
 					}
-				if (vmnu.mnuvh == dds.MNUVH.horizontal) {
-					if (vmnu.cadre == dds.CADRE.line0)
+				if (vmnu.mnuvh == MNUVH.horizontal) {
+					if (vmnu.cadre == CADRE.line0)
 						term.gotoXY(x ,h + y )
 					else
 						term.gotoXY(x + 1, h + y + 1);
@@ -367,7 +375,7 @@ pub const	mnu = struct {
 
 				n += 1;
 				h += utl.nbrCharStr(cell);
-				if (vmnu.mnuvh == dds.MNUVH.horizontal) h += mnuspc;
+				if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
 			}
 
 			var Tkey	= kbd.getKEY();
@@ -380,13 +388,13 @@ pub const	mnu = struct {
 				Tkey.Key = kbd.none;
 				if (term.MouseInfo.scroll ) {
 					if ( term.MouseInfo.scrollDir == term.ScrollDirection.msUp ) {
-						if (vmnu.mnuvh == dds.MNUVH.vertical)		Tkey.Key = kbd.up;
-						if (vmnu.mnuvh == dds.MNUVH.horizontal)	Tkey.Key = kbd.left;
+						if (vmnu.mnuvh == MNUVH.vertical)	Tkey.Key = kbd.up;
+						if (vmnu.mnuvh == MNUVH.horizontal)	Tkey.Key = kbd.left;
 					}
 
 					if (term.MouseInfo.scrollDir == term.ScrollDirection.msDown) {
-						if (vmnu.mnuvh == dds.MNUVH.vertical)		Tkey.Key = kbd.down;
-						if (vmnu.mnuvh == dds.MNUVH.horizontal)	Tkey.Key = kbd.right;
+						if (vmnu.mnuvh == MNUVH.vertical)	Tkey.Key = kbd.down;
+						if (vmnu.mnuvh == MNUVH.horizontal)	Tkey.Key = kbd.right;
 					}
 				}
 				else {
@@ -394,7 +402,7 @@ pub const	mnu = struct {
 					switch (term.MouseInfo.button) {
 						term.MouseButton.mbLeft		=>	Tkey.Key = kbd.enter,
 						term.MouseButton.mbMiddle	=>	Tkey.Key = kbd.enter,
-						term.MouseButton.mbRight	 =>	Tkey.Key = kbd.enter,
+						term.MouseButton.mbRight	=>	Tkey.Key = kbd.enter,
 						else => {}
 					}
 				}

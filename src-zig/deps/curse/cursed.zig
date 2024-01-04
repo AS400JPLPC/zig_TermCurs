@@ -1,7 +1,5 @@
 const std = @import("std");
 const utf = @import("std").unicode;
-const dds = @import("dds");
-
 
 const io = std.io;
 const os = std.os;
@@ -16,9 +14,84 @@ var use_termios: os.linux.termios = undefined;
 const stdout = std.io.getStdOut().writer();
 const stdin  = std.io.getStdIn().reader();
 // outils
-/// Iterator support iteration string
 
-const allocstr = std.heap.page_allocator;
+ // const allocstr = std.heap.page_allocator;
+ var arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorTerm = arenaTerm.allocator();
+pub fn deinitTerm() void {
+	arenaTerm.deinit();
+	arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	allocatorTerm = arenaTerm.allocator();
+}
+
+
+pub const  Style = enum (u8)  {
+	notStyle = 0,		// not styled
+	styleBold = 1,		// bold text
+	styleDim,			// dim text
+	styleItalic,		// italic (or reverse on terminals not supporting)
+	styleUnderscore,	// underscored text
+	styleBlink,			// blinking/bold text
+	styleBlinkRapid,	// rapid blinking/bold text (not widely supported)
+	styleReverse,		// reverse
+	styleHidden,		// hidden text
+	styleCrossed		// strikethrough
+};
+
+
+pub const  typeCursor = enum (u8)  {
+	cDefault,
+	cBlink,
+	cSteady,
+	cBlinkUnderline,
+	cSteadyUnderline,
+	cBlinkBar,
+	cSteadyBar
+};
+
+// def standard color fgd dull color  fg higth color
+pub const  ForegroundColor = enum (u8) {// terminal's foreground colors
+	fgdBlack = 30,		// black
+	fgdRed ,			// red
+	fgdGreen,			// green
+	fgdYellow,			// yellow
+	fgdBlue,			// blue
+	fgdMagenta,			// magenta
+	fgdCyan,			// cyan
+	fgdWhite,			// white
+	fgBlack = 90,		// black
+	fgRed ,				// red
+	fgGreen,			// green
+	fgYellow,			// yellow
+	fgBlue,				// blue
+	fgMagenta,			// magenta
+	fgCyan,				// cyan
+	fgWhite	  ,			// white
+};
+
+pub const  BackgroundColor = enum (u8)  { // terminal's background colors
+	bgBlack = 40,		// black
+	bgRed ,				// red
+	bgGreen,			// green
+	bgYellow,			// yellow
+	bgBlue,				// blue
+	bgMagenta,			// magenta
+	bgCyan  = 106 ,		// cyan
+	bgWhite = 47,		// white
+};
+
+// attribut standard
+pub const ZONATRB = struct {
+	styled	: [4]u32,
+	backgr	: BackgroundColor,
+	foregr	: ForegroundColor
+
+};
+
+
+
+
+
 pub const iteratStr = struct {
 	var strbuf:[] const u8 = undefined;
 
@@ -35,7 +108,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocstr.alloc(u8, size) catch {
+			var buf = allocatorTerm.alloc(u8, size) catch {
 							return ErrNbrch.InvalideAllocBuffer;
 					};
 			return buf;
@@ -43,7 +116,7 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocstr.free(self.buf);
+			if (self.buf.len > 0)	allocatorTerm.free(self.buf);
 			strbuf = "";
 		}
 
@@ -59,7 +132,7 @@ pub const iteratStr = struct {
 				idx += 1;
 			}
 
-			if (it.index == it.buf.len) return null;
+			if (it.index >= it.buf.len) return null;
 				idx = it.index;
 				it.index += getUTF8Size(it.buf[idx]);
 				return it.buf[idx..it.index];
@@ -194,7 +267,7 @@ pub fn cursShow() void {
 	stdout.writeAll("\x1b[?25h") catch {};
 }
 
-pub fn defCursor(e_curs: dds.typeCursor) void {
+pub fn defCursor(e_curs: typeCursor) void {
 	// define type	Cursor form terminal
 	switch (e_curs) {
 		.cDefault => {
@@ -314,20 +387,18 @@ fn setStyle(style: [4]u32) void {
 }
 
 /// Sets the terminal's foreground color.
-fn setForegroundColor(color: dds.BackgroundColor) void {
-	// const writer = TTY.writer();
+fn setForegroundColor(color: BackgroundColor) void {
 	stdout.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// Sets the terminal's Background color.
-fn setBackgroundColor(color: dds.ForegroundColor) void {
-	// const writer = TTY.writer();
+fn setBackgroundColor(color: ForegroundColor) void {
+	
 	stdout.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// write text and attribut
-pub fn writeStyled(text: []const u8, attribut: dds.ZONATRB) void {
-	// const writer = TTY.writer();
+pub fn writeStyled(text: []const u8, attribut: ZONATRB) void {
 	setForegroundColor(attribut.backgr);
 	setBackgroundColor(attribut.foregr);
 	setStyle(attribut.styled);
@@ -391,7 +462,7 @@ fn reset() void {
 
 /// Returns to the previous terminal state
 pub fn disableRawMode() void {
-	defCursor(dds.typeCursor.cSteady);
+	defCursor(typeCursor.cSteady);
 	offMouse();
 	cursShow();
 	cls();
@@ -662,9 +733,6 @@ pub const kbd = enum {
 		// init Event
 		var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
 
-		// variable --> Event.Char
-		// var vUnicode: []u8 = undefined;
-		// vUnicode = dds.allocatorPnl.alloc(u8, 4) catch unreachable;
 		// TODO: Check buffer size
 		var keybuf: [13]u8 = undefined;
 		flushIO();
@@ -783,7 +851,7 @@ pub const kbd = enum {
 			else => {
 				// return Character UTF8
 				var vUnicode: []u8 = undefined;
-				vUnicode = dds.allocatorStr.alloc(u8, 4) catch unreachable;	
+				vUnicode = allocatorTerm.alloc(u8, 4) catch unreachable;	
 				var i = utf.utf8Encode(c0, vUnicode ) catch {Event.Key = kbd.none; return Event;};
 				Event.Char = vUnicode[0..i];
 				Event.Key	= kbd.char;

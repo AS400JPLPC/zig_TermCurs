@@ -1,7 +1,5 @@
 const std = @import("std");
 
-const dds = @import("dds");
-
 // terminal Fonction
 const term = @import("cursed");
 // keyboard
@@ -54,17 +52,7 @@ pub const ErrMain = error{
 	main_NPANEL_invalide,
 };
 
-fn strToUsize(v: []const u8) usize{
-	if( v.len == 0) return 0 ;
-	return std.fmt.parseUnsigned(u64, v,10) 
-	catch |err| { @panic(@errorName(err));};
-}
 
-fn usizeToStr(v: usize ) []const u8{
-
-	return std.fmt.allocPrint(dds.allocatorStr,"{d}", .{v})
-	catch |err| { @panic(@errorName(err));};
-}
 
 const lp01 = enum {
 	F_shw,
@@ -418,7 +406,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										1, 1,
 										termSize.height,
 										termSize.width ,
-										dds.CADRE.line1,
+										forms.CADRE.line1,
 										"Def.Panel"
 										);
 
@@ -474,10 +462,10 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.label.append(lbl.newLabel(@tagName(fp01.name)	 ,2,2, "name.....:") ) catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(fp01.posx)	 ,3,2, "posX.....:") ) catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(fp01.posy)	 ,4,2, "posy.....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp01.lines)	,5,2, "lines....:") ) catch unreachable ;
+	Panel.label.append(lbl.newLabel(@tagName(fp01.lines) ,5,2, "lines....:") ) catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(fp01.cols)	 ,6,2, "cols.....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp01.cadre)	,7,2, "cadre....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp01.title)	,8,2, "title....:") ) catch unreachable ;
+	Panel.label.append(lbl.newLabel(@tagName(fp01.cadre) ,7,2, "cadre....:") ) catch unreachable ;
+	Panel.label.append(lbl.newLabel(@tagName(fp01.title) ,8,2, "title....:") ) catch unreachable ;
 
 	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp01.name),2,12,10,"",true,
 							"required","please enter text [a-zA-Z]{1,1} [A-z0-9]",
@@ -512,7 +500,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 							"required","please enter text",
 							"")) catch unreachable ;
 
-	Panel.lineh.append(lnh.newLine(@tagName(lp01.lnh1)	 ,9,2,116,dds.LINE.line1) ) catch unreachable ;
+	Panel.lineh.append(lnh.newLine(@tagName(lp01.lnh1)	 ,9,2,116,forms.LINE.line1) ) catch unreachable ;
 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.F_shw) ,11,9	,"show"))	 catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(lp01.F_chk) ,11,15 ,"check"))	catch unreachable ;
@@ -592,151 +580,151 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
 
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F1)			 ,12,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F1)		 ,12,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F1_shw)	 ,12,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F1_chk)	 ,12,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F1_txt) ,12,22,15,"",false,
 										"required","please enter text fonction","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F2)			 ,13,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F2)		 ,13,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F2_shw)	 ,13,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F2_chk)	 ,13,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F2_txt) ,13,22,15,"",false,
 										"required","please enter text fonction","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F3)			 ,14,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F3)		 ,14,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F3_shw)	 ,14,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F3_chk)	 ,14,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F3_txt) ,14,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F4)			 ,15,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F4)		 ,15,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F4_shw)	 ,15,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F4_chk)	 ,15,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F4_txt) ,15,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F5)			 ,16,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F5)		 ,16,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F5_shw)	 ,16,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F5_chk)	 ,16,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F5_txt) ,16,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F6)			 ,17,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F6)		 ,17,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F6_shw)	 ,17,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F6_chk)	 ,17,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F6_txt) ,17,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F7)			 ,18,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F7)		 ,18,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F7_shw)	 ,18,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F7_chk)	 ,18,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F7_txt) ,18,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F8)			 ,19,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F8)		 ,19,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F8_shw)	 ,19,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F8_chk)	 ,19,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F8_txt) ,19,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F9)			 ,20,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F9)		 ,20,6,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F9_shw)	 ,20,10,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F9_chk)	 ,20,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F9_txt) ,20,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10)			 ,22,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10_shw)	 ,22,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10_chk)	 ,22,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10)	 ,22,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10_shw) ,22,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F10_chk) ,22,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F10_txt) ,22,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11)			 ,23,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11_shw)	 ,23,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11_chk)	 ,23,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11)	 ,23,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11_shw) ,23,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F11_chk) ,23,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F11_txt) ,23,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12)			 ,24,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12_shw)	 ,24,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12_chk)	 ,24,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12)	 ,24,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12_shw) ,24,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F12_chk) ,24,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F12_txt) ,24,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13)			 ,25,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13_shw)	 ,25,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13_chk)	 ,25,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13)	 ,25,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13_shw) ,25,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F13_chk) ,25,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F13_txt) ,25,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 	
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14)			 ,26,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14_shw)	 ,26,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14_chk)	 ,26,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14)	 ,26,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14_shw) ,26,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F14_chk) ,26,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F14_txt) ,26,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15)			 ,27,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15_shw)	 ,27,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15_chk)	 ,27,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15)	 ,27,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15_shw) ,27,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F15_chk) ,27,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F15_txt) ,27,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16)			 ,28,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16_shw)	 ,28,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16_chk)	 ,28,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16)	 ,28,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16_shw) ,28,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F16_chk) ,28,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F16_txt) ,28,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17)			 ,29,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17_shw)	 ,29,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17_chk)	 ,29,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17)	 ,29,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17_shw) ,29,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F17_chk) ,29,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F17_txt) ,29,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18)			 ,30,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18_shw)	 ,30,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18_chk)	 ,30,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18)	 ,30,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18_shw) ,30,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F18_chk) ,30,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F18_txt) ,30,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 	
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19)			 ,32,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19_shw)	 ,32,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19_chk)	 ,32,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19)	 ,32,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19_shw) ,32,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F19_chk) ,32,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F19_txt) ,32,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20)			 ,33,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20_shw)	 ,33,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20_chk)	 ,33,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20)	 ,33,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20_shw) ,33,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F20_chk) ,33,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F20_txt) ,33,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21)			 ,34,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21_shw)	 ,34,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21_chk)	 ,34,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21)	 ,34,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21_shw) ,34,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F21_chk) ,34,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F21_txt) ,34,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22)			 ,35,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22_shw)	 ,35,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22_chk)	 ,35,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22)	 ,35,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22_shw) ,35,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F22_chk) ,35,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F22_txt) ,35,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23)			 ,36,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23_shw)	 ,36,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23_chk)	 ,36,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23)	 ,36,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23_shw) ,36,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F23_chk) ,36,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F23_txt) ,36,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24)			 ,37,6,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24_shw)	 ,37,10,false,"","")) catch unreachable ;
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24_chk)	 ,37,17,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24)	 ,37,6,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24_shw) ,37,10,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.F24_chk) ,37,17,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.F24_txt) ,37,22,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.linev.append(lnv.newLine(@tagName(lp01.lnv1)	 ,11,39,26,dds.LINE.line1) ) catch unreachable ;
+	Panel.linev.append(lnv.newLine(@tagName(lp01.lnv1)	 ,11,39,26,forms.LINE.line1) ) catch unreachable ;
 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_shw) ,11,50	,"show"))	 catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_chk) ,11,56	,"check"))	catch unreachable ;
@@ -847,7 +835,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"required","please enter text fonction ","")) catch unreachable ;
 
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altE)			 ,16,47,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altE)		 ,16,47,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altE_shw)	 ,16,51,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altE_chk)	 ,16,58,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altE_txt) ,16,63,15,"",false,
@@ -907,7 +895,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altN_txt) ,25,63,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altO)			 ,26,47,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altO)		 ,26,47,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altO_shw)	 ,26,51,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altO_chk)	 ,26,58,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altO_txt) ,26,63,15,"",false,
@@ -949,7 +937,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altU_txt) ,32,63,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altV)			 ,33,47,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altV)		 ,33,47,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altV_shw)	 ,33,51,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altV_chk)	 ,33,58,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altV_txt) ,33,63,15,"",false,
@@ -961,7 +949,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altW_txt) ,34,63,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altX)			 ,35,47,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altX)		 ,35,47,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altX_shw)	 ,35,51,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.altX_chk)	 ,35,58,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.altX_txt) ,35,63,15,"",false,
@@ -980,63 +968,63 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"required","please enter text fonction ","")) catch unreachable ;
 
 
-	Panel.linev.append(lnv.newLine(@tagName(lp01.lnv2)	 ,11,79,26,dds.LINE.line1) ) catch unreachable ;
+	Panel.linev.append(lnv.newLine(@tagName(lp01.lnv2)	 ,11,79,26,forms.LINE.line1) ) catch unreachable ;
 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_shw) ,11,91	,"show"))	 catch unreachable ; 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_chk) ,11,97	,"check"))	catch unreachable ; 
 	Panel.label.append(lbl.newLabel(@tagName(lp01.ctrl_txt) ,11,104	,"text") ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlA)		 ,12,82 ,@tagName(fp01.ctrlA)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlA) ,12,82 ,@tagName(fp01.ctrlA)) ) catch unreachable ; 
 	
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlB)		 ,13,82 ,@tagName(fp01.ctrlB)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlB) ,13,82 ,@tagName(fp01.ctrlB)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlC)		 ,14,82 ,@tagName(fp01.ctrlC)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlC) ,14,82 ,@tagName(fp01.ctrlC)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlD)		 ,15,82 ,@tagName(fp01.ctrlD)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlD) ,15,82 ,@tagName(fp01.ctrlD)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlE)		 ,16,82 ,@tagName(fp01.ctrlE)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlE) ,16,82 ,@tagName(fp01.ctrlE)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlF)		 ,17,82 ,@tagName(fp01.ctrlF)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlF) ,17,82 ,@tagName(fp01.ctrlF)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlG)		 ,18,82 ,@tagName(fp01.ctrlG)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlG) ,18,82 ,@tagName(fp01.ctrlG)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlH)		 ,19,82 ,@tagName(fp01.ctrlH)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlH) ,19,82 ,@tagName(fp01.ctrlH)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlI)		 ,20,82 ,@tagName(fp01.ctrlI)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlI) ,20,82 ,@tagName(fp01.ctrlI)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlJ)		 ,21,82 ,@tagName(fp01.ctrlJ)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlJ) ,21,82 ,@tagName(fp01.ctrlJ)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlK)		 ,22,82 ,@tagName(fp01.ctrlK)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlK) ,22,82 ,@tagName(fp01.ctrlK)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlL)		 ,23,82 ,@tagName(fp01.ctrlL)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlL) ,23,82 ,@tagName(fp01.ctrlL)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlM)		 ,24,82 ,@tagName(fp01.ctrlM)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlM) ,24,82 ,@tagName(fp01.ctrlM)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlN)		 ,25,82 ,@tagName(fp01.ctrlN)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlN) ,25,82 ,@tagName(fp01.ctrlN)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlO)		 ,26,82 ,@tagName(fp01.ctrlO)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlO) ,26,82 ,@tagName(fp01.ctrlO)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlP)		 ,27,82 ,@tagName(fp01.ctrlP)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlP) ,27,82 ,@tagName(fp01.ctrlP)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlQ)		 ,28,82 ,@tagName(fp01.ctrlQ)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlQ) ,28,82 ,@tagName(fp01.ctrlQ)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlR)		 ,29,82 ,@tagName(fp01.ctrlR)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlR) ,29,82 ,@tagName(fp01.ctrlR)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlS)		 ,30,82 ,@tagName(fp01.ctrlS)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlS) ,30,82 ,@tagName(fp01.ctrlS)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlT)		 ,31,82 ,@tagName(fp01.ctrlT)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlT) ,31,82 ,@tagName(fp01.ctrlT)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlU)		 ,32,82 ,@tagName(fp01.ctrlU)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlU) ,32,82 ,@tagName(fp01.ctrlU)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlV)		 ,33,82 ,@tagName(fp01.ctrlV)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlV) ,33,82 ,@tagName(fp01.ctrlV)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlW)		 ,34,82 ,@tagName(fp01.ctrlW)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlW) ,34,82 ,@tagName(fp01.ctrlW)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlX)		 ,35,82 ,@tagName(fp01.ctrlX)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlX) ,35,82 ,@tagName(fp01.ctrlX)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlY)		 ,36,82 ,@tagName(fp01.ctrlY)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlY) ,36,82 ,@tagName(fp01.ctrlY)) ) catch unreachable ; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlZ)		 ,37,82 ,@tagName(fp01.ctrlZ)) ) catch unreachable ; 
+	Panel.label.append(lbl.newLabel(@tagName(fp01.ctrlZ) ,37,82 ,@tagName(fp01.ctrlZ)) ) catch unreachable ; 
 
 
 
@@ -1076,7 +1064,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlF_txt) ,17,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlG)			 ,18,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlG)		 ,18,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlG_shw)	 ,18,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlG_chk)	 ,18,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlG_txt) ,18,104,15,"",false,
@@ -1112,85 +1100,85 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlL_txt) ,23,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlM)			 ,24,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlM)		 ,24,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlM_shw)	 ,24,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlM_chk)	 ,24,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlM_txt) ,24,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlN)			 ,25,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlN)		 ,25,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlN_shw)	 ,25,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlN_chk)	 ,25,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlN_txt) ,25,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlO)			 ,26,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlO)		 ,26,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlO_shw)	 ,26,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlO_chk)	 ,26,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlO_txt) ,26,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlP)			 ,27,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlP)		 ,27,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlP_shw)	 ,27,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlP_chk)	 ,27,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlP_txt) ,27,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlQ)			 ,28,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlQ)		 ,28,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlQ_shw)	 ,28,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlQ_chk)	 ,28,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlQ_txt) ,28,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlR)			 ,29,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlR)		 ,29,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlR_shw)	 ,29,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlR_chk)	 ,29,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlR_txt) ,29,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlS)			 ,30,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlS)		 ,30,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlS_shw)	 ,30,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlS_chk)	 ,30,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlS_txt) ,30,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlT)			 ,31,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlT)		 ,31,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlT_shw)	 ,31,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlT_chk)	 ,31,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlT_txt) ,31,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlU)			 ,32,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlU)		 ,32,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlU_shw)	 ,32,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlU_chk)	 ,32,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlU_txt) ,32,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlV)			 ,33,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlV)		 ,33,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlV_shw)	 ,33,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlV_chk)	 ,33,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlV_txt) ,33,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlW)			 ,34,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlW)		 ,34,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlW_shw)	 ,34,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlW_chk)	 ,34,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlW_txt) ,34,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlX)			 ,35,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlX)		 ,35,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlX_shw)	 ,35,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlX_chk)	 ,35,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlX_txt) ,35,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlY)			 ,36,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlY)		 ,36,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlY_shw)	 ,36,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlY_chk)	 ,36,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlY_txt) ,36,104,15,"",false,
 										"required","please enter text fonction ","")) catch unreachable ;
 
-	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlZ)			 ,37,88,false,"","")) catch unreachable ;
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlZ)		 ,37,88,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlZ_shw)	 ,37,92,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldSwitch(@tagName(fp01.ctrlZ_chk)	 ,37,99,false,"","")) catch unreachable ;
 	Panel.field.append(fld.newFieldTextFull(@tagName(fp01.ctrlZ_txt) ,37,104,15,"",false,
@@ -1211,49 +1199,48 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 // choix work panel
 pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 		var cellPos: usize = 0;
-
-
+		var Gkey: grd.GridSelect = undefined;
+	
 		var Xcombo : *grd.GRID =	grd.newGridC(
 				"qryPanel",
 				12,
 				1,
 				20,
 				grd.gridStyle,
-				dds.CADRE.line1,
+				grd.CADRE.line1,
 		);
 
+		defer Gkey.Buf.deinit();
+		defer grd.freeGrid(Xcombo);
 		defer grd.allocatorGrid.destroy(Xcombo);
-
-		grd.newCell(Xcombo,"ID", 3, dds.REFTYP.UDIGIT, dds.ForegroundColor.fgGreen);
-		grd.newCell(Xcombo,"Name", 10, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgYellow);
-		grd.newCell(Xcombo,"Title", 15, dds.REFTYP.TEXT_FREE, dds.ForegroundColor.fgGreen);
+	
+		grd.newCell(Xcombo,"ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+		grd.newCell(Xcombo,"Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+		grd.newCell(Xcombo,"Title", 15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
 		grd.setHeaders(Xcombo);
 
 
 		for (vpnl.items , 0..) |p , idx| {
-				grd.addRows(Xcombo, &.{ usizeToStr(idx), p.name, p.frame.title });
+				grd.addRows(Xcombo, &.{ utl.usizeToStr(idx), p.name, p.frame.title });
 		}
 
 		// It seems unlikely that you will go over 50 panel
 		grd.addRows(Xcombo,	&.{"888", "Add", "Panel"}) ;
 
-		var Gkey: grd.GridSelect = undefined;
-		defer Gkey.Buf.deinit();
-
+				
 		while (true) {
 				Gkey = grd.ioCombo(Xcombo, cellPos);
 
 				if (Gkey.Key == kbd.enter) {
-						grd.freeGrid(Xcombo);
-						return	strToUsize(Gkey.Buf.items[0]);
+					return	utl.strToUsize(Gkey.Buf.items[0]);
 				}
 
 
 				if (Gkey.Key == kbd.esc) {
-						grd.freeGrid(Xcombo);
 						return 999;
 				}
 		}
+
 }
 
 
@@ -1268,8 +1255,8 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	var mCadre = mnu.newMenu(
 							"cadre",				// name
 							8, 12,					// posx, posy	
-							dds.CADRE.line1,		// type line fram
-							dds.MNUVH.vertical,		// type menu vertical / horizontal
+							mnu.CADRE.line1,		// type line fram
+							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
 							"Noline",
 							"Line 1",
@@ -1284,7 +1271,7 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		if (nitem != 9999) break;
 	}
 
-	vfld.text = std.fmt.allocPrint(dds.allocatorStr,"{d}",.{nitem}) catch unreachable; 
+	vfld.text = std.fmt.allocPrint(forms.allocatorForms,"{d}",.{nitem}) catch unreachable; 
 	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
 
@@ -1320,11 +1307,13 @@ var callTask: TaskEnum = undefined;
 
 fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var posx =	 strToUsize(vfld.text);
+	var posx =	 utl.strToUsize(vfld.text);
 	
 	if (termSize.height < posx or posx	== 0 ) {
-		const msg = std.fmt.allocPrint(dds.allocatorStr,"{d} Position X is out of bounds",.{termSize.height})
+				const allocator = std.heap.page_allocator;
+				const msg = std.fmt.allocPrint(allocator,"{d} Position X is out of bounds",.{termSize.height})
 					catch unreachable;
+		defer allocator.free(msg);
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
@@ -1333,11 +1322,13 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var posy	=	strToUsize(vfld.text);
+	var posy	=	utl.strToUsize(vfld.text);
 	
 	if (termSize.width < posy or posy == 0 ) {
-		const msg = std.fmt.allocPrint(dds.allocatorStr,"{d} Position Y is out of bounds",.{termSize.width})
+				const allocator = std.heap.page_allocator;
+				const msg = std.fmt.allocPrint(allocator,"{d} Position Y is out of bounds",.{termSize.width})
 					catch unreachable;
+		defer allocator.free(msg);
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
@@ -1346,13 +1337,15 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		const termSize = term.getSize() ;
-		var lines =	strToUsize(vfld.text);
-		var posx	=	strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
+		var lines =	utl.strToUsize(vfld.text);
+		var posx	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
 		
 		if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
+			const allocator = std.heap.page_allocator;
 			const msg = std.fmt.allocPrint(
-			dds.allocatorStr,"{d} The number of rows is out of range",
+			allocator,"{d} The number of rows is out of range",
 			.{termSize.height}) catch unreachable;
+			defer allocator.free(msg);
 			pnl.msgErr(vpnl, msg);
 			vpnl.keyField = kbd.task;
 		}
@@ -1361,13 +1354,15 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var cols	=	strToUsize(vfld.text);
-	var posy	=	strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
+	var cols	=	utl.strToUsize(vfld.text);
+	var posy	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
 
-	if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) { 
+	if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) {
+		const allocator = std.heap.page_allocator;
 		const msg = std.fmt.allocPrint(
-			dds.allocatorStr,"{d} The number of columns is out of range",
+			allocator,"{d} The number of columns is out of range",
 			.{termSize.width }) catch unreachable;
+		defer allocator.free(msg);
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
@@ -1377,12 +1372,13 @@ fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var cadre =	strToUsize(vfld.text);
+	var cadre =	utl.strToUsize(vfld.text);
 	
-	if (termSize.width < cadre or cadre == 0 ) { 
-		const msg = std.fmt.allocPrint(dds.allocatorStr,
+	if (termSize.width < cadre or cadre == 0 ) {
+		const allocator = std.heap.page_allocator;
+		const msg = std.fmt.allocPrint(allocator,
 			"{d} The number of Lines Cadre is out of range",.{termSize.width }) catch unreachable;
-
+		defer allocator.free(msg);
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 		}
@@ -1414,9 +1410,11 @@ fn TaskF9(	VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD
 		if (std.mem.eql(u8, f.name, vfld.text) and	888 == panelNum	or
 			std.mem.eql(u8, f.name, vfld.text)	and	idx == panelNum	) {
 			vpnl.keyField = kbd.task;
-			vpnl.idxfld = @intFromEnum(fp01.name); 
-			const msg = std.fmt.allocPrint(dds.allocatorStr,"Name: {s} lready existing invalide",.{vfld.text})
+			vpnl.idxfld = @intFromEnum(fp01.name);
+			const allocator = std.heap.page_allocator;
+			const msg = std.fmt.allocPrint(allocator,"Name: {s} lready existing invalide",.{vfld.text})
 						catch unreachable;
+			defer allocator.free(msg);
 			pnl.msgErr(vpnl,msg);
 			return ;
 		} 
@@ -1434,8 +1432,10 @@ fn TaskF11( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIEL
 		if (std.mem.eql(u8, f.name, vfld.text) and ( idx != panelNum)	 ) {
 			vpnl.keyField = kbd.task;
 			vpnl.idxfld = @intFromEnum(fp01.name);
-			const msg = std.fmt.allocPrint(dds.allocatorStr,"{s} lready existing invalide",.{vfld.text})
+			const allocator = std.heap.page_allocator;
+			const msg = std.fmt.allocPrint(allocator,"{s} lready existing invalide",.{vfld.text})
 						catch unreachable;
+			defer allocator.free(msg);
 			pnl.msgErr(vpnl,msg);
 			return ;
 		} 
@@ -1506,7 +1506,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 	var pFmt01 = Panel_Fmt01();
 
-	var NPANEL = std.ArrayList(pnl.PANEL).init(dds.allocatorPnl);
+	var NPANEL = std.ArrayList(pnl.PANEL).init(forms.allocatorForms);
 	NPANEL.clearRetainingCapacity();
 
 	for (XPANEL.items) |p| {
@@ -1520,9 +1520,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 	else {
 		 const termSize = term.getSize();
 
-		 fld.setText(pFmt01,@intFromEnum(fp01.lines),usizeToStr(termSize.height))
+		 fld.setText(pFmt01,@intFromEnum(fp01.lines),utl.usizeToStr(termSize.height))
 			catch unreachable ;
-		 fld.setText(pFmt01,@intFromEnum(fp01.cols),usizeToStr(termSize.width))
+		 fld.setText(pFmt01,@intFromEnum(fp01.cols),utl.usizeToStr(termSize.width))
 			catch unreachable ;
 			
 	}
@@ -1534,7 +1534,6 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 	while (true) {
 		//Tkey = kbd.getKEY();
-		utl.deinitUStr();
 		Tkey.Key = pnl.ioPanel(pFmt01);
 
 		
@@ -1599,8 +1598,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.msgErr(pFmt01,"You are in creation correct F9 OK");
 				pnl.clearPanel(pFmt01);
 				numPanel = NPANEL.items.len - 1;// last panel
-				utl.deinitUStr();
-				//dds.deinitStr();
+				utl.deinitUtl();
 				loadPanel(&XPANEL.items[numPanel], pFmt01);
 			},
 
@@ -1624,8 +1622,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 					updPanel(pFmt01, &NPANEL.items[numPanel] , &XPANEL.items[numPanel] );
 					pnl.msgErr(pFmt01,"The update is correct F11 OK");
 					pnl.clearPanel(pFmt01);
-					utl.deinitUStr();
-					//dds.deinitStr();
+					utl.deinitUtl();
 					loadPanel(&NPANEL.items[numPanel], pFmt01);
 				} 
 				else	pnl.msgErr(pFmt01,"You are in creation mode Bad F11");
@@ -1634,11 +1631,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 			// exit module panel 
 			.F12 => {
 				pnl.freePanel(pFmt01);
+				forms.allocatorForms.destroy(pFmt01);
 				NPANEL.clearAndFree();
 				NPANEL.deinit();
-				utl.deinitUStr();
-				//dds.deinitStr();
-				defer dds.allocatorPnl.destroy(pFmt01); 
+				utl.deinitUtl();
+				grd.deinitGrid();
 				return ; 
 			},
 
@@ -1658,23 +1655,23 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 		catch |err| { @panic(@errorName(err));};
 		// posx
 		fld.setText(dst,@intFromEnum(fp01.posx),
-			usizeToStr(src.posx) ) 
+			utl.usizeToStr(src.posx) ) 
 			catch |err| { @panic(@errorName(err));};
 		// posy
 		fld.setText(dst,@intFromEnum(fp01.posy),
-			usizeToStr(src.posy) ) 
+			utl.usizeToStr(src.posy) ) 
 			catch |err| { @panic(@errorName(err));};
 		// lines
 		fld.setText(dst,@intFromEnum(fp01.lines),
-			usizeToStr(src.lines) ) 
+			utl.usizeToStr(src.lines) ) 
 			catch |err| { @panic(@errorName(err));};
 		// cols
 		fld.setText(dst,@intFromEnum(fp01.cols),
-			usizeToStr(src.cols) ) 
+			utl.usizeToStr(src.cols) ) 
 			catch |err| { @panic(@errorName(err));};
 		// cadre
 		fld.setText(dst,@intFromEnum(fp01.cadre),
-			usizeToStr(@intFromEnum(src.frame.cadre)) ) 
+			utl.usizeToStr(@intFromEnum(src.frame.cadre)) ) 
 			catch |err| { @panic(@errorName(err));};
 		// title
 		fld.setText(dst,@intFromEnum(fp01.title), src.frame.title) 
@@ -1700,7 +1697,7 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 																else fxx = 102 + ( (fxx - 24)	* 4) - 3 ;
 																buf = @tagName(@as(fp01,@enumFromInt(fxx))) ;
 			}
-																
+
 			
 			if (@intFromEnum(b.key) >= @intFromEnum(kbd.ctrlA) and @intFromEnum(b.key) <= @intFromEnum(kbd.ctrlZ) ){
 																fxx = @intFromEnum(b.key);
@@ -1714,10 +1711,10 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 			check = fxx + 2 ;
 			title = fxx + 3 ;
 
-			fld.setSwitch(dst , fxx	 	, true )		catch |err| { @panic(@errorName(err));};
-			fld.setSwitch(dst , show	, b.show	) catch |err| { @panic(@errorName(err));};
-			fld.setSwitch(dst , check 	, b.check ) catch |err| { @panic(@errorName(err));};
-			fld.setText(dst	, title , b.title ) catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , fxx	 	, true)			catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , show	, b.show) 		catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , check 	, b.check)		catch |err| { @panic(@errorName(err));};
+			fld.setText(dst	, title , b.title)			catch |err| { @panic(@errorName(err));};
 		}
 
 }
@@ -1729,12 +1726,12 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 fn addPanel( src: *pnl.PANEL, vNPANEL :	*std.ArrayList(pnl.PANEL),	vXPANEL: *std.ArrayList(pnl.PANEL) ) void {
 
 	var panel = pnl.initPanel(src.field.items[@intFromEnum(fp01.name)].text,
-										strToUsize(src.field.items[@intFromEnum(fp01.posx)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.posy)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.cols)].text),
-										@as(dds.CADRE,@enumFromInt(
-												strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text),
+										@as(forms.CADRE,@enumFromInt(
+												utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
 										src.field.items[@intFromEnum(fp01.title)].text);
 
 
@@ -1825,15 +1822,15 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :	*std.ArrayList(pnl.PANEL),	vXPANEL: *std
 fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 	
 	var panel : *pnl.PANEL = pnl.newPanelC(src.field.items[@intFromEnum(fp01.name)].text,
-										strToUsize(src.field.items[@intFromEnum(fp01.posx)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.posy)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
-										strToUsize(src.field.items[@intFromEnum(fp01.cols)].text),
-										@as(dds.CADRE,@enumFromInt(
-												strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.posx)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.posy)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.lines)].text),
+										utl.strToUsize(src.field.items[@intFromEnum(fp01.cols)].text),
+										@as(forms.CADRE,@enumFromInt(
+												utl.strToUsize(src.field.items[@intFromEnum(fp01.cadre)].text))),
 										src.field.items[@intFromEnum(fp01.title)].text);
 
-	defer dds.allocatorPnl.destroy(panel);
+	defer forms.allocatorForms.destroy(panel);
 
 	var fxx : usize = @intFromEnum(fp01.F1);
 	var kxx	 : usize =0 ;
@@ -1868,7 +1865,7 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 
 	while ( fxx <= @intFromEnum(fp01.altZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show
+		show  = fxx + 1;	// pos fld	show
 		check = fxx + 2;	// pos fld	show
 		title = fxx + 3;	// pos fld	show
 		fxx = title ;
@@ -1887,13 +1884,13 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 	fxx = @intFromEnum(fp01.ctrlA);
 	kxx	 = @intFromEnum(kbd.altZ) ;
 
-	show	= 0 ;
+	show  = 0 ;
 	check = 0 ;
 	title = 0 ;
 
 	while ( fxx <= @intFromEnum(fp01.ctrlZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show
+		show  = fxx + 1;	// pos fld	show
 		check = fxx + 2;	// pos fld	show
 		title = fxx + 3;	// pos fld	show
 		fxx = title ;
@@ -1913,18 +1910,18 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 	vNPANEL.name	 = panel.name;
 	vNPANEL.posx	 = panel.posx;
 	vNPANEL.posy	 = panel.posy;
-	vNPANEL.lines	= panel.lines;
+	vNPANEL.lines	 = panel.lines;
 	vNPANEL.cols	 = panel.cols;
-	vNPANEL.frame	= panel.frame;
-	vNPANEL.button = panel.button;
+	vNPANEL.frame	 = panel.frame;
+	vNPANEL.button   = panel.button;
 	vNPANEL.buf.clearAndFree(); 
 
 	vXPANEL.name	 = panel.name;
 	vXPANEL.posx	 = panel.posx;
 	vXPANEL.posy	 = panel.posy;
-	vXPANEL.lines	= panel.lines;
+	vXPANEL.lines	 = panel.lines;
 	vXPANEL.cols	 = panel.cols;
-	vXPANEL.frame	= panel.frame;
-	vXPANEL.button = panel.button;
+	vXPANEL.frame	 = panel.frame;
+	vXPANEL.button   = panel.button;
 	
 }

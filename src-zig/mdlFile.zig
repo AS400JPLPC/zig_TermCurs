@@ -1,8 +1,5 @@
 const std = @import("std");
 
-
-const dds = @import("dds");
-
 /// terminal Fonction
 const term = @import("cursed");
 // keyboard
@@ -45,7 +42,6 @@ const mdlSjson = @import("mdlSjson");
 // Restore JSON
 const mdlRjson = @import("mdlRjson");
 
-const allocator = std.heap.page_allocator;
 
 pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 	const termSize = term.getSize() ;
@@ -55,7 +51,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 										1, 1,
 										termSize.height,
 										termSize.width ,
-										dds.CADRE.line1,
+										forms.CADRE.line1,
 										title,
 										);
 
@@ -131,7 +127,17 @@ fn newFile(name: []const u8 ) void {
 	defer file.close();
 }
 
+fn cleanProgram(vpnl : *pnl.PANEL, vgrid : *grd.GRID) void {
 
+	pnl.freePanel(vpnl);
+	forms.allocatorForms.destroy(vpnl);
+	
+	grd.freeGrid(vgrid);
+	grd.allocatorGrid.destroy(vgrid);
+	term.deinitTerm();
+	grd.deinitGrid();
+	utl.deinitUtl();
+}
 
 pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 	
@@ -158,13 +164,9 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 					4, 2,				// posx, posy
 					20,					// numbers lines
 					grd.gridStyle,		// separator | or	space
-					dds.CADRE.line1,	// type line 1
+					grd.CADRE.line1,	// type line 1
 					);
 
-	defer dds.allocatorPnl.destroy(pFmt01);
-	defer pnl.freePanel(pFmt01);
-	// defer grd.freeGrid(Grid01);
-	defer grd.allocatorGrid.destroy(Grid01);
 
 	
 	if (!wrk) try btn.setActif(pFmt01,try btn.getIndex(pFmt01,kbd.F9),false);
@@ -193,10 +195,10 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 						
 						if (err) pnl.msgErr(pFmt01, "Name Json incorrect allready exist ")
 						else {
-							pnl.msgErr(pFmt01, try std.fmt.allocPrint(allocator, "Save {s} Json", .{nameJson})) ;
+							pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Save {s} Json", .{nameJson})) ;
 							try mdlSjson.SavJson(XPANEL,nameJson);
-							grd.freeGrid(Grid01);
-							return;
+							cleanProgram(pFmt01,Grid01);
+						return;
 						}
 					}
 				}
@@ -212,7 +214,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 				grd.resetRows(Grid01);
 
 				if (grd.countColumns(Grid01) == 0) {
-					grd.newCell(Grid01,"Name",25,dds.REFTYP.TEXT_FREE,dds.ForegroundColor.fgYellow);
+					grd.newCell(Grid01,"Name",25,grd.REFTYP.TEXT_FREE,term.ForegroundColor.fgYellow);
 					grd.setHeaders(Grid01);
 					grd.printGridHeader(Grid01);
 				}
@@ -231,7 +233,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 
 					if ( Gkey.Key == kbd.enter) {
 						nameJson =Gkey.Buf.items[0];
-						pnl.msgErr(pFmt01, try std.fmt.allocPrint(allocator, "Working {s} Json", .{nameJson})) ;
+						pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Working {s} Json", .{nameJson})) ;
 
 						if (wrk){
 							newFile(nameJson);
@@ -244,14 +246,14 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 				}
 
 				if ( Gkey.Key == kbd.enter) {
-					grd.freeGrid(Grid01);
+					cleanProgram(pFmt01,Grid01);
 					return ; 
 				}
 			},
 			
 			// exit module panel 
 			.F3 => {
-				grd.freeGrid(Grid01);
+				cleanProgram(pFmt01,Grid01);
 				return ; 
 			},
 
