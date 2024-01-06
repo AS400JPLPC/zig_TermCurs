@@ -287,8 +287,8 @@ pub const	mnu = struct {
 		var n : usize = 0;
 		var h : usize = 0;
 
-		var x :usize = vmnu.posx + 1;
-		var y :usize = vmnu.posy + 1;
+		const x :usize = vmnu.posx + 1;
+		const y :usize = vmnu.posy + 1;
 
 		printMenu(vmnu);
 
@@ -336,8 +336,8 @@ pub const	mnu = struct {
 		var pos : usize = npos;
 		var n	 : usize = 0;
 		var h	 : usize = 0;
-		var x :usize = vmnu.posx + 1;
-		var y :usize = vmnu.posy + 1;
+		const x :usize = vmnu.posx + 1;
+		const y :usize = vmnu.posy + 1;
 
 		term.onMouse();
 		term.cursHide();

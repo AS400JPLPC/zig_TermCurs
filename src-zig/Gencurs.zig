@@ -106,7 +106,7 @@ pub fn main() !void {
 	//-------------------------------------------------
 	//the menu is not double buffered it is not a Panel
 
-	var MenuPrincipal = mnu.newMenu(
+	const MenuPrincipal = mnu.newMenu(
 					"Screen",				// name
 					2, 2,					// posx, posy	
 					mnu.CADRE.line1,		// type line fram

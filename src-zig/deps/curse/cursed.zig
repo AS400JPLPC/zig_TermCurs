@@ -108,7 +108,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocatorTerm.alloc(u8, size) catch {
+			const buf = allocatorTerm.alloc(u8, size) catch {
 							return ErrNbrch.InvalideAllocBuffer;
 					};
 			return buf;
@@ -121,7 +121,7 @@ pub const iteratStr = struct {
 		}
 
 		pub fn next(it: *StringIterator) ?[]const u8 {
-			var optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
+			const optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
 
 			it.buf= optional_buf orelse "";
 			var idx : usize = 0;
@@ -140,7 +140,7 @@ pub const iteratStr = struct {
 
 
 		pub fn preview(it: *StringIterator) ?[]const u8 {
-			var optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
+			const optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
 
 			it.buf= optional_buf orelse "";
 			var idx : usize = 0;
@@ -453,7 +453,7 @@ pub fn enableRawMode() void {
 
 /// Clear gross terminal
 fn reset() void {
-	var name = "/bin/echo";
+	const name = "/bin/echo";
 	var args = [_:null]?[*:0]const u8{ "echo", "\x1b[H\x1b[3J" };
 	var env = [_:null]?[*:0]u8{};
 
@@ -852,7 +852,7 @@ pub const kbd = enum {
 				// return Character UTF8
 				var vUnicode: []u8 = undefined;
 				vUnicode = allocatorTerm.alloc(u8, 4) catch unreachable;	
-				var i = utf.utf8Encode(c0, vUnicode ) catch {Event.Key = kbd.none; return Event;};
+				const i = utf.utf8Encode(c0, vUnicode ) catch {Event.Key = kbd.none; return Event;};
 				Event.Char = vUnicode[0..i];
 				Event.Key	= kbd.char;
 				return Event;

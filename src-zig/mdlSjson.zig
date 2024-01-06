@@ -53,7 +53,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 
 	
 	try w.objectField("PANEL");
-	var nbrPnl: usize = XPANEL.items.len;
+	const nbrPnl: usize = XPANEL.items.len;
 	var np: usize = 0;
 	while (np < nbrPnl) : (np += 1) {
 		try w.beginArray();
@@ -91,7 +91,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 				},
 				.button => {
 					const Ibutton = std.enums.EnumIndexer(btn.Ebutton);
-					var nbrBtn: usize = XPANEL.items[np].button.items.len;
+					const nbrBtn: usize = XPANEL.items[np].button.items.len;
 					var bp: usize = 0;
 					try w.objectField("button");
 					try w.beginArray();
@@ -134,7 +134,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 				.label => {
 					const Ilabel = std.enums.EnumIndexer(lbl.Elabel);
 					var l: usize = 0;
-					var nbrLbl: usize = XPANEL.items[np].label.items.len;
+					const nbrLbl: usize = XPANEL.items[np].label.items.len;
 
 					var lp: usize = 0;
 					try w.objectField("label");
@@ -177,7 +177,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 				.field => {
 					const Ifield = std.enums.EnumIndexer(fld.Efield);
 					var f: usize = 0;
-					var nbrFld: usize = XPANEL.items[np].field.items.len;
+					const nbrFld: usize = XPANEL.items[np].field.items.len;
 
 					var fp: usize = 0;
 					try w.objectField("field");
@@ -262,7 +262,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 				.linev => {
 					const Ilinev = std.enums.EnumIndexer(lnv.Elinev);
 					var lx: usize = 0;
-					var nbrLineh: usize = XPANEL.items[np].linev.items.len;
+					const nbrLineh: usize = XPANEL.items[np].linev.items.len;
 
 					var lv: usize = 0;
 					try w.objectField("linev");
@@ -302,7 +302,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 				.lineh => {
 					const Ilineh = std.enums.EnumIndexer(lnh.Elineh);
 					var ly: usize = 0;
-					var nbrLineh: usize = XPANEL.items[np].lineh.items.len;
+					const nbrLineh: usize = XPANEL.items[np].lineh.items.len;
 
 					var lh: usize = 0;
 					try w.objectField("lineh");

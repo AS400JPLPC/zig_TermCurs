@@ -451,7 +451,7 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
 //-------------------------------------------------
 //the menu is not double buffered it is not a Panel
 pub fn Menu01() mnu.MENU {
-	var  m01 = mnu.newMenu(
+	const  m01 = mnu.newMenu(
 					"Menu01",				// name
 					2, 2,					// posx, posy	
 					mnu.CADRE.line1,		// type line fram
@@ -472,7 +472,7 @@ pub fn Menu01() mnu.MENU {
 fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	var cellPos:usize = 0;
 
-	var Xcombo : *grd.GRID =	grd.newGridC(
+	const Xcombo : *grd.GRID =	grd.newGridC(
 					"Combo01",
 					3, 75,
 					4 ,
@@ -514,7 +514,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	var cellPos:usize = 0;
 	
-	var Xcombo : *grd.GRID =	grd.newGridC(
+	const Xcombo : *grd.GRID =	grd.newGridC(
 										"Combo02",
 										4, 75,
 										4 ,	
@@ -564,7 +564,7 @@ pub const FnEnum = enum {
 
 	fn searchFn ( vtext: [] const u8 ) FnEnum {
 	var i	 :usize = 0;
-	var max :usize = @typeInfo(FnEnum).Enum.fields.len;
+	const max :usize = @typeInfo(FnEnum).Enum.fields.len;
 		while( i < max ) : (i += 1) {
 		if ( std.mem.eql(u8, @tagName(@as(FnEnum,@enumFromInt(i))), vtext)) return @as(FnEnum,@enumFromInt(i));
 		}
@@ -631,14 +631,14 @@ pub fn main() !void {
 				pnl.msgErr(pFmt01,"le test de la saisie est OK");
 			},
 			.F4 => {
-				var pFmt0X = Panel_Fmt0X();
+				const pFmt0X = Panel_Fmt0X();
 				_= pnl.ioPanel(pFmt0X);
 				pnl.rstPanel(pnl.PANEL,pFmt0X, pFmt01);
 				pnl.freePanel(pFmt0X);
 				forms.allocatorForms.destroy(pFmt0X);
 			},
 			.F5 => {
-				var nitem = mnu.ioMenu(mMenu01,0);
+				const nitem = mnu.ioMenu(mMenu01,0);
 				pnl.rstPanel(mnu.MENU,&mMenu01, pFmt01);
 				std.debug.print("n°item {}",.{nitem});
 			},

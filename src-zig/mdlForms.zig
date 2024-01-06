@@ -66,9 +66,9 @@ fn usizeToStr(v: usize) []const u8 {
 // description Function
 // choix work panel
 pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
-	var cellPos: usize = 0;
+	const cellPos: usize = 0;
 
-	var Xcombo: *grd.GRID = grd.newGridC(
+	const Xcombo: *grd.GRID = grd.newGridC(
 		"qryPanel",
 		1,
 		1,
@@ -305,7 +305,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 	term.onMouse();
 	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
-	var pFmtH01 = Panel_HELP();
+	const pFmtH01 = Panel_HELP();
 	while (true) {
 		term.cursShow();
 		Tkey = kbd.getKEY();
@@ -502,13 +502,13 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 	defer e_LABEL.deinit();
 	defer utl.allocUtl.destroy(&e_LABEL);
 
-	var e_posx: usize = term.posCurs.x;
-	var e_posy: usize = term.posCurs.y;
+	const e_posx: usize = term.posCurs.x;
+	const e_posy: usize = term.posCurs.y;
 	var e_curs: usize = e_posy;
 
 	// defines the receiving structure of the keyboard
 	var Tkey: term.Keyboard = undefined;
-	var pFmtH01 = Panel_HELP();
+	const pFmtH01 = Panel_HELP();
 
 	var i: usize = 0;
 	while (i < vpnl.cols) : (i += 1) {
@@ -603,7 +603,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 		catch |err| { @panic(@errorName(err)); };		
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -613,7 +613,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	var Order: *grd.GRID = grd.newGridC(
+	const Order: *grd.GRID = grd.newGridC(
 		"Order",
 		2,
 		70,
@@ -638,7 +638,7 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.label.items, 0..) |l, idx| {
-			var ridx = usizeToStr(idx);
+			const ridx = usizeToStr(idx);
 
 			if (l.text.len > 40) grd.addRows(Origine, &.{ ridx, l.name, l.text[0..39] })
 			else grd.addRows(Origine, &.{ ridx, l.name, l.text });
@@ -651,13 +651,13 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 			newlabel.append(vpnl.label.items[strToUsize(Gkey.Buf.items[0])])
 				catch |err| { @panic(@errorName(err)); };
 			
-			var ridy = usizeToStr(idy);
+			const ridy = usizeToStr(idy);
 
 			grd.addRows(Order, &.{ ridy, Gkey.Buf.items[1], Gkey.Buf.items[2] });
 			idy += 1;
 			grd.printGridHeader(Order);
 			grd.printGridRows(Order);
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.label.orderedRemove(ligne);
 		}
@@ -704,7 +704,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 			catch |err| { @panic(@errorName(err)); };
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -722,7 +722,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.label.items, 0..) |l, idx| {
-			var ridx =  usizeToStr(idx);
+			const ridx =  usizeToStr(idx);
  
 			if (l.text.len > 40) grd.addRows(Origine, &.{ ridx, l.name, l.text[0..39] })
 			else grd.addRows(Origine, &.{ ridx, l.name, l.text });
@@ -732,7 +732,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 		if (Gkey.Key == kbd.esc) break;
 		if (Gkey.Key == kbd.ctrlV) break;
 		if (Gkey.Key == kbd.enter) {
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.label.orderedRemove(ligne);
 		}
@@ -785,7 +785,7 @@ fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
 	}
 
 	var buffer: [128]u8 = [_]u8{0} ** 128;
-	var result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
+	const result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
 	@panic(result);
 }
 
@@ -1024,7 +1024,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	var pos: usize = 0;
 
-	var Xcombo: *grd.GRID = grd.newGridC(
+	const Xcombo: *grd.GRID = grd.newGridC(
 		"qryPanel",
 		vpnl.posx + 1,
 		vpnl.posy + 1,
@@ -1112,7 +1112,7 @@ pub const FuncEnum = enum {
 	}
 
 	fn searchFn(vtext: []const u8) FuncEnum {
-		var max: usize = @typeInfo(FuncEnum).Enum.fields.len;
+		const max: usize = @typeInfo(FuncEnum).Enum.fields.len - 1;
 
 		inline for (@typeInfo(FuncEnum).Enum.fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncEnum, @enumFromInt(f.value));
@@ -1137,7 +1137,7 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 }
 
 fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	var vReftype = strToEnum(forms.REFTYP, vfld.text);
+	const vReftype = strToEnum(forms.REFTYP, vfld.text);
 
 	for (vpnl.field.items, 0..) |f, idx| {
 		if (std.mem.eql(u8, f.name, @tagName(fp02.fscal))) {
@@ -1198,7 +1198,7 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 }
 
 fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	var val = strToUsize(vfld.text);
+	const val = strToUsize(vfld.text);
 
 	if (val + vfld.posx >= vpnl.cols) {
 		const msg = std.fmt.allocPrint(utl.allocUtl,
@@ -1216,7 +1216,7 @@ fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		var width = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fwidth)) catch unreachable) ;
 		if (std.mem.eql(u8, vfld.text, "DECIMAL")) width += 1;
 
-		var vscal = strToUsize(vfld.text);
+		const vscal = strToUsize(vfld.text);
 
 	
 		if (vscal + width + vfld.posx >= vpnl.cols) {
@@ -1236,11 +1236,11 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	if ( ! std.mem.eql(u8, vfld.text,"")) {
 		
 		var width = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fwidth))  catch unreachable) ;
-		var vtype = fld.getText(vpnl, @intFromEnum(fp02.ftype))  catch unreachable ;
+		const vtype = fld.getText(vpnl, @intFromEnum(fp02.ftype))  catch unreachable ;
 	
 		if (std.mem.eql(u8, vtype, "DIGIT") or std.mem.eql(u8, vtype, "DECIMAL"))  width += 1;
 
-		var scal = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fscal))  catch unreachable);
+		const scal = strToUsize(fld.getText(vpnl, @intFromEnum(fp02.fscal))  catch unreachable);
 
 		if (width + scal + vfld.posx >= vpnl.cols) {
 			const msg = std.fmt.allocPrint(utl.allocUtl,
@@ -1301,7 +1301,7 @@ pub const TaskEnum = enum {
 		}
 	}
 	fn searchFn(vtext: []const u8) TaskEnum {
-		var max: usize = @typeInfo(TaskEnum).Enum.fields.len;
+		const max: usize = @typeInfo(TaskEnum).Enum.fields.len - 1;
 
 		inline for (@typeInfo(TaskEnum).Enum.fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskEnum, @enumFromInt(f.value));
@@ -1314,7 +1314,7 @@ pub const TaskEnum = enum {
 pub fn writefield(vpnl: *pnl.PANEL) void {
 	term.getCursor();
 	var v_posx: usize = term.posCurs.x;
-	var v_posy: usize = term.posCurs.y;
+	const v_posy: usize = term.posCurs.y;
 
 	if (v_posx < 15) v_posx = 15 else v_posx = 2;
 
@@ -1893,7 +1893,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 		catch |err| { @panic(@errorName(err)); };
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -1903,7 +1903,7 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	var Order: *grd.GRID = grd.newGridC(
+	const Order: *grd.GRID = grd.newGridC(
 		"Order",
 		2,
 		70,
@@ -1934,12 +1934,12 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.field.items, 0..) |f, idx| {
-			var ridx = usizeToStr(idx);
+			const ridx = usizeToStr(idx);
 			
-			var posx = usizeToStr(f.posx) ;
-			var posy = usizeToStr(f.posy) ;
-			var width= usizeToStr(f.width) ;
-			var scal = usizeToStr(f.scal) ;
+			const posx = usizeToStr(f.posx) ;
+			const posy = usizeToStr(f.posy) ;
+			const width= usizeToStr(f.width) ;
+			const scal = usizeToStr(f.scal) ;
 
 			grd.addRows(Origine, &.{ ridx, f.name, @tagName(f.reftyp), posx , posy, width,scal });
 		}
@@ -1951,14 +1951,14 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 			newfield.append(vpnl.field.items[ strToUsize(Gkey.Buf.items[0])])
 				catch |err| { @panic(@errorName(err)); };
 
-			var ridn =usizeToStr(idxligne);
+			const ridn =usizeToStr(idxligne);
  
 			grd.addRows(Order, &.{ ridn, Gkey.Buf.items[1], Gkey.Buf.items[2],
 				Gkey.Buf.items[3], Gkey.Buf.items[4], Gkey.Buf.items[5], Gkey.Buf.items[6] });
 			idxligne += 1;
 			grd.printGridHeader(Order);
 			grd.printGridRows(Order);
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.field.orderedRemove(ligne);
 		}
@@ -2003,7 +2003,7 @@ fn removeField(vpnl: *pnl.PANEL) void {
 			catch |err| { @panic(@errorName(err)); };
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -2025,12 +2025,12 @@ fn removeField(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.field.items, 0..) |f, idx| {
-			var ridx = usizeToStr(idx);
+			const ridx = usizeToStr(idx);
 			
-			var posx = usizeToStr(f.posx) ;
-			var posy = usizeToStr(f.posy) ;
-			var width= usizeToStr(f.width) ;
-			var scal = usizeToStr(f.scal) ;
+			const posx = usizeToStr(f.posx) ;
+			const posy = usizeToStr(f.posy) ;
+			const width= usizeToStr(f.width) ;
+			const scal = usizeToStr(f.scal) ;
 			grd.addRows(Origine, &.{ ridx, f.name, @tagName(f.reftyp), posx , posy, width, scal });
 		}
 
@@ -2038,7 +2038,7 @@ fn removeField(vpnl: *pnl.PANEL) void {
 		if (Gkey.Key == kbd.esc) break;
 		if (Gkey.Key == kbd.ctrlV) break;
 		if (Gkey.Key == kbd.enter) {
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.field.orderedRemove(ligne);
 		}
@@ -2075,13 +2075,13 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 	defer e_LineH.deinit();
 	defer utl.allocUtl.destroy(&e_LineH);
 
-	var e_posx: usize = term.posCurs.x ;
-	var e_posy: usize = term.posCurs.y ;
-	var e_curs: usize = e_posy;
+	const e_posx: usize = term.posCurs.x ;
+	const e_posy: usize = term.posCurs.y ;
+	var   e_curs: usize = e_posy;
 
 	// defines the receiving structure of the keyboard
 	var Tkey: term.Keyboard = undefined;
-	var pFmtH01 = Panel_HELP();
+	const pFmtH01 = Panel_HELP();
 
 	var litem: usize = 0; // type line cadre menu
  
@@ -2159,7 +2159,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 		catch |err| { @panic(@errorName(err)); };		
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -2169,7 +2169,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	var Order: *grd.GRID = grd.newGridC(
+	const Order: *grd.GRID = grd.newGridC(
 		"Order",
 		2,
 		70,
@@ -2190,7 +2190,7 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.lineh.items, 0..) |l, idx| {
-			var ridx = usizeToStr(idx);
+			const ridx = usizeToStr(idx);
 
 			grd.addRows(Origine, &.{ ridx, l.name});
 		}
@@ -2202,13 +2202,13 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 			newline.append(vpnl.lineh.items[strToUsize(Gkey.Buf.items[0])])
 				catch |err| { @panic(@errorName(err)); };
 			
-			var ridy = usizeToStr(idy);
+			const ridy = usizeToStr(idy);
 
 			grd.addRows(Order, &.{ ridy, Gkey.Buf.items[1]});
 			idy += 1;
 			grd.printGridHeader(Order);
 			grd.printGridRows(Order);
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.lineh.orderedRemove(ligne);
 		}
@@ -2256,7 +2256,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 			catch |err| { @panic(@errorName(err)); };
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -2273,7 +2273,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.lineh.items, 0..) |l, idx| {
-			var ridx =  usizeToStr(idx);
+			const ridx =  usizeToStr(idx);
  
 			grd.addRows(Origine, &.{ ridx, l.name});
 		}
@@ -2282,7 +2282,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 		if (Gkey.Key == kbd.esc) break;
 		if (Gkey.Key == kbd.ctrlV) break;
 		if (Gkey.Key == kbd.enter) {
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.lineh.orderedRemove(ligne);
 		}
@@ -2320,13 +2320,13 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 	defer e_LineV.deinit();
 	defer utl.allocUtl.destroy(&e_LineV);
 
-	var e_posx: usize = term.posCurs.x ;
-	var e_posy: usize = term.posCurs.y ;
-	var e_curs: usize = e_posx;
+	const e_posx: usize = term.posCurs.x ;
+	const e_posy: usize = term.posCurs.y ;
+	var   e_curs: usize = e_posx;
 
 	// defines the receiving structure of the keyboard
 	var Tkey: term.Keyboard = undefined;
-	var pFmtH01 = Panel_HELP();
+	const pFmtH01 = Panel_HELP();
 
 	var litem: usize = 0; // type line cadre menu
  
@@ -2404,7 +2404,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 		catch |err| { @panic(@errorName(err)); };		
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -2414,7 +2414,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 	);
 	defer grd.allocatorGrid.destroy(Origine);
 
-	var Order: *grd.GRID = grd.newGridC(
+	const Order: *grd.GRID = grd.newGridC(
 		"Order",
 		2,
 		70,
@@ -2435,7 +2435,7 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.linev.items, 0..) |l, idx| {
-			var ridx = usizeToStr(idx);
+			const ridx = usizeToStr(idx);
 
 			grd.addRows(Origine, &.{ ridx, l.name});
 		}
@@ -2447,13 +2447,13 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 			newline.append(vpnl.linev.items[strToUsize(Gkey.Buf.items[0])])
 				catch |err| { @panic(@errorName(err)); };
 			
-			var ridy = usizeToStr(idy);
+			const ridy = usizeToStr(idy);
 
 			grd.addRows(Order, &.{ ridy, Gkey.Buf.items[1]});
 			idy += 1;
 			grd.printGridHeader(Order);
 			grd.printGridRows(Order);
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.linev.orderedRemove(ligne);
 		}
@@ -2501,7 +2501,7 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 			catch |err| { @panic(@errorName(err)); };
 	}
 
-	var Origine: *grd.GRID = grd.newGridC(
+	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
 		2,
@@ -2518,7 +2518,7 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 	while (true) {
 		grd.resetRows(Origine);
 		for (vpnl.linev.items, 0..) |l, idx| {
-			var ridx =  usizeToStr(idx);
+			const ridx =  usizeToStr(idx);
  
 			grd.addRows(Origine, &.{ ridx, l.name});
 		}
@@ -2527,7 +2527,7 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 		if (Gkey.Key == kbd.esc) break;
 		if (Gkey.Key == kbd.ctrlV) break;
 		if (Gkey.Key == kbd.enter) {
-			var ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
 			_ = vpnl.linev.orderedRemove(ligne);
 		}

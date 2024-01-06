@@ -89,10 +89,10 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
 	};
 
 	term.getCursor();
-	var Xterm = term.getSize();
+	const Xterm = term.getSize();
 	term.gotoXY(Xterm.height,1) ;
 	const allocator = std.heap.page_allocator;
-	var msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) 
+	const msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) 
 									catch |err| { @panic(@errorName(err));};
 	term.writeStyled(msg,AtrDebug);
 	_=term.kbd.getKEY();
@@ -195,12 +195,12 @@ pub const	dsperr = struct {
 
 		const allocator = std.heap.page_allocator;
 
-		var errTxt:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) 
+		const errTxt:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) 
 																		catch |err| { @panic(@errorName(err));};
 		defer allocator.free(errTxt);
 		
 
-		var x: usize	= vpnl.lines;
+		const x: usize	= vpnl.lines;
 		var n: usize	= vpnl.cols * (x - 2) ;
 		var y: usize	= 1 ;
 
@@ -220,7 +220,7 @@ pub const	dsperr = struct {
 		term.writeStyled(msgerr,MsgErr);
 
 		while (boucle) {
-			var e_key = kbd.getKEY();
+			const e_key = kbd.getKEY();
 
 			switch ( e_key.Key ) {
 				.esc=>boucle = false,
@@ -254,7 +254,7 @@ pub fn subStrForms( a: []const u8,pos: usize, n:usize) []const u8 {
 								catch |err| { @panic(@errorName(err));};
 	defer allocator.free(result);
 
-	std.mem.copy(u8, result, a[pos..n]);
+	@memcpy(result, a[pos..n]);
 	return std.fmt.allocPrint(allocator ,"{s}",.{result},)
 								catch |err| { @panic(@errorName(err));};
 }
@@ -271,7 +271,7 @@ pub fn subStrForms( a: []const u8,pos: usize, n:usize) []const u8 {
 				.foregr = term.ForegroundColor.fgRed,
 		};
 		const allocator = std.heap.page_allocator;
-		var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) 
+		const msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ term.MouseInfo.x, "/", term.MouseInfo.y }) 
 											catch |err| { @panic(@errorName(err));};
 		term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
 		term.writeStyled(msg, AtrDebug);
@@ -293,7 +293,7 @@ pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize, text:[] const u
 		term.writeStyled(text, AtrDebug);
 		}
 		const allocator = std.heap.page_allocator;
-		var msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) 
+		const msg = std.fmt.allocPrint(allocator, "{d:0>2}{s}{d:0>3}", .{ x_posx, "/", x_posy }) 
 											catch |err| { @panic(@errorName(err));};
 		term.gotoXY(vpnl.posx + vpnl.lines - 1, (vpnl.posy + vpnl.cols - 1) - 7);
 		term.writeStyled(msg, AtrDebug);
@@ -473,9 +473,9 @@ pub const	lbl = struct {
 		// display matrice PANEL
 		if (vpnl.actif == false ) return ;
 		if (vlbl.actif == false ) return ;
-			var x :usize = vlbl.posx - 1;
-			var y :usize = vlbl.posy - 1;
-			var vlen = utl.nbrCharStr(vlbl.text);
+			const x :usize = vlbl.posx - 1;
+			const y :usize = vlbl.posy - 1;
+			const vlen = utl.nbrCharStr(vlbl.text);
 			var n :usize = 0;
 			var npos :usize = (vpnl.cols * (vlbl.posx - 1)) + vlbl.posy - 1 ;
 			while (n < vlen) : (n += 1) {
@@ -493,9 +493,9 @@ pub const	lbl = struct {
 	fn displayLabel(vpnl: *pnl.PANEL, vlbl : LABEL )	void {
 		// display matrice PANEL
 		if (vpnl.actif == false ) return ;
-			var x :usize = vlbl.posx - 1 ;
-			var y :usize = vlbl.posy - 1;
-			var vlen = utl.nbrCharStr(vlbl.text);
+			const x :usize = vlbl.posx - 1 ;
+			const y :usize = vlbl.posy - 1;
+			const vlen = utl.nbrCharStr(vlbl.text);
 			var n :usize = 0;
 			var npos :usize = (vpnl.cols * vlbl.posx) + vlbl.posy - 1 ;
 			while (n < vlen) : (n += 1) {
@@ -603,7 +603,7 @@ pub const frm = struct {
 			var col:	usize = 0 ;
 			var npos: usize = 0 ;
 
-			var wlen : usize = utl.nbrCharStr(vfram.title);
+			const wlen : usize = utl.nbrCharStr(vfram.title);
 
 			var n:		usize = 0 ;
 			var x:usize = vfram.posx - 1 ;
@@ -1039,7 +1039,7 @@ pub const btn = struct{
 	pub fn printButton(vpnl: *pnl.PANEL) void {
 		if (vpnl.actif == false ) return ;
 	
-		var espace :usize = 3;
+		const espace :usize = 3;
 		var x :usize = 0;
 		var y :usize = 0;
 
@@ -1052,7 +1052,7 @@ pub const btn = struct{
 			y = 2;
 		}
 
-		var npos : usize = vpnl.cols * x ;
+		const npos : usize = vpnl.cols * x ;
 		var n =	npos + y;
 
 		for (vpnl.button.items) |button| {
@@ -2162,8 +2162,8 @@ pub const	fld = struct {
 		// display matrice PANEL
 		if (vpnl.actif == false ) return ;
 		if (vfld.actif == false ) return ;
-			var x :usize = vfld.posx - 1;
-			var y :usize = vfld.posy - 1;
+			const x :usize = vfld.posx - 1;
+			const y :usize = vfld.posy - 1;
 			var n :usize = 0;
 			var npos :usize = (vpnl.cols * vfld.posx) + vfld.posy - 1 ;
 			while (n < vfld.nbrcar) : (n += 1) {
@@ -2237,8 +2237,8 @@ pub const	fld = struct {
 		// display matrice PANEL
 		if (vpnl.actif == false ) return ;
 		if (vfld.actif == false ) return ;
-			var x :usize = vfld.posx - 1;
-			var y :usize = vfld.posy - 1;
+			const x :usize = vfld.posx - 1;
+			const y :usize = vfld.posy - 1;
 			var n :usize = 0;
 			var npos :usize = (vpnl.cols * (vfld.posx - 1)) + vfld.posy - 1 ;
 			while (n < vfld.nbrcar) : (n += 1) {
@@ -2371,7 +2371,7 @@ pub const	fld = struct {
 		};
 
 
-		var x: usize	= vpnl.lines;
+		const x: usize	= vpnl.lines;
 		var n: usize	= vpnl.cols * (x - 2) ;
 		var y: usize	= 1 ;
 
@@ -2391,7 +2391,7 @@ pub const	fld = struct {
 		term.writeStyled(msghlp,MsgHelp);
 
 		while (boucle) {
-			var e_key = kbd.getKEY();
+			const e_key = kbd.getKEY();
 
 			switch ( e_key.Key ) {
 				.esc=>boucle = false,
@@ -2421,7 +2421,7 @@ pub const	fld = struct {
 		term.writeStyled(utl.listToStr(e_FIELD),MsgErr);
 
 
-		var x: usize	= vpnl.lines;
+		const x: usize	= vpnl.lines;
 		var n: usize	= vpnl.cols * (x - 2) ;
 		var y: usize	= 1 ;
 
@@ -2441,7 +2441,7 @@ pub const	fld = struct {
 		term.writeStyled(msgerr,MsgErr);
 
 		while (boucle) {
-			var e_key = kbd.getKEY();
+			const e_key = kbd.getKEY();
 
 			switch ( e_key.Key ) {
 				.esc=>boucle = false,
@@ -2465,8 +2465,8 @@ pub const	fld = struct {
 	pub fn ioField(vpnl: *pnl.PANEL, vfld : FIELD ) kbd	{
 		if (vfld.protect or !vfld.actif)	return kbd.none;
 
-		var e_posx :usize = vpnl.posx + vfld.posx - 1;
-		var e_posy :usize = vpnl.posy + vfld.posy - 1;
+		const e_posx :usize = vpnl.posx + vfld.posx - 1;
+		const e_posy :usize = vpnl.posy + vfld.posy - 1;
 		var e_curs :usize = e_posy ;
 		var e_count :usize	= 0;
 		const e_nbrcar:usize	= vfld.nbrcar;
@@ -3061,7 +3061,7 @@ pub const Epanel = enum {
 		};
 		// INIT doublebuffer
 		var i:usize = (xpanel.lines+1) * (xpanel.cols+1);
-		var doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
+		const doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
 											.attribut = xpanel.attribut,
 											.on = false};
 
@@ -3117,7 +3117,7 @@ pub const Epanel = enum {
 
 		// INIT doublebuffer
 		var i:usize = (device.lines+1) * (device.cols+1);
-		var doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
+		const doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
 											.attribut = device.attribut,
 											.on = false};
 
@@ -3146,7 +3146,7 @@ pub const Epanel = enum {
 
 				// INIT doublebuffer
 		var i:usize = (vpnl.lines+1) * (vpnl.cols+1);
-		var doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
+		const doublebuffer = TERMINAL_CHAR	{ .ch =	" ",
 											.attribut = vpnl.attribut,
 											.on = false};
 
@@ -3327,7 +3327,7 @@ pub const Epanel = enum {
 
 	pub fn msgErr(vpnl: *PANEL, info: [] const u8) void {
 
-		var x: usize	= vpnl.lines;
+		const x: usize	= vpnl.lines;
 		var n: usize	= vpnl.cols * (x - 2) ;
 		var y: usize	= 1 ;
 
@@ -3346,7 +3346,7 @@ pub const Epanel = enum {
 		term.writeStyled(msgerr,MsgErr);
 
 		while (true) {
-			var e_key = kbd.getKEY();
+			const e_key = kbd.getKEY();
 
 			switch ( e_key.Key ) {
 				.esc => break,
@@ -3447,7 +3447,7 @@ pub const Epanel = enum {
 
 		var nField :usize = 0;
 		var fld_key : kbd =	kbd.enter;
-		var nbrFieldIO : usize = vpnl.field.items.len;
+		const nbrFieldIO : usize = vpnl.field.items.len;
 
 
 		if ( vpnl.idxfld == 9999) {
@@ -3488,7 +3488,7 @@ pub const Epanel = enum {
 
 		
 			if (nbrFieldIO == 0 or vpnl.field.items.len == 0 )	{
-				var vKey= kbd.getKEY();
+				const vKey= kbd.getKEY();
 
 				if (isPanelKey(vpnl,vKey.Key)) {
 					vpnl.idxfld = 9999;

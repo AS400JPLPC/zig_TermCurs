@@ -103,7 +103,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			var buf = allocUtl.alloc(u8, size) catch {
+			const buf = allocUtl.alloc(u8, size) catch {
 				return ErrNbrch.InvalideAllocBuffer;
 			};
 			return buf;
@@ -116,7 +116,7 @@ pub const iteratStr = struct {
 		}
 
 		pub fn next(it: *StringIterator) ?[]const u8 {
-			var optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
+			const optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
 
  			it.buf= optional_buf orelse "";
 			var idx : usize = 0;
@@ -133,7 +133,7 @@ pub const iteratStr = struct {
 		}
 
 		pub fn preview(it: *StringIterator) ?[]const u8 {
-			var optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
+			const optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
 
 			it.buf= optional_buf orelse "";
 			var idx : usize = 0;
@@ -185,7 +185,7 @@ pub fn nbrCharStr(str:[] const u8) usize {
 
 /// remove espace to STRING left and rigth
 pub fn trimStr(str:[] const u8) [] const u8{
-	var val =std.mem.trim(u8, str ," ");
+	const val =std.mem.trim(u8, str ," ");
 	return val;
 }
 
@@ -257,7 +257,7 @@ pub fn isDigitStr(str:[] const u8) bool {
 
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch)
+		const x = utf.utf8Decode(ch)
 			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'0'...'9' => continue ,
@@ -279,7 +279,7 @@ pub fn isDecimalStr(str:[] const u8) bool {
 	var p: bool = false; // dot
 	while (iter.next()) |ch| :( idx += 1) {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 		catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'0'...'9' => continue ,
@@ -307,7 +307,7 @@ pub fn isSignedStr(str:[] const u8) bool {
 	var b:bool = false;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 		catch |err| { @panic(@errorName(err));};
 		switch (x) {
 
@@ -332,7 +332,7 @@ pub fn isLetterStr(str:[] const u8) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'0'...'9' => b = false,
@@ -425,7 +425,7 @@ pub fn isSpecialStr(str:[] const u8) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 						catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'&' => continue ,
@@ -485,7 +485,7 @@ pub fn isPunct(str:[] const u8,) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'.' => continue ,
@@ -519,7 +519,7 @@ pub fn isCarOmit(str: [] const u8) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			';' => continue ,
@@ -547,7 +547,7 @@ pub fn isPassword(str:[] const u8) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 			catch |err| { @panic(@errorName(err));};
 		switch (x) {
 			'!' => continue ,
@@ -593,7 +593,7 @@ pub fn isMailStr(str:[] const u8) bool {
 	var b:bool = true;
 	while (iter.next()) |ch| {
 
-		var x = utf.utf8Decode(ch) 
+		const x = utf.utf8Decode(ch) 
 						catch |err| { @panic(@errorName(err));};
 
 		switch (x) {
@@ -623,7 +623,7 @@ pub fn upperStr(str:[] const u8) [] const u8 {
 		catch |err| { @panic(@errorName(err));};
 	defer allocUtl.free(result);
 
-	std.mem.copy(u8, result, str);
+	@memcpy(result, str);
 	var idx:usize = 0;
 	while (idx < result.len) :(idx += 1 ) {
 		result[idx] = std.ascii.toUpper(result[idx]);
@@ -669,8 +669,8 @@ pub fn concatStr( a: []const u8, b: []const u8) []const u8 {
 /// LT EQ GT -> enum CMP
 pub fn compStr( str1 : [] const u8 , str2 : [] const u8) CMP {
 
-	var c1 = std.fmt.count("{s}",.{str1});
-	var c2 = std.fmt.count("{s}",.{str2});
+	const c1 = std.fmt.count("{s}",.{str1});
+	const c2 = std.fmt.count("{s}",.{str2});
 
 	if (c1 > c2)	return CMP.GT ;
 	if (c1 == c2) {

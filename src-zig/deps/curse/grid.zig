@@ -217,7 +217,7 @@ pub const	grd = struct {
 			catch |err| { @panic(@errorName(err));};
 		defer allocatorGrid.free(result);
 
-		std.mem.copy(u8, result, a[pos..n]);
+		@memcpy(result, a[pos..n]);
 		return std.fmt.allocPrint(allocatorGrid,"{s}",.{result},)
 			catch |err| { @panic(@errorName(err));};
 	}
@@ -391,7 +391,7 @@ pub const	grd = struct {
 		// INIT doublebuffer
 
 		var i:usize = (self.lines) * self.cols;
-		var doublebuffer = TERMINAL_CHAR	{
+		const doublebuffer = TERMINAL_CHAR	{
 			.ch =	" ",
 			.attribut = self.attribut,
 			.on = false};
@@ -442,7 +442,7 @@ pub const	grd = struct {
 
 
 
-		var cell = CELL {
+		const cell = CELL {
 			.text	= vtext,
 			.reftyp = vreftyp,
 			.long	= nlong,
@@ -576,7 +576,7 @@ pub const	grd = struct {
 		var row:	usize = 1 ;
 		var y:		usize = 0 ;
 		var col:	usize = 0 ;
-		var cols: usize = getLenHeaders(self);
+		const cols: usize = getLenHeaders(self);
 
 		var n:		usize = 0 ;
 		var x :usize = self.posx - 1 ;
@@ -745,7 +745,7 @@ pub const	grd = struct {
 		var x : usize = 0;
 		var y : usize = 0;
 		var h : usize = 0;
-		var nColumns : usize = countColumns(self) ;
+		const nColumns : usize = countColumns(self) ;
 		var start : usize = 0 ;
 		var l : usize = 0;
 		var buf : [] const u8 = "";
@@ -1173,7 +1173,7 @@ pub const	grd = struct {
 					if (self.lignes > 0 ) {
 						gSelect.Key = kbd.enter;
 						if (self.curspage > 0) {
-							var vline =	(self.pageRows - 1 ) * (self.curspage - 1 );
+							const vline =	(self.pageRows - 1 ) * (self.curspage - 1 );
 							CountLigne += vline;
 						}
 						gSelect.Buf = self.data.items(.buf)[CountLigne];

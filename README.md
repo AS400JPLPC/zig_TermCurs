@@ -266,7 +266,19 @@ LINE is in Forms.<br />
 <br /><br />
 All these modifications aim to make it more flexible after long hours of studying others' work through publications and my understanding of ZIG-LANG. I had a hard time grasping memory cleanup, especially how to use allocators (not the order) and the repercussions of module nesting to have only the fluctuating data.<br /><br />
 Excuse me for those who have already used TERMCURS, but the resumption isn't too significant. However, it was a necessary step to advance in the code generator and enhance flexibility.<br /><br />
+→  2024-01-05<br />
+    I tested with two versions, 0.11.0 and 0.12.0-dev. Everything works fine except in mdlFile.zig:<br />
 
+    ```
+    // 0.11.0 active
+    const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
+
+    // 0.12.0 
+    // const iter_dir = std.fs.cwd().openDir(vdir, .{.iterate = true}) catch unreachable;
+    ```
+<br />
+    By default, 0.11.0 is active. I'm providing both build files, and there are significant differences, but the principle remains the same. All of this is to let you know that I am preparing for the migration to avoid any unexpected issues.<br /><br />
+    <br />
 <BR/>
 
 ---

@@ -1198,10 +1198,10 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 // description Function
 // choix work panel
 pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
-		var cellPos: usize = 0;
+		const cellPos: usize = 0;
 		var Gkey: grd.GridSelect = undefined;
 	
-		var Xcombo : *grd.GRID =	grd.newGridC(
+		const Xcombo : *grd.GRID =	grd.newGridC(
 				"qryPanel",
 				12,
 				1,
@@ -1290,7 +1290,7 @@ pub const FuncEnum = enum {
 	}
 
 	fn searchFn ( vtext: [] const u8 ) FuncEnum {
-		var max :usize = @typeInfo(FuncEnum).Enum.fields.len;
+		const max :usize = @typeInfo(FuncEnum).Enum.fields.len - 1;
 		
 		inline for (@typeInfo(FuncEnum).Enum.fields) |f| { 
 				if ( std.mem.eql(u8, f.name , vtext) ) return @as(FuncEnum,@enumFromInt(f.value));
@@ -1307,7 +1307,7 @@ var callTask: TaskEnum = undefined;
 
 fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var posx =	 utl.strToUsize(vfld.text);
+	const posx =	 utl.strToUsize(vfld.text);
 	
 	if (termSize.height < posx or posx	== 0 ) {
 				const allocator = std.heap.page_allocator;
@@ -1322,7 +1322,7 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var posy	=	utl.strToUsize(vfld.text);
+	const posy	=	utl.strToUsize(vfld.text);
 	
 	if (termSize.width < posy or posy == 0 ) {
 				const allocator = std.heap.page_allocator;
@@ -1337,8 +1337,8 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		const termSize = term.getSize() ;
-		var lines =	utl.strToUsize(vfld.text);
-		var posx	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
+		const lines =	utl.strToUsize(vfld.text);
+		const posx	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
 		
 		if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
 			const allocator = std.heap.page_allocator;
@@ -1354,8 +1354,8 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var cols	=	utl.strToUsize(vfld.text);
-	var posy	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
+	const cols	=	utl.strToUsize(vfld.text);
+	const posy	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
 
 	if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) {
 		const allocator = std.heap.page_allocator;
@@ -1372,7 +1372,7 @@ fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	const termSize = term.getSize();
-	var cadre =	utl.strToUsize(vfld.text);
+	const cadre =	utl.strToUsize(vfld.text);
 	
 	if (termSize.width < cadre or cadre == 0 ) {
 		const allocator = std.heap.page_allocator;
@@ -1479,7 +1479,7 @@ pub const TaskEnum = enum {
 				}
 	}
 	fn searchFn ( vtext: [] const u8 ) TaskEnum {
-		var max :usize = @typeInfo(TaskEnum).Enum.fields.len;
+		const max :usize = @typeInfo(TaskEnum).Enum.fields.len - 1;
 		
 		inline for (@typeInfo(TaskEnum).Enum.fields) |f| { 
 				if ( std.mem.eql(u8, f.name , vtext) ) return @as(TaskEnum,@enumFromInt(f.value));

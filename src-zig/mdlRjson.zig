@@ -160,7 +160,7 @@ fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
 	}
 
 	var buffer: [128]u8 = [_]u8{0} ** 128;
-	var result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
+	const result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
 	@panic(result);
 }
 
@@ -282,7 +282,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 
 	val = json.get("PANEL");
 
-	var nbrPanel = val.x.?.array.items.len;
+	const nbrPanel = val.x.?.array.items.len;
 
 	var p: usize= 0;
 
