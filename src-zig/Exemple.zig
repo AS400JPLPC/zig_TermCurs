@@ -45,6 +45,9 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("match");
 
+// tools execve Pgm
+const mdl = @import("modul");
+
 /// Errors 
 pub const Error = error{
 	main_function_Enum_invalide,
@@ -176,11 +179,13 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"abcd",						// text
 										true,						// tofill
 										"required",					// error msg
-										"please enter text Alpha",	// help
+										"please enter text Alpha crtl+p call Exemple",	// help
 										"^[a-zA-Z]{1,}$",			// regex
 										)
 	) catch unreachable ;
-
+	
+	fld.setCall(Panel,fld.getIndex(Panel,"alpha") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
+		
 	Panel.field.append(fld.newFieldAlphaUpper("alphaU",6,32,					// Name , posx posy
 										30,										// width
 										"ABCD",									// text
@@ -574,6 +579,46 @@ pub const FnEnum = enum {
 };
 var callFunc: FnEnum = undefined;
 
+
+/// run emun Function ex: combo
+pub const FnProg = enum {
+	exCallpgm,
+	none,
+
+	pub fn run(self: FnProg, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void	{
+		switch (self) {
+			.exCallpgm=> {
+
+			 mdl.callPgm("APPTERM",vfld.progcall) 
+						catch |err | switch(err)  {
+								mdl.ErrChild.Module_Invalid => {
+								const msgerr  = std.fmt.allocPrint(utl.allocUtl,
+								" module {s} invalide appeller service Informatique ",
+								.{vfld.progcall}) catch unreachable;
+								defer utl.allocUtl.free(msgerr);
+								forms.debeug(9999,msgerr);
+								},
+								else => unreachable,
+						};
+					
+			},
+			else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
+		}
+	}
+
+	fn searchFn ( vtext: [] const u8 ) FnProg {
+	var i	 :usize = 0;
+	const max :usize = @typeInfo(FnProg).Enum.fields.len;
+		while( i < max ) : (i += 1) {
+		if ( std.mem.eql(u8, @tagName(@as(FnProg,@enumFromInt(i))), vtext)) return @as(FnProg,@enumFromInt(i));
+		}
+		return FnProg.none;
+
+	}
+};
+var callProg: FnProg = undefined;
+
+
 pub fn deinitWrk() void {
 	term.deinitTerm();
 	grd.deinitGrid();
@@ -624,6 +669,11 @@ pub fn main() !void {
 			.func => {
 			callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); // User clicks "increment"
 			callFunc.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+			},
+
+			.call => {
+			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); // call programe ex: Exemple
+			callProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
 			},
 
 			.F2 => {

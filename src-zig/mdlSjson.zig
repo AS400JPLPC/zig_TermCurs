@@ -247,6 +247,10 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 									try w.objectField(@tagName(fld.Efield.proctask));
 									try w.print("\"{s}\"", .{XPANEL.items[np].field.items[fp].proctask});
 								},
+								.progcall => {
+									try w.objectField(@tagName(fld.Efield.progcall));
+									try w.print("\"{s}\"", .{XPANEL.items[np].field.items[fp].progcall});
+								},
 								.regex=> {
 									try w.objectField(@tagName(fld.Efield.regex));
 									try w.print("\"\"", .{});

@@ -196,6 +196,7 @@
           "help": "help vNOM",
           "procfunc": "",
           "proctask": "TvNOM",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -213,6 +214,7 @@
           "help": "help vPRENOM",
           "procfunc": "",
           "proctask": "TvPRENOM",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -230,6 +232,7 @@
           "help": "help vFREE",
           "procfunc": "",
           "proctask": "TvFREE",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -247,6 +250,7 @@
           "help": "help vFUll",
           "procfunc": "",
           "proctask": "TvFULL",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -264,6 +268,7 @@
           "help": "help ALHPA",
           "procfunc": "",
           "proctask": "TvLPHA",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -281,6 +286,7 @@
           "help": "help ALPHAUPPER",
           "procfunc": "",
           "proctask": "TvALPHAUPPER",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -298,6 +304,7 @@
           "help": "help vALPHANUM",
           "procfunc": "",
           "proctask": "TvALPHANUM",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -315,6 +322,7 @@
           "help": "help vALPHAnumUPPER",
           "procfunc": "",
           "proctask": "TvALPHAnumUPPER",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -332,6 +340,7 @@
           "help": "help vPASSWORD",
           "procfunc": "",
           "proctask": "TvPASSWORD",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -349,6 +358,7 @@
           "help": "help vYESNO",
           "procfunc": "",
           "proctask": "TvYESNO",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -366,6 +376,7 @@
           "help": "msg vUDIGIT",
           "procfunc": "",
           "proctask": "TvUDIGIT",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -383,6 +394,7 @@
           "help": "help vDIGIT",
           "procfunc": "",
           "proctask": "TvDIGIT",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -400,6 +412,7 @@
           "help": "help vUDECIMAL",
           "procfunc": "",
           "proctask": "TvUDECIMAL",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -417,6 +430,7 @@
           "help": "help vDECIMAL",
           "procfunc": "",
           "proctask": "TvDECIMAL",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -434,6 +448,7 @@
           "help": "help vDATEISO",
           "procfunc": "",
           "proctask": "TvDATEISO",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -451,6 +466,7 @@
           "help": "help vDATEFR",
           "procfunc": "",
           "proctask": "TvDATEFR",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -468,6 +484,7 @@
           "help": "help vDATEUS",
           "procfunc": "",
           "proctask": "TvDATEUS",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -485,6 +502,7 @@
           "help": "help TELEPHONE",
           "procfunc": "",
           "proctask": "TvTELEPHONE",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -502,6 +520,7 @@
           "help": "help VMAILISO",
           "procfunc": "",
           "proctask": "TvMAILISO",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -519,6 +538,7 @@
           "help": "help vSWITCH",
           "procfunc": "",
           "proctask": "TvSWITCH",
+          "progcall": "",
           "regex": ""
         },
         {
@@ -536,6 +556,7 @@
           "help": "help vFUNC",
           "procfunc": "FvFUNC",
           "proctask": "TvFUNC",
+          "progcall": "",
           "regex": ""
         }
       ],

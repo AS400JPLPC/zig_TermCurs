@@ -8,6 +8,8 @@ const reg = @import("match");
 const os = std.os;
 const io = std.io;
 
+const Child = @import("std").ChildProcess;
+
 ///-------------------------------
 /// FORMS
 ///-------------------------------
@@ -22,16 +24,6 @@ pub fn deinitForms() void {
 	arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 	allocatorForms = arenaForms.allocator();
 }
-
-// //free memory String
-// var arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-// pub var  allocatorStr = arenaStr.allocator();
-// pub fn deinitStr() void {
-// 	arenaStr.deinit();
-// 	arenaStr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-// 	allocatorStr = arenaStr.allocator();
-// }
-
 
 
 pub const CTRUE  = "✔";
@@ -92,7 +84,7 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
 	const Xterm = term.getSize();
 	term.gotoXY(Xterm.height,1) ;
 	const allocator = std.heap.page_allocator;
-	const msg =std.fmt.allocPrint(allocator,"linsrc:{d}  {s} ",.{vline, buf}) 
+	const msg =std.fmt.allocPrint(allocator,"line_src:{d}  {s} ",.{vline, buf}) 
 									catch |err| { @panic(@errorName(err));};
 	term.writeStyled(msg,AtrDebug);
 	_=term.kbd.getKEY();
@@ -161,6 +153,7 @@ pub const ErrForms = error{
 				fld_getErr_Index_invalide,
 				fld_getFunc_Index_invalide,
 				fld_getTask_Index_invalide,
+				fld_getCall_Index_invalide,
 				fld_getAttribut_Index_invalide,
 				fld_getAtrProtect_Index_invalide,
 				fld_getActif_Index_invalide,
@@ -168,15 +161,17 @@ pub const ErrForms = error{
 				fld_setText_Index_invalide,
 				fld_setSwitch_Index_invalide,
 				fld_setProtect_Index_invalide,
+				fld_setRequier_Index_invalide,
 				fld_setEdtcar_Index_invalide,
 				fld_setRegex_Index_invalide,
+				fld_setTask_Index_invalide,
+				fld_setCall_Index_invalide,
 				fld_setActif_Index_invalide,
 
 				fld_dltRows_Index_invalide,
 
 				Invalide_subStrForms_Index,
-				Invlide_subStrForms_pos
-
+				Invlide_subStrForms_pos,
 		};
 
 
@@ -1204,6 +1199,8 @@ pub const	fld = struct {
 
 		proctask: []const u8,	//name proc
 
+		progcall: []const u8,	//name call
+
 		actif:bool,
 	};
 
@@ -1222,6 +1219,7 @@ pub const	fld = struct {
 		help,
 		procfunc,
 		proctask,
+		progcall,
 		regex
 	};
 
@@ -1273,6 +1271,7 @@ pub const	fld = struct {
 			.zwitch = false,
 			.procfunc	="",
 			.proctask	="",
+			.progcall	="",
 			.attribut	= AtrField,
 			.atrProtect = AtrProtect,
 			.actif	= true
@@ -1434,29 +1433,30 @@ pub const	fld = struct {
 										vhelp: []const u8) FIELD {
 
 
-				var xfield = FIELD {	 
-						.name	 = vname,
-						.posx	 = vposx,
-						.posy	 = vposy,
-						.reftyp = REFTYP.YES_NO ,
-						.width	= 1,
-						.scal	 = 0,
-						.nbrcar = 1,
-						.requier	= vrequier,
-						.protect = false,
-						.pading	= false,
-						.edtcar = "",
-						.regex	= "",
-						.errmsg = verrmsg,
-						.help	 = vhelp,
-						.text	 = vtext,
-						.zwitch = false,
-						.procfunc	="",
-						.proctask	="",
-						.attribut	= AtrField,
-						.atrProtect = AtrProtect,
-						.actif	= true
-					};
+			var xfield = FIELD {	 
+					.name	 = vname,
+					.posx	 = vposx,
+					.posy	 = vposy,
+					.reftyp = REFTYP.YES_NO ,
+					.width	= 1,
+					.scal	 = 0,
+					.nbrcar = 1,
+					.requier	= vrequier,
+					.protect = false,
+					.pading	= false,
+					.edtcar = "",
+					.regex	= "",
+					.errmsg = verrmsg,
+					.help	 = vhelp,
+					.text	 = vtext,
+					.zwitch = false,
+					.procfunc	="",
+					.proctask	="",
+					.progcall	="",
+					.attribut	= AtrField,
+					.atrProtect = AtrProtect,
+					.actif	= true
+				};
 										
 		if (xfield.help.len == 0 ) xfield.help = "to validate Y or N " ;
 
@@ -1491,6 +1491,7 @@ pub const	fld = struct {
 				.zwitch  = vzwitch,
 				.procfunc ="",
 				.proctask ="",
+				.progcall ="",
 				.attribut = AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1538,6 +1539,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1587,6 +1589,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1636,6 +1639,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1684,13 +1688,14 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
 		};
 
 
-			// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
+	// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 			// chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.
 			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
 			,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"})
@@ -1735,6 +1740,7 @@ pub const	fld = struct {
 				.zwitch = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1784,6 +1790,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1829,6 +1836,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1875,6 +1883,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1929,6 +1938,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	="",
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -1984,6 +1994,7 @@ pub const	fld = struct {
 				.zwitch  = false,
 				.procfunc	=vprocfunc,
 				.proctask	="",
+				.progcall	="",
 				.attribut	= AtrField,
 				.atrProtect = AtrProtect,
 				.actif	= true
@@ -2079,7 +2090,10 @@ pub const	fld = struct {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].proctask;
 		return ErrForms.fld_getTask_Index_invalide ;
 	}
-
+	pub fn getCall(vpnl: *pnl.PANEL , n: usize)	ErrForms ! [] const u8 {
+		if ( n < vpnl.field.items.len) return vpnl.field.items[n].progcall;
+		return ErrForms.fld_getCall_Index_invalide ;
+	}
 	pub fn getAttribut(vpnl: *pnl.PANEL , n: usize)	ErrForms ! term.ZONATRB {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].atribut;
 		return ErrForms.fld_getAttribut_Index_invalide ;
@@ -2115,7 +2129,7 @@ pub const	fld = struct {
 
 	pub fn setRequier(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
 		if ( n < vpnl.field.items.len)	vpnl.field.items[n].protect = val
-		else return ErrForms.fld_setProtect_Index_invalide;
+		else return ErrForms.fld_setRequier_Index_invalide;
 	}
 
 	pub fn setEdtcar(vpnl: *pnl.PANEL , n: usize, val:[] const u8)	ErrForms ! void {
@@ -2128,7 +2142,11 @@ pub const	fld = struct {
 	}
 	pub fn setTask(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].proctask = val
-		else return ErrForms.fld_setActif_Index_invalide;
+		else return ErrForms.fld_setTask_Index_invalide;
+	}
+	pub fn setCall(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].progcall = val
+		else return ErrForms.fld_setCall_Index_invalide;
 	}
 	pub fn setActif(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].actif = val
@@ -2572,6 +2590,13 @@ pub const	fld = struct {
 					.ctrlH => {
 						if (	vfld.help.len > 0 ) msgHelp(vpnl,vfld);
 					},
+					.ctrlP => {
+						// Call pgm is call 
+						if ( vfld.progcall.len > 0) {
+							Fkey.Key = kbd.call;
+							break; 
+						}
+					},
 					.home => {
 						e_count = 0;
 						e_curs = e_posy;
@@ -2613,7 +2638,8 @@ pub const	fld = struct {
 					.delete=> {
 						if( e_reftyp != REFTYP.SWITCH) {
 							if( e_count >= 0) {
-								if (e_reftyp == REFTYP.DIGIT	and e_count >= 0 or	e_reftyp == REFTYP.DECIMAL and e_count >= 0 ) {
+								if (e_reftyp == REFTYP.DIGIT	and e_count >= 0 or	e_reftyp == REFTYP.DECIMAL and
+									e_count >= 0 ) {
 										delete(e_count);
 									}
 									else if (e_reftyp != REFTYP.DIGIT	 and	e_reftyp != REFTYP.DECIMAL)	{
@@ -2690,7 +2716,8 @@ pub const	fld = struct {
 								},
 								.TEXT_FULL=> {
 									if ( (e_count < e_nbrcar and isSpace(Fkey.Char) == false ) or
-										(utl.isLetterStr(Fkey.Char) or utl.isDigitStr(Fkey.Char) or utl.isSpecialStr(Fkey.Char)) or
+										(utl.isLetterStr(Fkey.Char) or utl.isDigitStr(Fkey.Char) or
+										utl.isSpecialStr(Fkey.Char)) or
 										(isSpace(Fkey.Char) == true and e_count > 0 and e_count < e_nbrcar) ) {
 										
 										if (statusCursInsert and e_count < e_nbrcar - 1) insert(Fkey.Char,e_count)
@@ -2726,7 +2753,8 @@ pub const	fld = struct {
 								},
 								.ALPHA_NUMERIC, .ALPHA_NUMERIC_UPPER => {
 									if ( (e_count < e_nbrcar and isSpace(Fkey.Char) == false ) and
-									(utl.isLetterStr(Fkey.Char) or utl.isDigitStr(Fkey.Char) or std.mem.eql(u8, Fkey.Char, "-")) or
+									(utl.isLetterStr(Fkey.Char) or utl.isDigitStr(Fkey.Char) or
+									 std.mem.eql(u8, Fkey.Char, "-")) or
 									(isSpace(Fkey.Char) == true and e_count > 0 and e_count < e_nbrcar) ) {
 
 										if (vfld.reftyp == .ALPHA_NUMERIC_UPPER) Fkey.Char = utl.upperStr(Fkey.Char);
@@ -2827,7 +2855,7 @@ pub const	fld = struct {
 										(std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
 										(std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
 
-										if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue;								 
+										if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue; 
 
 										if (statusCursInsert and e_count < e_nbrcar - 1) insert(Fkey.Char,e_count)
 										else	e_FIELD.items[e_count] = Fkey.Char;
@@ -3010,7 +3038,7 @@ pub const	pnl = struct {
 
 		idxfld: usize,
 
-		key	 : kbd ,		 // Func task
+		key	 : kbd ,		 // Func task call
 
 		keyField : kbd ,	// enter up down
 
@@ -3382,21 +3410,24 @@ pub const Epanel = enum {
 	///search there available field
 	fn isNextIO(vpnl: *PANEL, idx : usize ) usize {
 		var i : usize = idx + 1;
+		if (idx == vpnl.field.items.len) i = 0;
 		while ( i < vpnl.field.items.len) : (i += 1) {
-			if (vpnl.field.items[i].actif)
-				if (!vpnl.field.items[i].protect ) break ;
+			if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
 		}
+		if (i == vpnl.field.items.len) i = vpnl.field.items.len - 1;
+		if (vpnl.field.items[i].actif  and vpnl.field.items[i].protect ) i = isPriorIO(vpnl, i);
 		return i;
 	}
 
 	///search there available field
 	fn isPriorIO(vpnl: *PANEL, idx : usize) usize {
-		var i : usize = idx - 1;
-		if ( i < 0) i = 0;
+		const x : i64 = @intCast(idx - 1) ;
+		var i : usize = 0;
+		if ( x > 0) i = @intCast(x);
 		while ( i > 0 ) : (i -= 1) {
-			if (vpnl.field.items[i].actif)
-				if (!vpnl.field.items[i].protect ) break ;
+			if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
 		}
+		if (vpnl.field.items[i].actif  and vpnl.field.items[i].protect ) i = isNextIO(vpnl, i);
 		return i;
 	}
 
@@ -3433,14 +3464,13 @@ pub const Epanel = enum {
 	/// keyboard proction keys are returned to the calling procedure
 	///
 	/// only the key CtrlH = Aide / Help for field
-	///
+	/// only the key CtrlP = call to the program associated with the Field zone
 	/// Reserved keys for FIELD management
-	/// traditionally	UP, DOWN, TAB, STAB, CtrlA,
+	/// traditionally	UP, DOWN, TAB, STAB, CtrlA, F1..F24,
 	/// ENTER, HOME, END, RIGTH, LEFt, BACKSPACE, DELETE, INSERT
 	/// FUNC Triggered by ioField function
 	/// predefined and customizable REGEX control
-	/// CALL to be planned in the future with	call execve job
-	/// ATTN to be planned in the future with thread job
+	/// CALL execve Application Terminal and module
 	///------------------------------------------------------
 	pub fn ioPanel(vpnl: *PANEL) kbd {
 		if (vpnl.actif == false ) return	kbd.none;
@@ -3448,11 +3478,28 @@ pub const Epanel = enum {
 		var nField :usize = 0;
 		var fld_key : kbd =	kbd.enter;
 		const nbrFieldIO : usize = vpnl.field.items.len;
+		var   nbrField   : usize = 0;
 
 
+		// search field activ
+		if (vpnl.field.items.len > 1 ) {
+			for(0..vpnl.field.items.len - 1) | x | {
+			if (vpnl.field.items[x].actif and
+				!vpnl.field.items[x].protect ) nbrField  += 1;
+			}
+		}
+		else if (vpnl.field.items.len == 1 ) {
+				if ( vpnl.field.items[0].actif and
+						!vpnl.field.items[0].protect ) nbrField  += 1;
+			}
+			
+		// first time
 		if ( vpnl.idxfld == 9999) {
 				printPanel(vpnl); 
 				nField = 0;
+				// positioning on the first active Field zone
+				if (nbrField > 0 ) {
+					if (!vpnl.field.items[0].actif  or vpnl.field.items[0].protect ) nField = isNextIO(vpnl, 0);}
 		} else {
 
 			switch(vpnl.key ) { 
@@ -3481,13 +3528,13 @@ pub const Epanel = enum {
 				else => nField = vpnl.idxfld,		
 			}
 		}
-
 		vpnl.keyField = kbd.none; 
 
+		// Processing of the panel's Fields
 		while (true) {
 
 		
-			if (nbrFieldIO == 0 or vpnl.field.items.len == 0 )	{
+			if (nbrField == 0 or vpnl.field.items.len == 0 )	{
 				const vKey= kbd.getKEY();
 
 				if (isPanelKey(vpnl,vKey.Key)) {
@@ -3521,9 +3568,15 @@ pub const Epanel = enum {
 						vpnl.key = kbd.task;
 						return fld_key;
 					}
+					// function call pgm
+					if (fld_key == kbd.call) {
+						vpnl.idxfld = nField;
+						vpnl.key = kbd.call;
+						return fld_key;
+					}
 
 
-					
+
 
 					
 					// control validity
@@ -3553,7 +3606,7 @@ pub const Epanel = enum {
 					vpnl.idxfld = nField;
 				},
 				.up	=> {
-					if (nField == 0) nField = nbrFieldIO - 1
+					if (nField == 0) nField = nbrFieldIO - 1 
 					else nField= isPriorIO(vpnl,nField);
 					vpnl.idxfld = nField;
 				},

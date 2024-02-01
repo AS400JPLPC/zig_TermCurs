@@ -453,11 +453,10 @@ pub fn enableRawMode() void {
 
 /// Clear gross terminal
 fn reset() void {
-	const name = "/bin/echo";
-	var args = [_:null]?[*:0]const u8{ "echo", "\x1b[H\x1b[3J" };
-	var env = [_:null]?[*:0]u8{};
+	stdout.writeAll("\x1bc") catch {};
 
-	std.os.execveZ(name, args[0..args.len], env[0..env.len]) catch {};
+	stdout.writeAll("\x1b[H") catch {};
+
 }
 
 /// Returns to the previous terminal state
@@ -465,9 +464,6 @@ pub fn disableRawMode() void {
 	defCursor(typeCursor.cSteady);
 	offMouse();
 	cursShow();
-	cls();
-	stdout.print("\x1b[H", .{}) catch {}; // init pos_coursor
-
 	_ = os.linux.tcsetattr(TTY.handle, .FLUSH, &original_termios);
 	reset();
 }
@@ -644,6 +640,7 @@ pub const kbd = enum {
 	backspace,
 	func,
 	task,
+	call,
 
 
 
@@ -753,59 +750,59 @@ pub const kbd = enum {
 		if (iter.nextCodepoint()) |c0| switch (c0) {
 			'\x1b' => {
 				if (iter.nextCodepoint()) |c1| switch (c1) {
-				// fn (1 - 4)
-				// O - 0x6f - 111
-				'\x4f' => {
-					switch ((1 + keybuf[2] - '\x50')) {
-						1 => { Event.Key = kbd.F1; return Event; },
-						2 => { Event.Key = kbd.F2; return Event; },
-						3 => { Event.Key = kbd.F3; return Event; },
-						4 => { Event.Key = kbd.F4; return Event; },
-						else => { Event.Key = kbd.none; return Event; },
-					}
-				},
+					// fn (1 - 4)
+					// O - 0x6f - 111
+					'\x4f' => {
+						switch ((1 + keybuf[2] - '\x50')) {
+							1 => { Event.Key = kbd.F1; return Event; },
+							2 => { Event.Key = kbd.F2; return Event; },
+							3 => { Event.Key = kbd.F3; return Event; },
+							4 => { Event.Key = kbd.F4; return Event; },
+							else => { Event.Key = kbd.none; return Event; },
+						}
+					},
 
-				// csi
-				'[' => {
-						return parse_csiFunc(keybuf[2..c]);
-				},
+					// csi
+					'[' => {
+							return parse_csiFunc(keybuf[2..c]);
+					},
 
-				// alt key
-				else => {
-					switch (c1) {
-						'a' => { Event.Key = kbd.altA; return Event; },
-						'b' => { Event.Key = kbd.altB; return Event; },
-						'c' => { Event.Key = kbd.altC; return Event; },
-						'd' => { Event.Key = kbd.altD; return Event; },
-						'e' => { Event.Key = kbd.altE; return Event; },
-						'f' => { Event.Key = kbd.altF; return Event; },
-						'g' => { Event.Key = kbd.altG; return Event; },
-						'h' => { Event.Key = kbd.altH; return Event; },
-						'i' => { Event.Key = kbd.altI; return Event; },
-						'j' => { Event.Key = kbd.altJ; return Event; },
-						'k' => { Event.Key = kbd.altK; return Event; },
-						'l' => { Event.Key = kbd.altL; return Event; },
-						'm' => { Event.Key = kbd.altM; return Event; },
-						'n' => { Event.Key = kbd.altN; return Event; },
-						'o' => { Event.Key = kbd.altO; return Event; },
-						'p' => { Event.Key = kbd.altP; return Event; },
-						'q' => { Event.Key = kbd.altQ; return Event; },
-						'r' => { Event.Key = kbd.altR; return Event; },
-						's' => { Event.Key = kbd.altS; return Event; },
-						't' => { Event.Key = kbd.altT; return Event; },
-						'u' => { Event.Key = kbd.altU; return Event; },
-						'v' => { Event.Key = kbd.altV; return Event; },
-						'w' => { Event.Key = kbd.altW; return Event; },
-						'x' => { Event.Key = kbd.altX; return Event; },
-						'y' => { Event.Key = kbd.altY; return Event; },
-						'z' => { Event.Key = kbd.altZ; return Event; },
-						else => { Event.Key = kbd.none; return Event; },
-					}
-				},
+					// alt key
+					else => {
+						switch (c1) {
+							'a' => { Event.Key = kbd.altA; return Event; },
+							'b' => { Event.Key = kbd.altB; return Event; },
+							'c' => { Event.Key = kbd.altC; return Event; },
+							'd' => { Event.Key = kbd.altD; return Event; },
+							'e' => { Event.Key = kbd.altE; return Event; },
+							'f' => { Event.Key = kbd.altF; return Event; },
+							'g' => { Event.Key = kbd.altG; return Event; },
+							'h' => { Event.Key = kbd.altH; return Event; },
+							'i' => { Event.Key = kbd.altI; return Event; },
+							'j' => { Event.Key = kbd.altJ; return Event; },
+							'k' => { Event.Key = kbd.altK; return Event; },
+							'l' => { Event.Key = kbd.altL; return Event; },
+							'm' => { Event.Key = kbd.altM; return Event; },
+							'n' => { Event.Key = kbd.altN; return Event; },
+							'o' => { Event.Key = kbd.altO; return Event; },
+							'p' => { Event.Key = kbd.altP; return Event; },
+							'q' => { Event.Key = kbd.altQ; return Event; },
+							'r' => { Event.Key = kbd.altR; return Event; },
+							's' => { Event.Key = kbd.altS; return Event; },
+							't' => { Event.Key = kbd.altT; return Event; },
+							'u' => { Event.Key = kbd.altU; return Event; },
+							'v' => { Event.Key = kbd.altV; return Event; },
+							'w' => { Event.Key = kbd.altW; return Event; },
+							'x' => { Event.Key = kbd.altX; return Event; },
+							'y' => { Event.Key = kbd.altY; return Event; },
+							'z' => { Event.Key = kbd.altZ; return Event; },
+							else => { Event.Key = kbd.none; return Event; },
+						} 
+					},
 				} else { Event.Key = kbd.esc; return Event; }
 			},
 
-			// ctrl keys ( crtl-i (x09)	 ctrl-m (x0D) )
+			// ctrl keys ( crtl-i (x09)	 ctrl-m (x0d) )
 			'\x01'...'\x08', '\x0A'...'\x0C', '\x0E'...'\x1A' => {
 				switch (c0 + '\x60') {
 					'a' => { Event.Key = kbd.ctrlA; return Event; },
@@ -816,11 +813,11 @@ pub const kbd = enum {
 					'f' => { Event.Key = kbd.ctrlF; return Event; },
 					'g' => { Event.Key = kbd.ctrlG; return Event; },
 					'h' => { Event.Key = kbd.ctrlH; return Event; },
-					'i' => { Event.Key = kbd.ctrlI; return Event; },
+					// 'i' => { Event.Key = kbd.ctrlI; return Event; },
 					'j' => { Event.Key = kbd.ctrlJ; return Event; },
 					'k' => { Event.Key = kbd.ctrlK; return Event; },
 					'l' => { Event.Key = kbd.ctrlL; return Event; },
-					'm' => { Event.Key = kbd.ctrlM; return Event; },
+					// 'm' => { Event.Key = kbd.ctrlM; return Event; },
 					'n' => { Event.Key = kbd.ctrlN; return Event; },
 					'o' => { Event.Key = kbd.ctrlO; return Event; },
 					'p' => { Event.Key = kbd.ctrlP; return Event; },
@@ -839,13 +836,13 @@ pub const kbd = enum {
 			},
 
 			// tab
-			'\x09' => { Event.Key = kbd.tab;			 return Event; },
+			'\x09' => { Event.Key = kbd.tab;	return Event; },
 
 			// backspace
-			'\x7f' => { Event.Key = kbd.backspace; return Event; },
+			'\x7f' => { Event.Key = kbd.backspace;	return Event; } ,
 
 			// Enter
-			'\x0D' => { Event.Key = kbd.enter;		 return Event; },
+			'\x0d' => { Event.Key = kbd.enter;	return Event; },
 
 
 			else => {

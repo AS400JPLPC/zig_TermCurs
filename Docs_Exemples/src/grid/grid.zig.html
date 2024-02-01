@@ -387,7 +387,7 @@
 <span class="line" id="L217">			<span class="tok-kw">catch</span> |err| { <span class="tok-builtin">@panic</span>(<span class="tok-builtin">@errorName</span>(err));};</span>
 <span class="line" id="L218">		<span class="tok-kw">defer</span> allocatorGrid.free(result);</span>
 <span class="line" id="L219"></span>
-<span class="line" id="L220">		std.mem.copy(<span class="tok-type">u8</span>, result, a[pos..n]);</span>
+<span class="line" id="L220">		<span class="tok-builtin">@memcpy</span>(result, a[pos..n]);</span>
 <span class="line" id="L221">		<span class="tok-kw">return</span> std.fmt.allocPrint(allocatorGrid,<span class="tok-str">&quot;{s}&quot;</span>,.{result},)</span>
 <span class="line" id="L222">			<span class="tok-kw">catch</span> |err| { <span class="tok-builtin">@panic</span>(<span class="tok-builtin">@errorName</span>(err));};</span>
 <span class="line" id="L223">	}</span>
@@ -577,7 +577,7 @@
 </span>
 <span class="line" id="L392"></span>
 <span class="line" id="L393">		<span class="tok-kw">var</span> i:<span class="tok-type">usize</span> = (self.lines) * self.cols;</span>
-<span class="line" id="L394">		<span class="tok-kw">var</span> doublebuffer = TERMINAL_CHAR	{</span>
+<span class="line" id="L394">		<span class="tok-kw">const</span> doublebuffer = TERMINAL_CHAR	{</span>
 <span class="line" id="L395">			.ch =	<span class="tok-str">&quot; &quot;</span>,</span>
 <span class="line" id="L396">			.attribut = self.attribut,</span>
 <span class="line" id="L397">			.on = <span class="tok-null">false</span>};</span>
@@ -631,7 +631,7 @@
 <span class="line" id="L442"></span>
 <span class="line" id="L443"></span>
 <span class="line" id="L444"></span>
-<span class="line" id="L445">		<span class="tok-kw">var</span> cell = CELL {</span>
+<span class="line" id="L445">		<span class="tok-kw">const</span> cell = CELL {</span>
 <span class="line" id="L446">			.text	= vtext,</span>
 <span class="line" id="L447">			.reftyp = vreftyp,</span>
 <span class="line" id="L448">			.long	= nlong,</span>
@@ -779,7 +779,7 @@
 <span class="line" id="L576">		<span class="tok-kw">var</span> row:	<span class="tok-type">usize</span> = <span class="tok-number">1</span> ;</span>
 <span class="line" id="L577">		<span class="tok-kw">var</span> y:		<span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
 <span class="line" id="L578">		<span class="tok-kw">var</span> col:	<span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
-<span class="line" id="L579">		<span class="tok-kw">var</span> cols: <span class="tok-type">usize</span> = getLenHeaders(self);</span>
+<span class="line" id="L579">		<span class="tok-kw">const</span> cols: <span class="tok-type">usize</span> = getLenHeaders(self);</span>
 <span class="line" id="L580"></span>
 <span class="line" id="L581">		<span class="tok-kw">var</span> n:		<span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
 <span class="line" id="L582">		<span class="tok-kw">var</span> x :<span class="tok-type">usize</span> = self.posx - <span class="tok-number">1</span> ;</span>
@@ -951,7 +951,7 @@
 <span class="line" id="L745">		<span class="tok-kw">var</span> x : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
 <span class="line" id="L746">		<span class="tok-kw">var</span> y : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
 <span class="line" id="L747">		<span class="tok-kw">var</span> h : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
-<span class="line" id="L748">		<span class="tok-kw">var</span> nColumns : <span class="tok-type">usize</span> = countColumns(self) ;</span>
+<span class="line" id="L748">		<span class="tok-kw">const</span> nColumns : <span class="tok-type">usize</span> = countColumns(self) ;</span>
 <span class="line" id="L749">		<span class="tok-kw">var</span> start : <span class="tok-type">usize</span> = <span class="tok-number">0</span> ;</span>
 <span class="line" id="L750">		<span class="tok-kw">var</span> l : <span class="tok-type">usize</span> = <span class="tok-number">0</span>;</span>
 <span class="line" id="L751">		<span class="tok-kw">var</span> buf : [] <span class="tok-kw">const</span> <span class="tok-type">u8</span> = <span class="tok-str">&quot;&quot;</span>;</span>
@@ -1396,7 +1396,7 @@
 <span class="line" id="L1173">					<span class="tok-kw">if</span> (self.lignes &gt; <span class="tok-number">0</span> ) {</span>
 <span class="line" id="L1174">						gSelect.Key = kbd.enter;</span>
 <span class="line" id="L1175">						<span class="tok-kw">if</span> (self.curspage &gt; <span class="tok-number">0</span>) {</span>
-<span class="line" id="L1176">							<span class="tok-kw">var</span> vline =	(self.pageRows - <span class="tok-number">1</span> ) * (self.curspage - <span class="tok-number">1</span> );</span>
+<span class="line" id="L1176">							<span class="tok-kw">const</span> vline =	(self.pageRows - <span class="tok-number">1</span> ) * (self.curspage - <span class="tok-number">1</span> );</span>
 <span class="line" id="L1177">							CountLigne += vline;</span>
 <span class="line" id="L1178">						}</span>
 <span class="line" id="L1179">						gSelect.Buf = self.data.items(.buf)[CountLigne];</span>

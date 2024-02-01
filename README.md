@@ -103,6 +103,7 @@ FIELD<BR/>
 | MOUSE     | mouse array reference                     |
 | escape    | Restores the original area                |
 | ctrl-H    | Show help                                 |
+| ctrl-P    | call execve program extern                |
 | home      | Position at start of area                 |
 | end       | Position at end   of area                 |
 | right     | Position + 1 of area                      |
@@ -116,8 +117,9 @@ FIELD<BR/>
 | up        | Control valide update origine prior field |
 | down      | Control valide update origine next field  |
 | char      | Treatment of the character of the area    |
-| func      | dynamic function call                     |
-| task      | dynamic function call for controle etc... |
+| func      | dynamic function ex: qry table            |
+| task      | dynamic function for controle etc...      |
+| call      | dynamic function call program extern      |
 
 <BR/>
 
@@ -269,18 +271,23 @@ Excuse me for those who have already used TERMCURS, but the resumption isn't too
 →  2024-01-05<br />
     I tested with two versions, 0.11.0 and 0.12.0-dev. Everything works fine except in mdlFile.zig:<br />
 
-    ```
-    // 0.11.0 active
-    const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
+```
+// 0.11.0 active
+const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
 
-    // 0.12.0 
-    // const iter_dir = std.fs.cwd().openDir(vdir, .{.iterate = true}) catch unreachable;
-    ```
+// 0.12.0 
+// const iter_dir = std.fs.cwd().openDir(vdir, .{.iterate = true}) catch unreachable;
+```
 <br />
     By default, 0.11.0 is active. I'm providing both build files, and there are significant differences, but the principle remains the same. All of this is to let you know that I am preparing for the migration to avoid any unexpected issues.<br /><br />
     <br />
 <BR/>
-
+→  2024-02-01<br />
+**Significant modification due to the addition of the callPgm function (module.zig).**<br />
+     Call to the program associated with the Field zone. CTRL+P <br /><br />
+     Look at the example: Exemple.zig, the execve function in the source /deps/module.zig.<br /><br />
+     Several corrections: handling of Fields within the Panel function, plus a few message associations...<br /><br />
+     Addition to the Field structure: progcall zone [] const u8, setCall, and getCall functions.<br /><br />
 ---
 
 <BR/><BR/>

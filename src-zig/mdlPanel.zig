@@ -1227,7 +1227,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 		// It seems unlikely that you will go over 50 panel
 		grd.addRows(Xcombo,	&.{"888", "Add", "Panel"}) ;
 
-				
+	
 		while (true) {
 				Gkey = grd.ioCombo(Xcombo, cellPos);
 

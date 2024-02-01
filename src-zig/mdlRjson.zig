@@ -78,6 +78,8 @@ pub const DEFFIELD = struct {
 
 	proctask: []const u8, //name proc
 
+	progcall: []const u8, //name program
+	
 	actif: bool,
 };
 
@@ -97,6 +99,7 @@ const Jfield = enum {
 	help,
 	procfunc,
 	proctask,
+	progcall,
 	regex
 };
 
@@ -668,6 +671,14 @@ pub fn jsonDecode(my_json: []const u8) !void {
 										}));
 								},
 
+								Jfield.progcall => { if (val.ctrlPack(Ctype.string)) {
+										lf.progcall = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocator,
+											"Json  err_Field :{s}.{s}\n", .{
+											@tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v))
+										}));
+								},
+
 								Jfield.regex=>{
 									lf.regex=""; 
 
@@ -904,6 +915,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -920,7 +932,9 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
+
 				},
 
 				forms.REFTYP.ALPHA => {
@@ -936,6 +950,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -952,6 +967,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -968,6 +984,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -984,6 +1001,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1000,6 +1018,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1014,6 +1033,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 
 				},
@@ -1028,6 +1048,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1042,6 +1063,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1056,6 +1078,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1070,6 +1093,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1085,6 +1109,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1101,6 +1126,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				},
 
@@ -1117,8 +1143,8 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
-					vField.edtcar= p.edtcar;
 				},
 
 				forms.REFTYP.UDIGIT => {
@@ -1134,8 +1160,8 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
-					vField.edtcar= p.edtcar;
 				},
 
 				forms.REFTYP.DECIMAL => {
@@ -1152,8 +1178,8 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
-					vField.edtcar= p.edtcar;
 				},
 
 				forms.REFTYP.UDECIMAL => {
@@ -1170,8 +1196,8 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.regex,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
-					vField.edtcar= p.edtcar;
 				},
 
 				forms.REFTYP.FUNC => {
@@ -1187,6 +1213,7 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),nameJson: []const u8 ) !void {
 						p.help,
 					);
 					vField.proctask= p.proctask;
+					vField.progcall= p.progcall;
 					vField.protect= p.protect;
 				}
 			}

@@ -1020,7 +1020,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 
 //=================================================
 // description Function
-// choix Cadre
+// choix Type Field
 fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	var pos: usize = 0;
 
