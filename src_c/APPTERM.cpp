@@ -7,24 +7,6 @@
 ///			plus souple que XTERM et plus sécuritaire que les terminal public  pour des applicatifs
 ///			outil pour développer une application de type 5250 / 3270 ou terminal semi-graphic
 ///			tool to develop a 5250/3270 or terminal semi-graphic application
-
-
-
-
-
-
-
-/// THANK YOU   MERCI BEAUCOUP
-/// thanks Mr. CHRISTOPHE BLAESS for the book development system LINUX 1..4 edition en Français
-
-/// GTK platform and GNOME for VTE-TERMINAL
-
-/// https://github.com/SgtWiggles/ume   thank you that inspired me to set up a dedicated terminal
-
-/// https://vincent.bernat.im/fr/blog/2017-ecrire-emulateur-terminal
-
-/// tank you github for exemple open-source for etude
-
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,12 +25,14 @@
 */
 
 
+///  GTK3 and X11
 
 #include <filesystem>
 #include <sys/stat.h>
 #include <vte-2.91/vte/vte.h>
 #include <pango/pango.h>
 #include <gdk/gdkx.h>
+
 
 /// si test cout
 //#include <iostream>
@@ -75,17 +59,19 @@ unsigned int COL=	132;	  /// max 132
 unsigned int ROW =	42;		/// max 42 including a line for the system
 
 /// defined not optional
-#define VTEFONT	"DejaVu Sans Mono"
+#define VTEFONT	"Noto Sans Mono  Regular"
 
 //*******************************************************
 // PROGRAME
 //*******************************************************
 
 
-
 GtkWidget	*window, *terminal;
 
 GPid child_pid = 0;
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	function alphanumeric switch
@@ -108,8 +94,8 @@ bool ctrlPgm(std::string v_TEXT)
 	std::filesystem::path p(v_TEXT.c_str());
 											switch(strswitch(p.stem().c_str()))
 											{
-												case  strswitch("test")				: b_pgm =true;		break;
-												case  strswitch("Exemple")		: b_pgm =true;		break;
+												case  strswitch("Exemple")		    : b_pgm =true;		break;
+                                                case  strswitch("exCallpgm")		: b_pgm =true;		break;
 											}
 	return b_pgm;
 }
@@ -138,13 +124,13 @@ gboolean key_press_ALTF4()
 		const gchar* _MSG_ =  MESSAGE_ALT_F4;
 
 		dialog = gtk_message_dialog_new(
-										 GTK_WINDOW(window),
-										 GTK_DIALOG_MODAL,
-										 GTK_MESSAGE_QUESTION,
-										 GTK_BUTTONS_YES_NO,
-										 _MSG_,
-										 NULL,
-										 NULL);
+										GTK_WINDOW(window),
+									  GTK_DIALOG_MODAL,
+										GTK_MESSAGE_QUESTION,
+										GTK_BUTTONS_YES_NO,
+										_MSG_,
+										NULL,
+										NULL);
 
 		int result = gtk_dialog_run (GTK_DIALOG (dialog));
 
@@ -184,7 +170,8 @@ void	init_Terminal()
 	Display* d = XOpenDisplay(NULL);
 	Screen*  s = DefaultScreenOfDisplay(d);
 	char * font_terminal = new char[30] ;
-
+    //gint width  = gdk_screen_width();
+    //gint height = gdk_screen_height();
 
 	/// Font DejaVu Sans Mono -> xfce4-terminal
 	/// confortable and extend numbers columns and rows
@@ -201,8 +188,8 @@ void	init_Terminal()
 		}
 	else if ( s->width > 1920  ) {								//  ex: 2560 x1600 => 27"
 		sprintf(font_terminal,"%s %s" , VTEFONT,"15");
-		COL = 172;
-		ROW = 52;
+		COL = 168;
+		ROW = 44;
 	}
 
 	//COL = 132;
@@ -210,25 +197,24 @@ void	init_Terminal()
 	// resize  title  font
     VTE = VTE_TERMINAL (terminal);
 
-	vte_terminal_set_size (VTE, COL, ROW);												/// size du terminal
+    vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));		/// font utilisé
 
-	gtk_window_set_title(GTK_WINDOW(window), VTENAME);									/// titre du terminal de base
+	vte_terminal_set_size (VTE, COL, ROW);												                    /// size du terminal
 
-	vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));		/// font utilisé
+	gtk_window_set_title(GTK_WINDOW(window), VTENAME);									              /// titre du terminal de base
 
 	vte_terminal_set_scrollback_lines (VTE,0);		 									///	désactiver historique.
 
 	vte_terminal_set_scroll_on_output(VTE,FALSE);										/// pas de défilement en cas de nouvelle sortie
 
-	vte_terminal_set_scroll_on_keystroke(VTE,FALSE);									/// pas de défilement en bas s’il y a interaction de l’utilisateur
+	vte_terminal_set_scroll_on_keystroke(VTE,FALSE);								/// pas de défilement en bas s’il y a interaction de l’utilisateur
 
 	vte_terminal_set_mouse_autohide(VTE, TRUE);											/// cacher le curseur de la souris quand le clavier est utilisé.
 
-	vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);						/// cursor blink on
+	vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);		/// cursor blink on
 
-	vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);							/// define cursor 'block'
+	vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);		  /// define cursor 'block'
 }
-
 
 /// -----------------------------------------------------------------------------
 /// Callback for vte_terminal_spawn_async    retrived PID terminal ONLY
@@ -253,8 +239,8 @@ void on_title_changed(GtkWidget *terminal)
 
 void on_resize_window(GtkWidget *terminal, guint  _col, guint _row)
 {
-	  vte_terminal_set_size (VTE_TERMINAL(terminal),_col,_row);
-	  gtk_widget_show_all(window);
+    vte_terminal_set_size (VTE_TERMINAL(terminal),_col,_row);
+    gtk_widget_show_all(window);
 }
 
 /// -----------------------------------------------------------------------------
@@ -276,16 +262,18 @@ inline bool exists_File (const std::string& name) {
 
 // programme linux pas d'extention windows ".exe"
 inline bool extention_File(const std::string& name) {
-		std::filesystem::path filePath = name.c_str();
-		if (filePath.extension()!= "") return false;
-		return true;
+    std::filesystem::path filePath = name.c_str();
+    if (filePath.extension()!= "") return false;
+    return true;
 }
 
 inline bool isDir_File(const std::string& name) {
-		std::string strdir = std::filesystem::path(name.c_str()).parent_path();
-		if (strdir.empty() ) return false;
-		return true;
+    std::string strdir = std::filesystem::path(name.c_str()).parent_path();
+    if (strdir.empty() ) return false;
+    return true;
 }
+
+
 
 
 int main(int argc, char *argv[])
@@ -353,7 +341,7 @@ int main(int argc, char *argv[])
         VTE_PTY_DEFAULT, // VtePtyFlags pty_flags,
 
         dir,			// const char *working_directory
-        command,		// command
+       command,		// command
 
         NULL,			// environment
         (GSpawnFlags)(G_SPAWN_SEARCH_PATH |G_SPAWN_FILE_AND_ARGV_ZERO),				// spawn flags
@@ -370,6 +358,8 @@ int main(int argc, char *argv[])
 
     // Connect some signals
 	g_signal_connect(GTK_WINDOW(window),"delete_event", G_CALLBACK(key_press_ALTF4), NULL);
+  //gtk_widget_set_events (window, GDK_KEY_PRESS_MASK);
+  //g_signal_connect (G_OBJECT (window), "key_press_event",G_CALLBACK (key_press_event), NULL);
 
 
 	g_signal_connect(terminal, "child-exited",  G_CALLBACK (close_window), NULL);
@@ -385,8 +375,13 @@ int main(int argc, char *argv[])
     /* Put widgets together and run the main loop */
     gtk_container_add(GTK_CONTAINER(window), terminal);
 
-    gtk_widget_hide(window);			// hide = ignore flash
+    //gtk_widget_hide(window);			// hide = ignore flash
     gtk_widget_show_all(window);		// for test invalide contrôle protection
+
+
+
+
+
 
     gtk_main();
 
