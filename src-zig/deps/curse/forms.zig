@@ -3480,18 +3480,13 @@ pub const Epanel = enum {
 		const nbrFieldIO : usize = vpnl.field.items.len;
 		var   nbrField   : usize = 0;
 
-
 		// search field activ
-		if (vpnl.field.items.len > 1 ) {
-			for(0..vpnl.field.items.len - 1) | x | {
+		if (vpnl.field.items.len > 0 ) {
+			for(0..vpnl.field.items.len) | x | {
 			if (vpnl.field.items[x].actif and
 				!vpnl.field.items[x].protect ) nbrField  += 1;
 			}
 		}
-		else if (vpnl.field.items.len == 1 ) {
-				if ( vpnl.field.items[0].actif and
-						!vpnl.field.items[0].protect ) nbrField  += 1;
-			}
 			
 		// first time
 		if ( vpnl.idxfld == 9999) {

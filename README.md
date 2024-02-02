@@ -284,10 +284,12 @@ const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
 <BR/>
 →  2024-02-01<br />
 **Significant modification due to the addition of the callPgm function (module.zig).**<br />
-     Call to the program associated with the Field zone. CTRL+P <br /><br />
-     Look at the example: Exemple.zig, the execve function in the source /deps/module.zig.<br /><br />
-     Several corrections: handling of Fields within the Panel function, plus a few message associations...<br /><br />
-     Addition to the Field structure: progcall zone [] const u8, setCall, and getCall functions.<br /><br />
+&nbsp;&nbsp;&nbsp;.Call to the program associated with the Field zone. CTRL+P <br /><br />
+&nbsp;&nbsp;&nbsp;.Look at the example: Exemple.zig, the execve function in the source /deps/module.zig.<br /><br />
+&nbsp;&nbsp;&nbsp;.Several corrections: handling of Fields within the Panel function, plus a few message associations...<br /><br />
+&nbsp;&nbsp;&nbsp;.Addition to the Field structure: progcall zone [] const u8, setCall, and getCall functions.<br /><br />
+→  2024-02-02<br />
+&nbsp;&nbsp;&nbsp;.correction mineur<br />
 ---
 
 <BR/><BR/>
