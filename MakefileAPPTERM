@@ -26,7 +26,6 @@ OBJ = $(OBJDIR)$(PROJET).o
 RESULT = $(BINDIR)$(PROJET)
 
 
-
 # choix du compilateur :
 CXX = g++
 #CXX =clang++
@@ -36,7 +35,7 @@ CXX = g++
 #  production
 # -------------------------------------------------------------------
 ifeq ($(PROD), true)
- CPPFLAGS=	-std=c++17 \
+ CPPFLAGS=	-std=c++20 \
  	-Wall	-fexceptions	-pedantic-errors	-Wno-parentheses	-Waddress	\
  			-Wsign-compare -fpermissive 	-fstack-clash-protection	-fstack-protector-all \
  			`pkg-config --cflags vte-2.91`
@@ -50,7 +49,7 @@ OPTIMIZE = -fexpensive-optimizations -Os -s
 # -------------------------------------------------------------------
 
 else
-CPPFLAGS=	-std=c++17 -ggdb -g3  \
+CPPFLAGS=	-std=c++20 -ggdb -g3  \
 			-Wall	-fexceptions	-pedantic-errors	-Wno-parentheses	-Waddress \
 			-Wsign-compare -fpermissive \
 			`pkg-config --cflags vte-2.91`
