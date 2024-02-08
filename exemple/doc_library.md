@@ -1,3 +1,19 @@
+
+        library/
+            cursed.zig
+            .....x.zig
+            library.zig
+            build.zig
+            build.zig.zon
+        src-zig/
+            Exemple.zig
+            exCallpgm.zig
+            buildExemple.zig
+            buildexCallpgm.zig
+            build.zig.zon
+
+
+
 "library": is a directory that contains all the zig files and functions as the underlying engine. It includes a function named "build", along with "build.zig.zon" and "library.zig" files.
 
 
