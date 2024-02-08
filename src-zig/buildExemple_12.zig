@@ -19,8 +19,8 @@ pub fn build(b: *std.Build) void {
 	});
 	match.addIncludePath(.{.path = "./lib/"});
 
-	const modul = b.createModule(.{
-		.root_source_file = .{ .path = "./deps/curse/modul.zig" },
+	const callpgm = b.createModule(.{
+		.root_source_file = .{ .path = "./deps/curse/callpgm.zig" },
 	});
 
 	const cursed = b.createModule(.{
@@ -84,7 +84,7 @@ pub fn build(b: *std.Build) void {
 	
 	Prog.root_module.addImport("menu" , menu);
 	
-	Prog.root_module.addImport("modul" , modul);
+	Prog.root_module.addImport("callpgm" , callpgm);
 
 	const install_exe = b.addInstallArtifact(Prog, .{});
 	b.getInstallStep().dependOn(&install_exe.step); 

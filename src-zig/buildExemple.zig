@@ -18,8 +18,8 @@ pub fn build(b: *std.Build) void {
 		.source_file = .{ .path = "./deps/curse/match.zig" },
 	});
 		
-	const modul = b.createModule(.{
-		.source_file = .{ .path = "./deps/curse/modul.zig" },
+	const callpgm = b.createModule(.{
+		.source_file = .{ .path = "./deps/curse/callpgm.zig" },
 	});
 
 	const cursed = b.createModule(.{
@@ -73,7 +73,7 @@ pub fn build(b: *std.Build) void {
 	Prog.addModule("forms" , forms);
 	Prog.addModule("grid"  , grid);
 	Prog.addModule("menu"  , menu);
-	Prog.addModule("modul" , modul);
+	Prog.addModule("callpgm" , callpgm);
 
 	const install_exe = b.addInstallArtifact(Prog, .{});
 	b.getInstallStep().dependOn(&install_exe.step); 
@@ -98,7 +98,7 @@ pub fn build(b: *std.Build) void {
 	tests.addModule("grid"  , grid);
 	tests.addModule("menu"  , menu);
 	tests.addModule("match" , match);
-	tests.addModule("modul" , modul);
+	tests.addModule("callpgm" , callpgm);
 
 
 	const test_step = b.step("test", "Run app tests");
@@ -124,7 +124,7 @@ pub fn build(b: *std.Build) void {
 	docs.addModule("grid"  , grid);
 	docs.addModule("menu"  , menu);
 	docs.addModule("match" , match);
-	docs.addModule("modul" , modul);
+	docs.addModule("callpgm" , callpgm;
 
 	
 	const install_docs = b.addInstallDirectory(.{

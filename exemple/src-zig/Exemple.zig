@@ -345,7 +345,9 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"select combo",			// help
 										)
 	) catch unreachable ;
-
+	
+	fld.setCall(Panel,fld.getIndex(Panel,"cb01") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
+	
 	Panel.field.append(fld.newFieldFunc("cb02",4,76,			// Name , posx posy
 										20,						// width
 										"",						// text
