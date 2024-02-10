@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Devp
+Comment=
+Exec=xfce4-terminal --hide-menubar --hide-scrollbar --hide-toolbar    --geometry="80x26+5+5"  --title="MENU-DEV" -x $HOME/exemple/MenuDEV.sh
+Icon=applications-development
+Terminal=false
+StartupNotify=true
+Path=
