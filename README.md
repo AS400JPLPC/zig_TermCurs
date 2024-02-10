@@ -98,28 +98,28 @@ MOUSE<BR/>
 FIELD<BR/>
 
 
-| KEY       | text                                      |
-| ----------- | ------------------------------------------- |
-| MOUSE     | mouse array reference                     |
-| escape    | Restores the original area                |
-| ctrl-H    | Show help                                 |
-| ctrl-P    | call execve program extern                |
-| home      | Position at start of area                 |
-| end       | Position at end   of area                 |
-| right     | Position + 1 of area                      |
-| tab       | Position + 1 of area                      |
-| left      | Position - 1 of area                      |
-| shift tab | Position - 1 of area                      |
-| bacspace  | Position -1 of area and delete char       |
-| bacspace  | Position  of area and delete char         |
-| insert    | Position  of area   change cursor         |
-| enter     | Control valide update origine next field  |
-| up        | Control valide update origine prior field |
-| down      | Control valide update origine next field  |
-| char      | Treatment of the character of the area    |
-| func      | dynamic function ex: qry table            |
-| task      | dynamic function for controle etc...      |
-| call      | dynamic function call program extern      |
+| KEY       | text                                           |
+| ----------- | ---------------------------------------------|
+| MOUSE     | mouse array reference                          |
+| escape    | Restores the original area                     |
+| ctrl-H    | Show help                                      |
+| ctrl-P    | exec program extern                            |
+| home      | Position at start of area                      |
+| end       | Position at end   of area                      |
+| right     | Position + 1 of area                           |
+| tab       | Position + 1 of area                           |
+| left      | Position - 1 of area                           |
+| shift tab | Position - 1 of area                           |
+| bacspace  | Position -1 of area and delete char            |
+| bacspace  | Position  of area and delete char              |
+| insert    | Position  of area   change cursor              |
+| enter     | Control valide update origine next field       |
+| up        | Control valide update origine prior field      |
+| down      | Control valide update origine next field       |
+| char      | Treatment of the character of the area         |
+| fcun      | Interactive function linked to the input area. |
+| task      | Task executed after input in the zone.         |
+| call      | Interactive function exec program extern       |
 
 <BR/>
 
@@ -156,13 +156,11 @@ COMBO<BR/>
 | <BR/>    |                        |
 
 <BR/><BR/>
-<u>---.VSCODE-------------------------------------------</u><BR />
-&rarr;&nbsp; New methodology for clear compile.sh <br />
-&rarr;&nbsp; New tasck.json  use: Task Manager <br />
-<br />
+
 
 <u>---Organization-project------------------------------------------</u><BR />
 &rarr;&nbsp; folder deps: Filing of files zig including reference sources <br />
+&rarr;&nbsp; folder library:  zig       source files <br />
 &rarr;&nbsp; folder src_c:    C/C++     source files <br />
 &rarr;&nbsp; folder src_zig:  ZIG-lang  source files <br />
 &rarr;&nbsp; folder lib:      src xx.H  source files regex.h<br />
@@ -172,7 +170,6 @@ COMBO<BR/>
 
 <u>--peculiarity-------------------------------------------------</u><BR />
 test alt-ctrl ctrshift... etc for <br />
-there is a possibility to recover all the keys if we pass through GTK and use sys/shm.h.
 
 But it is no longer transportable.
 another way is to use IOCTL but again, there is a good chance of being forced to use root.
@@ -198,7 +195,7 @@ ex: pub const AtrLabel : stl.ZONATRB = .{<br />
 
 <u>-------Current treatments------------------------------------</u><BR />
 &rarr;&nbsp; forms.zig <br />
-&rarr;&nbsp; fram / panel / label /button / Menu / Grid / Combo / **dynamic function call** OK <br />
+&rarr;&nbsp; fram / panel / label /button / Menu / Grid / Combo / dynamic function Exec ** OK <br />
 &rarr;&nbsp; Preparation of "Field" processing as well as keyboard input.
 
 Please wait, if there are bugs everything is not fixed.<br />
@@ -221,14 +218,16 @@ on the other hand, i included in the cls function the underlying cleanup of the 
 in general to debug well, to use the console, it is advisable to deactivate preferences F10 and ALT... ,
 then compile with SMALL and to ensure violation of ALT-F4 use the cpp program gtk-vte an example is there.
 But in terminal mode the application is viable (to do with the commit data-base)<br />
-<u>I wish the friend google translate my french slang correctly </u>
-→  2023-02-05 Doc version 0.11.1
+<br />
+→  2023-02-05 Doc version 0.11.1 "view use TermCurs"
 [READ-DOCS](http://htmlpreview.github.io/?https://github.com/AS400JPLPC/zig_TermCurs/blob/master/Docs_Exemples/index.html) <br />
 <BR/>
 
-<br />
+
 ![](assets/20231129_012345_Gen00.png)
+
 <br />
+
 ![](assets/20231122_012345_Gen01.png)
 <BR />
 <BR />
@@ -243,31 +242,47 @@ Firstly, for better memory management.<br />
 Greater coherence.<br />
 All modules have their own allocators.<br />
 Avoiding back-and-forth between modules.<br />
-Removal of the DDS module (originally intended to contain all structure definitions).<br />
+<br />
+<br />
 "CURSED" (named in memory of "NCURSEW"):<br />
-Encompasses everything needed for writing to a terminal, including reading keyboard codes, mouse management, cursor handling, UTF8 work. I may introduce the "termios" concept for META codes. I took advantage of the restructuring to bring clarification.<br /><br />
+Encompasses everything needed for writing to a terminal, including reading keyboard codes, mouse management, cursor handling, UTF8 work. I may introduce the "termios" concept for META codes. I took advantage of the restructuring to bring clarification.<br />
+<br />
 "FORMS":<br />
 Includes management for:<br />
 LABEL - BUTTON - LINEV - LINEH - FIELD - FRAME - PANEL<br />
-Works with a matrix corresponding to the terminal surface so that the window can be restored. The FORMS allocator is designed for Fields and panel initialization. FORMS no longer includes GRID management, which is autonomous, nor MENU, which is autonomous<br /><br />
+Works with a matrix corresponding to the terminal surface so that the window can be restored. The FORMS allocator is designed for Fields and panel initialization. FORMS no longer includes GRID management, which is autonomous, nor MENU, which is autonomous<br />
+<br />
 "GRID":<br />
-Functions similarly to forms, allowing the display and retrieval of arguments either from a database or working as a combo. It is autonomous, but you must consider that it should be included in your Panel, as it positions itself within the terminal window.<br /><br />
+Functions similarly to forms, allowing the display and retrieval of arguments either from a database or working as a combo. It is autonomous, but you must consider that it should be included in your Panel, as it positions itself within the terminal window.<br />
+<br />
 "MENU":<br />
-Operates like GRID but is much simplified; the returned argument is usize.which doesn't work with the matrix but directly with the terminal.<br /><br />
+Operates like GRID but is much simplified; the returned argument is usize.which doesn't work with the matrix but directly with the terminal.<br />
+<br />
 "UTILS": (various tools and functions)<br />
-Contains various functions to manage the control needs of FIELD or STRING management ([] u8 const).<br /><br />
-The Example program demonstrates how to manage and use these functions. A tip: the first Panel can serve as the definition of the terminal window.
-<br /><br />
+Contains various functions to manage the control needs of FIELD or STRING management ([] u8 const).<br />
+<br />
+The Example program demonstrates how to manage and use these functions. A tip: the first Panel can serve as the definition of the terminal window.<br />
+<br />
+"MATCH": (regex libc)<br />
+<br />
+"LOGGER": <br />
+Allows for a written record of variables or waypoints.<br />
+<br />
+"CALLPGM": Executes in Zig mode, manages the call and the wait.<br />
+<br />
+
+<br />
 "INFO"<br />
 Display attributes are in CURSED, e.g., term.ZONATRB, the CURSOR type.<br />
 REFTYP is in Forms and Grid.<br />
 CTRUE/CFALSE are in Forms and Grid.<br />
 CADRE is in Forms and Grid.<br />
 LINE is in Forms.<br />
-"CURSED" and "UTILS" are being called within "Forms," "Grid," and "Menu,"<br />
+"CURSED" and "UTILS" are being called within "Forms", "Grid" and "Menu"<br />
+"MATCH" are being called within "Forms"<br />
+<br />
+<br />
 <br /><br />
-All these modifications aim to make it more flexible after long hours of studying others' work through publications and my understanding of ZIG-LANG. I had a hard time grasping memory cleanup, especially how to use allocators (not the order) and the repercussions of module nesting to have only the fluctuating data.<br /><br />
-Excuse me for those who have already used TERMCURS, but the resumption isn't too significant. However, it was a necessary step to advance in the code generator and enhance flexibility.<br /><br />
 →  2024-01-05<br />
     I tested with two versions, 0.11.0 and 0.12.0-dev. Everything works fine except in mdlFile.zig:<br />
 
@@ -284,12 +299,14 @@ const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
 <BR/>
 →  2024-02-01<br />
 **Significant modification due to the addition of the callPgm function (module.zig).**<br />
-&nbsp;&nbsp;&nbsp;.Call to the program associated with the Field zone. CTRL+P <br /><br />
-&nbsp;&nbsp;&nbsp;.Look at the example: Exemple.zig, the execve function in the source /deps/module.zig.<br /><br />
+&nbsp;&nbsp;&nbsp;.Exec to the program associated with the Field zone. CTRL+P <br /><br />
+&nbsp;&nbsp;&nbsp;.Look at the example: Exemple.zig, the execve function in the source /deps/callpgm.zig.<br /><br />
 &nbsp;&nbsp;&nbsp;.Several corrections: handling of Fields within the Panel function, plus a few message associations...<br /><br />
 &nbsp;&nbsp;&nbsp;.Addition to the Field structure: progcall zone [] const u8, setCall, and getCall functions.<br /><br />
 →  2024-02-02<br />
 &nbsp;&nbsp;&nbsp;.correction mineur<br />
----
+------------------------------------------------------------------<br />
+→  2024-02-10<br />
+The 'exemple' folder demonstrates how to use a shared library in your project that may contain multiple programs.
 
 <BR/><BR/>
