@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-
+# fo my Helix
 # Zig-lang  = 2    cpp = 1
 envZIG="2"
 PROJECT="ZTERM"

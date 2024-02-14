@@ -178,6 +178,13 @@
           "posy": 80,
           "text": "Func                 :",
           "title": false
+        },
+        {
+          "name": "L4280",
+          "posx": 42,
+          "posy": 80,
+          "text": "Test field Exec      :",
+          "title": false
         }
       ],
       "field": [
@@ -371,7 +378,7 @@
           "text": "",
           "requier": true,
           "protect": false,
-          "edtcar": "$",
+          "edtcar": "",
           "errmsg": "err vUDIGIT",
           "help": "msg vUDIGIT",
           "procfunc": "",
@@ -389,7 +396,7 @@
           "text": "",
           "requier": true,
           "protect": false,
-          "edtcar": "€",
+          "edtcar": "",
           "errmsg": "err vDIGIT",
           "help": "help vDIGIT",
           "procfunc": "",
@@ -407,7 +414,7 @@
           "text": "",
           "requier": true,
           "protect": false,
-          "edtcar": "£",
+          "edtcar": "",
           "errmsg": "err vUDECIMAL",
           "help": "help vUDECIMAL",
           "procfunc": "",
@@ -425,7 +432,7 @@
           "text": "",
           "requier": true,
           "protect": false,
-          "edtcar": "%",
+          "edtcar": "",
           "errmsg": "err vDECIMAL",
           "help": "help vDECIMAL",
           "procfunc": "",
@@ -557,6 +564,24 @@
           "procfunc": "FvFUNC",
           "proctask": "TvFUNC",
           "progcall": "",
+          "regex": ""
+        },
+        {
+          "name": "dddd",
+          "posx": 42,
+          "posy": 103,
+          "reftyp": "TEXT_FREE",
+          "width": 15,
+          "scal": 0,
+          "text": "",
+          "requier": false,
+          "protect": false,
+          "edtcar": "",
+          "errmsg": ".",
+          "help": "exec name Program",
+          "procfunc": "",
+          "proctask": "",
+          "progcall": "Pfacture",
           "regex": ""
         }
       ],

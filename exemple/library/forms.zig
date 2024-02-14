@@ -3290,13 +3290,15 @@ pub const Epanel = enum {
 		if (vdst.actif == false)	return ;
 		if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
 		if (vsrc.posy + vsrc.cols	> vdst.posy + vdst.cols	)	return ;
+
 		var x :usize = 0;
 		var y :usize = 0;
 		var n :usize = 0;
-		var npos : usize =	 vsrc.posx - 1 ;
-		
+		var npos : usize =	 vsrc.posx - vdst.posx   ;
+
+	
 		while (x <= vsrc.lines) : (x += 1) {
-				n = (vdst.cols * npos) + vsrc.posy - 1 ;
+				n = (vdst.cols * npos) + vsrc.posy - vdst.posy ;
 				y = 0;
 				while (y <= vsrc.cols ) : (y += 1) {
 					term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );

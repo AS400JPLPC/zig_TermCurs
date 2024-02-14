@@ -307,6 +307,13 @@ const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
 &nbsp;&nbsp;&nbsp;.correction mineur<br />
 ------------------------------------------------------------------<br />
 →  2024-02-10<br />
-The 'exemple' folder demonstrates how to use a shared library in your project that may contain multiple programs.
-
+The 'exemple' folder demonstrates how to use a shared library in your project that may contain multiple programs.<br />
+<br />
+→  2024-02-14<br />
+Correction of the "rstpanel" function.<br />
+Correction of "label.name" (memory issue).<br />
+Possibility of adding the program name to an input field.<br />
+Correct alignment in the Json backup files.<br />
+<br />
+I am progressing slowly (many tests). I have even considered directly addressing the memory.<br />
 <BR/><BR/>

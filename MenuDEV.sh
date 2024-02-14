@@ -73,11 +73,6 @@ do
 
 	f_dsplyPos  6  24 $faGras$fcJaune '------------compile Zig-----------------'
 	f_dsplyPos  7  20 $faGras$fcRouge'11.'; f_dsplyPos  7  24 $faGras$fcGreen 'Gencurs'
-	f_dsplyPos  8  20 $faGras$fcRouge'12.'; f_dsplyPos  8  24 $faGras$fcGreen 'Exemple'
-
-	f_dsplyPos  9  20 $faGras$fcRouge'13.'; f_dsplyPos  9  24 $faGras$fcGreen 'mdlRjson'
-
-	f_dsplyPos 11  20 $faGras$fcRouge'20.'; f_dsplyPos 11  24 $faGras$fcGreen 'study'
 
 
 	f_dsplyPos 13  24 $faGras$fcJaune '----------------------------------------'
@@ -119,23 +114,6 @@ do
 		11)
 			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gencurs"
 		;;
-
-#Example
-		12)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Exemple"
-		;;
-
-#Example: preparation of a module to integrate the main function
-		13)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "mdlRjson"	
-		;;
-
-
-#study 
-        20)
-			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "TUI"	
-		;;
-
 
 
 

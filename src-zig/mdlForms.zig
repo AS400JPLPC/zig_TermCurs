@@ -535,7 +535,7 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 			.F12 => return,
 
 			.ctrlV => {
-				tampon = std.fmt.allocPrint(utl.allocUtl, "L{d}{d}", .{ e_posx, e_posy })
+				tampon = std.fmt.allocPrint(forms.allocatorForms, "L{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
 				
 				text = utl.trimStr(utl.listToStr(e_LABEL));
@@ -776,6 +776,7 @@ const fp02 = enum {
 	fhelp,
 	ffunc,
 	ftask,
+	fexec,
 };
 
 //  string return enum
@@ -791,7 +792,7 @@ fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
 
 // panel for field
 fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
-	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM01", nposx, 2, 12, 62, forms.CADRE.line1, "Def.field");
+	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM01", nposx, 2, 13, 62, forms.CADRE.line1, "Def.field");
 
 	Panel.button.append(btn.newButton(
 		kbd.F9, // function
@@ -1010,10 +1011,21 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		false, // required
 		"err Task", // Msg err
 		"please enter Name Task T.....", // help
-		"(^[T]{1,1}[a-zA-Z0-9]{1,})$" // regex1
+		"(^[T]{1,1}[a-zA-Z0-9]{1,})$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
-	return Panel;
+	Panel.label.append(lbl.newLabel(@tagName(fp02.fexec), 10, 2, "Exec.:")) 
+		catch |err| { @panic(@errorName(err)); }; 
+		
+	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fexec), 10, // posx
+		2 + Panel.label.items[@intFromEnum(fp02.ftask)].text.len, //posy
+		15, // len
+		"", // text
+		false, // required
+		"", // Msg err
+		"please enter Name Exec <Proram>", // help
+		"(^[A-Z]{1,1}[a-zA-Z0-9]{1,})$" // regex
+	)) catch |err| { @panic(@errorName(err)); }; 	return Panel;
 }
 
 //---------------------------------------------------------------------------
@@ -1860,6 +1872,9 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 				fld.setTask(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.ftask)].text)
 					catch |err| { @panic(@errorName(err)); };
 					
+				fld.setCall(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fexec)].text)
+					catch |err| { @panic(@errorName(err)); };
+				
 				fld.setProtect(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fprotect)].zwitch)
 					catch |err| { @panic(@errorName(err)); };
 					
