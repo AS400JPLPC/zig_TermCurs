@@ -52,7 +52,7 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "cursed",	.module = cursed_mod },
 		.{ .name = "utils",		.module = utils_mod },
 		.{ .name = "match",		.module = match_mod },
-		.{ .name = "cllpgm",	.module = callpgm_mod },
+		.{ .name = "callpgm",	.module = callpgm_mod },
 		.{ .name = "forms",		.module = forms_mod },
 		.{ .name = "grid",		.module = grid_mod },
 		.{ .name = "menu",		.module = menu_mod },
