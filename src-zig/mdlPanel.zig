@@ -1,3 +1,8 @@
+	///-----------------------
+	/// prog mdlPanel
+	/// zig 0.12.0 dev
+	///-----------------------
+
 const std = @import("std");
 
 // terminal Fonction
@@ -1711,9 +1716,9 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 			check = fxx + 2 ;
 			title = fxx + 3 ;
 
-			fld.setSwitch(dst , fxx	 	, true)			catch |err| { @panic(@errorName(err));};
-			fld.setSwitch(dst , show	, b.show) 		catch |err| { @panic(@errorName(err));};
-			fld.setSwitch(dst , check 	, b.check)		catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , fxx		 , true)			catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , show	, b.show)		 catch |err| { @panic(@errorName(err));};
+			fld.setSwitch(dst , check	 , b.check)		catch |err| { @panic(@errorName(err));};
 			fld.setText(dst	, title , b.title)			catch |err| { @panic(@errorName(err));};
 		}
 

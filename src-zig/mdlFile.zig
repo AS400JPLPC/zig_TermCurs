@@ -1,3 +1,9 @@
+	///-----------------------
+	/// prog mdlFile
+	/// zig 0.12.0 dev
+	///-----------------------
+
+
 const std = @import("std");
 
 /// terminal Fonction
@@ -206,9 +212,10 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 			
 			.F11 => {
 				// 0.11.0
-				 const iter_dir = try std.fs.cwd().openIterableDir(vdir,.{}) ;
+				// const iter_dir = try std.fs.cwd().openIterableDir(vdir,.{}) ;
 				// 0.12.0 
-				// const iter_dir= std.fs.cwd().openDir(vdir,.{.iterate = true}) catch unreachable;
+				const iter_dir= std.fs.cwd().openDir(vdir,.{.iterate = true}) catch unreachable;
+
 				var iterator = iter_dir.iterate();
 				var ok_file= false;
 				var Gkey :grd.GridSelect = undefined ;

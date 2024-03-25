@@ -1,3 +1,8 @@
+	///-----------------------
+	/// prog Forms
+	/// zig 0.12.0 dev
+	///-----------------------
+
 const std = @import("std");
 
 /// terminal Fonction
@@ -62,6 +67,24 @@ fn usizeToStr(v: usize) []const u8 {
 	};
 }
 
+// specifique for mdlForms not pub
+fn setName(vpnl: *pnl.PANEL , n: usize, val:[] const u8) forms.ErrForms ! void {
+	if ( n < vpnl.field.items.len) vpnl.field.items[n].name = val
+	else return forms.ErrForms.fld_setName_Index_invalide;
+}
+
+fn setRefType(vpnl: *pnl.PANEL , n: usize, val:forms.REFTYP) forms.ErrForms ! void {
+	if ( n < vpnl.field.items.len) vpnl.field.items[n].reftyp = val
+	else return forms.ErrForms.fld_setRefType_Index_invalide;
+}
+
+
+fn setWidth(vpnl: *pnl.PANEL , n: usize, val:usize) forms.ErrForms ! void {
+	if ( n < vpnl.field.items.len) vpnl.field.items[n].width = val
+	else return forms.ErrForms.fld_setWidth_Index_invalide;
+}
+
+
 //=================================================
 // description Function
 // choix work panel
@@ -111,7 +134,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 pub fn Panel_HELP() *pnl.PANEL {
 	var Panel : *pnl.PANEL = pnl.newPanelC("HELP",
 										1, 1,
-										5,
+										6,
 										100 ,
 										forms.CADRE.line1,
 										""
@@ -134,7 +157,13 @@ pub fn Panel_HELP() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
 								"","",
 								"")) catch unreachable ;
-	fld.setProtect(Panel,0,true) catch unreachable;
+	fld.setProtect(Panel,1,true) catch unreachable;
+
+	
+	Panel.field.append(fld.newFieldTextFull("HELP3",4,5,90,"",false,
+								"","",
+								"")) catch unreachable ;
+	fld.setProtect(Panel,2,true) catch unreachable;
 	return Panel;
 	}
 
@@ -317,9 +346,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 
 		switch (Tkey.Key) {
 			.F1	 => {
-				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-T Title Alt-L label Alt-F Field")
+				fld.setText(pFmtH01,0,"F11 ENRG   F12 Abort   Alt-T Title   Alt-L label ")
 					catch unreachable;
-				fld.setText(pFmtH01,1,"Line AltH/V Horizontal Vertical AltW Outils")
+				fld.setText(pFmtH01,1,"Alt-F Field (new)   Alt-U Field(update)")
+					catch unreachable;
+				fld.setText(pFmtH01,2,"Line Alt-H Horizontal   Alt-V Vertical   Alt-W Outils")
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
@@ -419,6 +450,28 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				term.getCursor();
 				term.offMouse();
 				writefield(pFmt01);
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
+			},
+
+			// update field
+			.altU => {
+				term.getCursor();
+				
+				if (term.posCurs.x < minX or term.posCurs.x > maxX or
+					term.posCurs.y < minY or term.posCurs.y > maxY) continue;
+				
+				for (pFmt01.field.items, 0..) |p, nI| {
+					if (p.posx == term.posCurs.x  and p.posy == term.posCurs.y) {
+						term.writeStyled("?", pFmt01.attribut);
+						term.gotoXY(term.posCurs.x , term.posCurs.y );
+						term.getCursor();
+						term.offMouse();
+						updateField(pFmt01, nI, p);
+						break;
+					}
+				}
 				term.cls();
 				pnl.printPanel(pFmt01);
 				term.onMouse();
@@ -776,7 +829,9 @@ const fp02 = enum {
 	fhelp,
 	ffunc,
 	ftask,
-	fexec,
+	fcall,
+	ftcall,
+	fpcall,
 };
 
 //  string return enum
@@ -1014,18 +1069,55 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		"(^[T]{1,1}[a-zA-Z0-9]{1,})$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
-	Panel.label.append(lbl.newLabel(@tagName(fp02.fexec), 10, 2, "Exec.:")) 
-		catch |err| { @panic(@errorName(err)); }; 
+	Panel.label.append(lbl.newLabel(@tagName(fp02.fcall), 10, 2, "Exec.:"))
+				catch |err| { @panic(@errorName(err)); }; 
 		
-	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fexec), 10, // posx
-		2 + Panel.label.items[@intFromEnum(fp02.ftask)].text.len, //posy
+	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fcall), 10, // posx
+		2 + Panel.label.items[@intFromEnum(fp02.fcall)].text.len, //posy
 		15, // len
 		"", // text
 		false, // required
-		"", // Msg err
+		"Value invalid", // Msg err
 		"please enter Name Exec <Proram>", // help
 		"(^[A-Z]{1,1}[a-zA-Z0-9]{1,})$" // regex
-	)) catch |err| { @panic(@errorName(err)); }; 	return Panel;
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	fld.setTask(Panel, @intFromEnum(fp02.fcall), "TaskCall") catch |err| {
+		@panic(@errorName(err));
+	};
+
+	Panel.label.append(lbl.newLabel(@tagName(fp02.ftcall), 10, 30, "Type.:")) 
+		catch |err| { @panic(@errorName(err)); }; 
+
+	Panel.field.append(fld.newFieldFunc(@tagName(fp02.ftcall), 10, // posx
+		32 + Panel.label.items[@intFromEnum(fp02.ftcall)].text.len, //posy
+		10, // len
+		"", // text
+		false, // required
+		"funcCall", // function
+		"enter type call", // Msg err
+		"Tepe call", // help
+	)) catch |err| { @panic(@errorName(err)); };
+
+	fld.setTask(Panel, @intFromEnum(fp02.ftcall), "TaskTcall") catch |err| {
+		@panic(@errorName(err));
+	};
+
+	Panel.label.append(lbl.newLabel(@tagName(fp02.fpcall), 10, 50, "Parm.:"))
+		catch |err| { @panic(@errorName(err)); };
+		
+	Panel.field.append(fld.newFieldSwitch(@tagName(fp02.fpcall), 10, // posx
+		52 + Panel.label.items[@intFromEnum(fp02.fpcall)].text.len, //posy
+		false, // required
+		"", // Msg err
+		" field value required True or False" // Text
+	)) catch |err| { @panic(@errorName(err)); }; 
+
+	fld.setTask(Panel, @intFromEnum(fp02.fpcall), "TaskPcall") catch |err| {
+		@panic(@errorName(err));
+	};
+
+	return Panel;
 }
 
 //---------------------------------------------------------------------------
@@ -1108,17 +1200,63 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	}
 }
 
+fn funcCall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	var pos: usize = 0;
+
+	const Xcombo: *grd.GRID = grd.newGridC(
+		"qryPanel",
+		vpnl.posx + 1,
+		vpnl.posy + 1,
+		7,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer grd.allocatorGrid.destroy(Xcombo);
+	grd.newCell(Xcombo, "Ref.Type", 19, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.setHeaders(Xcombo);
+	grd.addRows(Xcombo, &.{""}); // Free
+	grd.addRows(Xcombo, &.{"SH"}); // batch
+	grd.addRows(Xcombo, &.{"APPTERM"}); // Letter Digit Char-special
+
+	if (std.mem.eql(u8, vfld.text, "")) pos = 0;
+	if (std.mem.eql(u8, vfld.text, "SH")) pos = 1;
+	if (std.mem.eql(u8, vfld.text, "APPTERM")) pos = 2;
+
+	var Gkey: grd.GridSelect = undefined;
+	defer Gkey.Buf.deinit();
+
+	while (true) {
+		Gkey = grd.ioCombo(Xcombo, pos);
+
+		if (Gkey.Key == kbd.enter) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			grd.freeGrid(Xcombo);
+			fld.setText(vpnl, @intFromEnum(fp02.ftcall), Gkey.Buf.items[0]) 
+				catch |err| { @panic(@errorName(err)); }; 
+			return;
+		}
+
+		if (Gkey.Key == kbd.esc) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			grd.freeGrid(Xcombo);
+			return;
+		}
+	}
+}
+
 var callFunc: FuncEnum = undefined;
 //=================================================
 // description Function
 /// run emun Function ex: combo
 pub const FuncEnum = enum {
 	funcType,
+	funcCall,
 	none,
 
 	pub fn run(self: FuncEnum, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		switch (self) {
 			.funcType => funcType(vpnl, vfld),
+			.funcCall => funcCall(vpnl, vfld),
 			else => dsperr.errorForms(vpnl, ErrMain.main_run_EnumFunc_invalide),
 		}
 	}
@@ -1215,7 +1353,7 @@ fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	if (val + vfld.posx >= vpnl.cols) {
 		const msg = std.fmt.allocPrint(utl.allocUtl,
 			"{d} the length of the zone is excessive", .{val})
-			catch |err| { @panic(@errorName(err)); };			
+			catch |err| { @panic(@errorName(err)); };
 		pnl.msgErr(vpnl, msg);
 
 		vpnl.keyField = kbd.task;
@@ -1285,10 +1423,72 @@ fn TaskFunc(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 	return;
 }
+
+fn TaskCall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	const ztext = std.mem.trim(u8, vfld.text," ");
+	var i : usize = 0 ;
+	if (std.mem.eql(u8, ztext, "")) {
+		i = fld.getIndex(vpnl,@tagName(fp02.ftcall)) catch unreachable;
+		fld.setText(vpnl,i,"") catch unreachable;
+		fld.printField(vpnl, vpnl.field.items[i]);
+		fld.displayField(vpnl, vpnl.field.items[i]);
+		i = fld.getIndex(vpnl,@tagName(fp02.fpcall)) catch unreachable;
+		fld.setSwitch(vpnl,i,false) catch unreachable;
+		fld.printField(vpnl, vpnl.field.items[i]);
+		fld.displayField(vpnl, vpnl.field.items[i]);
+	}
+	return;
+}
+
+
+fn TaskTcall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	var i : usize = fld.getIndex(vpnl,@tagName(fp02.fcall)) catch unreachable;
+
+	var  ztext = fld.getText(vpnl,i) catch unreachable;
+	ztext = std.mem.trim(u8, ztext," ");
+	if (std.mem.eql(u8, ztext,"")) {
+		vfld.text ="";
+		fld.printField(vpnl, vpnl.field.items[i]);
+		fld.displayField(vpnl, vpnl.field.items[i]);
+		i = fld.getIndex(vpnl,@tagName(fp02.fpcall)) catch unreachable;
+		fld.setSwitch(vpnl,i,false) catch unreachable;
+		fld.printField(vpnl, vpnl.field.items[i]);
+		fld.displayField(vpnl, vpnl.field.items[i]);
+
+		
+	}
+	else {
+		i = fld.getIndex(vpnl,@tagName(fp02.ftcall)) catch unreachable;
+		ztext = fld.getText(vpnl,i) catch unreachable;
+		ztext = std.mem.trim(u8, ztext," ");
+		if (std.mem.eql(u8, "", ztext)) {
+			pnl.msgErr(vpnl, "the function Type is invalid");
+			vpnl.keyField = kbd.task;
+		}
+	}
+	return;
+}
+
+fn TaskPcall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	var i : usize = fld.getIndex(vpnl,@tagName(fp02.fcall)) catch unreachable;
+
+	var  ztext = fld.getText(vpnl,i) catch unreachable;
+	ztext = std.mem.trim(u8, ztext," ");
+	if (std.mem.eql(u8, ztext,"")) {
+		i = fld.getIndex(vpnl,@tagName(fp02.fpcall)) catch unreachable;
+		vfld.zwitch = false;
+		vfld.text =forms.CFALSE;
+		fld.printField(vpnl, vpnl.field.items[i]);
+		fld.displayField(vpnl, vpnl.field.items[i]);
+	}
+	return;
+
+}
+
 var callTask: TaskEnum = undefined;
 //=================================================
 // description Function
-/// run emun Function ex: combo
+// run emun Function ex: combo
 pub const TaskEnum = enum {
 	TaskName,
 	TaskType,
@@ -1297,6 +1497,9 @@ pub const TaskEnum = enum {
 	TaskEdtcar,
 	TaskErrmsg,
 	TaskFunc,
+	TaskCall,
+	TaskTcall,
+	TaskPcall,
 	none,
 
 	pub fn run(self: TaskEnum, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1307,7 +1510,10 @@ pub const TaskEnum = enum {
 			.TaskScal	=> TaskScal(vpnl, vfld),
 			.TaskEdtcar	=> TaskEdtcar(vpnl, vfld),
 			.TaskErrmsg => TaskErrmsg(vpnl, vfld),
-			.TaskFunc 	=> TaskFunc(vpnl, vfld),
+			.TaskFunc	=> TaskFunc(vpnl, vfld),
+			.TaskCall	=> TaskCall(vpnl, vfld),
+			.TaskTcall	=> TaskTcall(vpnl, vfld),
+			.TaskPcall	=> TaskPcall(vpnl, vfld),
 
 			else => dsperr.errorForms(vpnl, ErrMain.main_run_EnumTask_invalide),
 		}
@@ -1472,7 +1678,9 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 							"",
 							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
 							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
-							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, "")) catch unreachable;
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, "")
+						) catch |err| {	@panic(@errorName(err));};
+
 
 						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
 							catch |err| { @panic(@errorName(err)); };
@@ -1872,7 +2080,13 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 				fld.setTask(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.ftask)].text)
 					catch |err| { @panic(@errorName(err)); };
 					
-				fld.setCall(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fexec)].text)
+				fld.setCall(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fcall)].text)
+					catch |err| { @panic(@errorName(err)); };
+
+				fld.setTypeCall(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.ftcall)].text)
+					catch |err| { @panic(@errorName(err)); };
+
+				fld.setParmCall(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fpcall)].zwitch)
 					catch |err| { @panic(@errorName(err)); };
 				
 				fld.setProtect(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fprotect)].zwitch)
@@ -1893,6 +2107,641 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 		}
 	}
 }
+
+//---------------------------------------------------------------------------
+
+pub fn updateField(vpnl : *pnl.PANEL, nI: usize,vfld: fld.FIELD) void {
+	term.getCursor();
+	var v_posx: usize = term.posCurs.x;
+	const v_posy: usize = term.posCurs.y;
+
+	if (v_posx < 15) v_posx = 15 else v_posx = 2;
+
+	// Init format panel
+	var pFmt02 = Panel_Fmt02(v_posx);
+
+	v_posx = term.posCurs.x;
+	// init zone field
+	fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(utl.allocUtl, "{d}", .{v_posx})
+		catch unreachable) catch unreachable;
+
+	fld.setProtect(pFmt02, @intFromEnum(fp02.fposx),true) catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(utl.allocUtl, "{d}", .{v_posy})
+		catch unreachable) catch unreachable;
+
+	fld.setProtect(pFmt02, @intFromEnum(fp02.fposy), true) catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fname),
+				vfld.name)
+			catch unreachable;
+
+
+
+	fld.setText(pFmt02, @intFromEnum(fp02.ftype),@tagName(vfld.reftyp))
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fwidth),
+				usizeToStr(vfld.width))
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fscal),
+				usizeToStr(vfld.scal))
+			catch unreachable;
+
+	fld.setSwitch(pFmt02,@intFromEnum(fp02.frequi),vfld.requier)
+			catch unreachable;
+
+
+	fld.setText(pFmt02, @intFromEnum(fp02.ferrmsg),
+				vfld.errmsg)
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fhelp),
+				vfld.help)
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.fedtcar),
+				vfld.edtcar)
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.ffunc),
+				vfld.procfunc)
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.ftask),
+				vfld.proctask)
+			catch unreachable;
+	fld.setText(pFmt02, @intFromEnum(fp02.fcall),
+				vfld.progcall)
+			catch unreachable;
+
+	fld.setText(pFmt02, @intFromEnum(fp02.ftcall),
+				vfld.typecall)
+			catch unreachable;
+
+	fld.setSwitch(pFmt02,@intFromEnum(fp02.fpcall),vfld.parmcall) catch unreachable;
+
+
+
+	fld.setSwitch(pFmt02,@intFromEnum(fp02.fprotect),vfld.protect) catch unreachable;
+
+	// init struct key
+	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
+	var idx: usize = 0;
+	var vReftyp: forms.REFTYP = undefined;
+	var vText: []u8 = undefined;
+	var vlen: usize = 0;
+	var vText2: []u8 = undefined;
+	while (true) {
+		//Tkey = kbd.getKEY();
+		// FIELD
+		forms.dspCursor(pFmt02, v_posx, v_posy,"Field");
+		Tkey.Key = pnl.ioPanel(pFmt02);
+		switch (Tkey.Key) {
+			// call function combo
+			.func => {
+				callFunc = FuncEnum.searchFn(pFmt02.field.items[pFmt02.idxfld].procfunc);
+				callFunc.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+			},
+			// call proc control chek value
+			.task => {
+				callTask = TaskEnum.searchFn(pFmt02.field.items[pFmt02.idxfld].proctask);
+				callTask.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+			},
+			// write field to panel
+			.F9 => {
+				vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+				vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+				
+				vReftyp = strToEnum(forms.REFTYP, pFmt02.field.items[@intFromEnum(fp02.ftype)].text);
+				@memset(vText[0..vlen], '#');
+
+				switch (vReftyp) {
+					forms.REFTYP.TEXT_FREE => {
+						vpnl.field.items[nI] = fld.newFieldTextFree(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							 strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							 strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							 strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							 "",
+							 pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							 pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							 pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+						) ;
+					
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+						
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.TEXT_FULL => {
+						vpnl.field.items[nI] = fld.newFieldTextFull(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+						catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.ALPHA => {
+						vpnl.field.items[nI] = fld.newFieldAlpha(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						); 
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.ALPHA_UPPER => {
+						vpnl.field.items[nI] = fld.newFieldAlphaUpper(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.ALPHA_NUMERIC => {
+						vpnl.field.items[nI] = fld.newFieldAlphaNumeric(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+							);
+
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,  
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.ALPHA_NUMERIC_UPPER => {
+						vpnl.field.items[nI] = fld.newFieldAlphaNumericUpper(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							 strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"", pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+						catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,  
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.PASSWORD => {
+						vpnl.field.items[nI] = fld.newFieldPassword(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.YES_NO => {
+						vpnl.field.items[nI] = fld.newFieldYesNo(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.UDIGIT => {
+						vpnl.field.items[nI] = fld.newFieldUDigit(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						);
+
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '0');
+
+						// editcar
+						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
+								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
+								 catch |err| { @panic(@errorName(err)); };
+						}
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+						
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						)	catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.DIGIT => {
+						vpnl.field.items[nI] = fld.newFieldDigit(pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"", pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						);
+
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '0');
+
+						vText = std.fmt.allocPrint(utl.allocUtl, "+{s}", .{vText})
+								catch |err| { @panic(@errorName(err)); };
+						//editcar
+						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
+								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text }
+							) catch |err| { @panic(@errorName(err)); };
+						}
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.UDECIMAL => {
+						vpnl.field.items[nI] = fld.newFieldUDecimal(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fscal)].text),
+							"", pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+						);
+
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '0');
+						
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fscal)].text);
+						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText2[0..vlen], '0');
+						
+						vText = std.fmt.allocPrint(utl.allocUtl, "{s},{s}", .{ vText, vText2 })
+							catch |err| { @panic(@errorName(err)); };
+
+						// editcar
+
+						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
+								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
+							catch |err| { @panic(@errorName(err)); };
+						}
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.DECIMAL => {
+						vpnl.field.items[nI] = fld.newFieldDecimal(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fscal)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+							""
+						);
+
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '0');
+						
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fscal)].text);
+						vText2 = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText2[0..vlen], '0');
+						
+						vText = std.fmt.allocPrint(utl.allocUtl, "+{s},{s}", .{ vText, vText2 })
+							catch unreachable;
+
+						// editcar
+						if (pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text.len > 0) {
+							vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{
+								vText, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text })
+							catch |err| { @panic(@errorName(err)); };
+						}
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.DATE_ISO => {
+						vpnl.field.items[nI] = fld.newFieldDateISO(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							"YYYY/MM/DD",
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.DATE_FR => {
+						vpnl.field.items[nI] = fld.newFieldDateFR(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+						);
+							
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							"DD/MM/YYYY",
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.DATE_US => {
+						vpnl.field.items[nI] = fld.newFieldDateUS(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						fld.setText(
+							vpnl,
+							idx,
+							"MM/DD/YYYY",
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.TELEPHONE => {
+						vpnl.field.items[nI] = fld.newFieldTelephone(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text, ""
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+						
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '*');
+						
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.MAIL_ISO => {
+						vpnl.field.items[nI] = fld.newFieldMail(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text,
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						vlen = strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text);
+						vText = std.heap.page_allocator.alloc(u8, vlen) catch unreachable;
+						@memset(vText[0..vlen], '@');
+						
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.SWITCH => {
+						vpnl.field.items[nI] = fld.newFieldSwitch(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+
+						
+						fld.setText(
+							vpnl,
+							idx,
+							forms.CTRUE,
+						) catch |err| { @panic(@errorName(err)); };
+					},
+
+					forms.REFTYP.FUNC => {
+						vpnl.field.items[nI] = fld.newFieldFunc(
+							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
+							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fwidth)].text),
+							"",
+							pFmt02.field.items[@intFromEnum(fp02.frequi)].zwitch,
+							pFmt02.field.items[@intFromEnum(fp02.ffunc)].text,
+							pFmt02.field.items[@intFromEnum(fp02.ferrmsg)].text,
+							pFmt02.field.items[@intFromEnum(fp02.fhelp)].text
+						);
+
+						idx = fld.getIndex(vpnl, pFmt02.field.items[@intFromEnum(fp02.fname)].text)
+							catch |err| { @panic(@errorName(err)); };
+						@memset(vText[0..vlen], 'F');
+						fld.setText(
+							vpnl,
+							idx,
+							vText,
+						) catch |err| { @panic(@errorName(err)); };
+					}
+				}
+				
+				fld.setEdtcar(vpnl, nI,	pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text)
+					catch |err| { @panic(@errorName(err)); };
+					
+				fld.setTask(vpnl, nI, pFmt02.field.items[@intFromEnum(fp02.ftask)].text)
+					catch |err| { @panic(@errorName(err)); };
+					
+				fld.setCall(vpnl, nI, pFmt02.field.items[@intFromEnum(fp02.fcall)].text)
+					catch |err| { @panic(@errorName(err)); };
+
+				fld.setTypeCall(vpnl, nI, pFmt02.field.items[@intFromEnum(fp02.ftcall)].text)
+					catch |err| { @panic(@errorName(err)); };
+
+				fld.setParmCall(vpnl, nI, pFmt02.field.items[@intFromEnum(fp02.fpcall)].zwitch)
+					catch |err| { @panic(@errorName(err)); };
+				
+				fld.setProtect(vpnl, nI, pFmt02.field.items[@intFromEnum(fp02.fprotect)].zwitch)
+					catch |err| { @panic(@errorName(err)); };
+				
+				pnl.freePanel(pFmt02);
+				defer forms.allocatorForms.destroy(pFmt02);
+				return;
+			},
+
+			// exit panel field
+			.F12 => {
+				pnl.freePanel(pFmt02);
+				defer forms.allocatorForms.destroy(pFmt02);
+				return;
+			},
+			else => {},
+		}
+	}
+}
+
+
+
 
 // Order field
 pub fn orderField(vpnl: *pnl.PANEL) void {
@@ -2138,7 +2987,7 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 			.ctrlV => {
 				tampon = std.fmt.allocPrint(utl.allocUtl, "H{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
-				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
+				// std.debug.print("Key: {d}  - {d}	  {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
 				vpnl.lineh.append(lnh.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
 					catch |err| { @panic(@errorName(err)); };
 				return;
@@ -2381,7 +3230,7 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 			.ctrlV => {
 				tampon = std.fmt.allocPrint(utl.allocUtl, "V{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
-				// std.debug.print("Key: {d}  - {d}      {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
+				// std.debug.print("Key: {d}  - {d}	  {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
 				vpnl.linev.append(lnv.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
 					catch |err| { @panic(@errorName(err)); };
 				return;

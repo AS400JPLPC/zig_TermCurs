@@ -1,3 +1,8 @@
+	///----------------------------
+	/// looger / historique traçage
+	/// zig 0.12.0 dev
+	///----------------------------
+
 const std = @import("std");
 const builtin = @import("builtin");
 const root = @import("root");

@@ -1,3 +1,14 @@
+	///-----------------------
+	/// forms 
+	/// Label
+	/// button
+	/// cadre
+	/// field
+	/// panel
+	/// zig 0.12.0 dev
+	///-----------------------
+
+
 const std = @import("std");
 const utf = @import("std").unicode;
 const kbd = @import("cursed").kbd;
@@ -154,11 +165,16 @@ pub const ErrForms = error{
 				fld_getFunc_Index_invalide,
 				fld_getTask_Index_invalide,
 				fld_getCall_Index_invalide,
+				fld_getTypeCall_Index_invalide,
+				fld_getParmCall_Index_invalide,
 				fld_getAttribut_Index_invalide,
 				fld_getAtrProtect_Index_invalide,
 				fld_getActif_Index_invalide,
 
 				fld_setText_Index_invalide,
+				fld_setName_Index_invalide,
+				fld_setRefType_Index_invalide,
+				fld_setWidth_Index_invalide,
 				fld_setSwitch_Index_invalide,
 				fld_setProtect_Index_invalide,
 				fld_setRequier_Index_invalide,
@@ -166,6 +182,8 @@ pub const ErrForms = error{
 				fld_setRegex_Index_invalide,
 				fld_setTask_Index_invalide,
 				fld_setCall_Index_invalide,
+				fld_setTypeCall_Index_invalide,
+				fld_setParmCall_Index_invalide,
 				fld_setActif_Index_invalide,
 
 				fld_dltRows_Index_invalide,
@@ -530,16 +548,16 @@ pub const frm = struct {
 	/// FRAME
 
 	pub const FRAME = struct {
-		name :	[]const u8,
+		name:	[]const u8,
 		posx:	usize,
 		posy:	usize,
-		lines:	usize,
+		lines:   usize,
 		cols:	usize,
-		cadre:	CADRE,
+		cadre:   CADRE,
 		attribut:term.ZONATRB,
-		title:	[]const u8,
+		title:   []const u8,
 		titleAttribut: term.ZONATRB,
-		actif:	bool
+		actif:   bool
 		};
 
 		// define Fram 
@@ -579,28 +597,28 @@ pub const frm = struct {
 			const ACS_Hlines	= "─";
 			const ACS_Vlines	= "│";
 			const ACS_UCLEFT	= "┌";
-			const ACS_UCRIGHT = "┐";
+			const ACS_UCRIGHT   = "┐";
 			const ACS_LCLEFT	= "└";
-			const ACS_LCRIGHT = "┘";
+			const ACS_LCRIGHT   = "┘";
 
-			const ACS_Hline2		= "═";
-			const ACS_Vline2		= "║";
-			const ACS_UCLEFT2	 = "╔";
-			const ACS_UCRIGHT2	= "╗";
-			const ACS_LCLEFT2	 = "╚";
-			const ACS_LCRIGHT2	= "╝";
+			const ACS_Hline2	= "═";
+			const ACS_Vline2	= "║";
+			const ACS_UCLEFT2   = "╔";
+			const ACS_UCRIGHT2  = "╗";
+			const ACS_LCLEFT2   = "╚";
+			const ACS_LCRIGHT2  = "╝";
 
 			var trait: []const u8 = "";
 			var edt :bool	 = undefined ;
 
 			var row:	usize = 1 ;
-			var y:		usize = 0 ;
+			var y:	  usize = 0 ;
 			var col:	usize = 0 ;
-			var npos: usize = 0 ;
+			var npos:   usize = 0 ;
 
 			const wlen : usize = utl.nbrCharStr(vfram.title);
 
-			var n:		usize = 0 ;
+			var n:	  usize = 0 ;
 			var x:usize = vfram.posx - 1 ;
 
 			while (row <= vfram.lines) {
@@ -713,9 +731,9 @@ pub const lnv = struct {
 
 	pub const LINEV = struct {
 		name :	[]const u8,
-		posx:	usize,
-		posy:	usize,
-		lng:	usize,
+		posx:	 usize,
+		posy:	 usize,
+		lng:	  usize,
 		trace:	LINE,
 		attribut:term.ZONATRB,
 		actif:	bool
@@ -750,7 +768,7 @@ pub const lnv = struct {
 			// assigne FRAMELINE VERTICAL
 
 			const ACS_Vlines	= "│";
-			const ACS_Vline2		= "║";
+			const ACS_Vline2	= "║";
 
 			var row:	usize = 0 ;
 
@@ -812,7 +830,7 @@ pub const lnh = struct {
 		name :	[]const u8,
 		posx:	 usize,
 		posy:	 usize,
-		lng:	usize,
+		lng:	  usize,
 		trace:	LINE,
 		attribut:term.ZONATRB,
 		actif:	bool
@@ -820,10 +838,10 @@ pub const lnh = struct {
 
 		// define Fram 
 		pub fn newLine(vname:[]const u8,
-										vposx:usize, vposy:usize,
-										vlng:usize,
-										vtrace:LINE,
-										) LINEH {
+					vposx:usize, vposy:usize,
+					vlng:usize,
+					vtrace:LINE,
+					) LINEH {
 
 					const xframe = LINEH {
 							.name = vname,
@@ -909,14 +927,14 @@ pub const btn = struct{
 
 	// define BUTTON
 	pub const BUTTON = struct {
-		name: [] const u8,
-		key : kbd,
-		show: bool,
-		check: bool,
-		title: []const u8,
+		name:	[] const u8,
+		key :	kbd,
+		show:	bool,
+		check:   bool,
+		title:   []const u8,
 		attribut:term.ZONATRB,
 		titleAttribut: term.ZONATRB,
-		actif: bool,
+		actif:   bool,
 	};
 
 	pub const Ebutton = enum {
@@ -930,10 +948,10 @@ pub const btn = struct{
 
 	// func BUTTON
 	pub fn newButton(
-							vkey : kbd,
-							vshow : bool,
-							vcheck:bool,
-							vtitle: [] const u8) BUTTON {
+				vkey : kbd,
+				vshow : bool,
+				vcheck:bool,
+				vtitle: [] const u8) BUTTON {
 
 				const xbutton = BUTTON {
 						.name = kbd.enumToStr(vkey),
@@ -1149,6 +1167,16 @@ pub const	fld = struct {
 			.foregr = term.ForegroundColor.fgCyan,
 	};
 
+	// associated field and call program 
+	pub var AtrCall : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgYellow
+	};
+	
 	pub var AtrCursor : term.ZONATRB = .{
 			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle),
@@ -1176,30 +1204,35 @@ pub const	fld = struct {
 		posy:	 usize,
 		attribut:term.ZONATRB,
 		atrProtect:term.ZONATRB,
-		reftyp: REFTYP,
+		atrCall:term.ZONATRB,
+		reftyp:   REFTYP,
 		width:	usize,
 		scal:	 usize,
-		nbrcar: usize,	// nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar =	ALPA..DIGIT..
+		nbrcar:   usize,  // nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar = ALPA..DIGIT..
 
 		requier: bool,	// requier or FULL
 		protect: bool,	// only display
 
-		pading: bool,	// pading blank
+		pading: bool,	 // pading blank
 		edtcar: []const u8,	// edtcar for monnaie		€ $ ¥ ₪ £ or %
 
-		regex: []const u8,	//contrôle regex
+		regex:  []const u8,	//contrôle regex
 		errmsg: []const u8,	//message this field
 
-		help: []const u8,	//help this field
+		help: []const u8,	  //help this field
 
 		text: []const u8,
-		zwitch: bool,		// CTRUE CFALSE
+		zwitch: bool,		  // CTRUE CFALSE
 
 		procfunc: []const u8,	//name proc
 
 		proctask: []const u8,	//name proc
 
 		progcall: []const u8,	//name call
+
+		typecall: []const u8,	//type call  SH / APPTERM
+
+		parmcall: bool,			// parm call  Yes/No
 
 		actif:bool,
 	};
@@ -1220,6 +1253,8 @@ pub const	fld = struct {
 		procfunc,
 		proctask,
 		progcall,
+		typecall,
+		parmcall,
 		regex
 	};
 
@@ -1256,24 +1291,27 @@ pub const	fld = struct {
 			.name	 = vname,
 			.posx	 = vposx,
 			.posy	 = vposy,
-			.reftyp = vreftyp,
+			.reftyp   = vreftyp,
 			.width	= vwidth,
 			.scal	 = 0,
-			.nbrcar = vwidth,
-			.requier	= vrequier,
-			.protect = false,
-			.pading	= true,
-			.edtcar ="",
+			.nbrcar   = vwidth,
+			.requier  = vrequier,
+			.protect  = false,
+			.pading   = true,
+			.edtcar   ="",
 			.regex	= "",
-			.errmsg = verrmsg,
+			.errmsg   = verrmsg,
 			.help	 = vhelp,
 			.text	 = vtext,
-			.zwitch = false,
-			.procfunc	="",
-			.proctask	="",
-			.progcall	="",
-			.attribut	= AtrField,
+			.zwitch   = false,
+			.procfunc ="",
+			.proctask ="",
+			.progcall ="",
+			.typecall ="",
+			.parmcall = false,
+			.attribut   = AtrField,
 			.atrProtect = AtrProtect,
+			.atrCall    = AtrCall,
 			.actif	= true
 		};
 		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
@@ -1437,24 +1475,27 @@ pub const	fld = struct {
 					.name	 = vname,
 					.posx	 = vposx,
 					.posy	 = vposy,
-					.reftyp = REFTYP.YES_NO ,
+					.reftyp   = REFTYP.YES_NO ,
 					.width	= 1,
 					.scal	 = 0,
-					.nbrcar = 1,
-					.requier	= vrequier,
-					.protect = false,
-					.pading	= false,
-					.edtcar = "",
+					.nbrcar   = 1,
+					.requier  = vrequier,
+					.protect  = false,
+					.pading   = false,
+					.edtcar   = "",
 					.regex	= "",
-					.errmsg = verrmsg,
+					.errmsg   = verrmsg,
 					.help	 = vhelp,
 					.text	 = vtext,
-					.zwitch = false,
-					.procfunc	="",
-					.proctask	="",
-					.progcall	="",
-					.attribut	= AtrField,
+					.zwitch   = false,
+					.procfunc ="",
+					.proctask ="",
+					.progcall ="",
+					.typecall ="",
+					.parmcall = false,
+					.attribut   = AtrField,
 					.atrProtect = AtrProtect,
+					.atrCall    = AtrCall,
 					.actif	= true
 				};
 										
@@ -1472,28 +1513,31 @@ pub const	fld = struct {
 										verrmsg: []const u8,
 										vhelp: []const u8) FIELD {
 
-		var xfield = FIELD {	 
+		var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.SWITCH ,
-				.width	 = 1,
+				.reftyp   = REFTYP.SWITCH ,
+				.width	= 1,
 				.scal	 = 0,
-				.nbrcar  = 1,
-				.requier = false,
-				.protect = false,
-				.pading	 = false,
-				.edtcar  = "",
-				.regex	 = "",
-				.errmsg  = verrmsg,
+				.nbrcar   = 1,
+				.requier  = false,
+				.protect  = false,
+				.pading   = false,
+				.edtcar   = "",
+				.regex	= "",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = "",
-				.zwitch  = vzwitch,
+				.zwitch   = vzwitch,
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
-				.attribut = AtrField,
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1520,28 +1564,31 @@ pub const	fld = struct {
 										vhelp: []const u8) FIELD {
 
 
-		var xfield = FIELD {	 
-				.name	 = vname,
-				.posx	 = vposx,
-				.posy	 = vposy,
-				.reftyp  = REFTYP.DATE_FR,
-				.width	 = 10,
-				.scal	 = 0,
-				.nbrcar  = 10,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = false,
-				.edtcar  ="",
-				.regex	 = "",
-				.errmsg  = verrmsg,
-				.help	 = vhelp,
-				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+		var xfield = FIELD {
+				.name	  = vname,
+				.posx	  = vposx,
+				.posy	  = vposy,
+				.reftyp   = REFTYP.DATE_FR,
+				.width    = 10,
+				.scal	  = 0,
+				.nbrcar   = 10,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = false,
+				.edtcar   ="",
+				.regex	  = "",
+				.errmsg   = verrmsg,
+				.help	  = vhelp,
+				.text	  = vtext,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1570,28 +1617,31 @@ pub const	fld = struct {
 										vhelp: []const u8) FIELD {
 
 
-		var xfield = FIELD {	 
+		var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.DATE_US,
-				.width	 = 10,
+				.reftyp   = REFTYP.DATE_US,
+				.width	= 10,
 				.scal	 = 0,
-				.nbrcar  = 10,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = false,
-				.edtcar  ="",
-				.regex	 = "",
-				.errmsg  = verrmsg,
+				.nbrcar   = 10,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = false,
+				.edtcar   ="",
+				.regex	= "",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1620,28 +1670,31 @@ pub const	fld = struct {
 										vhelp: []const u8) FIELD {
 
 
-		var xfield = FIELD {	 
+		var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.DATE_ISO,
-				.width	 = 10,
+				.reftyp   = REFTYP.DATE_ISO,
+				.width	= 10,
 				.scal	 = 0,
-				.nbrcar  = 10,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = false,
-				.edtcar  ="",
-				.regex	 = "",
-				.errmsg  = verrmsg,
+				.nbrcar   = 10,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = false,
+				.edtcar   ="",
+				.regex	= "",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1669,28 +1722,31 @@ pub const	fld = struct {
 										verrmsg: []const u8,
 										vhelp: []const u8) FIELD {
 
-		var xfield = FIELD {	 
+		var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.MAIL_ISO,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.MAIL_ISO,
+				.width	= vwidth,
 				.scal	 = 0,
-				.nbrcar  = vwidth,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 ="",
-				.errmsg  = verrmsg,
+				.nbrcar   = vwidth,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = true,
+				.edtcar   ="",
+				.regex	="",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1721,28 +1777,31 @@ pub const	fld = struct {
 										vhelp: []const u8,
 										vregex: []const u8) FIELD {
 
-			var xfield = FIELD {	 
+			var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.TELEPHONE,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.TELEPHONE,
+				.width	= vwidth,
 				.scal	 = 0,
-				.nbrcar  = vwidth,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 = "",
-				.errmsg  = verrmsg,
+				.nbrcar   = vwidth,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = true,
+				.edtcar   ="",
+				.regex	= "",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 			};
 
@@ -1771,28 +1830,31 @@ pub const	fld = struct {
 										vhelp: []const u8,
 										vregex: []const u8) FIELD {
 
-		var xfield = FIELD {	 
+		var xfield = FIELD {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.UDIGIT,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.UDIGIT,
+				.width	= vwidth,
 				.scal	 = 0,
-				.nbrcar  = vwidth,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 = vregex,
-				.errmsg  = verrmsg,
+				.nbrcar   = vwidth,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = true,
+				.edtcar   ="",
+				.regex	= vregex,
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1821,24 +1883,27 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.DIGIT,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.DIGIT,
+				.width	= vwidth,
 				.scal	 = 0,
-				.nbrcar  = 0,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 = vregex,
-				.errmsg  = verrmsg,
+				.nbrcar   = 0,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = true,
+				.edtcar   ="",
+				.regex	= vregex,
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 			xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
@@ -1868,24 +1933,27 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.UDECIMAL,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.UDECIMAL,
+				.width	= vwidth,
 				.scal	 = vscal,
-				.nbrcar  = 0,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 = vregex,
-				.errmsg  = verrmsg,
+				.nbrcar   = 0,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = true,
+				.edtcar   ="",
+				.regex	= vregex,
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1923,24 +1991,27 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.DECIMAL,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.DECIMAL,
+				.width	= vwidth,
 				.scal	 = vscal,
-				.nbrcar  = 0,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = true,
-				.edtcar  ="",
-				.regex	 = vregex,
-				.errmsg  = verrmsg,
+				.nbrcar   = 0,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading	= true,
+				.edtcar   ="",
+				.regex	= vregex,
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	="",
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc ="",
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1979,24 +2050,27 @@ pub const	fld = struct {
 				.name	 = vname,
 				.posx	 = vposx,
 				.posy	 = vposy,
-				.reftyp  = REFTYP.FUNC,
-				.width	 = vwidth,
+				.reftyp   = REFTYP.FUNC,
+				.width	= vwidth,
 				.scal	 = 0,
-				.nbrcar  = vwidth,
-				.requier = vrequier,
-				.protect = false,
-				.pading	 = false,
-				.edtcar  = "",
-				.regex	 = "",
-				.errmsg  = verrmsg,
+				.nbrcar   = vwidth,
+				.requier  = vrequier,
+				.protect  = false,
+				.pading   = false,
+				.edtcar   = "",
+				.regex	= "",
+				.errmsg   = verrmsg,
 				.help	 = vhelp,
 				.text	 = vtext,
-				.zwitch  = false,
-				.procfunc	=vprocfunc,
-				.proctask	="",
-				.progcall	="",
-				.attribut	= AtrField,
+				.zwitch   = false,
+				.procfunc =vprocfunc,
+				.proctask ="",
+				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
+				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -2094,6 +2168,14 @@ pub const	fld = struct {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].progcall;
 		return ErrForms.fld_getCall_Index_invalide ;
 	}
+	pub fn getTypeCall(vpnl: *pnl.PANEL , n: usize)	ErrForms ! [] const u8 {
+		if ( n < vpnl.field.items.len) return vpnl.field.items[n].typecall;
+		return ErrForms.fld_getTypeCall_Index_invalide ;
+	}
+	pub fn getParmCall(vpnl: *pnl.PANEL , n: usize)	ErrForms ! bool {
+		if ( n < vpnl.field.items.len) return vpnl.field.items[n].parmcall;
+		return ErrForms.fld_getParmCall_Index_invalide ;
+	}
 	pub fn getAttribut(vpnl: *pnl.PANEL , n: usize)	ErrForms ! term.ZONATRB {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].atribut;
 		return ErrForms.fld_getAttribut_Index_invalide ;
@@ -2147,6 +2229,14 @@ pub const	fld = struct {
 	pub fn setCall(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].progcall = val
 		else return ErrForms.fld_setCall_Index_invalide;
+	}
+	pub fn setTypeCall(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].typecall = val
+		else return ErrForms.fld_setTypeCall_Index_invalide ;
+	}
+	pub fn setParmCall(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].parmcall = val
+		else return ErrForms.fld_setParmCall_Index_invalide ;
 	}
 	pub fn setActif(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].actif = val
@@ -2204,8 +2294,11 @@ pub const	fld = struct {
 		while (nn < vfld.nbrcar) : (nn += 1 ) {
 			if (vfld.actif == true) {
 				vpnl.buf.items[n].ch = " " ;
-				if (vfld.protect == false) vpnl.buf.items[n].attribut = vfld.attribut
-				else vpnl.buf.items[n].attribut	= vpnl.attribut;
+				if (vfld.protect == true) vpnl.buf.items[n].attribut = vfld.atrProtect
+				else {
+					if (std.mem.eql(u8,vfld.progcall ,"")) vpnl.buf.items[n].attribut = vpnl.attribut
+					else vpnl.buf.items[n].attribut = vfld.atrCall;
+				}
 				vpnl.buf.items[n].on = true;
 			}
 			else {
@@ -2243,7 +2336,10 @@ pub const	fld = struct {
 				if (vfld.protect) vpnl.buf.items[n].attribut = vfld.atrProtect
 				else {
 						if (nile)vpnl.buf.items[n].attribut	= AtrNil
-						else vpnl.buf.items[n].attribut = vfld.attribut;
+						else {
+							if (std.mem.eql(u8,vfld.progcall ,"")) vpnl.buf.items[n].attribut = vpnl.attribut
+							else vpnl.buf.items[n].attribut = vfld.atrCall;
+						}
 				}
 
 			}
@@ -2591,7 +2687,7 @@ pub const	fld = struct {
 						if (	vfld.help.len > 0 ) msgHelp(vpnl,vfld);
 					},
 					.ctrlP => {
-						// Call pgm is call 
+						// Call pgm
 						if ( vfld.progcall.len > 0) {
 							Fkey.Key = kbd.call;
 							break; 
@@ -3021,24 +3117,24 @@ pub const	pnl = struct {
 
 		attribut: term.ZONATRB,
 
-		frame: frm.FRAME ,
+		frame:  frm.FRAME ,
 
-		label: std.ArrayList(lbl.LABEL),
+		label:  std.ArrayList(lbl.LABEL),
 
 		button: std.ArrayList(btn.BUTTON),
 
-		field: std.ArrayList(fld.FIELD),
+		field:  std.ArrayList(fld.FIELD),
 
-		linev: std.ArrayList(lnv.LINEV),
+		linev:  std.ArrayList(lnv.LINEV),
 
-		lineh: std.ArrayList(lnh.LINEH),
+		lineh:  std.ArrayList(lnh.LINEH),
 
 		// double buffer screen
 		buf:std.ArrayList(TERMINAL_CHAR),
 
 		idxfld: usize,
 
-		key	 : kbd ,		 // Func task call
+		key	  : kbd ,	// Func task call
 
 		keyField : kbd ,	// enter up down
 
@@ -3127,18 +3223,18 @@ pub const Epanel = enum {
 		device.name	 = vname;
 		device.posx	 = vposx;
 		device.posy	 = vposy;
-		device.lines = vlines;
+		device.lines	= vlines;
 		device.cols	 = vcols;
 		device.attribut = AtrPanel;
-		device.frame = undefined;
+		device.frame	= undefined;
 		device.label	= std.ArrayList(lbl.LABEL).init(allocatorForms);
 		device.button   = std.ArrayList(btn.BUTTON).init(allocatorForms);
 		device.field	= std.ArrayList(fld.FIELD).init(allocatorForms);
 		device.linev	= std.ArrayList(lnv.LINEV).init(allocatorForms);
 		device.lineh	= std.ArrayList(lnh.LINEH).init(allocatorForms);
-		device.buf		= std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
+		device.buf	  = std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
 		device.idxfld   = 9999;
-		device.key		=	kbd.none;
+		device.key	  = kbd.none;
 		device.keyField = kbd.none;
 		device.actif	= true;
 
@@ -3357,7 +3453,7 @@ pub const Epanel = enum {
 
 	pub fn msgErr(vpnl: *PANEL, info: [] const u8) void {
 
-		const x: usize	= vpnl.lines;
+		const x: usize  = vpnl.lines;
 		var n: usize	= vpnl.cols * (x - 2) ;
 		var y: usize	= 1 ;
 
@@ -3478,7 +3574,7 @@ pub const Epanel = enum {
 		if (vpnl.actif == false ) return	kbd.none;
 
 		var nField :usize = 0;
-		var fld_key : kbd =	kbd.enter;
+		var fld_key : kbd = kbd.enter;
 		const nbrFieldIO : usize = vpnl.field.items.len;
 		var   nbrField   : usize = 0;
 
@@ -3522,7 +3618,7 @@ pub const Epanel = enum {
 								else => nField = vpnl.idxfld,
 							}
 						},
-				else => nField = vpnl.idxfld,		
+				else => nField = vpnl.idxfld,
 			}
 		}
 		vpnl.keyField = kbd.none; 

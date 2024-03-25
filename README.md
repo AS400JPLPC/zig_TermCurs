@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.11.0**</u><BR />
+<u>**zig 0.12.0**</u><BR />
 <br />
 
 **TESTING** <br />
@@ -80,6 +80,7 @@ https://github.com/kissy24/zig-logger/<BR /> <br />
 | SWITCH               | N            | N / BOOL | CTRUE CFALSE                           |
 | FUNC                 | N            | y        | **dynamic function call**              |
 | TASK                 | N            | y        | **dynamic function call ex: control**  |
+| CALL                 | N            | y        | **dynamic call exter                   |
 |                      |              |          |                                        |
 
 <BR/>
@@ -317,3 +318,21 @@ Correct alignment in the Json backup files.<br />
 <br />
 I am progressing slowly (many tests). I have even considered directly addressing the memory.<br />
 <BR/><BR/>
+<BR/>
+→  2024-03-25<BR/>
+&nbsp;&nbsp;&nbsp; update version 0.12.0-dev.3429.<BR/>
+Inclusion of modules callPgmPid, zmmap  only v0.12
+
+Addition of the updateField function from mdlForms
+
+Minor correction in ioCombo, the cursor wasn't moving up
+
+In cursed, the handling of IOCTL has changed with the new Zig version
+
+I've left the lines for downgrading, with 2 or 3 exceptions.(cursed)
+
+Afterwards, I will only work with version 0.12.dev.
+
+test  :  "./Gen"  for Gencurs&nbsp;&nbsp;&nbsp;
+
+I'm still mulling over my design for the table generator.

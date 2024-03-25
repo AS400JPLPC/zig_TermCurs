@@ -1,3 +1,8 @@
+	///----------------------
+	/// match regex pcre2
+	/// zig 0.12.0 dev
+	///---------------------
+
 const std = @import("std");
 
 const re = @cImport({

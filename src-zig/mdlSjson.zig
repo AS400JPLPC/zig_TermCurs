@@ -1,3 +1,8 @@
+	///-----------------------
+	/// prog mdlSjson 
+	/// zig 0.12.0 dev
+	///-----------------------
+
 const std = @import("std");
 
 // keyboard
@@ -250,6 +255,16 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 								.progcall => {
 									try w.objectField(@tagName(fld.Efield.progcall));
 									try w.print("\"{s}\"", .{XPANEL.items[np].field.items[fp].progcall});
+								},
+								.typecall => {
+									try w.objectField(@tagName(fld.Efield.typecall));
+									try w.print("\"{s}\"", .{XPANEL.items[np].field.items[fp].typecall});
+								},
+								.parmcall => {
+									try w.objectField(@tagName(fld.Efield.parmcall));
+									if (@intFromBool(XPANEL.items[np].field.items[fp].parmcall) == 1)
+													try w.print("true", .{})
+									else try w.print("false", .{});
 								},
 								.regex=> {
 									try w.objectField(@tagName(fld.Efield.regex));
