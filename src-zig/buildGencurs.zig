@@ -1,3 +1,8 @@
+	///-----------------------
+	/// build Gencurs
+	/// zig 0.12.0 dev
+	///-----------------------
+
 const std = @import("std");
 // zi=g 0.12.0 dev
 
@@ -9,14 +14,14 @@ pub fn build(b: *std.Build) void {
 
 
 	// zig-src			source projet
-	// zig-src/deps	   curs/ form / outils ....
-	// src_c			  source c/c++
+	// zig-src/deps		curs/ form / outils ....
+	// src_c			source c/c++
 	// zig-src/lib		source .h 
 
 
 	// Definition of logger
 	// const logger = b.createModule(.{
-	// 	.root_source_file = .{ .path = "./deps/curse/logger.zig"},
+	//	 .root_source_file = .{ .path = "./deps/curse/logger.zig"},
 	// });
 
 	// Definition of module
@@ -91,17 +96,17 @@ pub fn build(b: *std.Build) void {
 		},
 	});
 
-	// const mdlGrids = b.createModule(.{
-	// 	.root_source_file = .{ .path = "./mdlGrids.zig" },
-	// 	.imports= &.{
-	// 		.{ .name = "cursed", .module = cursed },
-	// 		.{ .name = "utils",  .module = utils },
-	// 		.{ .name = "forms",  .module = forms },
-	// 		.{ .name = "grid",   .module = grid  },
-	// 		.{ .name = "menu",   .module = menu  },
-	// 		.{ .name = "match",  .module = match },
-	// 	},
-	// });
+	 const mdlGrids = b.createModule(.{
+		 .root_source_file = .{ .path = "./mdlGrids.zig" },
+		 .imports= &.{
+			 .{ .name = "cursed", .module = cursed },
+			 .{ .name = "utils",  .module = utils },
+			 .{ .name = "forms",  .module = forms },
+			 .{ .name = "grid",   .module = grid  },
+			 .{ .name = "menu",   .module = menu  },
+			 .{ .name = "match",  .module = match },
+		 },
+	 });
 
 	const mdlSjson = b.createModule(.{
 		.root_source_file = .{ .path = "./mdlSjson.zig" },
@@ -177,7 +182,7 @@ pub fn build(b: *std.Build) void {
 
 	Prog.root_module.addImport("mdlFile" , mdlFile);
 
-	// Prog.root_module.addImport("mdlGrids" , mdlGrids);
+	Prog.root_module.addImport("mdlGrids" , mdlGrids);
 
 	const install_exe = b.addInstallArtifact(Prog, .{});
 	b.getInstallStep().dependOn(&install_exe.step); 
