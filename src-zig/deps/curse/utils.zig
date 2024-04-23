@@ -149,7 +149,11 @@ pub const iteratStr = struct {
 
 /// number characters String
 pub fn nbrCharStr(str: []const u8) usize {
-	return std.fmt.count("{s}", .{str});
+	var wl : usize =0;
+	var iter = iteratStr.iterator(str);
+	defer iter.deinit();
+	while (iter.next()) |_|	{ wl += 1 ;}
+	return wl;
 }
 
 /// remove espace to STRING left and rigth

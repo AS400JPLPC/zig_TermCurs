@@ -333,6 +333,17 @@ I've left the lines for downgrading, with 2 or 3 exceptions.(cursed)
 
 Afterwards, I will only work with version 0.12.dev.
 
-test  :  "./Gen"  for Gencurs&nbsp;&nbsp;&nbsp;
+test  :  "./Gen"  for Gencurs
 
 I'm still mulling over my design for the table generator.
+
+→  2024-04-23<BR/>
+new bersion zig 0.12.0 stable
+Adding the 'mdlGrid' function.<br />
+- Alt-G: Create GRID definition
+- Alt-C: Create text columns
+- Alt-R: Remove GRID
+- Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell)<br />
+
+I'm making progress, and I'm going to create the JSON.<br />
+

@@ -75,13 +75,13 @@ const lp01 = enum {
 };
 // field panel pFmt01
 const	fp01 = enum (u9)	{
-	name		= 0 ,
-	posx		,
-	posy		, 
-	lines	 ,
-	cols		,
-	cadre	 ,
-	title	 ,
+	name  = 0 ,
+	posx  ,
+	posy  , 
+	lines ,
+	cols  ,
+	cadre ,
+	title ,
 // field function F01..F24
 
 	F1 ,

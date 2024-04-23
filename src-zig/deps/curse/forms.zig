@@ -208,7 +208,7 @@ pub const	dsperr = struct {
 
 		const allocator = std.heap.page_allocator;
 
-		const errTxt:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) 
+		const errTxt:[]const u8 = std.fmt.allocPrint(allocator,"{any}",.{errpgm }) 
 																		catch |err| { @panic(@errorName(err));};
 		defer allocator.free(errTxt);
 		
@@ -1127,7 +1127,7 @@ pub const	fld = struct {
 									catch |err| { @panic(@errorName(err));};
 	}
 
-	// define attribut default Fiel
+	// define attribut default Field
 	pub var AtrField : term.ZONATRB = .{
 			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle),
@@ -1144,13 +1144,13 @@ pub const	fld = struct {
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
 			.backgr = term.BackgroundColor.bgBlack,
-			.foregr = term.ForegroundColor.fgdWhite
+			.foregr = term.ForegroundColor.fgWhite
 	};
 
 	// define attribut default func ioField
 	pub var AtrIO : term.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(term.Style.styleReverse),
-										@intFromEnum(term.Style.notStyle),
+			.styled=[_]u32{@intFromEnum(term.Style.styleReverse ),
+										@intFromEnum(term.Style.styleDim),
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
 			.backgr = term.BackgroundColor.bgBlack,
@@ -2381,6 +2381,7 @@ pub const	fld = struct {
 		return wl;
 	}
 
+
 	fn delete(n : usize) void {
 		_=e_FIELD.orderedRemove(n);
 		e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
@@ -2465,7 +2466,7 @@ pub const	fld = struct {
 		else {
 				utl.addListStr(&e_FIELD	, f.text);
 			var i:usize = 0 ;
-			while (i < f.nbrcar - f.text.len) : ( i += 1) {
+			while (i < (f.nbrcar - utl.nbrCharStr(f.text))) : ( i += 1) {
 				e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
 			}
 		}
@@ -2776,7 +2777,6 @@ pub const	fld = struct {
 							catch |err| { @panic(@errorName(err));}
 						
 						else {
-							
 							setText(vpnl, nfield, ToStr(utl.trimStr(utl.listToStr(e_FIELD)))) 
 							catch |err| { @panic(@errorName(err));};
 						}

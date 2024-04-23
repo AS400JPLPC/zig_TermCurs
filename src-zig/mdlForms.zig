@@ -809,7 +809,7 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 	savlabel.deinit();
 	grd.deinitGrid();
 }
-
+  
 //==========================================
 // FIELD Management
 //==========================================
@@ -1168,15 +1168,16 @@ fn funcType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	if (std.mem.eql(u8, vfld.text, "PASSWORD")) pos = 6;
 	if (std.mem.eql(u8, vfld.text, "YES_NO")) pos = 7;
 	if (std.mem.eql(u8, vfld.text, "UDIGIT")) pos = 8;
-	if (std.mem.eql(u8, vfld.text, "UDECIMAL")) pos = 9;
-	if (std.mem.eql(u8, vfld.text, "DECIMAL")) pos = 10;
-	if (std.mem.eql(u8, vfld.text, "DATE_ISO")) pos = 11;
-	if (std.mem.eql(u8, vfld.text, "DATE_FR")) pos = 12;
-	if (std.mem.eql(u8, vfld.text, "DATE_US")) pos = 13;
-	if (std.mem.eql(u8, vfld.text, "TELEPHONE")) pos = 14;
-	if (std.mem.eql(u8, vfld.text, "MAIL_ISO")) pos = 15;
-	if (std.mem.eql(u8, vfld.text, "SWITCH")) pos = 16;
-	if (std.mem.eql(u8, vfld.text, "FUNC")) pos = 17;
+	if (std.mem.eql(u8, vfld.text, "DIGIT")) pos = 9;
+	if (std.mem.eql(u8, vfld.text, "UDECIMAL")) pos = 10;
+	if (std.mem.eql(u8, vfld.text, "DECIMAL")) pos = 11;
+	if (std.mem.eql(u8, vfld.text, "DATE_ISO")) pos = 12;
+	if (std.mem.eql(u8, vfld.text, "DATE_FR")) pos = 13;
+	if (std.mem.eql(u8, vfld.text, "DATE_US")) pos = 14;
+	if (std.mem.eql(u8, vfld.text, "TELEPHONE")) pos = 15;
+	if (std.mem.eql(u8, vfld.text, "MAIL_ISO")) pos = 16;
+	if (std.mem.eql(u8, vfld.text, "SWITCH")) pos = 17;
+	if (std.mem.eql(u8, vfld.text, "FUNC")) pos = 18;
 
 	var Gkey: grd.GridSelect = undefined;
 	defer Gkey.Buf.deinit();
@@ -1298,6 +1299,9 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, f.name, @tagName(fp02.fedtcar))) {
 			vpnl.field.items[idx].text = "";
 			vpnl.field.items[idx].protect = true;
+		}
+		if (std.mem.eql(u8, f.name, @tagName(fp02.fwidth))) {
+			vpnl.field.items[idx].protect = false;
 		}
 	}
 
