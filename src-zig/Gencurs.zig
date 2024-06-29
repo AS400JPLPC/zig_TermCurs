@@ -55,6 +55,9 @@ const mdlForms = @import("mdlForms");
 // Description GRID
 const mdlGrids = @import("mdlGrids");
 
+// Description GRID
+const mdlMenus = @import("mdlMenus");
+
 // sauvegarde JSON
 const mdlFile = @import("mdlFile");
 
@@ -143,7 +146,8 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
-		// if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NMENU) ;
+		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID) ;
+
 		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
 

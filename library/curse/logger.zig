@@ -25,12 +25,23 @@ pub fn customLog(
 	const level_txt = comptime message_level.asText();
 	const scope_name = "(" ++ @tagName(scope) ++ ")";
 
-	std.debug.getStderrMutex().lock();
-	defer std.debug.getStderrMutex().unlock();
-	const w  = flog.writer();
-	nosuspend w.print("[" ++ level_txt ++ scope_name ++ "] " ++ format ++ "\n", args) 
-			catch { @panic("file write error zlog;txt");};
-}
+	// std.debug.getStderrMutex().lock();
+	// defer std.debug.getStderrMutex().unlock();
+	// const w  = flog.writer();
+	// nosuspend w.print("[" ++ level_txt ++ scope_name ++ "] " ++ format ++ "\n", args) 
+	// 		catch { @panic("file write error zlog.txt");};
+
+	const stderr = std.io.getStdErr().writer();
+    var bw = std.io.bufferedWriter(stderr);
+    const writer = bw.writer();
+
+    std.debug.lockStdErr();
+    defer std.debug.unlockStdErr();
+    	nosuspend {
+        	writer.print("[" ++  level_txt ++ scope_name ++  "] " ++ format ++ "\n", args) catch return;
+       	 bw.flush() catch return;
+    	}
+	}
 
 pub fn scoped(comptime scope: @Type(.EnumLiteral)) type {
 	return struct {

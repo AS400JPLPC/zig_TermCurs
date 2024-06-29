@@ -15,10 +15,10 @@ pub fn callPgmPid( pgm: []const u8, module: []const u8, pid: ?[]const u8) !void 
 
 	if ( ! std.mem.eql(u8, pgm, "SH") and  !std.mem.eql(u8, pgm, "APPTERM") ) return ErrChild.Module_Invalid;
 
-	var CallModule: std.ChildProcess = undefined;
+	var CallModule: std.process.Child = undefined;
 	
 	// Retrieval of the working library.
-	var buf: [std.fs.MAX_PATH_BYTES]u8 = undefined;
+	var buf: [std.fs.max_path_bytes]u8 = undefined;
 	const cwd = std.posix.getcwd(&buf) catch unreachable;
 	//The set of modules is located in the manager's library, for example: (APPTERM).
 	CallModule.cwd = cwd;
@@ -37,32 +37,32 @@ pub fn callPgmPid( pgm: []const u8, module: []const u8, pid: ?[]const u8) !void 
 		if (std.mem.eql(u8, pgm, "SH")) {
 			cmd = std.fmt.allocPrint(allocChild, "./{s}  {s}", .{ module, value}) catch unreachable;
 			arg3 = .{ "/bin/sh", "-c", cmd };
-			CallModule = std.ChildProcess.init(arg3[0..], allocChild);
+			CallModule = std.process.Child.init(arg3[0..], allocChild);
 		} 
 		if (std.mem.eql(u8, pgm, "APPTERM")) {
 			prog = std.fmt.allocPrint(allocChild,"./{s}", .{pgm}) catch unreachable;
 			cmd  = std.fmt.allocPrint(allocChild,"./{s}", .{module}) catch unreachable;
 			parm = std.fmt.allocPrint(allocChild,"{s}", .{ value }) catch unreachable;
 			arg3 = .{prog,cmd, parm};
-			CallModule = std.ChildProcess.init(arg3[0..], allocChild);
+			CallModule = std.process.Child.init(arg3[0..], allocChild);
 		}
 	} else {
 		if (std.mem.eql(u8, pgm, "SH")) {
 			cmd  = std.fmt.allocPrint(allocChild, "./{s}", .{ module}) catch unreachable;
 			arg3 = .{ "/bin/sh", "-c", cmd };
-			CallModule = std.ChildProcess.init(arg3[0..], allocChild);
+			CallModule = std.process.Child.init(arg3[0..], allocChild);
 		} 
 		if (std.mem.eql(u8, pgm, "APPTERM")) {
 			prog = std.fmt.allocPrint(allocChild,"./{s}", .{pgm}) catch unreachable;
 			cmd  = std.fmt.allocPrint(allocChild,"./{s}", .{module}) catch unreachable;
 			arg2 = .{ prog, cmd };
-			CallModule = std.ChildProcess.init(arg2[0..], allocChild);
+			CallModule = std.process.Child.init(arg2[0..], allocChild);
 		}
 	}
 	
 	// CallModule = std.ChildProcess.init(args[0..], allocChild);
 	// Execution and suspension of the caller.
-	const childTerm = std.ChildProcess.spawnAndWait(&CallModule)
+	const childTerm = std.process.Child.spawnAndWait(&CallModule)
 		catch |err| {
 		@panic(std.fmt.allocPrint(allocChild, "{}", .{err}) catch unreachable);
 		};

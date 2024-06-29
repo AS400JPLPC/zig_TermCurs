@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.12.0**</u><BR />
+<u>**zig 0.13.0**</u><BR />
 <br />
 
 **TESTING** <br />
@@ -338,7 +338,7 @@ test  :  "./Gen"  for Gencurs
 I'm still mulling over my design for the table generator.
 
 →  2024-04-23<BR/>
-new bersion zig 0.12.0 stable
+new version zig 0.12.0 stable
 Adding the 'mdlGrid' function.<br />
 - Alt-G: Create GRID definition
 - Alt-C: Create text columns
@@ -347,3 +347,7 @@ Adding the 'mdlGrid' function.<br />
 
 I'm making progress, and I'm going to create the JSON.<br />
 
+→  2024-06-29<BR/>
+new version zig 0.13.0 stable<br />
+Implementation of the lib "library" removal of "deps"<br />
+I'm making progress, this MENU <br />

@@ -1752,12 +1752,11 @@ pub const	fld = struct {
 
 
 	// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
-			// chapitre RFC 6532 updates 5322 to allow and include full, clean UTF-8.
 			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-			,.{"^([-!#-\'*+\\/-9=?A-Z^-~]{1,64}(\\.[-!#-\'*+\\/-9=?A-Z^-~]{1,64})*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+$"})
+			,.{"^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@([a-zA-Z0-9.-])+$"})
 			catch |err| { @panic(@errorName(err));};
 			
-			if (xfield.help.len == 0 ) xfield.help = "ex: myname.myfirstname@gmail.com" ;
+			if (xfield.help.len == 0 ) xfield.help = "ex: myname.my_firstname@gmail.com" ;
 				
 		return xfield;
 

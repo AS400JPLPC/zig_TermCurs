@@ -19,34 +19,6 @@ const io = std.io;
 
 pub const CTRUE = "✔";
 pub const CFALSE = " ";
-
-
-
-// function special for developpeur
-// pub fn debeug(vline : usize, buf: [] const u8) void {
-	
-// 	const AtrDebug : term.ZONATRB = .{
-// 			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
-// 										@intFromEnum(term.Style.notStyle),
-// 										@intFromEnum(term.Style.notStyle),
-// 										@intFromEnum(term.Style.notStyle)},
-// 			.backgr = term.BackgroundColor.bgBlack,
-// 			.foregr = term.ForegroundColor.fgYellow
-// 	};
-
-// 	term.getCursor();
-// 	const Xterm = term.getSize();
-// 	term.gotoXY(Xterm.height,1) ;
-// 	const allocator = std.heap.page_allocator;
-// 	const msg =std.fmt.allocPrint(allocator,"line_src:{d}  {s} ",.{vline, buf}) 
-// 									catch |err| { @panic(@errorName(err));};
-// 	term.writeStyled(msg,AtrDebug);
-// 	_=term.kbd.getKEY();
-// 	term.gotoXY(term.posCurs.x,term.posCurs.y);
-// 	allocator.free(msg);
-// }
-
-
 //-------------------------------------------------------
 // management grid
 // ----------------
@@ -88,7 +60,6 @@ pub const ErrGrid = error{
 const TERMINAL_CHAR = struct { ch: []const u8, attribut: term.ZONATRB, on: bool };
 
 pub const grd = struct {
-
 	pub const CADRE = enum { line0, line1, line2 };
 
 	pub const REFTYP = enum {
@@ -1179,7 +1150,7 @@ pub const grd = struct {
 					return gSelect;
 				},
 
-				.up =>  if (CountLigne > 0) {
+				.up => if (CountLigne > 0) {
 					CountLigne -= 1;
 					self.cursligne -= 1;
 
