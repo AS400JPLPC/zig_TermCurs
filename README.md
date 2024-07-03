@@ -351,3 +351,6 @@ I'm making progress, and I'm going to create the JSON.<br />
 new version zig 0.13.0 stable<br />
 Implementation of the lib "library" removal of "deps"<br />
 I'm making progress, this MENU <br />
+
+→  2024-07-03<BR/> 
+a curse/forms shell <br />
