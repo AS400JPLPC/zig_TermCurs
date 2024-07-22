@@ -5,7 +5,7 @@
 	/// cadre
 	/// field
 	/// panel
-	/// zig 0.12.0 dev
+	/// zig 0.13.0 dev
 	///-----------------------
 
 
@@ -14,7 +14,7 @@ const utf = @import("std").unicode;
 const kbd = @import("cursed").kbd;
 const term= @import("cursed");
 const utl = @import("utils");
-const reg = @import("match");
+const reg = @import("mvzr");  // regex match
 
 const os = std.os;
 const io = std.io;
@@ -28,7 +28,7 @@ const Child = @import("std").ChildProcess;
 
 
 // for panel all arraylist (forms. label button line field pnl:)
- var arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+var arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 pub var  allocatorForms = arenaForms.allocator();
 pub fn deinitForms() void {
 	arenaForms.deinit();
@@ -102,9 +102,6 @@ pub fn debeug(vline : usize, buf: [] const u8) void {
 	term.gotoXY(term.posCurs.x,term.posCurs.y);
 	allocator.free(msg);
 }
-
-
-	
 
 
 
@@ -1149,11 +1146,11 @@ pub const	fld = struct {
 
 	// define attribut default func ioField
 	pub var AtrIO : term.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(term.Style.styleReverse ),
-										@intFromEnum(term.Style.styleDim),
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.styleBold),
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
-			.backgr = term.BackgroundColor.bgBlack,
+			.backgr = term.BackgroundColor.bgGray,
 			.foregr = term.ForegroundColor.fgWhite,
 	};
 
@@ -1179,7 +1176,7 @@ pub const	fld = struct {
 	
 	pub var AtrCursor : term.ZONATRB = .{
 			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
-										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.styleBold),
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
 			.backgr = term.BackgroundColor.bgBlack,
@@ -1594,7 +1591,7 @@ pub const	fld = struct {
 
 
 		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-		,.{"^(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4,4}$"}) 
+		,.{"(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4}"}) 
 		catch |err| { @panic(@errorName(err));};
 
 		if (xfield.help.len == 0 ) xfield.help = "ex: date DD/MM/YYYY" ;
@@ -1646,7 +1643,7 @@ pub const	fld = struct {
 		};
 
 		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-		,.{"^(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4,4}$" })
+		,.{"(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4}"})
 		catch |err| { @panic(@errorName(err));};
 
 		if (xfield.help.len == 0 ) xfield.help = "ex: date MM/DD/YYYY";
@@ -1700,7 +1697,7 @@ pub const	fld = struct {
 
 
 		xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-		,.{"^([0-9]{4,4})[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$"})
+		,.{"[0-9]{4}[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])"})
 		catch |err| { @panic(@errorName(err));};
 
 		if (xfield.help.len == 0 )	xfield.help = "ex: date YYYY-MM-DD" ;
@@ -1753,7 +1750,7 @@ pub const	fld = struct {
 
 	// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-			,.{"^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@([a-zA-Z0-9.-])+$"})
+			,.{"[a-zA-Z0-9_!#$%&'*+\\/=?`{|}~^.-]+@[a-zA-Z0-9.-]"})
 			catch |err| { @panic(@errorName(err));};
 			
 			if (xfield.help.len == 0 ) xfield.help = "ex: myname.my_firstname@gmail.com" ;
@@ -1806,12 +1803,12 @@ pub const	fld = struct {
 
 			if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
 			"^{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
-			// regex standar
+			// regex standard fr
 			if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-			,.{"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"})
+			,.{"[+][(][0-9]{2,3}[)][0-9]([-. }?[0-9]{2,3}){1,4}"})
 			catch |err| { @panic(@errorName(err));};
 
-			if (xfield.help.len == 0 ) xfield.help = "ex fr : +(33)6.12.131.141" ;
+			if (xfield.help.len == 0 ) xfield.help = "ex fr : +(33)6.12.13.14.15" ;
 
 		return xfield;
 
@@ -1858,7 +1855,7 @@ pub const	fld = struct {
 		};
 
 			if (vregex.len == 0 ) {
-				xfield.regex = std.fmt.allocPrint(allocatorForms,"^[0-9]{{1,{d}}}$",.{xfield.width})
+				xfield.regex = std.fmt.allocPrint(allocatorForms,"[0-9]{{1,{d}}}",.{xfield.width})
 				catch |err| { @panic(@errorName(err));};
 			}
 			if (xfield.help.len == 0 ) xfield.help = "ex: 0..9" ;
@@ -1907,7 +1904,7 @@ pub const	fld = struct {
 		};
 			xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
 			if (vregex.len == 0 ) {
-				xfield.regex = std.fmt.allocPrint(allocatorForms,"^[+-][0-9]{{1,{d}}}$",.{xfield.width})
+				xfield.regex = std.fmt.allocPrint(allocatorForms,"([+]|[-])[0-9]{{1,{d}}}",.{xfield.width})
 				catch |err| { @panic(@errorName(err));};
 			}
 			if (xfield.help.len == 0 ) xfield.help = "ex: +0..9" ;
@@ -1962,10 +1959,10 @@ pub const	fld = struct {
 
 		if (vregex.len == 0 ) {
 			if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
-			"^[0-9]{{1,{d}}}$",.{vwidth})	catch |err| { @panic(@errorName(err));}
+			"[0-9]{{1,{d}}}",.{vwidth})	catch |err| { @panic(@errorName(err));}
 
 			else xfield.regex = std.fmt.allocPrint(allocatorForms,
-			"^[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal,})
+			"[0-9]{{1,{d}}}[.][0-9]{{{d}}}",.{vwidth,vscal,})
 			catch |err| { @panic(@errorName(err));};
 		}
 		if (xfield.help.len == 0 ) xfield.help = "ex: 12301 or 123.01" ;
@@ -2020,10 +2017,10 @@ pub const	fld = struct {
 		if (vregex.len == 0 ) {
 
 			if (vscal == 0 ) xfield.regex =	std.fmt.allocPrint(allocatorForms,
-			"^[+-][0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
+			"([+]|[-])[0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
 
 			else xfield.regex = std.fmt.allocPrint(allocatorForms,
-			"^[+-][0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) 
+			"([+]|[-])[0-9]{{1,{d}}}[.][0-9]{{{d}}}",.{vwidth,vscal}) 
 			catch |err| { @panic(@errorName(err));};
 
 		}
@@ -2248,6 +2245,9 @@ pub const	fld = struct {
 	}
 
 
+
+
+
 	// clear value ALL FIELD
 	pub fn clearAll(vpnl: *pnl.PANEL) void {
 		var n : usize = 0;
@@ -2367,6 +2367,35 @@ pub const	fld = struct {
 	// inspiration ncurse
 	// application hold principe and new langage
 	//----------------------------------------------------==
+
+
+	pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
+	     const maybe_regex = reg.compile(pattern) ;
+	     if (maybe_regex) |regex| return regex.isMatch(testval) 
+	     else  return false ;   
+	}
+
+
+	pub fn isMatchFixed(testval : [] const u8, comptime pattern : [] const u8 ) bool {
+		const ops, const sets  = reg.resourcesNeeded(pattern);
+		const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	    const maybe_regex = SlimmedDownRegex.compile(pattern);
+	    if (maybe_regex) |regex| return regex.isMatch(testval) 
+	    else  return false ;   
+	}
+
+
+	// controle date YYYY-MM-DD validate
+	pub fn ctrlDate(testval : [] const u8) bool {
+		
+		const pattern : [] const u8= "([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)";
+		
+		const ops, const sets  = reg.resourcesNeeded(pattern);
+		const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	    const maybe_regex = SlimmedDownRegex.compile(pattern);
+	    if (maybe_regex) |regex| return regex.isMatch(testval) 
+	    else  return false ;
+	}	
 
 	var e_FIELD : std.ArrayList([] const u8) = undefined;
 
@@ -2607,7 +2636,7 @@ pub const	fld = struct {
 		var Fkey : term.Keyboard = undefined ;
 		var boucle : bool= true ;
 
-		term.defCursor(term.typeCursor.cBlink);
+		term.defCursor(term.typeCursor.cSteady);
 
 		term.onMouse();
 
@@ -2629,7 +2658,7 @@ pub const	fld = struct {
 			term.gotoXY(e_posx,e_curs);
 
 			if (statusCursInsert) term.defCursor(term.typeCursor.cSteadyBar)	
-			else term.defCursor(term.typeCursor.cBlink); // CHANGE CURSOR FORM BAR/BLOCK
+			else term.defCursor(term.typeCursor.cSteady); // CHANGE CURSOR FORM BAR/BLOCK
 
 			switch(e_reftyp) {
 				.PASSWORD => { 
@@ -2642,7 +2671,7 @@ pub const	fld = struct {
 			term.cursShow();
 
 			Fkey = kbd.getKEY();
-
+			term.cursHide();
 			term.resetStyle();
 
 			if (isfuncKey(vpnl,Fkey)) boucle = false
@@ -2760,7 +2789,7 @@ pub const	fld = struct {
 
 						//check field.len > 0 and regexLen > 0 execute regex
 						if ( vfld.regex.len > 0 and utl.trimStr(utl.listToStr(e_FIELD)).len > 0) {
-								if ( ! reg.isMatch(utl.trimStr(utl.listToStr(e_FIELD)) ,vfld.regex) ) {
+								if ( ! isMatch(utl.trimStr(utl.listToStr(e_FIELD)) ,vfld.regex) ) {
 									msgErr(vpnl,vfld,vfld.errmsg);
 									e_curs = e_posy;
 									e_count = 0 ;
@@ -3542,7 +3571,7 @@ pub const Epanel = enum {
 				}
 				//check requier and field.len > 0 and regexLen > 0 execute regex
 				if ( f.regex.len > 0 and f.requier and utl.trimStr(f.text).len > 0) {
-						if ( !reg.isMatch(utl.trimStr(f.text) ,f.regex)) {
+						if (!fld.isMatch(utl.trimStr(f.text) ,f.regex)) {
 							vpnl.idxfld = idx;
 							return false;
 						}
@@ -3625,7 +3654,8 @@ pub const Epanel = enum {
 		// Processing of the panel's Fields
 		while (true) {
 
-		
+			term.deinitTerm();
+
 			if (nbrField == 0 or vpnl.field.items.len == 0 )	{
 				const vKey= kbd.getKEY();
 

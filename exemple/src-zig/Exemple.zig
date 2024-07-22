@@ -1,3 +1,8 @@
+	///-----------------------
+	/// prog Exemple 
+	/// zig 0.13.0 dev
+	///-----------------------
+
 const std = @import("std");
 
 
@@ -43,7 +48,7 @@ const mnu = @import("menu").mnu;
 const utl = @import("utils");
 
 // tools regex
-const reg = @import("match");
+const reg = @import("mvzr");
 
 // tools execve Pgm
 const mdl = @import("callpgm");
@@ -51,6 +56,7 @@ const mdl = @import("callpgm");
 /// Errors 
 pub const Error = error{
 	main_function_Enum_invalide,
+	main_run_EnumTask_invalide,
 };
 
 
@@ -180,7 +186,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,						// tofill
 										"required",					// error msg
 										"please enter text Alpha crtl+p call Exemple",	// help
-										"^[a-zA-Z]{1,}$",			// regex
+										"^[a-z]{1,1}[a-zA-Z]{0,}$"	// regex
 										)
 	) catch unreachable ;
 	
@@ -202,7 +208,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,								// tofill
 										"required",							// error msg
 										"please enter text Alpha Numéric",	// help
-										"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}",	// regex
+										"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$",	// regex
 										)
 	) catch unreachable ;
 
@@ -212,7 +218,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,								// tofill
 										"required",							// error msg
 										"please enter text Alpha Numéric",	// help
-										"^[A-Z]{1,1}[A-Z0-9]{0,}",			// regex
+										"^[A-Z]{1,1}[A-Z0-9]{0,}$",			// regex
 										)
 	) catch unreachable ;
 
@@ -276,47 +282,54 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										)
 	) catch unreachable ;
 	
-	Panel.field.append(fld.newFieldDateISO("dateiso",18,32,		// Name , posx posy
-										"1951-10-12",			// text
-										true,					// tofill
-										"required",				// error msg
-										"",						// help default
+	Panel.field.append(fld.newFieldDateISO("dateiso",18,32,			// Name , posx posy
+										"1951-10-12",				// text
+										true,						// tofill
+										"date out of calendar",		// error msg
+										"",							// help default
 										)
 	) catch unreachable ;
+	// test with a calendar file to know the opening days
+	// single digit test
 	
-	Panel.field.append(fld.newFieldDateFR("datefr",19,32,		// Name , posx posy
-										"12/10/1951",			// text
-										true,					// tofill
-										"required",				// error msg
-										"",						// help default
+	// fld.setTask(Panel,fld.getIndex(Panel,"dateiso") catch unreachable,"TaskIso") catch unreachable ;
+
+	
+	Panel.field.append(fld.newFieldDateFR("datefr",19,32,			// Name , posx posy
+										"12/10/1951",				// text
+										true,						// tofill
+										"date hors calendrier",		// error msg
+										"",							// help default
 										)
 	) catch unreachable ;
+	fld.setTask(Panel,fld.getIndex(Panel,"datefr") catch unreachable,"TaskFr") catch unreachable ;
 	
 	Panel.field.append(fld.newFieldDateUS("dateus",20,32,			// Name , posx posy
 										"07/04/1776",				// text
 										true,						// tofill
-										"required",					// error msg
+										"date out of calendar",	// error msg
 										"",							// help default
 										)
 	) catch unreachable ;
+	fld.setTask(Panel,fld.getIndex(Panel,"dateus") catch unreachable,"TaskUs") catch unreachable ;
 
 	Panel.field.append(fld.newFieldTelephone("telephone",22,32,		// Name , posx posy
 										25,							// width
 										"+(001)451 452 453 545",	// text
 										true,						// tofill
 										"required or invalide",		// error msg
-										"ex:+(001)456.123.789",	 	// help
-			 "^[+]{1,1}[(]([0-9]{3,3})[)]([-. ]?[0-9]{3}){2,4}$",	// regex US default standard
+										"ex:+(001)456.123.789",		// help
+				 "[+][(][0-9]{3}[)][0-9]{3}([-. ]?[0-9]{3}){1,4}"	// regex US default standard
 										)
 	) catch unreachable ;
 
-	Panel.field.append(fld.newFieldTelephone("telephone2",24,32,			// Name , posx posy
-										25,						 			// width
-										"+(33)6 01 02 03 04",				// text
-										false,								// tofill
-										"required or invalide",	 			// error msg
-										"ex:+(33)6.12.34.56.78",			// help
-"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"	// regex default standard fr
+	Panel.field.append(fld.newFieldTelephone("telephone2",24,32,	// Name , posx posy
+										25,							// width
+										"+(33)6 01 02 03 04",		// text
+										false,						// tofill
+										"required or invalide",		// error msg
+										"ex:+(33)6.12.34.56.78",	// help
+				"[+][(][0-9]{2,3}[)][0-9]([-. ]?[0-9]{2,3}){1,4}"	// regex default standard fr
 										)
 	) catch unreachable ;
 	
@@ -582,7 +595,92 @@ pub const FnEnum = enum {
 var callFunc: FnEnum = undefined;
 
 
-/// run emun Function ex: combo
+
+var callTask: TaskEnum = undefined;
+fn TaskIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+	if ( ! fld.ctrlDate(vfld.text) ) {
+
+		const allocator = std.heap.page_allocator;
+		const msg = std.fmt.allocPrint(allocator,
+			"{s} inconsistent date  ",.{vfld.text}) catch unreachable;
+		defer allocator.free(msg);
+		pnl.msgErr(vpnl, msg);
+		vpnl.keyField = kbd.task;
+		}
+	return;
+}
+
+
+fn TaskFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+	const valtest = std.fmt.allocPrint(
+		utl.allocUtl,
+		"{s}-{s}-{s}",
+		.{ vfld.text[6..10], vfld.text[3..5], vfld.text[0..2]}) catch unreachable;
+
+	if ( ! fld.ctrlDate(valtest) ) {
+
+		const allocator = std.heap.page_allocator;
+		const msg = std.fmt.allocPrint(allocator,
+			"{s} inconsistent date  ",.{vfld.text}) catch unreachable;
+		defer allocator.free(msg);
+		pnl.msgErr(vpnl, msg);
+		vpnl.keyField = kbd.task;
+		}
+	return;
+}
+
+
+fn TaskUs( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+	const valtest = std.fmt.allocPrint(
+		utl.allocUtl,
+		"{s}-{s}-{s}",
+		.{ vfld.text[6..10], vfld.text[0..2], vfld.text[3..5]}) catch unreachable;
+
+	if ( ! fld.ctrlDate(valtest) ) {
+
+		const allocator = std.heap.page_allocator;
+		const msg = std.fmt.allocPrint(allocator,
+			"{s} inconsistent date  ",.{vfld.text}) catch unreachable;
+		defer allocator.free(msg);
+		pnl.msgErr(vpnl, msg);
+		vpnl.keyField = kbd.task;
+		}
+	return;
+}
+
+pub const TaskEnum = enum {
+	TaskIso,
+	TaskFr,
+	TaskUs,
+	none,
+
+	pub fn run(self: TaskEnum, 	vpnl : *pnl.PANEL, vfld: *fld.FIELD) void	{
+				switch (self) {
+				.TaskIso	=> TaskIso(vpnl,vfld),
+				.TaskFr		=> TaskFr(vpnl,vfld),
+				.TaskUs		=> TaskUs(vpnl,vfld),
+
+				else => dsperr.errorForms(vpnl,	Error.main_run_EnumTask_invalide),
+
+				}
+	}
+	fn searchFn ( vtext: [] const u8 ) TaskEnum {
+		const max :usize = @typeInfo(TaskEnum).Enum.fields.len - 1;
+		
+		inline for (@typeInfo(TaskEnum).Enum.fields) |f| { 
+				if ( std.mem.eql(u8, f.name , vtext) ) return @as(TaskEnum,@enumFromInt(f.value));
+		}
+		return @as(TaskEnum,@enumFromInt(max));
+	}
+};
+
+
+
+var callProg: FnProg = undefined;
+/// call program estern
 pub const FnProg = enum {
 	exCallpgm,
 	none,
@@ -590,8 +688,8 @@ pub const FnProg = enum {
 	pub fn run(self: FnProg, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void	{
 		switch (self) {
 			.exCallpgm=> {
-
-			 mdl.callPgm("APPTERM",vfld.progcall) 
+			const pgmParm : ?[] const u8 = null;
+			 mdl.callPgmPid("APPTERM",vfld.progcall,pgmParm) 
 						catch |err | switch(err)  {
 								mdl.ErrChild.Module_Invalid => {
 								const msgerr  = std.fmt.allocPrint(utl.allocUtl,
@@ -618,10 +716,9 @@ pub const FnProg = enum {
 
 	}
 };
-var callProg: FnProg = undefined;
 
-
-pub fn deinitWrk() void {
+// clean work
+ pub fn deinitWrk() void {
 	term.deinitTerm();
 	grd.deinitGrid();
 	utl.deinitUtl();
@@ -659,11 +756,7 @@ pub fn main() !void {
 
 
 	while (true) {
-		// clean works
-		term.deinitTerm();
-		grd.deinitGrid();
-		utl.deinitUtl();
-		
+		deinitWrk();
 		Tkey.Key = pnl.ioPanel(pFmt01);
 		
 		switch (Tkey.Key) {
@@ -673,9 +766,15 @@ pub fn main() !void {
 			callFunc.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
 			},
 
+			// call proc contrôl chek value
+			.task => {
+				callTask = TaskEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].proctask); 
+				callTask.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
+			},
+			
 			.call => {
-			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); // call programe ex: Exemple
-			callProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); // call programe ex: ExemplecallProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+			callProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
 			},
 
 			.F2 => {

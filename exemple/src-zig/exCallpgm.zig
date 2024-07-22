@@ -1,3 +1,8 @@
+	///-----------------------
+	/// prog exCallpgm
+	/// zig 0.13.0 dev
+	///-----------------------
+
 const std = @import("std");
 
 
@@ -43,7 +48,7 @@ const mnu = @import("menu").mnu;
 const utl = @import("utils");
 
 // tools regex
-const reg = @import("match");
+const reg = @import("mvzr");
 
 /// Errors 
 pub const Error = error{
@@ -122,11 +127,11 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
 	Panel.field.append(fld.newFieldAlpha("alpha",5,32,				// Name , posx posy
 										30,							// width
-										"abcd",						// text
+										"Abcd",						// text
 										true,						// tofill
 										"required",					// error msg
 										"please enter text Alpha crtl+p call Exemple",	// help
-										"^[a-zA-Z]{1,}$",			// regex
+										"^[A-Z]{1}[a-zA-Z]{0,}$",			// regex
 										)
 	) catch unreachable ;
 		

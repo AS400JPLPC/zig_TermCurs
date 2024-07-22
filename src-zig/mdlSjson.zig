@@ -1,9 +1,12 @@
 	///-----------------------
 	/// prog mdlSjson 
-	/// zig 0.12.0 dev
+	/// zig 0.13.0 dev
 	///-----------------------
 
+
+
 const std = @import("std");
+
 
 // keyboard
 const kbd = @import("cursed").kbd;
@@ -122,7 +125,7 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 								.check => {
 									try w.objectField(@tagName(btn.Ebutton.check));
 									if (@intFromBool(XPANEL.items[np].button.items[bp].check) == 1)
-													try w.print("\"true\"", .{})
+													try w.print("true", .{})
 									else try w.print("false", .{});
 								},
 								.title => {

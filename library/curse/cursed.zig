@@ -61,7 +61,7 @@ pub const ForegroundColor = enum(u8) { // terminal's foreground colors
     fgBlue, // blue
     fgMagenta, // magenta
     fgCyan, // cyan
-    fgWhite, // white
+    fgWhite , // white
 };
 
 pub const BackgroundColor = enum(u8) { // terminal's background colors
@@ -73,6 +73,7 @@ pub const BackgroundColor = enum(u8) { // terminal's background colors
     bgMagenta, // magenta
     bgCyan = 106, // cyan
     bgWhite = 47, // white
+    bgGray = 100, // Gray
 };
 
 // attribut standard
@@ -406,22 +407,6 @@ pub fn enableRawMode() void {
 
     // https://zig.news/lhp/want-to-create-a-tui-application-the-basics-of-uncooked-terminal-io-17gm
 
-    //---------------------------------------------------------------
-    // v 0.11.0
-    //---------------------------------------------------------------
-    // use_termios.iflag &= ~(os.linux.IGNBRK | os.linux.BRKINT | os.linux.PARMRK | os.linux.INPCK | os.linux.ISTRIP |
-    // 		os.linux.INLCR | os.linux.IGNCR | os.linux.ICRNL | os.linux.IXON);
-    // use_termios.oflag &= ~(os.linux.OPOST);
-    // use_termios.cflag &= ~(os.linux.CSIZE | os.linux.PARENB);
-    // use_termios.cflag |= (os.linux.CS8);
-    // use_termios.lflag &= ~(os.linux.ECHO | os.linux.ECHONL | os.linux.ICANON | os.linux.IEXTEN | os.linux.ISIG);
-
-    // Wait until it reads at least one byte	terminal standard
-    // use_termios.cc[os.linux.V.MIN] = 1;
-
-    // Wait 100 miliseconds at maximum.
-    // use_termios.cc[os.linux.V.TIME] = 0;
-    //---------------------------------------------------------------
 
     // iflag;	  /* input modes			*/
     // oflag;	  /* output modes			*/
@@ -429,7 +414,6 @@ pub fn enableRawMode() void {
     // lflag;	  /* local modes			*/
     // cc[NCCS];   /* special characters	*/
 
-    // V 0.12 0 >
     var iflags = use_termios.iflag;
     iflags.IGNBRK = false;
     iflags.BRKINT = false;
@@ -460,11 +444,11 @@ pub fn enableRawMode() void {
     lflags.ISIG = false;
     use_termios.lflag = lflags;
 
-    //Wait until it reads at least one byte	terminal standard
+    //Nombre minimum de caractères lors d'une lecture en mode non canonique
     use_termios.cc[@intFromEnum(std.os.linux.V.MIN)] = 1;
 
     // Wait 100 miliseconds at maximum.
-    use_termios.cc[@intFromEnum(os.linux.V.TIME)] = 1;
+    use_termios.cc[@intFromEnum(std.os.linux.V.TIME)] = 1;
 
     // apply changes
     _ = os.linux.tcsetattr(TTY.handle, .NOW, &use_termios);
@@ -588,6 +572,18 @@ pub const kbd = enum {
     F22,
     F23,
     F24,
+    F25,
+    F26,
+    F27,
+    F28,
+    F29,
+    F30,
+    F31,
+    F32,
+    F33,
+    F34,
+    F35,
+    F36,
     altA,
     altB,
     altC,
@@ -691,10 +687,17 @@ pub const kbd = enum {
                 return @as(kbd, @enumFromInt(10 + result));
             }
 
-            // f20..f24
+            // f20..f29
             if (vlen == 3 and name[1] == '2') {
                 result = @as(u8, name[2]) - 48;
                 return @as(kbd, @enumFromInt(20 + result));
+            }
+
+            
+            // f30..f36
+            if (vlen == 3 and name[1] == '3') {
+                result = @as(u8, name[2]) - 48;
+                return @as(kbd, @enumFromInt(30 + result));
             }
         }
 
@@ -759,6 +762,8 @@ pub const kbd = enum {
                 return Event;
             };
         }
+
+// std.debug.print("{any}\r\n",.{keybuf});
 
         const view = std.unicode.Utf8View.init(keybuf[0..c]) catch {
             Event.Key = kbd.none;
@@ -1057,6 +1062,7 @@ pub const kbd = enum {
                     return Event;
                 };
                 Event.Char = vUnicode[0..i];
+
                 Event.Key = kbd.char;
                 return Event;
             },
@@ -1070,6 +1076,8 @@ pub const kbd = enum {
         // init
         var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
 
+        // std.debug.print("{u}\r\n",.{csibuf[0]});
+    
         switch (csibuf[0]) {
             // keys
             'A' => {
@@ -1160,7 +1168,7 @@ pub const kbd = enum {
                     }
                 }
 
-                if (csibuf[2] == 50) { // f11..f14 and // shift
+                if (csibuf[2] == 50) { // f13..f16 
                     switch (csibuf[3]) {
                         'P' => {
                             Event.Key = kbd.F13;
@@ -1221,7 +1229,7 @@ pub const kbd = enum {
                     }
                 }
 
-                if (csibuf[2] == 53) { //	sihft ctrl
+                if (csibuf[2] == 53) { //	no verr.numeric
                     switch (csibuf[3]) {
                         'A' => {
                             Event.Key = kbd.up;
@@ -1258,7 +1266,7 @@ pub const kbd = enum {
                     }
                 }
 
-                if (csibuf[2] == 54) { //	sihft / controle
+                if (csibuf[2] == 54) { //	shift / controle
                     switch (csibuf[3]) {
                         'A' => {
                             Event.Key = kbd.up;
@@ -1288,29 +1296,20 @@ pub const kbd = enum {
                             Event.Key = kbd.pageDown;
                             return Event;
                         },
-                        else => {
-                            Event.Key = kbd.none;
-                            return Event;
-                        },
-                    }
-                }
-
-                if (csibuf[2] == 60) { // f11..f14
-                    switch (csibuf[3]) {
                         'P' => {
-                            Event.Key = kbd.F13;
+                            Event.Key = kbd.F25;
                             return Event;
                         },
                         'Q' => {
-                            Event.Key = kbd.F14;
+                            Event.Key = kbd.F26;
                             return Event;
                         },
                         'R' => {
-                            Event.Key = kbd.F15;
+                            Event.Key = kbd.F27;
                             return Event;
                         },
                         'S' => {
-                            Event.Key = kbd.F16;
+                            Event.Key = kbd.F28;
                             return Event;
                         },
                         else => {
@@ -1320,7 +1319,7 @@ pub const kbd = enum {
                     }
                 }
 
-                if (csibuf[4] == 126) { // f15..f24
+                if (csibuf[3] == 50 and csibuf[4] == 126) { // f15..f24
                     switch (csibuf[1]) {
                         '5' => {
                             Event.Key = kbd.F17;
@@ -1352,6 +1351,46 @@ pub const kbd = enum {
                         },
                         '4' => {
                             Event.Key = kbd.F24;
+                            return Event;
+                        },
+                        else => {
+                            Event.Key = kbd.none;
+                            return Event;
+                        },
+                    }
+                }
+                 if (csibuf[3] == 54 and csibuf[4] == 126) { // f29..f36
+                    switch (csibuf[1]) {
+                        '5' => {
+                            Event.Key = kbd.F29;
+                            return Event;
+                        },
+                        '7' => {
+                            Event.Key = kbd.F30;
+                            return Event;
+                        },
+                        '8' => {
+                            Event.Key = kbd.F31;
+                            return Event;
+                        },
+                        '9' => {
+                            Event.Key = kbd.F32;
+                            return Event;
+                        },
+                        '0' => {
+                            Event.Key = kbd.F33;
+                            return Event;
+                        },
+                        '1' => {
+                            Event.Key = kbd.F34;
+                            return Event;
+                        },
+                        '3' => {
+                            Event.Key = kbd.F35;
+                            return Event;
+                        },
+                        '4' => {
+                            Event.Key = kbd.F36;
                             return Event;
                         },
                         else => {

@@ -1,10 +1,13 @@
 	///-----------------------
 	/// prog Gencurs 
-	/// zig 0.12.0 dev
+	/// zig 0.13.0 dev
 	///-----------------------
 
 const std = @import("std");
 
+const deb_Log = @import("logger").openFile;   // open  file
+const end_Log = @import("logger").closeFile;  // close file
+const plog   = @import("logger").scoped;      // print file 
 
 
 /// terminal Fonction
@@ -44,7 +47,7 @@ const mnu = @import("menu").mnu;
 const utl = @import("utils");
 
 // tools regex
-const reg = @import("match");
+const reg = @import("mvzr");
 
 // Description PANEL
 const mdlPanel = @import("mdlPanel");
@@ -56,7 +59,7 @@ const mdlForms = @import("mdlForms");
 const mdlGrids = @import("mdlGrids");
 
 // Description GRID
-const mdlMenus = @import("mdlMenus");
+// const mdlMenus = @import("mdlMenus");
 
 // sauvegarde JSON
 const mdlFile = @import("mdlFile");
@@ -66,6 +69,7 @@ const allocator = std.heap.page_allocator;
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
+var NMENU  = std.ArrayList(mnu.MENU ).init(allocator);
 
 //================================
 // defined var global
@@ -146,12 +150,16 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
-		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID) ;
+		// if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
 
+deb_Log("LOG.txt");
+
+plog(.main).debug("Begin\n", .{});
 		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
+plog(.end).debug("End.\n", .{});
 
-
+end_Log();
 		// clean allocator *all
 		if (nopt == @intFromEnum(choix.clean)) {
 			pnl.freePanel(base);
@@ -168,6 +176,10 @@ pub fn main() !void {
 			if (NGRID.items.len > 0) {
 				NGRID.clearAndFree();
 				NGRID.deinit();
+			}
+			if (NMENU.items.len > 0) {
+				NMENU.clearAndFree();
+				NMENU.deinit();
 			}
 			base = pnl.newPanelC("base",
 			1, 1,

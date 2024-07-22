@@ -33,8 +33,11 @@ thank you for your valuable explanations   David Vanderson<br />
 https://zig.news/david_vanderson<br /> <br />
 Structure the complex build
 https://zig.news/xq/zig-build-explained-part-3-1ima <BR /><br />
-inspiration
-https://www.openmymind.net/Regular-Expressions-in-Zig/<BR /> <br />
+
+thank you for your valuable explanations  Sam Atman 
+https://github.com/mnemnion/mvzr/<BR /> <br />
+
+
 extra..., to follow and have a history
 https://github.com/kissy24/zig-logger/<BR /> <br />
 <br />
@@ -353,4 +356,11 @@ Implementation of the lib "library" removal of "deps"<br />
 I'm making progress, this MENU <br />
 
 →  2024-07-03<BR/> 
-a curse/forms shell <br />
+curse/forms shell <br />
+
+
+→  2024-07-03<BR/> 
+-  big update cursed  F1..F36 extension <br />
+-  Change of REGEX module <br />
+Following the work provided by **Sam Atman**, a basic "regex" library allowing on-the-fly constraint testing of a form, all written in ZIG, now my project is in pure ZIG.
+-  Therefore, update of the forms module, revision of the mdlPanel module to integrate the functions F1..F36, and correction of an error in mdlJson.
