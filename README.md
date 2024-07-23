@@ -167,7 +167,7 @@ COMBO<BR/>
 &rarr;&nbsp; folder library:  zig       source files <br />
 &rarr;&nbsp; folder src_c:    C/C++     source files <br />
 &rarr;&nbsp; folder src_zig:  ZIG-lang  source files <br />
-&rarr;&nbsp; folder lib:      src xx.H  source files regex.h<br />
+&rarr;&nbsp; folder lib:      src xx.H  source files <br />
 &rarr;&nbsp; build: build+source-name ex: buildexemple <br />
 &rarr;&nbsp; makefile <br />
 <br />
@@ -267,7 +267,7 @@ Contains various functions to manage the control needs of FIELD or STRING manage
 <br />
 The Example program demonstrates how to manage and use these functions. A tip: the first Panel can serve as the definition of the terminal window.<br />
 <br />
-"MATCH": (regex libc)<br />
+"MATCH": (regex MVZR pur zig)<br />
 <br />
 "LOGGER": <br />
 Allows for a written record of variables or waypoints.<br />
@@ -359,8 +359,12 @@ I'm making progress, this MENU <br />
 curse/forms shell <br />
 
 
-→  2024-07-03<BR/> 
+→  2024-07-22<BR/> 
 -  big update cursed  F1..F36 extension <br />
 -  Change of REGEX module <br />
 Following the work provided by **Sam Atman**, a basic "regex" library allowing on-the-fly constraint testing of a form, all written in ZIG, now my project is in pure ZIG.
--  Therefore, update of the forms module, revision of the mdlPanel module to integrate the functions F1..F36, and correction of an error in mdlJson.
+-  Therefore, update of the forms module, revision of the mdlPanel module to integrate the functions F1..F36, and correction of an error in mdlJson. <br />
+
+
+→  2024-07-23<BR/>
+-  correction of mdlForms following the inclusion of the new regex module. <br />

@@ -874,7 +874,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		true, // required
 		"required help ctrl-h", // Msg err
 		"please enter text 1car Letter  other alphanumeric", // help
-		"(^[a-zA-Z]{1,1}[a-zA-Z0-9]{1,})$" // regex
+		"^[a-zA-Z]{1}[a-zA-Z0-9]{0,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
 	fld.setTask(Panel, @intFromEnum(fp02.fname), "TaskName") 
@@ -1048,7 +1048,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		false, // required
 		"required Function", // Msg err
 		"please enter Name Function  F.....", // help
-		"(^[F]{1,1}[a-zA-Z0-9]{1,})$" // regex
+		"^[F]{1}[a-zA-Z0-9]{1,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
 	fld.setTask(Panel, @intFromEnum(fp02.ffunc), "TaskFunc") catch |err| {
@@ -1066,7 +1066,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		false, // required
 		"err Task", // Msg err
 		"please enter Name Task T.....", // help
-		"(^[T]{1,1}[a-zA-Z0-9]{1,})$" // regex
+		"^[T]{1}[a-zA-Z0-9]{1,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
 	Panel.label.append(lbl.newLabel(@tagName(fp02.fcall), 10, 2, "Exec.:"))
@@ -1079,7 +1079,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		false, // required
 		"Value invalid", // Msg err
 		"please enter Name Exec <Proram>", // help
-		"(^[A-Z]{1,1}[a-zA-Z0-9]{1,})$" // regex
+		"^[A-Z]{1}[a-zA-Z0-9]{1,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); };
 	
 	fld.setTask(Panel, @intFromEnum(fp02.fcall), "TaskCall") catch |err| {
@@ -1096,7 +1096,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		false, // required
 		"funcCall", // function
 		"enter type call", // Msg err
-		"Tepe call", // help
+		"Type call", // help
 	)) catch |err| { @panic(@errorName(err)); };
 
 	fld.setTask(Panel, @intFromEnum(fp02.ftcall), "TaskTcall") catch |err| {
@@ -1208,7 +1208,7 @@ fn funcCall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		"qryPanel",
 		vpnl.posx + 1,
 		vpnl.posy + 1,
-		7,
+		4,
 		grd.gridStyle,
 		grd.CADRE.line1,
 	);
