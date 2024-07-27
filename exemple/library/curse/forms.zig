@@ -1204,22 +1204,23 @@ pub const	fld = struct {
 		atrCall:term.ZONATRB,
 		reftyp:   REFTYP,
 		width:	usize,
-		scal:	 usize,
-		nbrcar:   usize,  // nbrcar DECIMAL = (precision+scale + 1'.' ) + 1 this signed || other nbrcar = ALPA..DIGIT..
+		scal:	usize,
+		nbrcar: usize,  	// nbrcar DECIMAL = (precision+scale + 1'.' ) 
+							//	+ 1 this signed || other nbrcar = width
 
-		requier: bool,	// requier or FULL
-		protect: bool,	// only display
+		requier: bool,		// requier or FULL
+		protect: bool,		// only display
 
-		pading: bool,	 // pading blank
+		pading: bool,	 	// pading blank
 		edtcar: []const u8,	// edtcar for monnaie		€ $ ¥ ₪ £ or %
 
 		regex:  []const u8,	//contrôle regex
 		errmsg: []const u8,	//message this field
 
-		help: []const u8,	  //help this field
+		help: []const u8,	//help this field
 
-		text: []const u8,
-		zwitch: bool,		  // CTRUE CFALSE
+		text: []const u8,	// text saisie
+		zwitch: bool,		// CTRUE CFALSE
 
 		procfunc: []const u8,	//name proc
 
@@ -1265,11 +1266,11 @@ pub const	fld = struct {
 	// New Field String ---> arraylist panel-label
 	// refence type
 	// TEXT_FREE,
+	// TEXT_FULL,
 	// ALPHA,
 	// ALPHA_UPPER,
 	// ALPHA_NUMERIC,
 	// ALPHA_NUMERIC_UPPER,
-	// ALPHA_FULL,
 	// PASSWORD,
 	// YES_NO,
 	fn initFieldString(
@@ -1425,7 +1426,7 @@ pub const	fld = struct {
 
 	// New Field String	---> arraylist panel-lfield
 	// refence type
-	// .ALPHA_NUMERIC
+	// .ALPHA_NUMERIC_UPPER
 	pub fn newFieldAlphaNumericUpper(vname: [] const u8,
 										vposx: usize, vposy: usize,
 										vwidth:	usize,
@@ -2184,7 +2185,6 @@ pub const	fld = struct {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].actif;
 		return ErrForms.fld_getActif_Index_invalide ;
 	}
-
 
 	pub fn setText(vpnl: *pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].text = val

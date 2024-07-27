@@ -5,9 +5,6 @@
 
 const std = @import("std");
 
-const deb_Log = @import("logger").openFile;   // open  file
-const end_Log = @import("logger").closeFile;  // close file
-const plog   = @import("logger").scoped;      // print file 
 
 
 /// terminal Fonction
@@ -59,7 +56,7 @@ const mdlForms = @import("mdlForms");
 const mdlGrids = @import("mdlGrids");
 
 // Description GRID
-// const mdlMenus = @import("mdlMenus");
+const mdlMenus = @import("mdlMenus");
 
 // sauvegarde JSON
 const mdlFile = @import("mdlFile");
@@ -69,7 +66,7 @@ const allocator = std.heap.page_allocator;
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
-var NMENU  = std.ArrayList(mnu.MENU ).init(allocator);
+var NMENU  = std.ArrayList(mnu.MENUDEF ).init(allocator);
 
 //================================
 // defined var global
@@ -103,7 +100,7 @@ pub fn main() !void {
 	term.titleTerm("DESIGNER");
 
 
-	//term.resizeTerm(52,172);
+	term.resizeTerm(44,168);
 	const termSize = term.getSize();
 
 
@@ -150,16 +147,12 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
 		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
-		// if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
+		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
 
-deb_Log("LOG.txt");
 
-plog(.main).debug("Begin\n", .{});
 		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
 		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
-plog(.end).debug("End.\n", .{});
 
-end_Log();
 		// clean allocator *all
 		if (nopt == @intFromEnum(choix.clean)) {
 			pnl.freePanel(base);
@@ -168,6 +161,7 @@ end_Log();
 			grd.deinitGrid();
 			utl.deinitUtl();
 			forms.deinitForms();
+			mdlMenus.deinitMenu();
 
 			if (NPANEL.items.len > 0) {
 				NPANEL.clearAndFree();

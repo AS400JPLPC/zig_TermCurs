@@ -42,21 +42,52 @@ const mnu = @import("menu").mnu;
 const utl = @import("utils");
 
 // tools regex
-const reg = @import("match");
+const reg = @import("mvzr");
 
 var numPanel: usize = undefined;
-var numGrid : usize = undefined;
+var numMenu : usize = undefined;
+
+// for panel all arraylist (forms. label button line field pnl:)
+var arenaMenu = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+pub var  allocatorMenu = arenaMenu.allocator();
+pub fn deinitMenu() void {
+	arenaMenu.deinit();
+	arenaMenu = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	allocatorMenu = arenaMenu.allocator();
+}
+
 
 pub const ErrMain = error{
-	main_append_XPANEL_invalide,
+	// main_append_XPANEL_invalide,
 	main_run_FuncGrid_invalide,
 	main_run_TaskGrid_invalide,
 	main_run_FcellEnum_invalide,
 	main_run_TcellEnum_invalide,
-	main_loadPanel_allocPrint_invalide,
-	main_updatePanel_allocPrint_invalide,
-	main_XPANEL_invalide,
+	// main_loadPanel_allocPrint_invalide,
+	// main_updatePanel_allocPrint_invalide,
+	// main_XPANEL_invalide,
 };
+
+
+	pub fn initMenuDef(
+		vname: []const u8,
+		vposx: usize,
+		vposy: usize,
+		vcadre: mnu.CADRE,
+		vmnuvh: mnu.MNUVH,
+		vxitems : [][] const u8	) 
+		mnu.MENUDEF{
+			const xmenu = mnu.MENUDEF{
+			.name = vname,
+			.posx = vposx,
+			.posy = vposy,
+			.cadre = vcadre,
+			.mnuvh = vmnuvh,
+			.xitems = vxitems
+			};
+		return xmenu;
+	}
+
 
 fn strToUsize(v: []const u8) usize {
 	if (v.len == 0) return 0;
@@ -69,6 +100,17 @@ fn usizeToStr(v: usize) []const u8 {
 	return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
 		@panic(@errorName(err));
 	};
+}
+
+
+fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
+	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
+		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
+	}
+
+	var buffer: [128]u8 = [_]u8{0} ** 128;
+	const result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
+	@panic(result);
 }
 
 //=================================================
@@ -117,7 +159,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 //=================================================
 // description Function
 // choix work Grid
-pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
+pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.MENUDEF)) usize {
 	const cellPos: usize = 0;
 	var Gkey: grd.GridSelect = undefined;
 
@@ -137,7 +179,7 @@ pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
 	grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.setHeaders(Xcombo);
 
-	for (vgrd.items, 0..) |p, idx| {
+	for (vmnu.items, 0..) |p, idx| {
 		grd.addRows(Xcombo, &.{ usizeToStr(idx), p.name});
 	}
 
@@ -156,8 +198,10 @@ pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
 	}
 }
 
-
-
+//=================================================
+// end desription Function
+// display Help
+//=================================================
 pub fn Panel_HELP() *pnl.PANEL {
 	var Panel : *pnl.PANEL = pnl.newPanelC("HELP",
 										1, 1,
@@ -188,7 +232,6 @@ pub fn Panel_HELP() *pnl.PANEL {
 	return Panel;
 	}
 
-// end desription Function
 //=================================================
 
 var maxY: usize = 0;
@@ -198,12 +241,13 @@ var minX: usize = 0;
 var X: usize = 0;
 var Y: usize = 0;
 
-// const allocator = std.heap.page_allocator;
 
 var NGRID : std.ArrayList(grd.GRID) = undefined;
+var NMENU : std.ArrayList(mnu.MENUDEF) = undefined;
 
-//pub fn main() !void {
-pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID)) void {
+pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
+				XGRID: *std.ArrayList(grd.GRID),
+				XMENU: *std.ArrayList(mnu.MENUDEF)) void {
 	term.cls();
 
 
@@ -216,6 +260,12 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 	for (XGRID.items) |xgrd| { NGRID.append(xgrd) catch unreachable; }
 	defer NGRID.clearAndFree();
 	defer NGRID.deinit();
+
+
+	NMENU = std.ArrayList(mnu.MENUDEF).init(allocatorMenu);
+	for (XMENU.items) |xmenu| { NMENU.append(xmenu) catch unreachable; }
+	defer NMENU.clearAndFree();
+	defer NMENU.deinit();
 
 	term.cls();
 	var pFmt01: *pnl.PANEL = pnl.newPanelC("FRAM01",
@@ -337,10 +387,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 			mnu.CADRE.line1, // type line fram
 			mnu.MNUVH.vertical, // type menu vertical / horizontal
 			&.{ // item
-			"Combo-View",
-			"Cell-View",
-			"Cell-Order",
-			"Cell-Remove",
+			"Menu-View",
+			"Menu-Remove",
 			}
 		);
   
@@ -372,9 +420,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
 		switch (Tkey.Key) {
 			.F1	 => {
-				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-G add-Grid  Alt-C add-Cell")
+				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-M add-Menu  Alt-C add-Cell")
 					catch unreachable;
-				fld.setText(pFmtH01,1,"Alt-R remove Grid  AltW Outils")
+				fld.setText(pFmtH01,1,"AltW  view  / remove")
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
@@ -383,28 +431,30 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 				continue;
 			},
 			.F11 => {
-				// const allocator = std.heap.page_allocator;
-				// XGRID.clearAndFree();
-				// XGRID = XGRID.init(allocator);
-				XGRID.clearRetainingCapacity();
-				for (NGRID.items, 0..) |xgrd,idx| {
-					grd.resetRows(&NGRID.items[idx]);
-					
-					XGRID.append( grd.initGrid(
-							xgrd.name,
-							xgrd.posx,
-							xgrd.posy,
-							xgrd.pageRows,
-							xgrd.separator,
-							xgrd.cadre)
-						 ) catch unreachable;
-					for (xgrd.cell.items, 0..) |p,id| {
-						grd.newCell(&XGRID.items[idx], p.text, p.long, p.reftyp, p.atrCell.foregr);
-						grd.setCellEditCar(&XGRID.items[idx].cell.items[id], p.edtcar);
+				XMENU.clearRetainingCapacity();
+				for (NMENU.items) |xmnu| {
+					for (xmnu.xitems) |text | {
+						if (text.len > 0) {
+							XMENU.append(
+								initMenuDef(
+									xmnu.name,
+									xmnu.posx,
+									xmnu.posy,
+									xmnu.cadre,
+									xmnu.mnuvh,
+									xmnu.xitems
+								)
+							) catch unreachable;
+						}
+						break;
 					}
 				}
 				pnl.freePanel(pFmt01);
 				defer forms.allocatorForms.destroy(pFmt01);
+				defer NMENU.clearAndFree();
+				defer NMENU.deinit();
+				defer NGRID.clearAndFree();
+				defer NGRID.deinit();
 				return;
 			},
 			.F12 => {
@@ -414,8 +464,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 			},
 
 
-			// def grid
-			.altG => {
+			// def Menu
+			.altM => {
 				term.getCursor();
 				
 				if (term.posCurs.x < minX or term.posCurs.x > maxX or
@@ -425,7 +475,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 				term.gotoXY(term.posCurs.x , term.posCurs.y );
 				term.getCursor();
 				term.offMouse();
-				writeDefGrid(pFmt01);
+				writeDefMenu(pFmt01);
 				term.cls();
 				pnl.printPanel(pFmt01);
 				term.onMouse();
@@ -433,11 +483,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
 			// def field
 			.altC => {
-				numGrid = qryCellGrid(pFmt01, &NGRID);
+				numMenu = qryCellMenu(pFmt01, &NMENU);
 
-				if (numGrid != 999) {
+				if (numMenu != 999) {
 					term.offMouse();
-					writeDefCell(&NGRID,numGrid);
+					writeDefCell(&NMENU,numMenu);
 					term.cls();
 					pnl.printPanel(pFmt01);
 					term.onMouse();
@@ -445,54 +495,45 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 			},
 
 
-			// Order / Remove
+			// view
 			.altW => {
-				numGrid = qryCellGrid(pFmt01, &NGRID);
+				numMenu = qryCellMenu(pFmt01, &NMENU);
 
-				if (numGrid != 999) {
+				if (numMenu != 999) {
 					var nitem: usize = 0;
 					nitem = mnu.ioMenu( mChoix, nitem);
 					term.offMouse();
 					pnl.rstPanel(mnu.MENU,&mChoix,pFmt01);
 					term.onMouse();
 
-					if (nitem == 0) viewGrid(pFmt01,NGRID,numGrid );	// view  Grid
-					if (nitem == 1) viewCell(pFmt01,NGRID,numGrid );	// view  Cell
-					if (nitem == 2) orderCell(NGRID,numGrid );			// order Cell
-					if (nitem == 3) removeCell(NGRID,numGrid );			// order Cell
+					if (nitem == 0) viewMenu(pFmt01,NMENU,numMenu );
+					if (nitem == 1) removeMenu(&NMENU);
 					term.cls();
 					pnl.printPanel(pFmt01);
 					term.onMouse();
 				}
 			},
 			
-
-			// Remove
-			.altR => {
-					removeGrid(&NGRID);   // Remove Grid
-
-					term.cls();
-					pnl.printPanel(pFmt01);
-					term.onMouse();
-			},
 			else => {},
 		}
 	}
 }
 
+//=====================================================
+// display definition frame menu
+//=====================================================
 
 // forms field
 const fp02 = enum {
 	fname,
 	fposx,
 	fposy,
-	flines,
-	fstyle,
 	fcadre,
+	fsens
 };
 
 
-fn Panel_defGrid(nposx: usize) *pnl.PANEL {
+fn Panel_defMenu(nposx: usize) *pnl.PANEL {
 
 
 	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM02", nposx ,2,9, 42, forms.CADRE.line1, "Def.field");
@@ -514,9 +555,8 @@ fn Panel_defGrid(nposx: usize) *pnl.PANEL {
 	Panel.label.append(lbl.newLabel(@tagName(fp02.fname)  ,2,2, "name.....:") ) catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(fp02.fposx)  ,3,2, "posX.....:") ) catch unreachable ;
 	Panel.label.append(lbl.newLabel(@tagName(fp02.fposy)  ,4,2, "posy.....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp02.flines) ,5,2, "lines....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp02.fstyle) ,6,2, "style....:") ) catch unreachable ;
-	Panel.label.append(lbl.newLabel(@tagName(fp02.fcadre) ,7,2, "cadre....:") ) catch unreachable ;
+	Panel.label.append(lbl.newLabel(@tagName(fp02.fcadre) ,5,2, "cadre....:") ) catch unreachable ;
+	Panel.label.append(lbl.newLabel(@tagName(fp02.fsens)  ,6,2, "sens.....:") ) catch unreachable ;
 
 	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
 							"required","please enter :text [a-zA-Z]{1,1} [A-z0-9]",
@@ -533,20 +573,14 @@ fn Panel_defGrid(nposx: usize) *pnl.PANEL {
 							"^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
 	fld.setProtect(Panel,@intFromEnum(fp02.fposy),true) catch unreachable ;
 
-	Panel.field.append(fld.newFieldUDigit(@tagName(fp02.flines),5,12,2,"",true,
-							"required","please enter Lines 1...",
-							"^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
-	fld.setTask(Panel,@intFromEnum(fp02.flines),"TaskLines") catch unreachable ;
-
-	Panel.field.append(fld.newFieldFunc(@tagName(fp02.fstyle),6,12,1,"",false,"FuncStyle",
-							"required","please enter gridStyle = | gridnoStyles = ' '",
-							)) catch unreachable ;
-	fld.setTask(Panel,@intFromEnum(fp02.fstyle),"TaskStyle") catch unreachable ;
-
-	Panel.field.append(fld.newFieldFunc(@tagName(fp02.fcadre),7,12,1,"",true,"FuncCadre",
-							"required","please choose the type of frame")) catch unreachable ;
+	Panel.field.append(fld.newFieldFunc(@tagName(fp02.fcadre),5,12,5,"",true,"FuncCadre",
+							"required","please enter line1 line2")) catch unreachable ;
 	fld.setTask(Panel,@intFromEnum(fp02.fcadre),"TaskCadre") catch unreachable ; 
 
+	Panel.field.append(fld.newFieldFunc(@tagName(fp02.fsens),6,12,10,"",false,"FuncSens",
+							"required","please enter horizontal verticale ",
+							)) catch unreachable ;
+	fld.setTask(Panel,@intFromEnum(fp02.fsens),"TaskSens") catch unreachable ;
 	return Panel;
   }
 
@@ -554,14 +588,15 @@ fn Panel_defGrid(nposx: usize) *pnl.PANEL {
 
 
 //=================================================
-// description Function
+// Description Function
+// Func: Think of it as a choice like a fixed combo
 
-var callFuncGrid: FuncGrid = undefined;
+var callFuncMenu: FuncMenu = undefined;
 // description Function
 // choix Cadre
 fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
-	var pos:usize = 1;
+	var pos:usize = 0;
 
 	var mCadre = mnu.newMenu(
 							"cadre",				// name
@@ -569,25 +604,27 @@ fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 							mnu.CADRE.line1,		// type line fram
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
-							"Line 1",
-							"Line 2",
+							"line1",
+							"line2",
 							});
 	var nitem	:usize = 0;
-	if (std.mem.eql(u8, vfld.text, "1")) pos = 1;
-	if (std.mem.eql(u8, vfld.text, "2")) pos = 2;
+	if (std.mem.eql(u8, vfld.text, "line1")) pos = 0;
+	if (std.mem.eql(u8, vfld.text, "line2")) pos = 1;
 	while (true) {
 		nitem	= mnu.ioMenu(mCadre,pos);
 		if (nitem != 9999) break;
 	}
 
-	vfld.text = std.fmt.allocPrint(forms.allocatorForms,"{d}",.{nitem}) catch unreachable; 
+	vfld.text = std.fmt.allocPrint(utl.allocUtl,"{s}",
+						.{@tagName(@as(mnu.CADRE,@enumFromInt(nitem + 1)))}) catch unreachable;
+
 	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
-// description Function
-// choix Style
-fn FuncStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
-	var pos:usize = 1;
+// choix Sens Orientation
+fn FuncSens( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+	var pos:usize = 0;
 
 	var mCadre = mnu.newMenu(
 							"Style",				// name
@@ -595,53 +632,56 @@ fn FuncStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 							mnu.CADRE.line1,		// type line frame
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
-							"gridStyle2",
-							"gridStyle",
+							"verticale",
+							"horizontal",
 							});
 	var nitem	:usize = 0;
 	if (std.mem.eql(u8, vfld.text, " ")) pos = 0;
-	if (std.mem.eql(u8, vfld.text, grd.gridStyle)) pos = 1;
+	if (std.mem.eql(u8, vfld.text, "verticale"))  pos = 0;
+	if (std.mem.eql(u8, vfld.text, "horizontal")) pos = 1;
+
 	while (true) {
 		nitem	= mnu.ioMenu(mCadre,pos);
 		if (nitem != 9999) break;
 	}
+	vfld.text = std.fmt.allocPrint(utl.allocUtl,"{s}",
+						.{@tagName(@as(mnu.MNUVH,@enumFromInt(nitem	)))}) catch unreachable;
 
-	if (nitem == 1 ) vfld.text = std.fmt.allocPrint(forms.allocatorForms,"{s}",.{grd.gridStyle}) catch unreachable
-	else vfld.text = std.fmt.allocPrint(forms.allocatorForms,"║",.{}) catch unreachable; 
-	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
+ 	pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
-//=================================================
-// description Function
-/// run emun Function ex: combo
-pub const FuncGrid = enum {
-	FuncStyle,
+//-------------------------
+// exec funtion
+//-------------------------
+pub const FuncMenu = enum {
+	FuncSens,
 	FuncCadre,
 	none,
 
-	pub fn run(self: FuncGrid , vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	pub fn run(self: FuncMenu , vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		switch (self) {
-			.FuncStyle => FuncStyle(vpnl, vfld),
+			.FuncSens  => FuncSens(vpnl, vfld),
 			.FuncCadre => FuncCadre(vpnl, vfld),
 			else => dsperr.errorForms(vpnl, ErrMain.main_run_FuncGrid_invalide),
 		}
 	}
 
-	fn searchFn(vtext: []const u8) FuncGrid {
-		const max: usize = @typeInfo(FuncGrid).Enum.fields.len - 1 ;
+	fn searchFn(vtext: []const u8) FuncMenu {
+		const max: usize = @typeInfo(FuncMenu).Enum.fields.len - 1 ;
 
-		inline for (@typeInfo(FuncGrid).Enum.fields) |f| {
-			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncGrid, @enumFromInt(f.value));
+		inline for (@typeInfo(FuncMenu).Enum.fields) |f| {
+			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncMenu, @enumFromInt(f.value));
 		}
-		return @as(FuncGrid, @enumFromInt(max));
+		return @as(FuncMenu, @enumFromInt(max));
 	}
 };
 
 //=================================================
 // description Function
-// test exist Name for add or change name
+// Task: Performs complex checks, automatically upon input output,
+// but can be used as a control flow before validating the form.
 
 fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	for (NGRID.items) |f| {
+	for (NMENU.items) |f| {
 		if (std.mem.eql(u8, f.name, vfld.text)) {
 			pnl.msgErr(vpnl, "Already existing invalide Name");
 			vpnl.keyField = kbd.task;
@@ -651,82 +691,57 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	return;
 }
 
-
-fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
-		const termSize = term.getSize() ;
-		const lines =	utl.strToUsize(vfld.text);
-		const posx	=	utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp02.fposx)) catch unreachable) ;
-		
-		if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
-			const msg = std.fmt.allocPrint(
-			grd.allocatorGrid,"The number of rows Invalide",
-			.{}) catch unreachable;
-			defer grd.allocatorGrid.free(msg);
-			pnl.msgErr(vpnl, msg);
-			vpnl.keyField = kbd.task;
+fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+	
+	if (std.mem.eql(u8, vfld.text,""))  {
+		pnl.msgErr(vpnl, "Cadre is invalide");
+		vpnl.keyField = kbd.task;
 		}
 	return;
 }
 
 
-fn TaskStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskSens( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 	
 	if (std.mem.eql(u8, vfld.text,"")) {
-		const msg = std.fmt.allocPrint(grd.allocatorGrid,
-			"Style is invalide",.{}) catch unreachable;
-		defer grd.allocatorGrid.free(msg);
-		pnl.msgErr(vpnl, msg);
-		vpnl.keyField = kbd.task;
-		}
-	return;
-}
-
-fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
-	const cadre =	utl.strToUsize(vfld.text);
-	
-	if (cadre == 0 ) {
-		const msg = std.fmt.allocPrint(grd.allocatorGrid,
-			"Cadre is invalide",.{}) catch unreachable;
-		defer grd.allocatorGrid.free(msg);
-		pnl.msgErr(vpnl, msg);
+		pnl.msgErr(vpnl, "Sense is invalide");
 		vpnl.keyField = kbd.task;
 		}
 	return;
 }
 
 
-var callTaskGrid: TaskGrid = undefined;
+var callTaskMenu: TaskMenu = undefined;
 //=================================================
 // description Function
-/// run emun Function ex: combo
-pub const TaskGrid= enum {
+// exec Task
+
+pub const TaskMenu= enum {
 	TaskName,
-	TaskLines,
-	TaskStyle,
 	TaskCadre,
+	TaskSens,
 	none,
 
-	pub fn run(self: TaskGrid, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+	pub fn run(self: TaskMenu, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		switch (self) {
 			.TaskName	=> TaskName(vpnl, vfld),
-			.TaskLines	=> TaskLines(vpnl,vfld),
-			.TaskStyle	=> TaskStyle(vpnl,vfld),
 			.TaskCadre	=> TaskCadre(vpnl,vfld),
+			.TaskSens	=> TaskSens(vpnl,vfld),
 			else => dsperr.errorForms(vpnl, ErrMain.main_run_TaskGrid_invalide),
 		}
 	}
-	fn searchFn(vtext: []const u8) TaskGrid {
-		const max: usize = @typeInfo(TaskGrid).Enum.fields.len - 1;
+	fn searchFn(vtext: []const u8) TaskMenu {
+		const max: usize = @typeInfo(TaskMenu).Enum.fields.len - 1;
 
-		inline for (@typeInfo(TaskGrid).Enum.fields) |f| {
-			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskGrid, @enumFromInt(f.value));
+		inline for (@typeInfo(TaskMenu).Enum.fields) |f| {
+			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskMenu, @enumFromInt(f.value));
 		}
-		return @as(TaskGrid, @enumFromInt(max));
+		return @as(TaskMenu, @enumFromInt(max));
 	}
 };
 //---------------------------------------------------------------------------
 
-pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
+pub fn writeDefMenu(vpnl: *pnl.PANEL) void {
 	term.getCursor();
 	const v_posx: usize = term.posCurs.x;
 	const v_posy: usize = term.posCurs.y;
@@ -734,48 +749,53 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
 	// Init format panel
 	var v_pos :usize = 0;
 	if (v_posx >= 20 ) v_pos = 2 else v_pos = 22 ;
-	var pFmt02 = Panel_defGrid(v_pos);
+	var pFmt02 = Panel_defMenu(v_pos);
 	pFmt02.field.items[@intFromEnum(fp02.fposx)].text = usizeToStr(v_posx);
 	pFmt02.field.items[@intFromEnum(fp02.fposy)].text = usizeToStr(v_posy);
 	
 	// init struct key
-	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
-	const idx: usize = 0;
-	_ = idx;
-	var vlen: usize = 0;
-	
+	var Tkey: term.Keyboard = undefined; 
 
 	while (true) {
-		//Tkey = kbd.getKEY();
 
-		forms.dspCursor(vpnl, v_posx, v_posy,"Field");
+		forms.dspCursor(vpnl, v_posx, v_posy,"Def. Menu");
 		Tkey.Key = pnl.ioPanel(pFmt02);
 		switch (Tkey.Key) {
 			// call function combo
 			.func => {
-				callFuncGrid = FuncGrid.searchFn(pFmt02.field.items[pFmt02.idxfld].procfunc);
-				callFuncGrid.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+				callFuncMenu = FuncMenu.searchFn(pFmt02.field.items[pFmt02.idxfld].procfunc);
+				callFuncMenu.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
 			},
 			// call proc control chek value
 			.task => {
-				callTaskGrid = TaskGrid.searchFn(pFmt02.field.items[pFmt02.idxfld].proctask);
-				callTaskGrid.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+				callTaskMenu = TaskMenu.searchFn(pFmt02.field.items[pFmt02.idxfld].proctask);
+				callTaskMenu.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
 			},
 			// write field to panel
 			.F9 => {
-				vlen = pFmt02.field.items[@intFromEnum(fp02.fname)].text.len;
-			
-				NGRID.append( grd.initGrid(
+				// control 
+				for (pFmt02.field.items, 0.. ) |f , idx | {
+					if (f.proctask.len > 0) {
+						pFmt02.idxfld =  idx;
+						pFmt02.keyField = kbd.none;
+						callTaskMenu  = TaskMenu.searchFn(f.proctask);
+						callTaskMenu.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+						if (pFmt02.keyField == kbd.task) break;
+					}
+				}
+				if (pFmt02.keyField == kbd.task) continue;
+				const vitems : [][]const u8 = allocatorMenu.alloc([]const u8, 1) catch unreachable;
+				const bl : []const u8 = "";
+				vitems[0] = bl;
+				NMENU.append( initMenuDef(
 							pFmt02.field.items[@intFromEnum(fp02.fname)].text,
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
 							strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
-							strToUsize(pFmt02.field.items[@intFromEnum(fp02.flines)].text),
-							pFmt02.field.items[@intFromEnum(fp02.fstyle)].text,
-							@enumFromInt(strToUsize(pFmt02.field.items[@intFromEnum(fp02.fcadre)].text))
-						 )) catch unreachable;
+							strToEnum(mnu.CADRE,pFmt02.field.items[@intFromEnum(fp02.fcadre)].text),
+							strToEnum(mnu.MNUVH,pFmt02.field.items[@intFromEnum(fp02.fsens)].text),
+							vitems
+						)) catch unreachable;
 
-		
-		
 				pnl.freePanel(pFmt02);
 				defer forms.allocatorForms.destroy(pFmt02);
 				return;
@@ -793,22 +813,42 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
 }
 //==========================================
 // CELL Management
+// defining menu options
 //==========================================
 
 // forms field
 const fp03 = enum {
-	ftext,
-	fwidth,
-	ftype,
-	fedtcar,
-	fatrcell
-	
-
+	ftext1,
+	ftext2,
+	ftext3,
+	ftext4,
+	ftext5,
+	ftext6,
+	ftext7,
+	ftext8,
+	ftext9,
+	ftext10,
+	ftext11,
+	ftext12,
+	ftext13,
+	ftext14,
+	ftext15,
+	ftext16,
+	ftext17,
+	ftext18,
+	ftext19,
+	ftext20,
+	ftext21,
+	ftext22,
+	ftext23,
+	ftext24,
+	ftext25,
+	ftext26,
 };
 // panel for field
-fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
-	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM03", nposx, 2, 13, 62, forms.CADRE.line1, "Def.field");
-
+fn Panel_Fmt03() *pnl.PANEL {
+	var Panel: *pnl.PANEL = pnl.newPanelC("FRAM03", 2, 2 , 30, 82, forms.CADRE.line1, "Def.Menu");
+	
 	Panel.button.append(btn.newButton(
 		kbd.F9, // function
 		true, // show
@@ -823,411 +863,336 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
 		"Return", // title
 	)) catch |err| { @panic(@errorName(err)); }; 
 	
-	Panel.label.append(lbl.newLabel(@tagName(fp03.ftext), 2, 2, "Text.....:")) 
-	catch |err| { @panic(@errorName(err)); };
 	
-	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext), 2, // posx
-		2 + Panel.label.items[@intFromEnum(fp03.ftext)].text.len, //posy
-		20, // len
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext1),
+		2, 2 ,
+		80, // len
 		"", // text
-		true, // required
+		false, // required
 		"required help ctrl-h", // Msg err
-		"please enter text 1car Letter  other alphanumeric", // help
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext2),
+		3, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext3),
+		4, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext4),
+		5, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext5),
+		6, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext6),
+		7, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext7),
+		8, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext8),
+		9, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext9),
+		10, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext10),
+		11, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext11),
+		12, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext12),
+		13, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext13),
+		14, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext14),
+		15, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext15),
+		16, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext16),
+		17, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext17),
+		18, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext18),
+		19, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext19),
+		20, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext20),
+		21, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext21),
+		22, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext22),
+		23, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext23),
+		24, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext24),
+		25, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext25),
+		26, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
+		"" // regex
+	)) catch |err| { @panic(@errorName(err)); };
+	
+	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext26),
+		27, 2 ,
+		80, // len
+		"", // text
+		false, // required
+		"required help ctrl-h", // Msg err
+		"please enter text 1 car Letter  other alphanumeric", // help
 		"" // regex
 	)) catch |err| { @panic(@errorName(err)); };
 
-	fld.setTask(Panel, @intFromEnum(fp03.ftext), "TcellText") 
-	catch |err| { @panic(@errorName(err)); }; 
-
-
-	Panel.label.append(lbl.newLabel(@tagName(fp03.fwidth), 3, 2, "Width....:"))
-		catch |err| { @panic(@errorName(err)); }; 
-		
-	Panel.field.append(fld.newFieldUDigit(@tagName(fp03.fwidth), 3, // posx
-		2 + Panel.label.items[@intFromEnum(fp03.fwidth)].text.len, //posy
-		3, // len
-		"", // text
-		true, // required
-		"Len field required or too long", // Msg err
-		"len field", // help
-		"" // regex
-	)) catch |err| { @panic(@errorName(err)); }; 
-
-	fld.setTask(Panel, @intFromEnum(fp03.fwidth), "TcellWidth") 
-		catch |err| { @panic(@errorName(err)); }; 
-
-
-	Panel.label.append(lbl.newLabel(@tagName(fp03.ftype), 3, 32, "Type.:"))
-		catch |err| { @panic(@errorName(err)); }; 
-		
-	Panel.field.append(fld.newFieldFunc(
-		@tagName(fp03.ftype),
-		3, // posx
-		32 + Panel.label.items[@intFromEnum(fp03.ftype)].text.len, //posy
-		19, // len
-		"", // text
-		true, // required
-		"FcellType", // function
-		"Reference type required", // Msg err
-		"Refence field", // help
-	)) catch |err| {
-		@panic(@errorName(err));
-	};
-	fld.setTask(Panel, @intFromEnum(fp03.ftype), "TcellType")
-		catch |err| { @panic(@errorName(err)); };
-
-
-	Panel.label.append(lbl.newLabel(@tagName(fp03.fedtcar), 4, 2, "Edit Car.:"))
-		catch |err| { @panic(@errorName(err)); }; 
-		
-	Panel.field.append(fld.newFieldTextFull(@tagName(fp03.fedtcar), 4, // posx
-		2 + Panel.label.items[@intFromEnum(fp03.fedtcar)].text.len, //posy
-		1, // len
-		"", // text
-		false, // required
-		"", // Msg err
-		"please enter text ex:$ € % £", // help
-		"" // regex
-	)) catch |err| { @panic(@errorName(err)); }; 
- 
-
-	Panel.label.append(lbl.newLabel(@tagName(fp03.fatrcell), 5, 2, "Color...:"))
-		catch |err| { @panic(@errorName(err)); }; 
-		
-	Panel.field.append(fld.newFieldFunc(
-		@tagName(fp03.fatrcell),
-		5, // posx
-		2 + Panel.label.items[@intFromEnum(fp03.fatrcell)].text.len, //posy
-		19, // len
-		"", // text
-		true, // required
-		"FcellAtr", // function
-		"Reference type required", // Msg err
-		"Refence field", // help
-	)) catch |err| {
-		@panic(@errorName(err));
-	};
-	fld.setTask(Panel, @intFromEnum(fp03.fatrcell), "TcellAtr")
-		catch |err| { @panic(@errorName(err)); };
 
 	return Panel;
 }
 
+
 //---------------------------------------------------------------------------
-//  string return enum
-fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
-	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
-		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
-	}
-
-	var buffer: [128]u8 = [_]u8{0} ** 128;
-	const result = std.fmt.bufPrintZ(buffer[0..], "invalid Text {s} for strToEnum ", .{vtext}) catch unreachable;
-	@panic(result);
-}
-//=================================================
-// description Function
-// choix Type Field
-fn FcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	var pos: usize = 0;
-	var Gkey: grd.GridSelect = undefined;
-	const Xcombo: *grd.GRID = grd.newGridC(
-		"qryPanel",
-		vpnl.posx + 2,
-		vpnl.posy + 32,
-		6,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Xcombo);
-	defer grd.allocatorGrid.destroy(Xcombo);
-	
-	grd.newCell(Xcombo, "Ref.Type", 19, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
-	grd.setHeaders(Xcombo);
-	grd.addRows(Xcombo, &.{"TEXT_FREE"}); // Free
-	grd.addRows(Xcombo, &.{"UDIGIT"}); // Digit unsigned
-	grd.addRows(Xcombo, &.{"DIGIT"}); // Digit signed
-	grd.addRows(Xcombo, &.{"UDECIMAL"}); // Decimal unsigned
-	grd.addRows(Xcombo, &.{"DECIMAL"}); // Decimal signed
-
-	if (std.mem.eql(u8, vfld.text, "TEXT_FREE")) pos = 0;
-	if (std.mem.eql(u8, vfld.text, "UDIGIT"))    pos = 1;
-	if (std.mem.eql(u8, vfld.text, "DIGIT"))     pos = 2;
-	if (std.mem.eql(u8, vfld.text, "UDECIMAL"))  pos = 3;
-	if (std.mem.eql(u8, vfld.text, "DECIMAL"))   pos = 4;
-
-	while (true) {
-		Gkey = grd.ioCombo(Xcombo, pos);
-
-		if (Gkey.Key == kbd.enter) {
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			fld.setText(vpnl, @intFromEnum(fp03.ftype), Gkey.Buf.items[0]) 
-				catch |err| { @panic(@errorName(err)); }; 
-			return;
-		}
-
-		if (Gkey.Key == kbd.esc) {
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			return;
-		}
-	}
-}
-
-//=================================================
-// description Function
-// choix Type Field
-fn FcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	var pos: usize = 2;
-	var Gkey: grd.GridSelect = undefined;
-	
-	var vtext :[]const u8 = undefined;
-	const Xcombo: *grd.GRID = grd.newGridC(
-		"qryPanel",
-		vpnl.posx ,
-		vpnl.posy ,
-		9,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Xcombo);
-	defer grd.allocatorGrid.destroy(Xcombo);
-	
-	grd.newCell(Xcombo, "Color-Text", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
-	grd.setHeaders(Xcombo);
-	grd.addRows(Xcombo, &.{"Black"});
-	grd.addRows(Xcombo, &.{"Red"});
-	grd.addRows(Xcombo, &.{"Green"});
-	grd.addRows(Xcombo, &.{"Yellow"});
-	grd.addRows(Xcombo, &.{"Blue"});
-	grd.addRows(Xcombo, &.{"Magenta"});
-	grd.addRows(Xcombo, &.{"Cyan"});
-	grd.addRows(Xcombo, &.{"White"});
-
-
-	if (std.mem.eql(u8, vfld.text, "fgBlack"))   pos = 0;
-	if (std.mem.eql(u8, vfld.text, "fgRed"))     pos = 1;
-	if (std.mem.eql(u8, vfld.text, "fgGreen"))   pos = 2;
-	if (std.mem.eql(u8, vfld.text, "fgYellow"))  pos = 3;
-	if (std.mem.eql(u8, vfld.text, "fgBlue"))    pos = 4;
-	if (std.mem.eql(u8, vfld.text, "fgMagenta")) pos = 5;
-	if (std.mem.eql(u8, vfld.text, "fgCyan"))    pos = 6;
-	if (std.mem.eql(u8, vfld.text, "fgWhite"))   pos = 7;
-
-
-	while (true) {
-		Gkey = grd.ioCombo(Xcombo, pos);
-
-		if (Gkey.Key == kbd.enter) {
-			vtext = std.fmt.allocPrint(grd.allocatorGrid,"fg{s}",.{Gkey.Buf.items[0]}) catch unreachable;
-			fld.setText(vpnl, @intFromEnum(fp03.fatrcell),	vtext) 
-				catch |err| { @panic(@errorName(err)); };
-			
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			return;
-		}
-
-		if (Gkey.Key == kbd.esc) {
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			return;
-		}
-	}
-}
-
-var callFcell: FcellEnum = undefined;
-//=================================================
-// description Function
-/// run emun Function ex: combo
-pub const FcellEnum = enum {
-	FcellType,
-	FcellAtr,
-	none,
-
-	pub fn run(self: FcellEnum, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-		switch (self) {
-			.FcellType => FcellType(vpnl, vfld),
-			.FcellAtr  => FcellAtr(vpnl, vfld),
-			else => dsperr.errorForms(vpnl, ErrMain.main_run_FcellEnum_invalide),
-		}
-	}
-
-	fn searchFn(vtext: []const u8) FcellEnum {
-		const max: usize = @typeInfo(FcellEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(FcellEnum).Enum.fields) |f| {
-			if (std.mem.eql(u8, f.name, vtext)) return @as(FcellEnum, @enumFromInt(f.value));
-		}
-		return @as(FcellEnum, @enumFromInt(max));
-	}
-};
-//---------------------------------------------------------------------------
-//=================================================
-// description Function
-// test exist Name for add or change name
-
-fn TcellText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-		if (std.mem.eql(u8, vfld.text , "")) {
-			pnl.msgErr(vpnl, "Already existing invalide Text field");
-			vpnl.keyField = kbd.task;
-			return;
-		}
-	return;
-}
-
-fn TcellWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	const val = strToUsize(vfld.text);
-
-	if (val == 0) {
-		const msg = std.fmt.allocPrint(utl.allocUtl,
-			"{d} the length of the zone is invalid", .{val})
-			catch |err| { @panic(@errorName(err)); };
-		pnl.msgErr(vpnl, msg);
-
-		vpnl.keyField = kbd.task;
-	}
-	return;
-}
-fn TcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-	const vReftype = strToEnum(forms.REFTYP, vfld.text);
-
-	for (vpnl.field.items, 0..) |f, idx| {
-		if (std.mem.eql(u8, f.name, @tagName(fp03.fedtcar))) {
-			vpnl.field.items[idx].text = "";
-			vpnl.field.items[idx].protect = true;
-		}
-		if (std.mem.eql(u8, f.name, @tagName(fp03.fwidth))) {
-				vpnl.field.items[idx].protect = false;
-		}
-	}
-
-
-
-	
-	for (vpnl.field.items, 0..) |f, idx| {
-		
-		if (vReftype == forms.REFTYP.DIGIT or
-			vReftype == forms.REFTYP.UDIGIT or
-			vReftype == forms.REFTYP.DECIMAL or
-			vReftype == forms.REFTYP.UDECIMAL)
-		{
-			if (std.mem.eql(u8, f.name, @tagName(fp03.fedtcar))) {
-				vpnl.field.items[idx].protect = false;
-			}
-		}
-	}
-
-
-	if (vReftype == forms.REFTYP.DATE_ISO or
-		vReftype == forms.REFTYP.DATE_FR or
-		vReftype == forms.REFTYP.DATE_US)
-	{
-		for (vpnl.field.items, 0..) |f, idx| {
-			if (std.mem.eql(u8, f.name, @tagName(fp03.fwidth))) {
-				vpnl.field.items[idx].text = "10";
-				vpnl.field.items[idx].protect = true;
-			}
-		}
-	}
-
-	if (vReftype == forms.REFTYP.YES_NO or vReftype == forms.REFTYP.SWITCH) {
-		for (vpnl.field.items, 0..) |f, idx| {
-			if (std.mem.eql(u8, f.name, @tagName(fp03.fwidth))) {
-				vpnl.field.items[idx].text = "1";
-				vpnl.field.items[idx].protect = true;
-			}
-		}
-	}
-	return;
-}
-fn TcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-
-		if (std.mem.eql(u8, vfld.text,"")) {
-			const msg = std.fmt.allocPrint(utl.allocUtl,
-				"the error message Color is invalid", .{})
-				catch |err| { @panic(@errorName(err)); };			
-			pnl.msgErr(vpnl, msg);
-
-			vpnl.keyField = kbd.task;
-		}
-}
-var callTcell: TcellEnum = undefined;
-//=================================================
-// description Function
-// run emun Function ex: combo
-pub const TcellEnum = enum {
-	TcellText,
-	TcellType,
-	TcellWidth,
-	TcellAtr,
-	none,
-
-	pub fn run(self: TcellEnum, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-		switch (self) {
-			.TcellText	=> TcellText(vpnl, vfld),
-			.TcellType	=> TcellType(vpnl, vfld),
-			.TcellWidth	=> TcellWidth(vpnl, vfld),
-			.TcellAtr	=> TcellAtr(vpnl, vfld),
-
-			else => dsperr.errorForms(vpnl, ErrMain.main_run_TcellEnum_invalide),
-		}
-	}
-	fn searchFn(vtext: []const u8) TcellEnum {
-		const max: usize = @typeInfo(TcellEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(TcellEnum).Enum.fields) |f| {
-			if (std.mem.eql(u8, f.name, vtext)) return @as(TcellEnum, @enumFromInt(f.value));
-		}
-		return @as(TcellEnum, @enumFromInt(max));
-	}
-};
-//---------------------------------------------------------------------------
-pub fn writeDefCell(vGrid: *std.ArrayList(grd.GRID) , gridNum : usize) void {
+pub fn writeDefCell(vMenu: *std.ArrayList(mnu.MENUDEF) , menuNum : usize) void {
 	term.getCursor();
-	var v_posx: usize = term.posCurs.x;
 
-	if (v_posx >= 20) v_posx = 2 else v_posx = 22;
 
 	// Init format panel
-	var pFmt03 = Panel_Fmt03(v_posx);
+	const pFmt03 = Panel_Fmt03();
 	// init zone field
-
+	for (vMenu.items[menuNum].xitems, 0..) |text , idx| {
+		if (text.len > 0) {
+				pFmt03.field.items[idx].text = text;
+		}
+	}
 	// init struct key
-	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
-	var vlen: usize = 0;
-	while (true) {
-		//Tkey = kbd.getKEY();
+	var Tkey: term.Keyboard = undefined; 
+
+		while (true) {
 
 		Tkey.Key = pnl.ioPanel(pFmt03);
 		switch (Tkey.Key) {
-			// call function combo
-			.func => {
-				callFcell = FcellEnum.searchFn(pFmt03.field.items[pFmt03.idxfld].procfunc);
-				callFcell.run(pFmt03, &pFmt03.field.items[pFmt03.idxfld]);
-			},
-			// call proc control chek value
-			.task => {
-				callTcell = TcellEnum.searchFn(pFmt03.field.items[pFmt03.idxfld].proctask);
-				callTcell.run(pFmt03, &pFmt03.field.items[pFmt03.idxfld]);
-			},
 			// write field to panel
 			.F9 => {
-	
-				grd.newCell(
-					&vGrid.items[gridNum],
-					pFmt03.field.items[@intFromEnum(fp03.ftext)].text,
-					strToUsize(pFmt03.field.items[@intFromEnum(fp03.fwidth)].text),
-					strToEnum(grd.REFTYP, pFmt03.field.items[@intFromEnum(fp03.ftype)].text),
-					strToEnum(term.ForegroundColor, pFmt03.field.items[@intFromEnum(fp03.fatrcell)].text)
-				);
-				vlen = vGrid.items[gridNum].cell.items.len - 1;
-				grd.setCellEditCar(&vGrid.items[gridNum].cell.items[vlen],
-									pFmt03.field.items[@intFromEnum(fp03.fedtcar)].text);
-				pnl.freePanel(pFmt03);
-				defer forms.allocatorForms.destroy(pFmt03);
-				return;
+					var fxx : usize = @intFromEnum(fp03.ftext1);
+					var nTst : usize = 0;
+					while ( fxx <= @intFromEnum(fp03.ftext26)) :( fxx += 1 ) {
+						if (pFmt03.field.items[fxx].text.len == 0) nTst += 1;
+					}
+						 
+					if (nTst == 26) {
+						pnl.msgErr(pFmt03, "No definition, INVALID record");
+					}
+					else {
+						var xmenu =  std.ArrayList([]const u8).init(allocatorMenu);
+						fxx  = @intFromEnum(fp03.ftext1);
+						nTst = 0;
+						while ( fxx <= @intFromEnum(fp03.ftext26)) :( fxx += 1 ) {
+							if (pFmt03.field.items[fxx].text.len > 0) {
+								nTst += 1;
+								xmenu.append(pFmt03.field.items[fxx].text) catch unreachable;
+							}
+						}
+						var menu : [] []const u8 = undefined;
+						if ( nTst > 0) {
+							menu = allocatorMenu.alloc([]const u8, nTst) catch unreachable;
+							for (xmenu.items, 0.. ) |txt,idx | {
+								menu[idx] = txt; 
+							}
+							vMenu.items[menuNum].xitems = menu;
+						} 
+						else {
+							menu = allocatorMenu.alloc([]const u8, 1) catch unreachable;
+							
+							const bl : []const u8 = "";
+							menu[0] = bl;
+						}
+						vMenu.items[menuNum].xitems = menu;
+					
+						pnl.freePanel(pFmt03);
+						defer forms.allocatorForms.destroy(pFmt03);
+						return;
+					}
 			},
 
-			// exit panel field
+			// exit panel field Menu
 			.F12 => {
 				pnl.freePanel(pFmt03);
 				defer forms.allocatorForms.destroy(pFmt03);
@@ -1239,62 +1204,29 @@ pub fn writeDefCell(vGrid: *std.ArrayList(grd.GRID) , gridNum : usize) void {
 }
 //=================================================
 // description Function
-// view GRID
-pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
+// view Menu
+pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.MENUDEF), menuNum: usize) void {
 
-	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
-	const cellPos: usize = 0;
-	var Gkey: grd.GridSelect = undefined;
+		var Menudisplay = mnu.newMenu(
+						vmnu.items[menuNum].name,				// name
+						vmnu.items[menuNum].posx,				// posx
+						vmnu.items[menuNum].posy,				// posy	
+						vmnu.items[menuNum].cadre,			// type line fram
+						vmnu.items[menuNum].mnuvh,			// type menu vertical / horizontal
+						vmnu.items[menuNum].xitems,			// Item const 
+						) ;
+		_= mnu.ioMenu(Menudisplay,0);
+		pnl.rstPanel(mnu.MENU,&Menudisplay,vpnl);
 
-	const Xcombo: *grd.GRID = grd.newGridC(
-		vgrd.items[gridNum].name,
-		vgrd.items[gridNum].posx,
-		vgrd.items[gridNum].posy,
-		vgrd.items[gridNum].pageRows,
-		vgrd.items[gridNum].separator,
-		vgrd.items[gridNum].cadre,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Xcombo);
-	defer grd.allocatorGrid.destroy(Xcombo);
-
-	for (vgrd.items[numGrid].cell.items, 0..) |p, idx| {
-	grd.newCell(Xcombo, p.text, p.long, p.reftyp, p.atrCell.foregr);
-	grd.setCellEditCar(&Xcombo.cell.items[idx], p.edtcar);
-	}
-	grd.setHeaders(Xcombo);
-
-	const vlist = std.ArrayList([] const u8);
-	var m = vlist.init(grd.allocatorGrid);
-	for (vgrd.items[gridNum].cell.items) |p|  {
-		var vText: []u8= std.heap.page_allocator.alloc(u8, p.long) catch unreachable;
-		@memset(vText[0..p.long], '#');
-		m.append(vText) catch unreachable;
-	}
-	for (vgrd.items[gridNum].pageRows) |_| {
-		Xcombo.data.append(grd.allocatorArgData, .{ .buf = m }) catch |err| {
-			@panic(@errorName(err));
-		};
-	}
-	grd.setPageGrid(Xcombo);
-
-	while (true) {
-		Gkey = grd.ioCombo(Xcombo, cellPos);
-
-		if (Gkey.Key == kbd.esc) {
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			break;
-		}
-	}
 }
-// remove Grid
-fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
-	var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+// remove MenuGrid
+fn removeMenu(vmenu: *std.ArrayList(mnu.MENUDEF)) void {
+	var savgrid: std.ArrayList(mnu.MENUDEF) = std.ArrayList(mnu.MENUDEF).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 
 	
-	for (vgrid.items) |p| {
+	for (vmenu.items) |p| {
 		savgrid.append(p)  
 			catch |err| { @panic(@errorName(err)); };
 	}
@@ -1316,18 +1248,16 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
 	grd.newCell(Origine, "name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.newCell(Origine, "X", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "Y", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "width", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
 	grd.setHeaders(Origine);
 
 	while (true) {
 		grd.resetRows(Origine);
-		for (vgrid.items, 0..) |g, idx| {
+		for (vmenu.items, 0..) |g, idx| {
 			const ridx = usizeToStr(idx);
 			
 			const posx = usizeToStr(g.posx) ;
 			const posy = usizeToStr(g.posy) ;
-			const lines= usizeToStr(g.lines) ;
-			grd.addRows(Origine, &.{ ridx, g.name, posx , posy, lines});
+			grd.addRows(Origine, &.{ ridx, g.name, posx , posy});
 		}
 
 		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
@@ -1336,17 +1266,17 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
 		if (Gkey.Key == kbd.enter) {
 			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
 
-			_ = vgrid.orderedRemove(ligne);
+			_ = vmenu.orderedRemove(ligne);
 		}
 	}
 
 	// restor and exit
 	if (Gkey.Key == kbd.esc) {
-		vgrid.clearAndFree();
-		vgrid.clearRetainingCapacity();
+		vmenu.clearAndFree();
+		vmenu.clearRetainingCapacity();
 
 		for (savgrid.items) |p| {
-			vgrid.append(p) 
+			vmenu.append(p) 
 			 catch |err| { @panic(@errorName(err)); };
 		}
 	}
@@ -1354,237 +1284,3 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
 	savgrid.clearAndFree();
 	savgrid.deinit();
 }
-
-// view GRID
-pub fn viewCell(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
-
-	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
-	const cellPos: usize = 0;
-	var Gkey: grd.GridSelect = undefined;
-
-	const Xcombo: *grd.GRID = grd.newGridC(
-		"Xcombo",
-		2,
-		2,
-		20,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Xcombo);
-	defer grd.allocatorGrid.destroy(Xcombo);
-
-	grd.newCell(Xcombo, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Xcombo, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
-	grd.newCell(Xcombo, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Xcombo, "pos"   , 3,  grd.REFTYP.UDIGIT,	term.ForegroundColor.fgGreen);
-	grd.newCell(Xcombo, "Edtcar", 1,  grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgWhite);
-	grd.newCell(Xcombo, "Color" , 10, grd.REFTYP.TEXT_FREE,	term.ForegroundColor.fgGreen);
-	
-
-	for (vgrd.items[gridNum].cell.items) |p|  {
-	grd.addRows(Xcombo, &.{ p.text,usizeToStr(p.long), @tagName(p.reftyp),
-							usizeToStr(p.posy),p.edtcar,@tagName(p.atrCell.foregr)});
-	}
-
-	grd.setHeaders(Xcombo);
-	while (true) {
-		Gkey = grd.ioCombo(Xcombo, cellPos);
-
-		if (Gkey.Key == kbd.esc) {
-			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
-			break;
-		}
-	}
-}
-
-// order GRID
-pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
-
-	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
-
-
-	var newcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
-	var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
-
-
-	
-	for (vgrd.items[gridNum].cell.items) |p|  {
-		savcell.append(p)
-		catch |err| { @panic(@errorName(err)); };
-	}
-
-
-	
-	var idxligne: usize = 0;
-	var Gkey: grd.GridSelect = undefined;
-
-	const Origine: *grd.GRID = grd.newGridC(
-		"Origine",
-		2,
-		2,
-		20,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Origine);
-	defer grd.allocatorGrid.destroy(Origine);
-
-	grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "pos"   , 3,  grd.REFTYP.UDIGIT,	term.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Edtcar", 1,  grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgWhite);
-	grd.newCell(Origine, "Color" , 10, grd.REFTYP.TEXT_FREE,	term.ForegroundColor.fgGreen);
-	grd.setHeaders(Origine);
-
-
-
-	const Order: *grd.GRID = grd.newGridC(
-		"Order",
-		2,
-		80,
-		20,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer grd.freeGrid(Order);
-	defer grd.allocatorGrid.destroy(Order);
-	grd.newCell(Order, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Order, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Order, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
-	grd.newCell(Order, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Order, "pos"   , 3,  grd.REFTYP.UDIGIT,	term.ForegroundColor.fgGreen);
-	grd.newCell(Order, "Edtcar", 1,  grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgWhite);
-	grd.newCell(Order, "Color" , 10, grd.REFTYP.TEXT_FREE,	term.ForegroundColor.fgGreen);
-	grd.setHeaders(Order);
-
-	while (true) {
-		grd.resetRows(Origine);
-
-		for (vgrd.items[gridNum].cell.items, 0..) |p,idx|  {
-			grd.addRows(Origine, &.{usizeToStr(idx),
-					 p.text,usizeToStr(p.long), @tagName(p.reftyp),
-					usizeToStr(p.posy),p.edtcar,@tagName(p.atrCell.foregr)});
-		}
-
-		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
-		if (Gkey.Key == kbd.esc) break;
-		if (Gkey.Key == kbd.ctrlV) break;
-		if (Gkey.Key == kbd.enter) {
-			newcell.append(vgrd.items[gridNum].cell.items[ strToUsize(Gkey.Buf.items[0])])
-				catch |err| { @panic(@errorName(err)); };
-			const ridn =usizeToStr(idxligne);
-			grd.addRows(Order, &.{ ridn, Gkey.Buf.items[1], Gkey.Buf.items[2],
-				Gkey.Buf.items[3], ridn, Gkey.Buf.items[5], Gkey.Buf.items[6] });
-			idxligne += 1;
-			grd.printGridHeader(Order);
-			grd.printGridRows(Order);
-			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
-			_ = vgrd.items[gridNum].cell.orderedRemove(ligne);
-		}
-	}
-
-	vgrd.items[gridNum].cell.clearAndFree();
-	vgrd.items[gridNum].cell.clearRetainingCapacity();
-	// restor and exit
-	if (Gkey.Key == kbd.esc) {
-		for (savcell.items) |p| {
-			vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
-		}
-	}
-	// new Order and exit
-	else {
-		for (newcell.items,0..) |_,idx| {
-			newcell.items[idx].posy= idx;
-		}
-		for (newcell.items) |p| {
-			vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
-		}
-	}
-	newcell.clearAndFree();
-	newcell.deinit();
-
-	savcell.clearAndFree();
-	savcell.deinit();
-	return;
-}
-
-
-// order GRID
-pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
-
-	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
-
-	var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
-
-	for (vgrd.items[gridNum].cell.items) |p|  {
-		savcell.append(p)
-		catch |err| { @panic(@errorName(err)); };
-	}
-
-
-
-	var Gkey: grd.GridSelect = undefined;
-
-	const Origine: *grd.GRID = grd.newGridC(
-		"Xcombo",
-		2,
-		2,
-		20,
-		grd.gridStyle,
-		grd.CADRE.line1,
-	);
-	defer Gkey.Buf.deinit();
-	defer grd.freeGrid(Origine);
-	defer grd.allocatorGrid.destroy(Origine);
-
-	grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
-	grd.newCell(Origine, "pos"   , 3,  grd.REFTYP.UDIGIT,	term.ForegroundColor.fgGreen);
-	grd.newCell(Origine, "Edtcar", 1,  grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgWhite);
-	grd.newCell(Origine, "Color" , 10, grd.REFTYP.TEXT_FREE,	term.ForegroundColor.fgGreen);
-	grd.setHeaders(Origine);
-
-
-	while (true) {
-		grd.resetRows(Origine);
-
-		for (vgrd.items[gridNum].cell.items, 0..) |p,idx|  {
-			grd.addRows(Origine, &.{usizeToStr(idx),
-					 p.text,usizeToStr(p.long), @tagName(p.reftyp),
-					usizeToStr(p.posy),p.edtcar,@tagName(p.atrCell.foregr)});
-		}
-
-		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
-		if (Gkey.Key == kbd.esc) break;
-		if (Gkey.Key == kbd.ctrlV) break;
-		if (Gkey.Key == kbd.enter) {
-			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
-			_ = vgrd.items[gridNum].cell.orderedRemove(ligne);
-		}
-	}
-
-	// restor and exit
-	if (Gkey.Key == kbd.esc) {
-		vgrd.items[gridNum].cell.clearAndFree();
-		vgrd.items[gridNum].cell.clearRetainingCapacity();
-		for (savcell.items) |p| {
-			vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
-		}
-	}
-	// new Order and exit
-	else {
-		
-		for (0..vgrd.items[gridNum].cell.items.len ) |idx| {
-			vgrd.items[gridNum].cell.items[idx].posy= idx;
-		}
-	}
-
-	savcell.clearAndFree();
-	savcell.deinit();
-	return;
-}
-

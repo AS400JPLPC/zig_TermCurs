@@ -297,9 +297,7 @@ const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
 // 0.12.0 
 // const iter_dir = std.fs.cwd().openDir(vdir, .{.iterate = true}) catch unreachable;
 ```
-<br />
-    By default, 0.11.0 is active. I'm providing both build files, and there are significant differences, but the principle remains the same. All of this is to let you know that I am preparing for the migration to avoid any unexpected issues.<br /><br />
-    <br />
+
 <BR/>
 →  2024-02-01<br />
 **Significant modification due to the addition of the callPgm function (module.zig).**<br />
@@ -343,12 +341,11 @@ I'm still mulling over my design for the table generator.
 →  2024-04-23<BR/>
 new version zig 0.12.0 stable
 Adding the 'mdlGrid' function.<br />
-- Alt-G: Create GRID definition
-- Alt-C: Create text columns
-- Alt-R: Remove GRID
+- Alt-G: Create GRID definition<BR/>
+- Alt-C: Create text columns<BR/>
+- Alt-R: Remove GRID<BR/>
 - Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell)<br />
 
-I'm making progress, and I'm going to create the JSON.<br />
 
 →  2024-06-29<BR/>
 new version zig 0.13.0 stable<br />
@@ -368,3 +365,12 @@ Following the work provided by **Sam Atman**, a basic "regex" library allowing o
 
 →  2024-07-23<BR/>
 -  correction of mdlForms following the inclusion of the new regex module. <br />
+
+→  2024-07-27<BR/>
+Added MENU definition function
+you have to understand the menu option as a fixed combo with constant values <br />
+- Alt-G: Create MENU definition<BR/>
+- Alt-C: Create / UPDATE  text columns<BR/> 
+- Alt-W: Tools menu (View GRID, Remove MENU)<br />
+
+I'm making progress, and I'm going to create the JSON.<br />

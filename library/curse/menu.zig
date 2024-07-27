@@ -41,7 +41,7 @@ pub const mnu = struct {
 
 	pub const MNUVH = enum { vertical, horizontal };
 	// nbr espace intercaler
-	pub var mnuspc: usize = 3;
+	pub var mnuspc: usize = 1;
 
 	// define attribut default CADRE
 	pub var AtrMnu: term.ZONATRB = .{
@@ -77,6 +77,18 @@ pub const mnu = struct {
 		.foregr = term.ForegroundColor.fgWhite,
 	};
 
+
+
+	// define MENU itemm ALL
+	pub const MENUDEF = struct {
+		 name:  []const u8,
+		 posx:  usize,
+		 posy:  usize,
+		 cadre: CADRE,
+		 mnuvh: MNUVH,
+		 xitems: [][]const u8,
+	};
+	
 	// define MENU
 	pub const MENU = struct {
 		 name:  []const u8,
@@ -111,17 +123,32 @@ pub const mnu = struct {
 			.attrCell = AtrCell,
 			.xitems = vitems,
 			.nbr = 0,
-			.actif = true
+			.actif = false
 			};
-
-		for (xmenu.xitems) |txt| {
-			if (txt.len > 0) {
-				if (xmenu.cols < txt.len) xmenu.cols = txt.len;
-				xmenu.nbr += 1;
+			if (xmenu.mnuvh == MNUVH.vertical) {
+				for (xmenu.xitems) |txt| {
+					if (txt.len > 0) {
+						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
+						xmenu.nbr += 1;
+						xmenu.actif = true;
+					}
+				}
+				xmenu.lines += xmenu.nbr + 2; //nbr ligne	+ header =cadre
+				xmenu.cols += 2;
+			}			
+			if (xmenu.mnuvh == MNUVH.horizontal) {
+				for (xmenu.xitems) |txt| {
+					if (txt.len > 0) {
+						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
+						xmenu.cols += utl.nbrCharStr(txt) + mnuspc;
+						xmenu.nbr += 1;
+						xmenu.actif = true;
+					}
+				}
+				xmenu.lines = 3 ;
+				xmenu.cols -= mnuspc;
+				xmenu.cols += 1;
 			}
-		}
-		xmenu.lines += xmenu.nbr + 2; //nbr ligne	+ header =cadre
-		xmenu.cols += 2;
 		return xmenu;
 	}
 
@@ -191,7 +218,7 @@ pub const mnu = struct {
 		var row: usize = 1;
 		var y: usize = 0;
 		var col: usize = 0;
-
+				
 		var x: usize = vmnu.posx;
 
 		// if line 0 ex: directory tab
@@ -248,10 +275,13 @@ pub const mnu = struct {
 						}
 					}
 					if (edt) {
-						term.gotoXY(row + vmnu.posx, col + vmnu.posy);
+
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
+						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
 						term.writeStyled(trait, vmnu.attribut);
 					} else {
-						term.gotoXY(row + vmnu.posx, col + vmnu.posy);
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
+						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
 						term.writeStyled(" ", vmnu.attribut);
 					}
 
@@ -272,6 +302,7 @@ pub const mnu = struct {
 		const x: usize = vmnu.posx + 1;
 		const y: usize = vmnu.posy + 1;
 
+		if ( !vmnu.actif) return;
 		printMenu(vmnu);
 
 		term.onMouse();

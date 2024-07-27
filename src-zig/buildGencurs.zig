@@ -21,7 +21,7 @@ pub fn build(b: *std.Build) void {
 
 
 	// ===========================================================
-	const logger = b.dependency("library", .{}).module("logger");
+	// const logger = b.dependency("library", .{}).module("logger");
     const cursed = b.dependency("library", .{}).module("cursed");
     const utils  = b.dependency("library", .{}).module("utils");
 	const forms  = b.dependency("library", .{}).module("forms");
@@ -29,9 +29,8 @@ pub fn build(b: *std.Build) void {
 	const menu   = b.dependency("library", .{}).module("menu");
 	const mvzr   = b.dependency("library", .{}).module("mvzr");
 
-	// const logger  = b.dependency("library", .{}).module("logger");
 		
-	    const mdlPanel = b.createModule(.{
+    const mdlPanel = b.createModule(.{
 		.root_source_file = b.path( "./mdlPanel.zig" ),
 		.imports= &.{
 			.{ .name = "cursed", .module = cursed},
@@ -67,17 +66,17 @@ pub fn build(b: *std.Build) void {
 		 },
 	 });
 
-	 // const mdlMenus = b.createModule(.{
-		//  .root_source_file = b.path( "./mdlMenus.zig" ),
-		//  .imports= &.{
-		// 	 .{ .name = "cursed", .module = cursed },
-		// 	 .{ .name = "utils",  .module = utils },
-		// 	 .{ .name = "forms",  .module = forms },
-		// 	 .{ .name = "grid",   .module = grid  },
-		// 	 .{ .name = "menu",   .module = menu  },
-		// 	 .{ .name = "mvzr",   .module = mvzr  },
-		//  },
-	 // });
+	const mdlMenus = b.createModule(.{
+		 .root_source_file = b.path( "./mdlMenus.zig" ),
+		 .imports= &.{
+			 .{ .name = "cursed", .module = cursed },
+			 .{ .name = "utils",  .module = utils },
+			 .{ .name = "forms",  .module = forms },
+			 .{ .name = "grid",   .module = grid  },
+			 .{ .name = "menu",   .module = menu  },
+			 .{ .name = "mvzr",   .module = mvzr  },
+		 },
+	 });
 	 
 	const mdlSjson = b.createModule(.{
 		.root_source_file = b.path("./mdlSjson.zig" ),
@@ -146,7 +145,7 @@ pub fn build(b: *std.Build) void {
 	Prog.root_module.addImport("menu" , menu);
 
 	
-	Prog.root_module.addImport("logger" , logger);
+	// Prog.root_module.addImport("logger" , logger);
 	
 	Prog.root_module.addImport("mdlPanel" , mdlPanel);
 
@@ -156,13 +155,9 @@ pub fn build(b: *std.Build) void {
 
 	Prog.root_module.addImport("mdlGrids" , mdlGrids);
 
-	// Prog.root_module.addImport("mdlMenus" , mdlMenus);
+	Prog.root_module.addImport("mdlMenus" , mdlMenus);
 
 
-
-
-	// const install_exe = b.addInstallArtifact(Prog, .{});
-	// b.getInstallStep().dependOn(&install_exe.step); 
 	b.installArtifact(Prog);
 
 
