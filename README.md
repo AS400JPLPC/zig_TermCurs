@@ -369,7 +369,7 @@ Following the work provided by **Sam Atman**, a basic "regex" library allowing o
 →  2024-07-27<BR/>
 Added MENU definition function
 you have to understand the menu option as a fixed combo with constant values <br />
-- Alt-G: Create MENU definition<BR/>
+- Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
 - Alt-W: Tools menu (View GRID, Remove MENU)<br />
 
