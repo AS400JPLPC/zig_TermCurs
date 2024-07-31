@@ -3169,20 +3169,20 @@ pub const	pnl = struct {
 		actif: bool
 	};
 
-pub const Epanel = enum {
-	name,
-	posx,
-	posy,
-	lines,
-	cols,
-	cadre,
-	title,
-	button,
-	label,
-	field,
-	linev,
-	lineh,
-};
+	pub const Epanel = enum {
+		name,
+		posx,
+		posy,
+		lines,
+		cols,
+		cadre,
+		title,
+		button,
+		label,
+		field,
+		linev,
+		lineh,
+	};
 
 	// Init Panel for arrayList exemple Gencurs modlPanel
 	pub fn initPanel(vname: [] const u8,

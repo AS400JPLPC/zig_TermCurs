@@ -66,7 +66,7 @@ const allocator = std.heap.page_allocator;
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
-var NMENU  = std.ArrayList(mnu.MENUDEF ).init(allocator);
+var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
 
 //================================
 // defined var global
@@ -150,9 +150,10 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
 
 
-		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL,true) ;
-		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL,false) ;
-
+		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, true) ;
+		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;
+		
+		
 		// clean allocator *all
 		if (nopt == @intFromEnum(choix.clean)) {
 			pnl.freePanel(base);

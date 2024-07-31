@@ -63,9 +63,6 @@ pub const ErrMain = error{
 	main_run_TaskGrid_invalide,
 	main_run_FcellEnum_invalide,
 	main_run_TcellEnum_invalide,
-	// main_loadPanel_allocPrint_invalide,
-	// main_updatePanel_allocPrint_invalide,
-	// main_XPANEL_invalide,
 };
 
 
@@ -76,8 +73,8 @@ pub const ErrMain = error{
 		vcadre: mnu.CADRE,
 		vmnuvh: mnu.MNUVH,
 		vxitems : [][] const u8	) 
-		mnu.MENUDEF{
-			const xmenu = mnu.MENUDEF{
+		mnu.DEFMENU{
+			const xmenu = mnu.DEFMENU{
 			.name = vname,
 			.posx = vposx,
 			.posy = vposy,
@@ -159,7 +156,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 //=================================================
 // description Function
 // choix work Grid
-pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.MENUDEF)) usize {
+pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.DEFMENU)) usize {
 	const cellPos: usize = 0;
 	var Gkey: grd.GridSelect = undefined;
 
@@ -243,11 +240,11 @@ var Y: usize = 0;
 
 
 var NGRID : std.ArrayList(grd.GRID) = undefined;
-var NMENU : std.ArrayList(mnu.MENUDEF) = undefined;
+var NMENU : std.ArrayList(mnu.DEFMENU) = undefined;
 
 pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 				XGRID: *std.ArrayList(grd.GRID),
-				XMENU: *std.ArrayList(mnu.MENUDEF)) void {
+				XMENU: *std.ArrayList(mnu.DEFMENU)) void {
 	term.cls();
 
 
@@ -262,7 +259,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 	defer NGRID.deinit();
 
 
-	NMENU = std.ArrayList(mnu.MENUDEF).init(allocatorMenu);
+	NMENU = std.ArrayList(mnu.DEFMENU).init(allocatorMenu);
 	for (XMENU.items) |xmenu| { NMENU.append(xmenu) catch unreachable; }
 	defer NMENU.clearAndFree();
 	defer NMENU.deinit();
@@ -386,6 +383,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 			1, 1, // posx, posy
 			mnu.CADRE.line1, // type line fram
 			mnu.MNUVH.vertical, // type menu vertical / horizontal
+			
 			&.{ // item
 			"Menu-View",
 			"Menu-Remove",
@@ -1130,7 +1128,7 @@ fn Panel_Fmt03() *pnl.PANEL {
 
 
 //---------------------------------------------------------------------------
-pub fn writeDefCell(vMenu: *std.ArrayList(mnu.MENUDEF) , menuNum : usize) void {
+pub fn writeDefCell(vMenu: *std.ArrayList(mnu.DEFMENU) , menuNum : usize) void {
 	term.getCursor();
 
 
@@ -1205,7 +1203,7 @@ pub fn writeDefCell(vMenu: *std.ArrayList(mnu.MENUDEF) , menuNum : usize) void {
 //=================================================
 // description Function
 // view Menu
-pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.MENUDEF), menuNum: usize) void {
+pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.DEFMENU), menuNum: usize) void {
 
 		var Menudisplay = mnu.newMenu(
 						vmnu.items[menuNum].name,				// name
@@ -1220,8 +1218,8 @@ pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.MENUDEF), menuNum: usi
 
 }
 // remove MenuGrid
-fn removeMenu(vmenu: *std.ArrayList(mnu.MENUDEF)) void {
-	var savgrid: std.ArrayList(mnu.MENUDEF) = std.ArrayList(mnu.MENUDEF).init(grd.allocatorGrid);
+fn removeMenu(vmenu: *std.ArrayList(mnu.DEFMENU)) void {
+	var savgrid: std.ArrayList(mnu.DEFMENU) = std.ArrayList(mnu.DEFMENU).init(grd.allocatorGrid);
 
 	var Gkey: grd.GridSelect = undefined;
 

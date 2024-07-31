@@ -121,7 +121,7 @@ FIELD<BR/>
 | up        | Control valide update origine prior field      |
 | down      | Control valide update origine next field       |
 | char      | Treatment of the character of the area         |
-| fcun      | Interactive function linked to the input area. |
+| func      | Interactive function linked to the input area. |
 | task      | Task executed after input in the zone.         |
 | call      | Interactive function exec program extern       |
 
@@ -371,6 +371,22 @@ Added MENU definition function
 you have to understand the menu option as a fixed combo with constant values <br />
 - Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
-- Alt-W: Tools menu (View GRID, Remove MENU)<br />
+- Alt-W: Tools menu (View MENU, Remove MENU)<br />
 
 I'm making progress, and I'm going to create the JSON.<br />
+
+
+→  2024-07-31<BR/>
+**JSON function enabled for grid and menu.**<br />
+- full test GRID/MENU<BR/>
+- various changes due to testing and implementation of the JSON function<BR/>
+- This should not alter the old definitions.<BR/>
+- you will find results in the dspf directory<BR/>
+
+------------------------------------------------------------------<br />
+
+Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />
+
+maintenant, je vais générer du code et pour cela, je vais utiliser  le module "MUSTACHE-ZIG"<br /><br />
+
+In the current state, one could very well use JSON files and encapsulate them in the program, and why not make the forms in the project dynamic... I did this on the AS400.<br />

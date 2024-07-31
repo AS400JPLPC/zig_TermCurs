@@ -178,13 +178,6 @@
           "posy": 80,
           "text": "Func                 :",
           "title": false
-        },
-        {
-          "name": "L4280",
-          "posx": 42,
-          "posy": 80,
-          "text": "Test field Exec      :",
-          "title": false
         }
       ],
       "field": [
@@ -204,6 +197,8 @@
           "procfunc": "",
           "proctask": "TvNOM",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -222,6 +217,8 @@
           "procfunc": "",
           "proctask": "TvPRENOM",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -240,6 +237,8 @@
           "procfunc": "",
           "proctask": "TvFREE",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -258,6 +257,8 @@
           "procfunc": "",
           "proctask": "TvFULL",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -276,6 +277,8 @@
           "procfunc": "",
           "proctask": "TvLPHA",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -294,6 +297,8 @@
           "procfunc": "",
           "proctask": "TvALPHAUPPER",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -312,6 +317,8 @@
           "procfunc": "",
           "proctask": "TvALPHANUM",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -330,6 +337,8 @@
           "procfunc": "",
           "proctask": "TvALPHAnumUPPER",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -348,6 +357,8 @@
           "procfunc": "",
           "proctask": "TvPASSWORD",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -366,6 +377,8 @@
           "procfunc": "",
           "proctask": "TvYESNO",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -384,6 +397,8 @@
           "procfunc": "",
           "proctask": "TvUDIGIT",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -402,6 +417,8 @@
           "procfunc": "",
           "proctask": "TvDIGIT",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -420,6 +437,8 @@
           "procfunc": "",
           "proctask": "TvUDECIMAL",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -438,6 +457,8 @@
           "procfunc": "",
           "proctask": "TvDECIMAL",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -456,6 +477,8 @@
           "procfunc": "",
           "proctask": "TvDATEISO",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -474,6 +497,8 @@
           "procfunc": "",
           "proctask": "TvDATEFR",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -492,6 +517,8 @@
           "procfunc": "",
           "proctask": "TvDATEUS",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -510,6 +537,8 @@
           "procfunc": "",
           "proctask": "TvTELEPHONE",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -528,6 +557,8 @@
           "procfunc": "",
           "proctask": "TvMAILISO",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -546,6 +577,8 @@
           "procfunc": "",
           "proctask": "TvSWITCH",
           "progcall": "",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         },
         {
@@ -564,29 +597,121 @@
           "procfunc": "FvFUNC",
           "proctask": "TvFUNC",
           "progcall": "",
-          "regex": ""
-        },
-        {
-          "name": "dddd",
-          "posx": 42,
-          "posy": 103,
-          "reftyp": "TEXT_FREE",
-          "width": 15,
-          "scal": 0,
-          "text": "",
-          "requier": false,
-          "protect": false,
-          "edtcar": "",
-          "errmsg": ".",
-          "help": "exec name Program",
-          "procfunc": "",
-          "proctask": "",
-          "progcall": "Pfacture",
+          "typecall": "",
+          "parmcall": false,
           "regex": ""
         }
       ],
-      "linev": [],
-      "lineh": []
+      "linev": [
+        {
+          "name": "V38",
+          "posx": 3,
+          "posy": 8,
+          "lng": 4,
+          "trace": "line1"
+        },
+        {
+          "name": "V277",
+          "posx": 2,
+          "posy": 77,
+          "lng": 39,
+          "trace": "line1"
+        }
+      ],
+      "lineh": [
+        {
+          "name": "H89",
+          "posx": 8,
+          "posy": 9,
+          "lng": 51,
+          "trace": "line1"
+        },
+        {
+          "name": "H423",
+          "posx": 42,
+          "posy": 3,
+          "lng": 164,
+          "trace": "line1"
+        }
+      ]
+    }
+  ],
+  "GRID": [
+    {
+      "name": "grid01",
+      "posx": 11,
+      "posy": 7,
+      "pagerows": 5,
+      "separator": "│",
+      "cadre": "line1",
+      "cells": [
+        {
+          "text": "nom",
+          "long": 30,
+          "reftyp": "TEXT_FREE",
+          "posy": 0,
+          "edtcar": "",
+          "atrcell": "fgGreen"
+        },
+        {
+          "text": "age",
+          "long": 3,
+          "reftyp": "UDIGIT",
+          "posy": 1,
+          "edtcar": "",
+          "atrcell": "fgYellow"
+        }
+      ]
+    }
+  ],
+  "MENU": [
+    {
+      "name": "menu01",
+      "posx": 12,
+      "posy": 8,
+      "cadre": "line1",
+      "mnuvh": "vertical",
+      "xitems": [
+        {
+          "text": "file"
+        },
+        {
+          "text": "sav"
+        },
+        {
+          "text": "delete"
+        },
+        {
+          "text": "exit"
+        }
+      ]
+    },
+    {
+      "name": "menu02",
+      "posx": 13,
+      "posy": 18,
+      "cadre": "line1",
+      "mnuvh": "horizontal",
+      "xitems": [
+        {
+          "text": "a"
+        },
+        {
+          "text": "z"
+        },
+        {
+          "text": "e"
+        },
+        {
+          "text": "r"
+        },
+        {
+          "text": "t"
+        },
+        {
+          "text": "y"
+        }
+      ]
     }
   ]
 }

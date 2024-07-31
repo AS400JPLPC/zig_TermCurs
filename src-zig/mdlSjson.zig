@@ -36,7 +36,11 @@ const forms = @import("forms");
 const allocator = std.heap.page_allocator;
 
 
-pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
+
+pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
+				XGRID: *std.ArrayList(grd.GRID),
+				XMENU: *std.ArrayList(mnu.DEFMENU),
+				nameJson: []const u8) !void {
 
 
 
@@ -52,6 +56,9 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 
 	var w = std.json.writeStream( out, .{ .whitespace = .indent_2 });
 
+//----------------------------------
+// Panel JSON
+//----------------------------------
 
 	const Ipanel = std.enums.EnumIndexer(pnl.Epanel);
 
@@ -366,6 +373,167 @@ pub fn SavJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 		try w.endObject();
 		try w.endArray();
 	}
-	try w.endObject();
+	const nbrMenu: usize = XMENU.items.len;
+	const nbrGrid: usize = XMENU.items.len;
+    if ( nbrGrid == 0 and nbrMenu == 0)try w.endObject();
+
+//----------------------------------
+// Grid JSON
+//----------------------------------
+	if ( nbrGrid > 0 ) {
+	const Igrid = std.enums.EnumIndexer(grd.Egrid);
+	try w.objectField("GRID");
+	var ng: usize = 0;
+
+	try w.beginArray();
+	while (ng < nbrGrid) : (ng += 1) {
+
+		try w.beginObject();
+		var g: usize = 0;
+		while (g < Igrid.count) : (g += 1) {
+			switch (Igrid.keyForIndex(g)) {
+				.name => {
+					try w.objectField(@tagName(grd.Egrid.name));
+					try w.print("\"{s}\"", .{XGRID.items[ng].name});
+				},
+				.posx => {
+					try w.objectField(@tagName(grd.Egrid.posx));
+					try w.print("{d}", .{XGRID.items[ng].posx});
+				},
+				.posy => {
+					try w.objectField(@tagName(grd.Egrid.posy));
+					try w.print("{d}", .{XGRID.items[ng].posy});
+				},
+				.pagerows => {
+					try w.objectField(@tagName(grd.Egrid.pagerows));
+					try w.print("{d}", .{XGRID.items[ng].pageRows});
+				},
+				.separator => {
+					try w.objectField(@tagName(grd.Egrid.separator));
+					try w.print("\"{s}\"", .{XGRID.items[ng].separator});
+				},
+				.cadre => {
+					try w.objectField(@tagName(grd.Egrid.cadre));
+					try w.print("\"{s}\"", .{@tagName(XGRID.items[ng].cadre)});
+				},
+				.cell => {
+					const Icell = std.enums.EnumIndexer(grd.Ecell);
+					var cx: usize = 0;
+					const nbrcell: usize = XGRID.items[ng].cell.items.len;
+
+					var cv: usize = 0;
+					try w.objectField("cells");
+					try w.beginArray();
+					while (cv < nbrcell) : (cv += 1) {
+						try w.beginObject();
+						cx = 0;
+						while (cx < Icell.count) : (cx += 1) {
+							switch (Icell.keyForIndex(cx)) {
+								.text => {
+									try w.objectField(@tagName(grd.Ecell.text));
+									try w.print("\"{s}\"", .{XGRID.items[ng].cell.items[cv].text});
+								},
+								.long => {
+									try w.objectField(@tagName(grd.Ecell.long));
+									try w.print("{d}", .{XGRID.items[ng].cell.items[cv].long});
+								},
+								.reftyp => {
+									try w.objectField(@tagName(grd.Ecell.reftyp));
+									try w.print("\"{s}\"", .{@tagName(XGRID.items[ng].cell.items[cv].reftyp)});
+								},
+								.posy => {
+									try w.objectField(@tagName(grd.Ecell.posy));
+									try w.print("{d}", .{XGRID.items[ng].cell.items[cv].posy});
+								},
+								.edtcar => {
+									try w.objectField(@tagName(grd.Ecell.edtcar));
+									try w.print("\"{s}\"", .{XGRID.items[ng].cell.items[cv].edtcar});
+								},
+								.atrcell => {
+									try w.objectField(@tagName(grd.Ecell.atrcell));
+									try w.print("\"{s}\"", .{@tagName(XGRID.items[ng].cell.items[cv].atrCell.foregr)});
+								}
+							} // end switch
+						} // end wile field cell
+						try w.endObject();
+					} // end nbr cell
+					try w.endArray();
+					try w.endObject();
+				},	
+				.data => {
+				},
+			}
+		}
+    }
+    try w.endArray();
+    if ( nbrMenu == 0 )try w.endObject();
+} 
+
+
+//----------------------------------
+// Menu JSON
+//----------------------------------
+	if ( nbrMenu > 0 ) {
+	const Imenu = std.enums.EnumIndexer(mnu.Emenu);
+	try w.objectField("MENU");
+	var ng: usize = 0;
+
+	try w.beginArray();
+	while (ng < nbrMenu) : (ng += 1) {
+		try w.beginObject();
+		var m: usize = 0;
+		while (m < Imenu.count) : (m += 1) {
+			switch (Imenu.keyForIndex(m)) {
+				.name => {
+					try w.objectField(@tagName(mnu.Emenu.name));
+					try w.print("\"{s}\"", .{XMENU.items[ng].name});
+				},
+				.posx => {
+					try w.objectField(@tagName(mnu.Emenu.posx));
+					try w.print("{d}", .{XMENU.items[ng].posx});
+				},
+				.posy => {
+					try w.objectField(@tagName(mnu.Emenu.posy));
+					try w.print("{d}", .{XMENU.items[ng].posy});
+				},
+				.cadre => {
+					try w.objectField(@tagName(mnu.Emenu.cadre));
+					try w.print("\"{s}\"", .{@tagName(XMENU.items[ng].cadre)});
+				},
+				.mnuvh => {
+					try w.objectField(@tagName(mnu.Emenu.mnuvh));
+					try w.print("\"{s}\"", .{@tagName(XMENU.items[ng].mnuvh)});
+				},
+			
+				.xitems => {
+					const Iopt = std.enums.EnumIndexer(mnu.Eopt);
+					var cx: usize = 0;
+					const nbrcell: usize = XMENU.items[ng].xitems.len;
+
+					var cv: usize = 0;
+					try w.objectField("xitems");
+					try w.beginArray();
+					while (cv < nbrcell) : (cv += 1) {
+						try w.beginObject();
+						cx = 0;
+						while (cx < Iopt.count) : (cx += 1) {
+							switch (Iopt.keyForIndex(cx)) {
+								.text => {
+									try w.objectField(@tagName(mnu.Eopt.text));
+									try w.print("\"{s}\"", .{XMENU.items[ng].xitems[cv]});
+								},
+							} // end switch
+						} // end wile field cell
+						try w.endObject();
+					} // end nbr cell
+					try w.endArray();
+				}
+			}
+		}
+		try w.endObject();
+	}
+	try w.endArray();
+	} 
+  	if ( nbrMenu > 0 )  try w.endObject(); 
 return ;
 }

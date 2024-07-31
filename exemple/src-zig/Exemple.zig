@@ -495,7 +495,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	const Xcombo : *grd.GRID =	grd.newGridC(
 					"Combo01",
 					3, 75,
-					4 ,
+					5 ,
 					grd.gridStyle,
 					grd.CADRE.line1,
 					);
@@ -537,7 +537,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	const Xcombo : *grd.GRID =	grd.newGridC(
 										"Combo02",
 										4, 75,
-										4 ,	
+										3 ,	
 										grd.gridStyle,
 										grd.CADRE.line1,
 										);
@@ -740,7 +740,7 @@ pub fn main() !void {
 	// open terminal and config and offMouse , cursHide->(cursor hide)
 	term.enableRawMode();
 	defer term.disableRawMode() ;
-
+	term.resizeTerm(32,132);
 	// define Panel
 	var pFmt01 = Panel_Fmt01();
 
@@ -773,7 +773,7 @@ pub fn main() !void {
 			},
 			
 			.call => {
-			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); // call programe ex: ExemplecallProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
+			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); 
 			callProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]) ;
 			},
 
@@ -852,6 +852,18 @@ pub fn main() !void {
 
 					if (Gkey.Key	== kbd.pageDown) {
 					grd.resetRows(Grid01);
+					grd.addRows(Grid01 , &.{"1", "Adam","Aigle","1000,00","1","tictac"});
+					grd.addRows(Grid01 , &.{"2", "Eve", "poisson","1001,00","1","tictac"});
+					grd.addRows(Grid01 , &.{"3", "Rouge","Aigle","1002,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"4", "Bleu", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"5", "Bleu5", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"6", "Bleu6", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"7", "Bleu7", "poisson","100,00","1","tictac"});
+					grd.addRows(Grid01 , &.{"8", "Bleu8", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"9", "Bleu9", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"10", "Bleu10", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"11", "Bleu11", "poisson","100,00","0","tictac"});
+					grd.addRows(Grid01 , &.{"12", "Bleu12", "Canard","100,00","0","tictac"});
 					grd.addRows(Grid01 , &.{"13", "Bleu13", "poisson","100,00","0","tictac"});
 					grd.addRows(Grid01 , &.{"14", "Bleu14", "Vache","100,00","0","tictac"});
 					}

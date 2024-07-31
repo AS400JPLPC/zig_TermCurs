@@ -4,6 +4,9 @@
 	///-----------------------
 const std = @import("std");
 
+// term
+
+const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
@@ -28,7 +31,9 @@ const mnu = @import("menu").mnu;
 // full delete for produc
 const forms = @import("forms");
 
-const allocator = std.heap.page_allocator;
+
+pub const allocatorJson = std.heap.page_allocator;
+
 
 // tools utility
 const utl = @import("utils");
@@ -109,6 +114,57 @@ const DEFLINEH = struct { name: []const u8, posx: usize, posy: usize, lng: usize
 const Jlineh = enum { name, posx, posy, lng, trace };
 
 //..............................//
+// define CELL JSON
+//..............................//
+
+const DEFCELL = struct { text: []const u8, long: usize, reftyp: grd.REFTYP,	
+						posy: usize, edtcar: []const u8, atrCell: term.ForegroundColor };
+
+const Jcell = enum {text, long, reftyp, posy, edtcar, atrcell };
+
+//..............................//
+// define GRID JSON
+//..............................//
+
+const ArgData = struct {
+		buf: std.ArrayList([]const u8) = std.ArrayList([]const u8).init(allocatorJson),
+	};
+
+const RGRID = struct { name: []const u8, posx: usize, posy: usize , pageRows: usize, separator: []const u8,
+	 cadre: grd.CADRE, cells: std.ArrayList(DEFCELL), data: std.MultiArrayList(ArgData)};
+
+const Jgrid = enum {name, posx, posy, pagerows, separator, cadre, cells, data};
+
+
+//..............................//
+// define MENU JSON
+//..............................//
+
+const DEFMENU = struct { name: []const u8, posx: usize, posy: usize , cadre: mnu.CADRE, mnuvh: mnu.MNUVH, 
+						xitems : [][] const u8};
+
+const Jmenu = enum {name, posx, posy, cadre, mnuvh, xitems};
+const Jitem = enum {text};
+
+	pub fn initMenuDef(
+		vname: []const u8,
+		vposx: usize,
+		vposy: usize,
+		vcadre: mnu.CADRE,
+		vmnuvh: mnu.MNUVH,
+		vxitems : [][] const u8	) 
+		mnu.DEFMENU{
+			const xmenu = mnu.DEFMENU{
+			.name = vname,
+			.posx = vposx,
+			.posy = vposy,
+			.cadre = vcadre,
+			.mnuvh = vmnuvh,
+			.xitems = vxitems
+			};
+		return xmenu;
+	}
+//..............................//
 // define PANEL JSON
 //..............................//
 const RPANEL = struct { name: []const u8, posx: usize, posy: usize, lines: usize, cols: usize,
@@ -121,7 +177,9 @@ const RPANEL = struct { name: []const u8, posx: usize, posy: usize, lines: usize
 
 const Jpanel = enum { name, posx, posy, lines, cols, cadre, title, button, label, field, linev, lineh };
 
-var ENRG = std.ArrayList(RPANEL).init(allocator);
+var NPANEL = std.ArrayList(RPANEL).init(allocatorJson);
+var NGRID  = std.ArrayList(RGRID ).init(allocatorJson);
+var NMENU  = std.ArrayList(DEFMENU ).init(allocatorJson);
 
 //..............................//
 //  string return enum
@@ -162,7 +220,7 @@ const T = struct {
 	}
 
 	pub fn ctrlPack(self: T, Xtype: Ctype) bool {
-		var out = std.ArrayList(u8).init(allocator);
+		var out = std.ArrayList(u8).init(allocatorJson);
 		defer out.deinit();
 
 		switch (self.x.?) {
@@ -189,7 +247,7 @@ const T = struct {
 			.string => {
 				if (Xtype != Ctype.string) return false;
 				if (Xtype == Ctype.decimal_string)
-					return utl.isDecimalStr(std.fmt.allocPrint(allocator, "{s}", .{self.x.?.string})
+					return utl.isDecimalStr(std.fmt.allocPrint(allocatorJson, "{s}", .{self.x.?.string})
 						catch unreachable);
 			},
 
@@ -233,12 +291,14 @@ const T = struct {
 pub fn jsonDecode(my_json: []const u8) !void {
 	var val: T = undefined;
 
-	const parsed = try std.json.parseFromSlice(std.json.Value, allocator, my_json, .{});
+	const parsed = try std.json.parseFromSlice(std.json.Value, allocatorJson, my_json, .{});
 	defer parsed.deinit();
 
-	std.debug.print("\n", .{});
-
 	const json = T.init(parsed.value);
+
+//----------------------------------------------------
+// PANEL
+//----------------------------------------------------
 
 	val = json.get("PANEL");
 
@@ -261,13 +321,13 @@ pub fn jsonDecode(my_json: []const u8) !void {
 	while (p < nbrPanel) : (p += 1) {
 		var n: usize = 0; // index
 
-		ENRG.append(RPANEL{ .name = "", .posx = 0, .posy = 0, .lines = 0, .cols = 0,
+		NPANEL.append(RPANEL{ .name = "", .posx = 0, .posy = 0, .lines = 0, .cols = 0,
 			.cadre = forms.CADRE.line0, .title = "",
-			.button = std.ArrayList(DEFBUTTON).init(allocator),
-			.label = std.ArrayList(DEFLABEL).init(allocator),
-			.field = std.ArrayList(DEFFIELD).init(allocator),
-			.linev = std.ArrayList(DEFLINEV).init(allocator),
-			.lineh = std.ArrayList(DEFLINEH).init(allocator) }) catch unreachable;
+			.button = std.ArrayList(DEFBUTTON).init(allocatorJson),
+			.label = std.ArrayList(DEFLABEL).init(allocatorJson),
+			.field = std.ArrayList(DEFFIELD).init(allocatorJson),
+			.linev = std.ArrayList(DEFLINEV).init(allocatorJson),
+			.lineh = std.ArrayList(DEFLINEH).init(allocatorJson) }) catch unreachable;
 
 		while (n < Rpanel.count) : (n += 1) {
 			var v: usize = 0; // index
@@ -285,62 +345,62 @@ pub fn jsonDecode(my_json: []const u8) !void {
 					if (T.err) break;
 
 					if (val.ctrlPack(Ctype.string))
-						ENRG.items[p].name = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+						NPANEL.items[p].name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  Panel err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  Panel err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.posx => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.integer))
-						ENRG.items[p].posx = @intCast(val.x.?.integer)
+						NPANEL.items[p].posx = @intCast(val.x.?.integer)
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.posy => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.integer))
-						ENRG.items[p].posy = @intCast(val.x.?.integer)
+						NPANEL.items[p].posy = @intCast(val.x.?.integer)
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.lines => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.integer))
-						ENRG.items[p].lines = @intCast(val.x.?.integer)
+						NPANEL.items[p].lines = @intCast(val.x.?.integer)
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.cols => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.integer))
-						ENRG.items[p].cols = @intCast(val.x.?.integer)
+						NPANEL.items[p].cols = @intCast(val.x.?.integer)
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.cadre => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.string)) {
-						ENRG.items[p].cadre = strToEnum(forms.CADRE, val.x.?.string);
-					} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						NPANEL.items[p].cadre = strToEnum(forms.CADRE, val.x.?.string);
+					} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 						.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				Jpanel.title => {
 					val = json.get("PANEL").index(p).get(@tagName(Rpanel.keyForIndex(n)));
 
 					if (val.ctrlPack(Ctype.string))
-						ENRG.items[p].title = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+						NPANEL.items[p].title = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 					else
-						@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 							.{@tagName(Rpanel.keyForIndex(n))}));
 				},
 				//===============================================================================
@@ -365,31 +425,31 @@ pub fn jsonDecode(my_json: []const u8) !void {
 								Jbutton.key => {
 									if (val.ctrlPack(Ctype.string)) {
 										bt.key = strToEnum(kbd, val.x.?.string);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rbutton.keyForIndex(v)) }));
 								},
 								Jbutton.show => {
 									if (val.ctrlPack(Ctype.bool))
 										bt.show = val.x.?.bool
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rbutton.keyForIndex(v)) }));
 								},
 								Jbutton.check => {
 									if (val.ctrlPack(Ctype.bool))
 										bt.check = val.x.?.bool
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rbutton.keyForIndex(v)) }));
 								},
 								Jbutton.title => {
 									if (val.ctrlPack(Ctype.string))
-										bt.title = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										bt.title = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rbutton.keyForIndex(v)) }));
 
-									ENRG.items[p].button.append(bt) catch unreachable;
+									NPANEL.items[p].button.append(bt) catch unreachable;
 								},
 							}
 						}
@@ -417,38 +477,38 @@ pub fn jsonDecode(my_json: []const u8) !void {
 							switch (Rlabel.keyForIndex(v)) {
 								Jlabel.name => {
 									if (val.ctrlPack(Ctype.string))
-										lb.name = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										lb.name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlabel.keyForIndex(v)) }));
 								},
 								Jlabel.posx => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lb.posx = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlabel.keyForIndex(v)) }));
 								},
 								Jlabel.posy => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lb.posy = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlabel.keyForIndex(v)) }));
 								},
 								Jlabel.text => {
 									if (val.ctrlPack(Ctype.string))
-										lb.text = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										lb.text = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlabel.keyForIndex(v)) }));
 								},
 								Jlabel.title => {
 									if (val.ctrlPack(Ctype.bool))
 										lb.title = val.x.?.bool
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlabel.keyForIndex(v)) }));
 
-									ENRG.items[p].label.append(lb) catch unreachable;
+									NPANEL.items[p].label.append(lb) catch unreachable;
 								},
 							}
 						}
@@ -481,30 +541,30 @@ pub fn jsonDecode(my_json: []const u8) !void {
 							switch (Rfield.keyForIndex(v)) {
 								Jfield.name => {
 									if (val.ctrlPack(Ctype.string))
-										lf.name = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										lf.name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.posx => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lf.posx = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.posy => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lf.posy = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.reftyp => {
 									if (val.ctrlPack(Ctype.string)) {
-										sreftyp = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										sreftyp = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 
 									lf.reftyp = strToEnum(forms.REFTYP, sreftyp);
@@ -513,14 +573,14 @@ pub fn jsonDecode(my_json: []const u8) !void {
 								Jfield.width => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lf.width = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.scal => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lf.scal = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
@@ -535,77 +595,77 @@ pub fn jsonDecode(my_json: []const u8) !void {
 								Jfield.requier => {
 									if (val.ctrlPack(Ctype.bool)) {
 										lf.requier = val.x.?.bool;
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.protect => {
 									if (val.ctrlPack(Ctype.bool)) {
 										lf.protect = val.x.?.bool;
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.edtcar => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.edtcar = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.edtcar = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.errmsg => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.errmsg = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.errmsg = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.help => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.help = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.help = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.procfunc => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.procfunc = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.procfunc = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.proctask => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.proctask = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.proctask = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.progcall => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.progcall = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.progcall = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.typecall => {
 									if (val.ctrlPack(Ctype.string)) {
-										lf.typecall = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string});
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										lf.typecall = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string});
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 
 								Jfield.parmcall => {
 									if (val.ctrlPack(Ctype.bool)) {
 										lf.parmcall = val.x.?.bool;
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rfield.keyForIndex(v)) }));
 								},
 								
 								Jfield.regex => {
 									lf.regex = "";
 
-									ENRG.items[p].field.append(lf) catch unreachable;
+									NPANEL.items[p].field.append(lf) catch unreachable;
 								},
 							}
 						}
@@ -633,36 +693,36 @@ pub fn jsonDecode(my_json: []const u8) !void {
 							switch (Rlinev.keyForIndex(v)) {
 								Jlinev.name => {
 									if (val.ctrlPack(Ctype.string))
-										lv.name = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										lv.name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlinev.keyForIndex(v)) }));
 								},
 								Jlinev.posx => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lv.posx = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlinev.keyForIndex(v)) }));
 								},
 								Jlinev.posy => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lv.posy = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlinev.keyForIndex(v)) }));
 								},
 								Jlinev.lng => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lv.lng = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlinev.keyForIndex(v)) }));
 								},
 								Jlinev.trace => {
 									if (val.ctrlPack(Ctype.string)) {
 										lv.trace = strToEnum(forms.LINE, val.x.?.string);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 										.{@tagName(Rlinev.keyForIndex(n))}));
 
-									ENRG.items[p].linev.append(lv) catch unreachable;
+									NPANEL.items[p].linev.append(lv) catch unreachable;
 								},
 							}
 						}
@@ -691,36 +751,36 @@ pub fn jsonDecode(my_json: []const u8) !void {
 							switch (Rlineh.keyForIndex(v)) {
 								Jlineh.name => {
 									if (val.ctrlPack(Ctype.string))
-										lh.name = try std.fmt.allocPrint(allocator, "{s}", .{val.x.?.string})
+										lh.name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
 									else
-										@panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+										@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 											.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlineh.keyForIndex(v)) }));
 								},
 								Jlineh.posx => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lh.posx = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlineh.keyForIndex(v)) }));
 								},
 								Jlineh.posy => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lh.posy = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlineh.keyForIndex(v)) }));
 								},
 								Jlineh.lng => {
 									if (val.ctrlPack(Ctype.integer)) {
 										lh.lng = @intCast(val.x.?.integer);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}.{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
 										.{ @tagName(Rpanel.keyForIndex(n)), @tagName(Rlineh.keyForIndex(v)) }));
 								},
 								Jlineh.trace => {
 									if (val.ctrlPack(Ctype.string)) {
 										lh.trace = strToEnum(forms.LINE, val.x.?.string);
-									} else @panic(try std.fmt.allocPrint(allocator, "Json  err_Field :{s}\n",
+									} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
 										.{@tagName(Rlineh.keyForIndex(n))}));
 
-									ENRG.items[p].lineh.append(lh) catch unreachable;
+									NPANEL.items[p].lineh.append(lh) catch unreachable;
 								},
 							}
 						}
@@ -731,42 +791,297 @@ pub fn jsonDecode(my_json: []const u8) !void {
 			}
 		}
 	}
+
+//----------------------------------------------------
+// GRID
+//----------------------------------------------------
+
+	val = json.get("GRID");
+	if (!T.err)  {
+	const nbrGrid = val.x.?.array.items.len;
+	var g: usize = 0;
+	const Rcell = std.enums.EnumIndexer(Jcell);
+	const Rgrid = std.enums.EnumIndexer(Jgrid);
+	
+	while (g < nbrGrid) : (g += 1) {
+		
+		NGRID.append(RGRID{.name = "", .posx = 0, .posy = 0, .pageRows = 0 ,
+			.separator = " ", .cadre = grd.CADRE.line1,
+			.cells = std.ArrayList(DEFCELL).init(allocatorJson),
+			.data  = std.MultiArrayList(ArgData){}	} 
+		) catch unreachable;
+
+		var n: usize = 0; // index
+	while (n < Rgrid.count) : (n += 1) {
+		var v: usize = 0; // index
+		var y: usize = 0; // array len
+		var z: usize = 0; // compteur
+		var c: usize = 0; // cell
+		switch (Rgrid.keyForIndex(n)) {
+			Jgrid.name => {
+					val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+					if (T.err) break;
+
+					if (val.ctrlPack(Ctype.string))
+						NGRID.items[g].name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+					else
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  Panel err_Field :{s}\n",
+							.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.posx => {
+				val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.integer))
+					NGRID.items[g].posx = @intCast(val.x.?.integer)
+				else
+					@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+						.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.posy => {
+				val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.integer))
+					NGRID.items[g].posy = @intCast(val.x.?.integer)
+				else
+					@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+						.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.pagerows => {
+				val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.integer))
+					NGRID.items[g].pageRows = @intCast(val.x.?.integer)
+				else
+					@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+						.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.separator => {
+					val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+					if (T.err) break;
+
+					if (val.ctrlPack(Ctype.string))
+						NGRID.items[g].separator = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+					else
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  Panel err_Field :{s}\n",
+							.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.cadre => {
+				val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.string)) {
+					NGRID.items[g].cadre = strToEnum(grd.CADRE, val.x.?.string);
+				} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+					.{@tagName(Rgrid.keyForIndex(n))}));
+			},
+			Jgrid.cells => {
+				val = json.get("GRID").index(g).get(@tagName(Rgrid.keyForIndex(n)));
+				if (T.err) break;
+
+				var cl: DEFCELL = undefined;
+				var sreftyp: []const u8 = undefined;
+				var satrcell: []const u8 = undefined;
+				y = val.x.?.array.items.len;
+				z = 0;
+				c = 0;
+				while (z < y) : (z += 1) {
+					v = 0;
+					while (v < Rcell.count) : (v += 1  ) {
+						val = json.get("GRID").index(g).get("cells").index(c)
+								.get(@tagName(Rcell.keyForIndex(v)));
+							
+						switch (Rcell.keyForIndex(v)) {
+							Jcell.text => {
+								if (val.ctrlPack(Ctype.string))
+									cl.text = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+							},
+							Jcell.long => {
+								if (val.ctrlPack(Ctype.integer))
+									cl.long = @intCast(val.x.?.integer)
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+
+							},
+							Jcell.reftyp => {
+								if (val.ctrlPack(Ctype.string)) 
+									sreftyp = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+								cl.reftyp = strToEnum(grd.REFTYP, sreftyp);
+							},
+							Jcell.posy => {
+								if (val.ctrlPack(Ctype.integer))
+								cl.posy = @intCast(val.x.?.integer)
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+
+							},
+							Jcell.edtcar => {
+								if (val.ctrlPack(Ctype.string))
+								cl.edtcar = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+							},
+							Jcell.atrcell => {
+								if (val.ctrlPack(Ctype.string)) 
+									satrcell = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rgrid.keyForIndex(g)), @tagName(Rgrid.keyForIndex(v)) }));
+								cl.atrCell = strToEnum(term.ForegroundColor, satrcell);
+								NGRID.items[g].cells.append(cl) catch |err| {@panic(@errorName(err));};
+							}
+						}
+					}
+					c += 1 ;
+				}
+			},
+			Jgrid.data => {}
+		}
+	} // Rgrid
+	} //nbrGrid
+	} // Terr
+//----------------------------------------------------
+// MENU
+//----------------------------------------------------
+
+	val = json.get("MENU");
+	if (!T.err)  {
+	const nbrMenu = val.x.?.array.items.len;
+	var m: usize = 0;
+	const Ritem = std.enums.EnumIndexer(Jitem);
+	const Rmenu = std.enums.EnumIndexer(Jmenu);
+	
+	while (m < nbrMenu) : (m += 1) {
+		
+		NMENU.append(DEFMENU{.name = "", .posx = 0, .posy = 0,
+			 .cadre = mnu.CADRE.line1, .mnuvh = mnu.MNUVH.vertical ,
+			 .xitems  = undefined,
+			 }
+	 
+		) catch unreachable;
+
+		var n: usize = 0; // index
+	while (n < Rmenu.count) : (n += 1) {
+		var v: usize = 0; // index
+		var y: usize = 0; // array len
+		var z: usize = 0; // compteur
+		var c: usize = 0; // cell
+		switch (Rmenu.keyForIndex(n)) {
+			Jmenu.name => {
+					val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+					if (T.err) break;
+
+					if (val.ctrlPack(Ctype.string))
+						NMENU.items[m].name = try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string})
+					else
+						@panic(try std.fmt.allocPrint(allocatorJson, "Json  Panel err_Field :{s}\n",
+							.{@tagName(Rmenu.keyForIndex(n))}));
+			},
+			Jmenu.posx => {
+				val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.integer))
+					NMENU.items[m].posx = @intCast(val.x.?.integer)
+				else
+					@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+						.{@tagName(Rmenu.keyForIndex(n))}));
+			},
+			Jmenu.posy => {
+				val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.integer))
+					NMENU.items[m].posy = @intCast(val.x.?.integer)
+				else
+					@panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+						.{@tagName(Rmenu.keyForIndex(n))}));
+			},
+			Jmenu.cadre => {
+				val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.string)) {
+					NMENU.items[m].cadre = strToEnum(mnu.CADRE, val.x.?.string);
+				} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+					.{@tagName(Rmenu.keyForIndex(n))}));
+			},
+			Jmenu.mnuvh => {
+				val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+
+				if (val.ctrlPack(Ctype.string)) {
+					NMENU.items[m].mnuvh = strToEnum(mnu.MNUVH, val.x.?.string);
+				} else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}\n",
+					.{@tagName(Rmenu.keyForIndex(n))}));
+			},
+			Jmenu.xitems => {
+				val = json.get("MENU").index(m).get(@tagName(Rmenu.keyForIndex(n)));
+				if (T.err) break;
+				var xmenu =  std.ArrayList([]const u8).init(allocatorJson);
+				defer xmenu.clearAndFree();
+				y = val.x.?.array.items.len;
+				z = 0;
+				c = 0;
+				while (z < y) : (z += 1) {
+					v = 0;
+					while (v < Ritem.count) : (v += 1  ) {
+						val = json.get("MENU").index(m).get("xitems").index(c)
+								.get(@tagName(Ritem.keyForIndex(v)));
+							
+						switch (Ritem.keyForIndex(v)) {
+							Jitem.text => {
+								if (val.ctrlPack(Ctype.string))
+								try xmenu.append(try std.fmt.allocPrint(allocatorJson, "{s}", .{val.x.?.string}))
+								else @panic(try std.fmt.allocPrint(allocatorJson, "Json  err_Field :{s}.{s}\n",
+									.{ @tagName(Rmenu.keyForIndex(m)), @tagName(Rmenu.keyForIndex(v)) }));
+							}
+						}
+					}
+					c += 1 ;
+				}
+				
+				NMENU.items[m].xitems = try allocatorJson.alloc([]const u8, y);
+				for (xmenu.items, 0.. ) |_,idx | {
+					NMENU.items[m].xitems[idx]  = xmenu.items[idx];  
+				}
+			},
+		}
+	} // nbrMenu
+	} // Rmenu
+	} // Terr
+	
 }
 
 //..............................//
 // Main function
 //..............................//
-pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
-	//pub fn main () ! void{
-
-	//	var XPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-
-	//	const nameJson: []const u8 = "test.dspf";
+pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL), 
+		XGRID: *std.ArrayList(grd.GRID),
+		XMENU: *std.ArrayList(mnu.DEFMENU),
+		nameJson: []const u8) !void {
 
 	const cDIR = std.fs.cwd().openDir("dspf", .{}) catch |err| {
-		@panic(try std.fmt.allocPrint(allocator, "err Open.{any}\n", .{err}));
+		@panic(try std.fmt.allocPrint(allocatorJson, "err Open.{any}\n", .{err}));
 	};
 
 	var my_file = cDIR.openFile(nameJson, .{}) catch |err| {
-		@panic(try std.fmt.allocPrint(allocator, "err Open.{any}\n", .{err}));
+		@panic(try std.fmt.allocPrint(allocatorJson, "err Open.{any}\n", .{err}));
 	};
 	defer my_file.close();
 
 	const file_size = try my_file.getEndPos();
-	var buffer: []u8 = allocator.alloc(u8, file_size) catch unreachable;
+	var buffer: []u8 = allocatorJson.alloc(u8, file_size) catch unreachable;
 
 	_ = try my_file.read(buffer[0..buffer.len]);
 
 	jsonDecode(buffer) catch |err| {
-		@panic(try std.fmt.allocPrint(allocator, "err JsonDecode.{any}\n", .{err}));
+		@panic(try std.fmt.allocPrint(allocatorJson, "err JsonDecode.{any}\n", .{err}));
 	};
 
 	XPANEL.clearAndFree();
 
-	for (ENRG.items, 0..) |pnlx, idx| {
+	for (NPANEL.items, 0..) |pnlx, idx| {
 		var vPanel: pnl.PANEL = undefined;
-		vPanel = pnl.initPanel(ENRG.items[idx].name, ENRG.items[idx].posx, ENRG.items[idx].posy,
-			ENRG.items[idx].lines, ENRG.items[idx].cols, ENRG.items[idx].cadre, ENRG.items[idx].title);
+		vPanel = pnl.initPanel(NPANEL.items[idx].name, NPANEL.items[idx].posx, NPANEL.items[idx].posy,
+			NPANEL.items[idx].lines, NPANEL.items[idx].cols, NPANEL.items[idx].cadre, NPANEL.items[idx].title);
 
 		for (pnlx.button.items) |p| {
 			var vButton: btn.BUTTON = undefined;
@@ -1172,6 +1487,52 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL), nameJson: []const u8) !void {
 		XPANEL.append(vPanel) catch unreachable;
 	}
 
-	ENRG.clearAndFree();
+	defer NPANEL.clearAndFree();
+
+
+	XGRID.clearRetainingCapacity();
+
+	for (NGRID.items, 0.. ) |xgrd, idx | {
+				XGRID.append( grd.initGrid(
+							xgrd.name,
+							xgrd.posx,
+							xgrd.posy,
+							xgrd.pageRows,
+							xgrd.separator,
+							xgrd.cadre)
+						 ) catch |err| {@panic(@errorName(err));};
+	 
+			 for (xgrd.cells.items ) |pcell | {
+				 	XGRID.items[idx].cell.append(grd.CELL{
+					.text = pcell.text, .reftyp = pcell.reftyp, .long = pcell.long,
+					.posy = pcell.posy, .edtcar = pcell.edtcar, .atrCell = grd.toRefColor(pcell.atrCell) })
+				catch |err| {@panic(@errorName(err));};
+			}
+	}
+	
+
+
+	defer NGRID.clearAndFree();
+
+	XMENU.clearRetainingCapacity();
+
+	for (NMENU.items ) |xmnu| {
+				XMENU.append(initMenuDef(
+									xmnu.name,
+									xmnu.posx,
+									xmnu.posy,
+									xmnu.cadre,
+									xmnu.mnuvh,
+									xmnu.xitems
+								)
+						 ) catch |err| {@panic(@errorName(err));};
+	 
+	}
+	
+
+
+	defer NMENU.clearAndFree();
 	return;
 }
+
+

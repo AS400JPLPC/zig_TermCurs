@@ -54,6 +54,7 @@ pub const CFALSE = " ";
 /// Errors that may occur when using String
 pub const ErrGrid = error{
 	grd_dltRows_Index_invalide,
+	grd_getIndex_Name_Invalide
 };
 
 // buffer terminal MATRIX
@@ -134,13 +135,40 @@ pub const grd = struct {
 	pub var gridStyle2: []const u8 = "║";
 	pub var gridnoStyle: []const u8 = " ";
 
+	//------------------------------------------
+	// def management JSON
+	pub const Ecell = enum {
+		text,
+		long,
+		reftyp,
+		posy,
+		edtcar,
+		atrcell
+	};
+
+	pub const Egrid = enum {
+		name,
+		posx,
+		posy,
+		pagerows,
+		separator,
+		cadre,
+		cell,
+		data
+	};
+	//------------------------------------------
+
+
+
+	/// define CELL
 	pub const CELL = struct {
 		text: []const u8,
 		long: usize,
 		reftyp: REFTYP,
 		posy: usize,
 		edtcar: []const u8,
-		atrCell: term.ZONATRB };
+		atrCell: term.ZONATRB
+	};
 
 	const ArgData = struct {
 		buf: std.ArrayList([]const u8) = std.ArrayList([]const u8).init(allocatorArgData),
@@ -249,8 +277,8 @@ pub const grd = struct {
 	pub fn setPageGrid(self: *GRID) void {
 		self.lignes = self.data.len;
 		if (self.lignes < self.pageRows ) self.pages = 1 else {
-			self.pages = self.lignes / (self.pageRows - 1);
-			if (@rem(self.lignes, (self.pageRows - 1)) > 0) self.pages += 1;
+			self.pages = self.lignes / (self.pageRows );
+			if (@rem(self.lignes, (self.pageRows )) > 0) self.pages += 1;
 		}
 	}
 
@@ -268,7 +296,7 @@ pub const grd = struct {
 		.name = vname,
 		.posx = vposx,
 		.posy = vposy,
-		.lines = vpageRows + 2, //	row per page	+ cadre
+		.lines = vpageRows + 3, //	row per page	+ cadre
 		.cols  = 0,
 		.separator = vseparator,
 		.pageRows  = vpageRows,
@@ -307,7 +335,7 @@ pub const grd = struct {
 		device.name = vname;
 		device.posx = vposx;
 		device.posy = vposy;
-		device.lines = vpageRows + 2; //	row per page	+ cadre
+		device.lines = vpageRows + 3; //	row per page	+ cadre
 		device.cols  = 0;
 		device.separator = vseparator;
 		device.pageRows  = vpageRows;
@@ -344,7 +372,7 @@ pub const grd = struct {
 		self.name = vname;
 		self.posx = vposx;
 		self.posy = vposy;
-		self.lines = vpageRows + 2; //	row per page	+ cadre
+		self.lines = vpageRows + 3; //	row per page	+ cadre
 		self.cols = 0;
 		self.separator = vseparator;
 		self.pageRows = vpageRows;
@@ -414,7 +442,7 @@ pub const grd = struct {
 	}
 
 	// return color
-	fn toRefColor(TextColor: term.ForegroundColor) term.ZONATRB {
+	pub fn toRefColor(TextColor: term.ForegroundColor) term.ZONATRB {
 		var vAtrCell = AtrCell;
 
 		switch (TextColor) {
@@ -494,6 +522,14 @@ pub const grd = struct {
 	//	panel-grid ACTIF
 	pub fn getActif(self: *GRID) bool {
 		return self.actif;
+	}
+
+	pub fn getIndex(self: *std.ArrayList(grd.GRID) , name: [] const u8 )	ErrGrid ! usize {
+
+		for (self.items, 0..) |g, idx| {
+			if (std.mem.eql(u8, g.name, name)) return idx ;
+		}
+		return ErrGrid.grd_getIndex_Name_Invalide;
 	}
 
 	// add row	-data ---> arraylist panel-grid
@@ -754,9 +790,9 @@ pub const grd = struct {
 		var bufItems: []const u8 = "";
 
 		self.maxligne = 0;
-		if (self.curspage == 0) start = 0 else start = (self.pageRows - 1) * (self.curspage - 1);
+		if (self.curspage == 0) start = 0 else start = (self.pageRows ) * (self.curspage - 1);
 		var r: usize = 0;
-		while (r < self.pageRows - 1) : (r += 1) {
+		while (r < self.pageRows ) : (r += 1) {
 			l = r + start;
 			if (l < self.lignes) {
 				self.maxligne = r;

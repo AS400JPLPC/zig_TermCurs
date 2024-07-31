@@ -479,12 +479,11 @@ const TermSize = struct { width: usize, height: usize };
 
 pub fn getSize() TermSize {
     var win_size: std.os.linux.winsize = undefined;
-    //var win_size: std.posix.winsize = undefined;
+    // var win_size: std.posix.winsize = undefined;
 
     const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&win_size));
     if (std.posix.errno(err) != .SUCCESS) {
         @panic(" Cursed getSize error ioctl TTY");
-        //return os.unexpectedErrno(os.errno(err));
     }
 
     

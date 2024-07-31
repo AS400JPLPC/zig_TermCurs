@@ -78,9 +78,24 @@ pub const mnu = struct {
 	};
 
 
-
+	//------------------------------------------
+	// def management JSON
+	pub const Emenu = enum {
+		name,
+		posx,
+		posy,
+		cadre,
+		mnuvh,
+		xitems
+	};
+	pub const Eopt = enum {
+		text,
+	};	
+	
+	//------------------------------------------
+	
 	// define MENU itemm ALL
-	pub const MENUDEF = struct {
+	pub const DEFMENU = struct {
 		 name:  []const u8,
 		 posx:  usize,
 		 posy:  usize,

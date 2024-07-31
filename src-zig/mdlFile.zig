@@ -138,13 +138,15 @@ fn cleanProgram(vpnl : *pnl.PANEL, vgrid : *grd.GRID) void {
 	forms.allocatorForms.destroy(vpnl);
 	
 	grd.freeGrid(vgrid);
-	grd.allocatorGrid.destroy(vgrid);
+	
 	term.deinitTerm();
-	grd.deinitGrid();
 	utl.deinitUtl();
 }
 
-pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
+pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
+				XGRID: *std.ArrayList(grd.GRID),
+				XMENU: *std.ArrayList(mnu.DEFMENU),
+				wrk: bool) !void {
 	
 
 	_= std.fs.cwd().openDir(vdir,.{})
@@ -201,7 +203,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 						if (err) pnl.msgErr(pFmt01, "Name Json incorrect allready exist ")
 						else {
 							pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Save {s} Json", .{nameJson})) ;
-							try mdlSjson.SavJson(XPANEL,nameJson);
+							try mdlSjson.SavJson(XPANEL, XGRID, XMENU, nameJson);
 							cleanProgram(pFmt01,Grid01);
 						return;
 						}
@@ -210,9 +212,6 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 			},
 			
 			.F11 => {
-				// 0.11.0
-				// const iter_dir = try std.fs.cwd().openIterableDir(vdir,.{}) ;
-				// 0.12.0 
 				const iter_dir= std.fs.cwd().openDir(vdir,.{.iterate = true}) catch unreachable;
 
 				var iterator = iter_dir.iterate();
@@ -245,17 +244,12 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL), wrk: bool) !void {
 
 						if (wrk){
 							newFile(nameJson);
-							try mdlSjson.SavJson(XPANEL, nameJson);
+							try mdlSjson.SavJson(XPANEL, XGRID, XMENU, nameJson);
 						} 
-						else try mdlRjson.RstJson(XPANEL, nameJson) ;
-					
-						break;
+						else try mdlRjson.RstJson(XPANEL, XGRID, XMENU, nameJson) ;
+						cleanProgram(pFmt01,Grid01);
+						return ; 
 					}
-				}
-
-				if ( Gkey.Key == kbd.enter) {
-					cleanProgram(pFmt01,Grid01);
-					return ; 
 				}
 			},
 			
