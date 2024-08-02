@@ -383,6 +383,11 @@ I'm making progress, and I'm going to create the JSON.<br />
 - This should not alter the old definitions.<BR/>
 - you will find results in the dspf directory<BR/>
 
+→  2024-08-02<BR/>
+- Minor modification, forms attribute field AtrIO reverse = AtrField<BR/>
+
+<BR/>
+
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />

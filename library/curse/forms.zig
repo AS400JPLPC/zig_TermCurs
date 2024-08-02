@@ -1146,12 +1146,12 @@ pub const	fld = struct {
 
 	// define attribut default func ioField
 	pub var AtrIO : term.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+			.styled=[_]u32{@intFromEnum(term.Style.styleReverse),
 										@intFromEnum(term.Style.styleBold),
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
-			.backgr = term.BackgroundColor.bgGray,
-			.foregr = term.ForegroundColor.fgWhite,
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgWhite
 	};
 
 	// define attribut default Field protect
