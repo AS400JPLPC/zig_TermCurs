@@ -1146,12 +1146,12 @@ pub const	fld = struct {
 
 	// define attribut default func ioField
 	pub var AtrIO : term.ZONATRB = .{
-			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+			.styled=[_]u32{@intFromEnum(term.Style.styleReverse),
 										@intFromEnum(term.Style.styleBold),
 										@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle)},
-			.backgr = term.BackgroundColor.bgGray,
-			.foregr = term.ForegroundColor.fgWhite,
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgWhite
 	};
 
 	// define attribut default Field protect
@@ -3460,7 +3460,6 @@ pub const	pnl = struct {
 
 		// BUTTON
 		if (vpnl.button.items.len > 0) {
-
 			btn.printButton(vpnl);
 		}
 		
@@ -3520,7 +3519,7 @@ pub const	pnl = struct {
 	/// Check if it is a KEY function
 	fn isPanelKey(vpnl:	*PANEL, e_key: kbd) bool {
 		for ( vpnl.button.items) |xbtn| {
-		if (xbtn.key == e_key ) return true;
+		if (xbtn.key == e_key and xbtn.actif == true ) return true;
 		}
 		return false;
 	}

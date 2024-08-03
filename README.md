@@ -180,7 +180,7 @@ another way is to use IOCTL but again, there is a good chance of being forced to
 
 Anyway, to make management applications or Terminal type tools are more than enough.
 
-ctrl or alt combinations plus Fn(1..24) TAB Backspace home end insert delete pageup pagedown enter escape alt ctrl left rigth up down altgr mouse
+ctrl or alt combinations plus Fn(1..36) TAB Backspace home end insert delete pageup pagedown enter escape alt ctrl left rigth up down altgr mouse
 and the utf8 keyboard is a lot.<br />
 
 <u>--styling-------------------------------------------------</u><BR />
@@ -383,10 +383,12 @@ I'm making progress, and I'm going to create the JSON.<br />
 - This should not alter the old definitions.<BR/>
 - you will find results in the dspf directory<BR/>
 
-→  2024-08-02<BR/>
-- Minor modification, forms attribute field AtrIO reverse = AtrField<BR/>
 
-<BR/>
+→  2024-08-04<BR/>
+**addbackup/restore**<br />
+**add directory choice**<br />
+**sort directory and files**<br />
+- Small bug fixed with testing
 
 ------------------------------------------------------------------<br />
 

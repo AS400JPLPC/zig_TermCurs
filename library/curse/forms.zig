@@ -3460,7 +3460,6 @@ pub const	pnl = struct {
 
 		// BUTTON
 		if (vpnl.button.items.len > 0) {
-
 			btn.printButton(vpnl);
 		}
 		
@@ -3520,7 +3519,7 @@ pub const	pnl = struct {
 	/// Check if it is a KEY function
 	fn isPanelKey(vpnl:	*PANEL, e_key: kbd) bool {
 		for ( vpnl.button.items) |xbtn| {
-		if (xbtn.key == e_key ) return true;
+		if (xbtn.key == e_key and xbtn.actif == true ) return true;
 		}
 		return false;
 	}

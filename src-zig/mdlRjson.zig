@@ -1056,9 +1056,10 @@ pub fn jsonDecode(my_json: []const u8) !void {
 pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL), 
 		XGRID: *std.ArrayList(grd.GRID),
 		XMENU: *std.ArrayList(mnu.DEFMENU),
+		dir: [] const u8 ,
 		nameJson: []const u8) !void {
 
-	const cDIR = std.fs.cwd().openDir("dspf", .{}) catch |err| {
+	const cDIR = std.fs.cwd().openDir(dir, .{}) catch |err| {
 		@panic(try std.fmt.allocPrint(allocatorJson, "err Open.{any}\n", .{err}));
 	};
 
