@@ -385,7 +385,7 @@ I'm making progress, and I'm going to create the JSON.<br />
 
 
 →  2024-08-04<BR/>
-**addbackup/restore**<br />
+*backup/restore*<br />
 **add directory choice**<br />
 **sort directory and files**<br />
 - Small bug fixed with testing
