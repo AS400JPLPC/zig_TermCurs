@@ -314,7 +314,7 @@ pub fn isLetterStr(str: []const u8) bool {
 			'|' => b = false,
 			'`' => b = false,
 			'_' => b = false,
-			'\\' => b = false,
+			92 => b =false ,
 			'^' => b = false,
 			'@' => b = false,
 			'°' => b = false,
@@ -331,7 +331,6 @@ pub fn isLetterStr(str: []const u8) bool {
 			'þ' => b = false,
 			'¨' => b = false,
 			'ø' => b = false,
-			'ß' => b = false,
 			'‘' => b = false,
 			'´' => b = false,
 			'%' => b = false,
@@ -367,8 +366,11 @@ pub fn isLetterStr(str: []const u8) bool {
 			'¡' => b = false,
 			'§' => b = false,
 			'!' => b = false,
+			320 => b = false,
+			8217 => b = false,
 			else => {},
 		}
+		if (b == false ) return b;
 	}
 	return b;
 }
@@ -550,6 +552,22 @@ pub fn isMailStr(str: []const u8) bool {
 			'_' => continue,
 			'.' => continue,
 			'@' => continue,
+			'!' => continue,
+			'#' => continue,
+			'$' => continue,
+			'%' => continue,
+			'&' => continue,
+			'*' => continue,
+			'/' => continue,
+			'=' => continue,
+			'?' => continue,
+			 39 => continue,
+			'`' => continue,
+			'{' => continue,
+			'}' => continue,
+			'|' => continue,
+			'~' => continue,
+			'^' => continue,
 			else => {
 				if (x >= 191 and x <= 255) return false;
 				if (isLetterStr(ch)) continue;
@@ -563,23 +581,40 @@ pub fn isMailStr(str: []const u8) bool {
 
 /// upper-case String Latin
 pub fn upperStr(str: []const u8) []const u8 {
-	const result = allocUtl.alloc(u8, str.len) catch |err| {
+	const work = allocUtl.alloc(u8, str.len) catch |err| {
 		@panic(@errorName(err));
 	};
-	defer allocUtl.free(result);
+	defer allocUtl.free(work);
 
-	@memcpy(result, str);
-	var idx: usize = 0;
-	while (idx < result.len) : (idx += 1) {
-		result[idx] = std.ascii.toUpper(result[idx]);
+	@memcpy(work, str);
+	var string: []const u8 = "";
+	
+	var iter = iteratStr.iterator(work);
+	defer iter.deinit();
+	var i :usize = 0;
+	var zone : [4]   u8 = undefined;
+	var car :[]const u8 = undefined;
+	var r : u21 = 0 ;
+	while (iter.next()) |ch | {
+		const x = utf.utf8Decode(ch) catch |err| {
+			@panic(@errorName(err));
+		};
+		r = 0 ;
+		if ( x >= 97 and x <= 122 )  r = x - 32;
+        if ( x >= 224 and x <= 255 )  r = x - 32;
+        if ( x == 339 )  r = x - 1;
+        if ( x == 255 )  r = 376;
+		if (r > 0 ) { 
+				zone = [_]u8{0} ** 4;
+				i = utf.utf8Encode(r,&zone) catch unreachable;
+				car = "";
+				car = zone[0..i];
+				string = concatStr(string, car);
+		}		
+		else {string = concatStr(string, ch);
+}	
 	}
-	return std.fmt.allocPrint(
-		allocUtl,
-		"{s}",
-		.{result},
-	) catch |err| {
-		@panic(@errorName(err));
-	};
+	return string;
 }
 
 /// Lower String Latin
@@ -617,21 +652,12 @@ pub fn concatStr(a: []const u8, b: []const u8) []const u8 {
 /// comp string
 /// LT EQ GT -> enum CMP
 pub fn compStr(str1: []const u8, str2: []const u8) CMP {
-	const c1 = std.fmt.count("{s}", .{str1});
-	const c2 = std.fmt.count("{s}", .{str2});
-
-	if (c1 > c2) return CMP.GT;
-	if (c1 == c2) {
-		var idx: u8 = 0;
-		var n: i32 = 0;
-		while (idx < c1) : (idx += 1) {
-			if (str1[idx] < str2[idx]) n -= 1;
-			if (str1[idx] > str2[idx]) n += 1;
-		}
-		if (n < 0) return CMP.LT;
-		if (n > 0) return CMP.GT else return CMP.EQ;
-	}
-	return CMP.LT;
+    const order = std.mem.order(u8, str1, str2);
+    switch (order) {
+        .lt => return CMP.LT,
+        .eq => return CMP.EQ,
+        .gt => return CMP.GT,
+    }
 }
 
 /// aligned string
@@ -663,6 +689,8 @@ pub fn alignStr(text: []const u8, aligns: ALIGNS, wlen: usize) []const u8 {
 
 	return string;
 }
+
+
 
 /// Delete Items ArrayList
 pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void {
@@ -734,3 +762,4 @@ pub fn cboolToBool(v: []const u8) bool {
 pub fn cboolToStr(v: []const u8) []const u8 {
 	return if (std.mem.eql(u8, v, CTRUE)) "1" else "0";
 }
+

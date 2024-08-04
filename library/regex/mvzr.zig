@@ -122,16 +122,6 @@ pub fn SizedRegex(ops: comptime_int, char_sets: comptime_int) type {
             }
         }
 
-        /// Boolean test if the regex matches in the haystack.
-        pub fn isMatch(regex: *const SizedRegexT, haystack: []const u8) bool {
-            const maybe_matched = regex.matchInternal(haystack);
-            if (maybe_matched) |_| {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
         /// Copy a Regex to the heap, returning a pointer.  Free the memory
         /// later with `allocator.destroy(owned_regex)`.
         pub fn toOwnedRegex(regex: *const SizedRegexT, allocator: std.mem.Allocator) !*const SizedRegexT {

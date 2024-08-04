@@ -1751,7 +1751,7 @@ pub const	fld = struct {
 
 	// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-			,.{"[a-zA-Z0-9_!#$%&'*+\\/=?`{|}~^.-]+@[a-zA-Z0-9.-]"})
+			,.{"^[a-zA-Z0-9_!#$%&=.-^~|?*+'`{}/]+@([a-zA-Z0-9.-])+$"})
 			catch |err| { @panic(@errorName(err));};
 			
 			if (xfield.help.len == 0 ) xfield.help = "ex: myname.my_firstname@gmail.com" ;
@@ -2369,33 +2369,104 @@ pub const	fld = struct {
 	//----------------------------------------------------==
 
 
+	// pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
+	// 	const maybe_regex = reg.compile(pattern) ;
+	// 	const maybe_matched = reg.isMatch(testval);
+ //            if (maybe_matched) |_| {
+ //                return true;
+ //            } else {
+ //                return false;
+ //            }
+   
+	// }
+
 	pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
-	     const maybe_regex = reg.compile(pattern) ;
-	     if (maybe_regex) |regex| return regex.isMatch(testval) 
-	     else  return false ;   
+         const maybe_regex = reg.compile(pattern) ;
+	     if (maybe_regex) |regex|{
+	         const match1 = regex.match(testval);
+	        if (match1) |m1| {
+	            if (testval.len ==  m1.end) return true;
+	        } else {
+	            return false;
+	        }   
+	     }  
+	     return false ;   
+       
+	 }
+
+	// pub fn isMatchFixed(testval : [] const u8, comptime pattern : [] const u8 ) bool {
+	// 	const ops, const sets  = reg.resourcesNeeded(pattern);
+	// 	const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	//     const maybe_regex = SlimmedDownRegex.compile(pattern);
+	//     if (maybe_regex) |regex| return regex.isMatch(testval) 
+	//     else  return false ;   
+	// }
+
+	pub fn isMatchiFixedIso(testval : [] const u8) bool { 
+    
+	  const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
+    
+	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
+	    if (maybe_regex) |regex|{
+	         const match1 = regex.match(testval);
+	        if (match1) |m1| {
+	            if (testval.len ==  m1.end) return true;
+	        } else {
+	            return false;
+	        }   
+	     }  
+	     return false ; 
 	}
 
-
-	pub fn isMatchFixed(testval : [] const u8, comptime pattern : [] const u8 ) bool {
-		const ops, const sets  = reg.resourcesNeeded(pattern);
-		const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	    const maybe_regex = SlimmedDownRegex.compile(pattern);
-	    if (maybe_regex) |regex| return regex.isMatch(testval) 
-	    else  return false ;   
-	}
-
-
+	
 	// controle date YYYY-MM-DD validate
-	pub fn ctrlDate(testval : [] const u8) bool {
-		
-		const pattern : [] const u8= "([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)";
-		
-		const ops, const sets  = reg.resourcesNeeded(pattern);
-		const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	    const maybe_regex = SlimmedDownRegex.compile(pattern);
-	    if (maybe_regex) |regex| return regex.isMatch(testval) 
-	    else  return false ;
-	}	
+	pub fn isMatchiFixedFr(testval : [] const u8) bool {
+
+		const valtest = std.fmt.allocPrint(
+			utl.allocUtl,
+			"{s}-{s}-{s}",
+			.{ testval[6..10], testval[3..5], testval[0..2]}) catch unreachable;
+	
+	       const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
+    
+	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
+
+	   if (maybe_regex) |regex|{
+	         const match1 = regex.match(valtest);
+	        if (match1) |m1| {
+	            if (testval.len ==  m1.end) return true;
+	        } else {
+	            return false;
+	        }   
+	     }  
+	     return false ; 
+	}
+
+	pub fn isMatchiFixedUs(testval : [] const u8) bool {
+
+		const valtest = std.fmt.allocPrint(
+			utl.allocUtl,
+			"{s}-{s}-{s}",
+			.{ testval[6..10], testval[0..2], testval[3..5]}) catch unreachable;
+	
+	       const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
+    
+	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
+
+	   if (maybe_regex) |regex|{
+	         const match1 = regex.match(valtest);
+	        if (match1) |m1| {
+	            if (testval.len ==  m1.end) return true;
+	        } else {
+	            return false;
+	        }   
+	     }  
+	     return false ; 
+	}
+
 
 	var e_FIELD : std.ArrayList([] const u8) = undefined;
 
@@ -2789,12 +2860,40 @@ pub const	fld = struct {
 
 						//check field.len > 0 and regexLen > 0 execute regex
 						if ( vfld.regex.len > 0 and utl.trimStr(utl.listToStr(e_FIELD)).len > 0) {
-								if ( ! isMatch(utl.trimStr(utl.listToStr(e_FIELD)) ,vfld.regex) ) {
+							 switch(vfld.reftyp){
+							 .DATE_ISO => { 
+								if ( ! isMatchiFixedIso(utl.trimStr(utl.listToStr(e_FIELD))) )  {
 									msgErr(vpnl,vfld,vfld.errmsg);
 									e_curs = e_posy;
 									e_count = 0 ;
 									continue;
 								}
+							},
+							.DATE_FR => { 
+								if ( ! isMatchiFixedFr(utl.trimStr(utl.listToStr(e_FIELD))) ) {
+									msgErr(vpnl,vfld,vfld.errmsg);
+									e_curs = e_posy;
+									e_count = 0 ;
+									continue;
+								}
+							},
+							.DATE_US => { 
+								if ( ! isMatchiFixedUs(utl.trimStr(utl.listToStr(e_FIELD))) ) {
+									msgErr(vpnl,vfld,vfld.errmsg);
+									e_curs = e_posy;
+									e_count = 0 ;
+									continue;
+								}
+							},	
+							else => { 
+								if ( ! isMatch(utl.trimStr(utl.listToStr(e_FIELD,)) ,vfld.regex) ) {
+									msgErr(vpnl,vfld,vfld.errmsg);
+									e_curs = e_posy;
+									e_count = 0 ;
+									continue;
+								}
+							},
+							}		
 						}
 
 
@@ -2859,7 +2958,7 @@ pub const	fld = struct {
 								},
 								.ALPHA, .ALPHA_UPPER => {
 									if ( (e_count < e_nbrcar and isSpace(Fkey.Char) == false ) and
-									(utl.isLetterStr(Fkey.Char) or std.mem.eql(u8, Fkey.Char, "-")) or
+									(utl.isLetterStr(Fkey.Char) ) or
 									(isSpace(Fkey.Char) == true and e_count > 0 and e_count < e_nbrcar) ) {
 										
 										if (vfld.reftyp == .ALPHA_UPPER) Fkey.Char = utl.upperStr(Fkey.Char);
@@ -2878,8 +2977,7 @@ pub const	fld = struct {
 								.ALPHA_NUMERIC, .ALPHA_NUMERIC_UPPER => {
 									if ( (e_count < e_nbrcar and isSpace(Fkey.Char) == false ) and
 									(utl.isLetterStr(Fkey.Char) or utl.isDigitStr(Fkey.Char) or
-									 std.mem.eql(u8, Fkey.Char, "-")) or
-									(isSpace(Fkey.Char) == true and e_count > 0 and e_count < e_nbrcar) ) {
+									(isSpace(Fkey.Char) == true and e_count > 0 and e_count < e_nbrcar) )) {
 
 										if (vfld.reftyp == .ALPHA_NUMERIC_UPPER) Fkey.Char = utl.upperStr(Fkey.Char);
 

@@ -599,7 +599,7 @@ var callFunc: FnEnum = undefined;
 var callTask: TaskEnum = undefined;
 fn TaskIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
-	if ( ! fld.ctrlDate(vfld.text) ) {
+	if ( ! fld.isMatchiFixedIso(vfld.text) ) {
 
 		const allocator = std.heap.page_allocator;
 		const msg = std.fmt.allocPrint(allocator,
@@ -614,12 +614,7 @@ fn TaskIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
-	const valtest = std.fmt.allocPrint(
-		utl.allocUtl,
-		"{s}-{s}-{s}",
-		.{ vfld.text[6..10], vfld.text[3..5], vfld.text[0..2]}) catch unreachable;
-
-	if ( ! fld.ctrlDate(valtest) ) {
+	if ( ! fld.isMatchiFixedFr(vfld.text) ) {
 
 		const allocator = std.heap.page_allocator;
 		const msg = std.fmt.allocPrint(allocator,
@@ -627,19 +622,14 @@ fn TaskFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		defer allocator.free(msg);
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
-		}
+	}
 	return;
 }
 
 
 fn TaskUs( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
-	const valtest = std.fmt.allocPrint(
-		utl.allocUtl,
-		"{s}-{s}-{s}",
-		.{ vfld.text[6..10], vfld.text[0..2], vfld.text[3..5]}) catch unreachable;
-
-	if ( ! fld.ctrlDate(valtest) ) {
+	if ( ! fld.isMatchiFixedUs(vfld.text) ) {
 
 		const allocator = std.heap.page_allocator;
 		const msg = std.fmt.allocPrint(allocator,
