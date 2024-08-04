@@ -384,16 +384,20 @@ I'm making progress, and I'm going to create the JSON.<br />
 - you will find results in the dspf directory<BR/>
 
 
-→  2024-08-04<BR/>
+→  2024-08-03 / 04 <BR/>
 *backup/restore*<br />
 **add directory choice**<br />
 **sort directory and files**<br />
-- Small bug fixed with testing
+- Small bug fixed with testing<br /><br />
+- this morning some big tests:<br /><br />
+- refining uppercase extended ascii mode<br />
+- in-depth regex test MVRZR MACH activation<br />
+- scan and roll test JSON
 
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />
 
-maintenant, je vais générer du code et pour cela, je vais utiliser  le module "MUSTACHE-ZIG"<br /><br />
+PAUSE<br /> <br />
 
 In the current state, one could very well use JSON files and encapsulate them in the program, and why not make the forms in the project dynamic... I did this on the AS400.<br />
