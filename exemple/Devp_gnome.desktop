@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Devp
+Comment=
+Exec=Exec=gnome-terminal --hide-menubar   --geometry="80x26+5+5"  --title="MENU-DEV" --window-with-profile=NoScrollbar --  $HOME/exemple/MenuDEV.sh
+Icon=applications-development
+Terminal=false
+StartupNotify=true
+Path=
+Name[fr_FR]=Devp_gnome

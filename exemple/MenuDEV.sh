@@ -68,13 +68,12 @@ do
 	f_dsplyPos  1  24 $faGras$fcJaune 'Project: '$faGras$fcCyan' Zterm'
 
 	f_dsplyPos  3  24 $faGras$fcJaune '------------compile cpp-----------------'
-	f_dsplyPos  4  20 $faGras$fcRouge' 1.'; f_dsplyPos  4  24 $faGras$fcGreen 'Terminal-Gen'
 	f_dsplyPos  5  20 $faGras$fcRouge' 2.'; f_dsplyPos  5  24 $faGras$fcGreen 'APPTERM'
 
 	f_dsplyPos  6  24 $faGras$fcJaune '------------compile Zig-----------------'
-	f_dsplyPos  8  20 $faGras$fcRouge'10.'; f_dsplyPos  8  24 $faGras$fcGreen 'Gencurs'
+
 	f_dsplyPos 10  20 $faGras$fcRouge'11.'; f_dsplyPos 10  24 $faGras$fcGreen 'Exemple'
-	f_dsplyPos 12  20 $faGras$fcRouge'20.'; f_dsplyPos 12  24 $faGras$fcGreen 'study'
+	f_dsplyPos 12  20 $faGras$fcRouge'20.'; f_dsplyPos 12  24 $faGras$fcGreen 'exCallpgm'
 
 
 	f_dsplyPos 13  24 $faGras$fcJaune '----------------------------------------'
@@ -105,20 +104,12 @@ do
 
  		case "$choix" in
 
-# Gen
-		1)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Gen"
-		;;
 # APPTERM
 		2)
 			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
 		;;
 
 
-#Gencurs
-		10)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gencurs"
-		;;
 
 #Example
 		11)
@@ -126,7 +117,7 @@ do
 		;;
 
 
-#study 
+#exCallpgm 
         20)
 			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "exCallpgm"
 		;;
