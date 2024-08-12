@@ -288,7 +288,7 @@ pub const grd = struct {
 		vname: []const u8,
 		vposx: usize,
 		vposy: usize,
-		vpageRows: usize, // nbr ligne	+ header
+		vpageRows: usize, // nbr ligne + header
 		vseparator: []const u8,
 		vcadre: CADRE,
 	) GRID {
@@ -296,7 +296,7 @@ pub const grd = struct {
 		.name = vname,
 		.posx = vposx,
 		.posy = vposy,
-		.lines = vpageRows + 3, //	row per page	+ cadre
+		.lines = vpageRows + 3, //row per page + cadre
 		.cols  = 0,
 		.separator = vseparator,
 		.pageRows  = vpageRows,
@@ -324,7 +324,7 @@ pub const grd = struct {
 		vname: []const u8,
 		vposx: usize,
 		vposy: usize,
-		vpageRows: usize, // nbr ligne	+ header
+		vpageRows: usize, // nbr ligne + header
 		vseparator: []const u8,
 		vcadre: CADRE,
 	) *GRID {
@@ -335,7 +335,7 @@ pub const grd = struct {
 		device.name = vname;
 		device.posx = vposx;
 		device.posy = vposy;
-		device.lines = vpageRows + 3; //	row per page	+ cadre
+		device.lines = vpageRows + 3; // row per page + cadre
 		device.cols  = 0;
 		device.separator = vseparator;
 		device.pageRows  = vpageRows;
@@ -363,7 +363,7 @@ pub const grd = struct {
 		vname: []const u8,
 		vposx: usize,
 		vposy: usize,
-		vpageRows: usize, // nbr ligne	+ header
+		vpageRows: usize, // nbr ligne + header
 		vseparator: []const u8,
 		vcadre: CADRE,
 	) void {
@@ -372,7 +372,7 @@ pub const grd = struct {
 		self.name = vname;
 		self.posx = vposx;
 		self.posy = vposy;
-		self.lines = vpageRows + 3; //	row per page	+ cadre
+		self.lines = vpageRows + 3; // row per page + cadre
 		self.cols = 0;
 		self.separator = vseparator;
 		self.pageRows = vpageRows;
@@ -393,7 +393,7 @@ pub const grd = struct {
 		self.buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid);
 	}
 
-	// return len header	---> arraylist panel-grid
+	// return len header---> arraylist panel-grid
 	pub fn getLenHeaders(self: *GRID) usize {
 		var vlen: usize = 0;
 
@@ -406,17 +406,17 @@ pub const grd = struct {
 		return vlen;
 	}
 
-	// return number items-header	---> arraylist panel-grid
+	// return number items-header---> arraylist panel-grid
 	pub fn countColumns(self: *GRID) usize {
 		return self.headers.items.len;
 	}
 
-	// return number row-Data	---> arraylist panel-grid
+	// return number row-Data---> arraylist panel-grid
 	pub fn countRows(self: *GRID) usize {
 		return self.data.len;
 	}
 
-	// initialization CELL -header	---> arraylist panel-grid
+	// initialization CELL -header---> arraylist panel-grid
 	pub fn setHeaders(self: *GRID) void {
 		self.cols = 0;
 		for (self.cell.items) |xcell| {
@@ -425,7 +425,7 @@ pub const grd = struct {
 			};
 		}
 		self.cols += getLenHeaders(self);
-		// this.lines + 2 = cadre + header		cols + separator
+		// this.lines + 2 = cadre + header cols + separator
 		// INIT doublebuffer
 
 		var i: usize = (self.lines) * self.cols;
@@ -467,7 +467,7 @@ pub const grd = struct {
 		return vAtrCell;
 	}
 
-	// New	CELL	--> arraylist panel-grid
+	// New CELL --> arraylist panel-grid
 	pub fn newCell(self: *GRID, vtext: []const u8, vlong: usize, vreftyp: REFTYP, TextColor: term.ForegroundColor)
 	void {
 
@@ -483,43 +483,43 @@ pub const grd = struct {
 		};
 	}
 
-	// Set Char	-cell ---> arraylist panel-grid
+	// Set Char -cell ---> arraylist panel-grid
 	pub fn setCellEditCar(self: *CELL, vedtcar: []const u8) void {
 		self.edtcar = vedtcar;
 	}
 
-	// return len	-cell ---> arraylist panel-grid
+	// return len -cell ---> arraylist panel-grid
 	pub fn getcellLen(cell: *CELL) usize {
 		return cell.long;
 	}
 
-	// return name	-header ---> arraylist panel-grid
+	// return name -header ---> arraylist panel-grid
 	pub fn getHeadersText(self: *GRID, r: usize) []const u8 {
 		return self.header.items[r].text;
 	}
 
-	// return posy	-header ---> arraylist panel-grid
+	// return posy -header ---> arraylist panel-grid
 	pub fn getHeadersPosy(self: *GRID, r: usize) usize {
 		return self.header.items[r].posy;
 	}
 
-	// return reference Type	-header ---> arraylist panel-grid
+	// return reference Type -header ---> arraylist panel-grid
 	pub fn getHeadersType(self: *GRID, r: usize) REFTYP {
 		return self.header.items[r].reftyp;
 	}
 
-	// return edit Char	-header ---> arraylist panel-grid
+	// return edit Char -header ---> arraylist panel-grid
 	pub fn getHeadersCar(self: *GRID, r: usize) []const u8 {
 		return self.header.items[r].edtcar;
 	}
 
-	// return Text	-data ---> arraylist panel-grid
+	// return Text -data ---> arraylist panel-grid
 	// get text from grid,rows (multiArray)
 	pub fn getRowsText(self: *GRID, r: usize, i: usize) []const u8 {
 		return self.data.items(.buf)[r].items[i];
 	}
 
-	//	panel-grid ACTIF
+	// panel-grid ACTIF
 	pub fn getActif(self: *GRID) bool {
 		return self.actif;
 	}
@@ -532,7 +532,7 @@ pub const grd = struct {
 		return ErrGrid.grd_getIndex_Name_Invalide;
 	}
 
-	// add row	-data ---> arraylist panel-grid
+	// add row -data ---> arraylist panel-grid
 	pub fn addRows(self: *GRID, vrows: []const []const u8) void {
 		const vlist = std.ArrayList([]const u8);
 		var m = vlist.init(allocatorGrid);
@@ -545,7 +545,7 @@ pub const grd = struct {
 		setPageGrid(self);
 	}
 
-	// delete row	-data ---> arraylist panel-grid
+	// delete row -data ---> arraylist panel-grid
 	pub fn dltRows(self: *GRID, r: usize) ErrGrid!void {
 		if (r < self.data.len) {
 			self.data.orderedRemove(r);
@@ -553,7 +553,7 @@ pub const grd = struct {
 		} else return ErrGrid.grd_dltRows_Index_invalide;
 	}
 
-	// reset row data	-GRID ---> arraylist panel-grid
+	// reset row data -GRID ---> arraylist panel-grid
 	pub fn resetRows(self: *GRID) void {
 		while (self.data.len > 0) {
 			self.data.orderedRemove(self.data.len - 1);
@@ -588,7 +588,7 @@ pub const grd = struct {
 		self.actif = false;
 	}
 
-	// assign -Box(fram) MATRIX TERMINAL	---> arraylist panel-grid
+	// assign -Box(fram) MATRIX TERMINAL ---> arraylist panel-grid
 	fn GridBox(self: *GRID) void {
 		if (CADRE.line0 == self.cadre) return;
 
@@ -682,7 +682,7 @@ pub const grd = struct {
 		}
 	}
 
-	// assign and display -header MATRIX TERMINAL	---> arraylist panel-grid
+	// assign and display -header MATRIX TERMINAL ---> arraylist panel-grid
 	pub fn printGridHeader(self: *GRID) void {
 		if (self.actif == false) return;
 
@@ -774,7 +774,7 @@ pub const grd = struct {
 		}
 	}
 
-	// assign and display -data MATRIX TERMINAL	---> arraylist panel-grid
+	// assign and display -data MATRIX TERMINAL ---> arraylist panel-grid
 	pub fn printGridRows(self: *GRID) void {
 		if (self.actif == false) return;
 
@@ -835,7 +835,7 @@ pub const grd = struct {
 	}
 
 	//----------------------------------------------------------------
-	// Management GRID enter = select	1..n 0 = abort (Escape)
+	// Management GRID enter = select 1..n 0 = abort (Escape)
 	// Turning on the mouse
 	// UP DOWn PageUP PageDown
 	// Automatic alignment based on the type reference
@@ -845,7 +845,7 @@ pub const grd = struct {
 
 	//------------------------------------
 	// manual= on return pageUp/pageDown no select
-	// esc	 = return no select
+	// esc   = return no select
 	// enter = return enter and line select
 	// -----------------------------------
 
@@ -965,10 +965,10 @@ pub const grd = struct {
 	}
 
 	///------------------------------------
-	/// manual= on return pageUp/pageDown no select
-	/// esc	 = return no select
-	/// KEY	 = return select valide ex: management Grid to Grid
-	/// enter = return enter and line select
+	/// manual = on return pageUp/pageDown no select
+	/// esc    = return no select
+	/// KEY    = return select valide ex: management Grid to Grid
+	/// enter  = return enter and line select
 	/// -----------------------------------
 	pub fn ioGridKey(self: *GRID, gKey: term.kbd, manual: bool) GridSelect {
 		var gSelect: GridSelect = .{ .Key = term.kbd.none, .Buf = std.ArrayList([]const u8).init(allocatorGrid) };

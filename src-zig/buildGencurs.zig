@@ -13,13 +13,6 @@ pub fn build(b: *std.Build) void {
 	const optimize = b.standardOptimizeOption(.{});
 
 
-	// zig-src			source projet
-	// zig-src/deps		curs/ form / outils ....
-	// src_c			source c/c++
-	// zig-src/lib		source .h 
-
-
-
 	// ===========================================================
 	// const logger = b.dependency("library", .{}).module("logger");
     const cursed = b.dependency("library", .{}).module("cursed");

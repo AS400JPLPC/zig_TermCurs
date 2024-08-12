@@ -258,7 +258,7 @@ fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
 	"Grid01",			// Name
 	5, 2,				// posx, posy
 	20,					// numbers lines
-	grd.gridStyle,		// separator | or	space
+	grd.gridStyle,		// separator | or space
 	grd.CADRE.line1,	// type line 1
 	);
 	defer grd.freeGrid(Grid00);
@@ -347,7 +347,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 		}
 
 	// _= std.fs.cwd().openDir(vdir,.{})
-	// 	catch try std.fs.cwd().makeDir(vdir); 
+	// catch try std.fs.cwd().makeDir(vdir); 
 	var err: bool = true ;
 	var nameJson : [] const u8 = undefined;
 
@@ -357,7 +357,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 					"Grid01",			// Name
 					4, 2,				// posx, posy
 					20,					// numbers lines
-					grd.gridStyle,		// separator | or	space
+					grd.gridStyle,		// separator | or space
 					grd.CADRE.line1,	// type line 1
 					);
 	defer grd.freeGrid(Grid01);

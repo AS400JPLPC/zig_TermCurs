@@ -433,11 +433,9 @@ pub fn isSpecialStr(str: []const u8) bool {
 	return b;
 }
 
-/// is String Punctuation
-/// force omit ' ; csv
-pub fn isPunct(
-	str: []const u8,
-) bool {
+// is String Punctuation
+// force omit ' ; csv
+pub fn isPunct(str: []const u8) bool {
 	var iter = iteratStr.iterator(str);
 	defer iter.deinit();
 	var b: bool = true;
@@ -467,7 +465,7 @@ pub fn isPunct(
 	return b;
 }
 
-/// is	String omit char
+// is String omit char
 pub fn isCarOmit(str: []const u8) bool {
 	var iter = iteratStr.iterator(str);
 	defer iter.deinit();

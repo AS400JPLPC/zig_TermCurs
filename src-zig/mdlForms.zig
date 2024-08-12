@@ -2991,7 +2991,6 @@ fn writeHorizontal(vpnl: *pnl.PANEL) void {
 			.ctrlV => {
 				tampon = std.fmt.allocPrint(utl.allocUtl, "H{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
-				// std.debug.print("Key: {d}  - {d}	  {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
 				vpnl.lineh.append(lnh.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
 					catch |err| { @panic(@errorName(err)); };
 				return;
@@ -3234,7 +3233,7 @@ fn writeVertical(vpnl: *pnl.PANEL) void {
 			.ctrlV => {
 				tampon = std.fmt.allocPrint(utl.allocUtl, "V{d}{d}", .{ e_posx, e_posy })
 					catch |err| { @panic(@errorName(err)); };
-				// std.debug.print("Key: {d}  - {d}	  {d} \n\r",.{e_posx, e_posy, e_count });_= kbd.getKEY();
+				
 				vpnl.linev.append(lnv.newLine(tampon, e_posx, e_posy, e_count,@enumFromInt(litem))) 
 					catch |err| { @panic(@errorName(err)); };
 				return;

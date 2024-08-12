@@ -12,15 +12,11 @@ pub fn build(b: *std.Build) void {
 	const target   = b.standardTargetOptions(.{});
 	const optimize = b.standardOptimizeOption(.{});
 
-	// zig-src			source projet
-	// zig-src/deps		curs/ form / outils ....
-	// src_c			source c/c++
-	// zig-src/lib		source .h 
-
 
 	// Definition of module
 	// ===========================================================
-    const cursed = b.dependency("library", .{}).module("cursed");
+
+	const cursed = b.dependency("library", .{}).module("cursed");
     const utils  = b.dependency("library", .{}).module("utils");
 	const forms  = b.dependency("library", .{}).module("forms");
     const grid   = b.dependency("library", .{}).module("grid");

@@ -1433,7 +1433,7 @@ fn FuncBorder( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var mCadre = mnu.newMenu(
 							"cadre",				// name
-							8, 12,					// posx, posy	
+							8, 12,					// posx, posy
 							mnu.CADRE.line1,		// type line fram
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
@@ -1924,9 +1924,9 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :	*std.ArrayList(pnl.PANEL),	vXPANEL: *std
 
 	while ( fxx <= @intFromEnum(fp01.F36)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show	 
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show	= fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
 		fxx = title ; 
 
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
@@ -1948,9 +1948,9 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :	*std.ArrayList(pnl.PANEL),	vXPANEL: *std
 
 	while ( fxx <= @intFromEnum(fp01.altZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show	 
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show	= fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
 		fxx = title ;
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
 			panel.button.append(btn.newButton(
@@ -1974,9 +1974,9 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :	*std.ArrayList(pnl.PANEL),	vXPANEL: *std
 
 	while ( fxx <= @intFromEnum(fp01.ctrlZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show	 
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show	= fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
 		fxx = title ;
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
 
@@ -2020,9 +2020,10 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 
 	while ( fxx <= @intFromEnum(fp01.F36)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show	= fxx + 1;	// pos fld	show
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show	= fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
+
 		fxx = title ; 
 
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
@@ -2044,9 +2045,9 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 
 	while ( fxx <= @intFromEnum(fp01.altZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show  = fxx + 1;	// pos fld	show
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show  = fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
 		fxx = title ;
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
 			panel.button.append(btn.newButton(
@@ -2069,9 +2070,9 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )	void {
 
 	while ( fxx <= @intFromEnum(fp01.ctrlZ)) :( fxx += 1 ) {
 		kxx	 += 1;
-		show  = fxx + 1;	// pos fld	show
-		check = fxx + 2;	// pos fld	show
-		title = fxx + 3;	// pos fld	show
+		show  = fxx + 1;	// pos fld show
+		check = fxx + 2;	// pos fld show
+		title = fxx + 3;	// pos fld show
 		fxx = title ;
 		if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
 			panel.button.append(btn.newButton(

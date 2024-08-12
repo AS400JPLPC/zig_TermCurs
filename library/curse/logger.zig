@@ -29,7 +29,7 @@ pub fn customLog(
 	// defer std.debug.getStderrMutex().unlock();
 	// const w  = flog.writer();
 	// nosuspend w.print("[" ++ level_txt ++ scope_name ++ "] " ++ format ++ "\n", args) 
-	// 		catch { @panic("file write error zlog.txt");};
+	// catch { @panic("file write error zlog.txt");};
 
 	const stderr = std.io.getStdErr().writer();
     var bw = std.io.bufferedWriter(stderr);

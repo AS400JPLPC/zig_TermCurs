@@ -211,7 +211,6 @@ const T = struct {
 		err = false;
 
 		if (self.x.?.object.get(query) == null) {
-			//	std.debug.print("ERROR::{s}::{s}\n\n", .{"invalid",query});
 			err = true;
 			return T.init(self.x.?);
 		}

@@ -392,7 +392,11 @@ I'm making progress, and I'm going to create the JSON.<br />
 - this morning some big tests:<br /><br />
 - refining uppercase extended ascii mode<br />
 - in-depth regex test MVRZR MACH activation<br />
-- scan and roll test JSON
+- scan and roll test JSON<br /><br />
+
+
+→  2024-08-12<BR/>
+-  upgrade version 0.13 / 0.14 token<br /><br />
 
 ------------------------------------------------------------------<br />
 

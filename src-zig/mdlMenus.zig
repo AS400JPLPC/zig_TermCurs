@@ -598,7 +598,7 @@ fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var mCadre = mnu.newMenu(
 							"cadre",				// name
-							vpnl.posx + 1, 20,					// posx, posy	
+							vpnl.posx + 1, 20,		// posx, posy
 							mnu.CADRE.line1,		// type line fram
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
@@ -626,7 +626,7 @@ fn FuncSens( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var mCadre = mnu.newMenu(
 							"Style",				// name
-							vpnl.posx + 1, 20,					// posx, posy	
+							vpnl.posx + 1, 20,		// posx, posy
 							mnu.CADRE.line1,		// type line frame
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
@@ -1206,9 +1206,9 @@ pub fn writeDefCell(vMenu: *std.ArrayList(mnu.DEFMENU) , menuNum : usize) void {
 pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.DEFMENU), menuNum: usize) void {
 
 		var Menudisplay = mnu.newMenu(
-						vmnu.items[menuNum].name,				// name
-						vmnu.items[menuNum].posx,				// posx
-						vmnu.items[menuNum].posy,				// posy	
+						vmnu.items[menuNum].name,			// name
+						vmnu.items[menuNum].posx,			// posx
+						vmnu.items[menuNum].posy,			// posy
 						vmnu.items[menuNum].cadre,			// type line fram
 						vmnu.items[menuNum].mnuvh,			// type menu vertical / horizontal
 						vmnu.items[menuNum].xitems,			// Item const 

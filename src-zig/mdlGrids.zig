@@ -564,7 +564,7 @@ fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var mCadre = mnu.newMenu(
 							"cadre",				// name
-							vpnl.posx + 1, 20,					// posx, posy	
+							vpnl.posx + 1, 20,		// posx, posy
 							mnu.CADRE.line1,		// type line fram
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item
@@ -592,7 +592,7 @@ fn FuncStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	var mCadre = mnu.newMenu(
 							"Style",				// name
-							vpnl.posx + 1, 20,					// posx, posy	
+							vpnl.posx + 1, 20,		// posx, posy
 							mnu.CADRE.line1,		// type line frame
 							mnu.MNUVH.vertical,		// type menu vertical / horizontal
 							&.{						// item

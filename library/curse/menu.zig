@@ -148,7 +148,7 @@ pub const mnu = struct {
 						xmenu.actif = true;
 					}
 				}
-				xmenu.lines += xmenu.nbr + 2; //nbr ligne	+ header =cadre
+				xmenu.lines += xmenu.nbr + 2; //nbr ligne + header =cadre
 				xmenu.cols += 2;
 			}			
 			if (xmenu.mnuvh == MNUVH.horizontal) {
@@ -167,7 +167,7 @@ pub const mnu = struct {
 		return xmenu;
 	}
 
-	// return index-menu	---> arraylist panel-menu
+	// return index-menu ---> arraylist panel-menu
 	pub fn getIndex(vmnu: *mnu.MENU, name: []const u8) ErrMenu!usize {
 		for (vmnu.items, 0..) |l, idx| {
 			if (std.mem.eql(u8, l.name, name)) return idx;
@@ -210,7 +210,7 @@ pub const mnu = struct {
 		if (n < vmnu.items.len) _ = vmnu.orderedRemove(n) else return ErrMenu.mnu_dltRows_Index_invalide;
 	}
 
-	// assign -menu MATRIX TERMINAL	---> arraylist panel-menu
+	// assign -menu MATRIX TERMINALi ---> arraylist panel-menu
 	fn printMenu(vmnu: MENU) void {
 		if (vmnu.actif == false) return;
 		const ACS_Hlines = "─";
@@ -308,7 +308,7 @@ pub const mnu = struct {
 		}
 	}
 
-	// display	MATRIX to terminal ---> arraylist panel-menu
+	// display MATRIX to terminal ---> arraylist panel-menu
 	fn displayMenu(vmnu: MENU, npos: usize) void {
 		var pos: usize = npos;
 		var n: usize = 0;
@@ -355,7 +355,7 @@ pub const mnu = struct {
 	}
 
 	//----------------------------------------------------------------
-	// menu	enter = select	1..n 0 = abort (Escape)
+	// menu enter = select 1..n 0 = abort (Escape)
 	// Turning on the mouse
 	// UP DOWN LEFT RIGHT
 	// movement width the wheel and validation width the clik

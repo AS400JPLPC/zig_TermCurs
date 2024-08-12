@@ -240,7 +240,7 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
 pub fn Menu01() mnu.MENU {
 	const  m01 = mnu.newMenu(
 					"Menu01",				// name
-					2, 2,					// posx, posy	
+					2, 2,					// posx, posy
 					mnu.CADRE.line1,		// type line fram
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{"Open..",			// item
@@ -330,7 +330,7 @@ pub fn main() !void {
 							"Grid01",			// Name
 							20, 62,				// posx, posy
 							7,					// numbers lines
-							grd.gridStyle,		// separator | or	space
+							grd.gridStyle,		// separator | or space
 							grd.CADRE.line1,	// type line 1
 							);
 

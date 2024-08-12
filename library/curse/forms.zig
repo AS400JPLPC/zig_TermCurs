@@ -376,7 +376,7 @@ pub const	lbl = struct {
 
 				const xlabel = LABEL {
 						.name = vname,
-						.posx = vposx ,
+						.posx = vposx,
 						.posy = vposy,
 						.attribut = AtrTitle,
 						.text = vtext,
@@ -388,7 +388,7 @@ pub const	lbl = struct {
 	}
 
 
-	// return index-label	---> arraylist panel-label
+	// return index-label ---> arraylist panel-label
 	pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )	ErrForms ! usize {
 
 		for (vpnl.label.items, 0..) |l, idx| {
@@ -441,12 +441,12 @@ pub const	lbl = struct {
 	}
 
 	// delete -label ---> arraylist panel-label
-	pub fn dltRows(vpnl: *pnl.PANEL,	n :usize ) ErrForms ! void {
-		if ( n < vpnl.label.items.len)	_= vpnl.label.orderedRemove(n)
+	pub fn dltRows(vpnl: *pnl.PANEL, n :usize ) ErrForms ! void {
+		if ( n < vpnl.label.items.len) _= vpnl.label.orderedRemove(n)
 		else return ErrForms.lbl_dltRows_Index_invalide;
 	}
 
-	// update Label and Display	---> arraylist panel-label
+	// update Label and Display ---> arraylist panel-label
 	pub fn updateText(vpnl: *pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
 		if ( n < vpnl.label.items.len) {
 			clsLabel(vpnl, vpnl.label.items[n]);
@@ -456,7 +456,7 @@ pub const	lbl = struct {
 		} else return ErrForms.lbl_updateText_Index_invalide;
 	}
 
-	// assign -label MATRIX TERMINAL	---> arraylist panel-label
+	// assign -label MATRIX TERMINALi ---> arraylist panel-label
 	pub fn printLabel(vpnl: *pnl.PANEL, vlbl : LABEL ) void {
 		var n	= (vpnl.cols * (vlbl.posx - 1)) + vlbl.posy - 1;
 		var iter = utl.iteratStr.iterator(vlbl.text);
@@ -499,7 +499,7 @@ pub const	lbl = struct {
 	}
 
 
-	// display	MATRIX to terminal ---> arraylist panel-label
+	// displayi MATRIX to terminal ---> arraylist panel-label
 	fn displayLabel(vpnl: *pnl.PANEL, vlbl : LABEL )	void {
 		// display matrice PANEL
 		if (vpnl.actif == false ) return ;
@@ -585,7 +585,7 @@ pub const frm = struct {
 		}
 
 
-		// write MATRIX TERMINAL	---> arraylist panel-fram
+		// write MATRIX TERMINAL ---> arraylist panel-fram
 		pub fn printFrame(vpnl : *pnl.PANEL , vfram: FRAME) void {
 
 			// assigne FRAME to init matrice for display
@@ -757,7 +757,7 @@ pub const lnv = struct {
 		}
 
 
-		// write MATRIX TERMINAL	---> arraylist panel-line
+		// write MATRIX TERMINAL ---> arraylist panel-line
 		pub fn printLine(vpnl : *pnl.PANEL , vline: LINEV) void {
 		if (vpnl.actif == false ) return ;
 		if (vline.actif == false ) return ;
@@ -788,7 +788,7 @@ pub const lnv = struct {
 				n =	(vpnl.cols * x ) + vline.posy - 1 ;
 			}
 		}
-	// return index-LINE	---> arraylist panel-line
+	// return index-LINE ---> arraylist panel-line
 	pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )	ErrForms ! usize {
 
 		for (vpnl.linev.items, 0..) |l, idx| {
@@ -854,7 +854,7 @@ pub const lnh = struct {
 		}
 
 
-		// write MATRIX TERMINAL	---> arraylist panel-line
+		// write MATRIX TERMINAL ---> arraylist panel-line
 		pub fn printLine(vpnl : *pnl.PANEL , vline: LINEH) void {
 		if (vpnl.actif == false ) return ;
 		if (vline.actif == false ) return ;
@@ -885,7 +885,7 @@ pub const lnh = struct {
 			}
 		}
 
-	// return index-LINE	---> arraylist panel-line
+	// return index-LINE ---> arraylist panel-line
 	pub fn getIndex(vpnl: *pnl.PANEL , name: [] const u8 )	ErrForms ! usize {
 
 		for (vpnl.lineh.items, 0..) |l, idx| {
@@ -964,7 +964,7 @@ pub const btn = struct{
 				return xbutton;
 	}
 
-	// return index-button	---> arraylist panel-button
+	// return index-button ---> arraylist panel-button
 	pub fn getIndex(vpnl: *pnl.PANEL , key: kbd	) ErrForms ! usize {
 
 		for (vpnl.button.items, 0..) |b ,idx	| {
@@ -973,64 +973,64 @@ pub const btn = struct{
 		return ErrForms.btn_getIndex_Key_Button_Invalide;
 	}
 
-	// return name-button	---> arraylist panel-button
+	// return name-button ---> arraylist panel-button
 	pub fn getName(vpnl: *pnl.PANEL , n: usize) ErrForms ! [] const u8 {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].name;
 		return ErrForms.btn_getName_Index_invalide ;
 
 	}
 
-	// return key-button	---> arraylist panel-button
+	// return key-button ---> arraylist panel-button
 	pub fn getKey(vpnl: *pnl.PANEL , n: usize) ErrForms ! kbd {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].key;
 		return ErrForms.btn_getKey_Index_invalide ;
 
 	}
 
-	// return show-button	---> arraylist panel-button
+	// return show-button ---> arraylist panel-button
 	pub fn getShow(vpnl: *pnl.PANEL , n: usize) ErrForms ! bool {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].show;
 		return ErrForms.btn_getShow_Index_invalide ;
 	}
 
-	// return text-button	---> arraylist panel-button
+	// return text-button ---> arraylist panel-button
 	pub fn getTitle(vpnl: *pnl.PANEL , n: usize) ErrForms ! [] const u8 {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].title;
 		return ErrForms.btn_getText_Index_invalide ;
 	}
 
-	// return check-button	---> arraylist panel-button
+	// return check-button ---> arraylist panel-button
 	// work for field input-field
 	pub fn getCheck(vpnl: *pnl.PANEL , n: usize) ErrForms ! bool {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].check;
 		return ErrForms.btn_getCheck_Index_invalide ;
 	}
 
-	// return ON/OFF-button	---> arraylist panel-button
+	// return ON/OFF-button ---> arraylist panel-button
 	pub fn getActif(vpnl: *pnl.PANEL , n: usize) ErrForms ! bool {
 		if ( n < vpnl.button.items.len) return vpnl.button.items[n].actif;
 		return ErrForms.btn_getActif_Index_invalide ;
 	}
 
-	// set show-button	---> arraylist panel-button
+	// set show-button ---> arraylist panel-button
 	pub fn setShow(vpnl: *pnl.PANEL , n: usize, val :bool) ErrForms ! void {
 		if ( n < vpnl.button.items.len)	vpnl.button.items[n].show = val
 		else return ErrForms.btn_setShow_Index_invalide ;
 	}
 
-	// set text-button	---> arraylist panel-button
+	// set text-button ---> arraylist panel-button
 	pub fn setText(vpnl: *pnl.PANEL , n: usize, val:[] const u8) ErrForms ! void {
 		if ( n < vpnl.button.items.len) vpnl.button.items[n].text = val
 		else return ErrForms.btn_setText_Index_invalide ;
 	}
 
-	// set chek-button	---> arraylist panel-button
+	// set chek-button ---> arraylist panel-button
 	pub fn setCheck(vpnl: *pnl.PANEL , n: usize, val :bool) ErrForms ! void {
 		if ( n < vpnl.button.items.len) vpnl.button.items[n].check = val
 		else return ErrForms.btn_setCheck_Index_invalide ;
 	}
 
-	// set ON/OFF-button	---> arraylist panel-button
+	// set ON/OFF-button ---> arraylist panel-button
 	pub fn setActif(vpnl: *pnl.PANEL , n: usize, val :bool) ErrForms ! void {
 		if ( n < vpnl.button.items.len) vpnl.button.items[n].actif = val
 		else return ErrForms.btn_setActif_Index_invalide ;
@@ -1038,14 +1038,14 @@ pub const btn = struct{
 
 
 
-	// delete -button	---> arraylist panel-button
+	// delete -button ---> arraylist panel-button
 	pub fn dltRows(vpnl:*pnl.PANEL,	n :usize ) ErrForms ! void {
 		if ( n < vpnl.button.items.len) _= vpnl.button.orderedRemove(n)
 		else return ErrForms.btn_dltRows_Index_invalide ;
 	}
 
 
-	// assign -button MATRIX TERMINAL	---> arraylist panel-button
+	// assign -button MATRIX TERMINAL ---> arraylist panel-button
 	pub fn printButton(vpnl: *pnl.PANEL) void {
 		if (vpnl.actif == false ) return ;
 	
@@ -1206,13 +1206,13 @@ pub const	fld = struct {
 		width:	usize,
 		scal:	usize,
 		nbrcar: usize,  	// nbrcar DECIMAL = (precision+scale + 1'.' ) 
-							//	+ 1 this signed || other nbrcar = width
+							//+ 1 this signed || other nbrcar = width
 
 		requier: bool,		// requier or FULL
 		protect: bool,		// only display
 
 		pading: bool,	 	// pading blank
-		edtcar: []const u8,	// edtcar for monnaie		€ $ ¥ ₪ £ or %
+		edtcar: []const u8,	// edtcar for monnaie  € $ ¥ ₪ £ or %
 
 		regex:  []const u8,	//contrôle regex
 		errmsg: []const u8,	//message this field
@@ -1318,7 +1318,7 @@ pub const	fld = struct {
 
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .TEXT_FREE
 	pub fn newFieldTextFree(
@@ -1345,7 +1345,7 @@ pub const	fld = struct {
 								vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// letter numeric punct 
 	// refence type
 	// .TEXT_FULL
@@ -1373,7 +1373,7 @@ pub const	fld = struct {
 							vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .ALPHA
 	pub fn newFieldAlpha(vname: [] const u8,
@@ -1390,7 +1390,7 @@ pub const	fld = struct {
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .ALPHA_UPPER
 	pub fn newFieldAlphaUpper(vname: [] const u8,
@@ -1407,7 +1407,7 @@ pub const	fld = struct {
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .ALPHA_NUMERIC
 	pub fn newFieldAlphaNumeric(vname: [] const u8,
@@ -1424,7 +1424,7 @@ pub const	fld = struct {
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .ALPHA_NUMERIC_UPPER
 	pub fn newFieldAlphaNumericUpper(vname: [] const u8,
@@ -1441,7 +1441,7 @@ pub const	fld = struct {
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .PASSWORD
 	pub fn newFieldPassword(vname: [] const u8,
@@ -1458,7 +1458,7 @@ pub const	fld = struct {
 													vwidth, vtext, vrequier, verrmsg, vhelp, vregex);
 	}
 
-	// New Field String	---> arraylist panel-lfield
+	// New Field String ---> arraylist panel-lfield
 	// refence type
 	// .YES_NO
 	pub fn newFieldYesNo(vname: [] const u8,
@@ -1815,7 +1815,7 @@ pub const	fld = struct {
 
 	}
 
-	// New Field Digit	---> arraylist panel-lfield
+	// New Field Digit ---> arraylist panel-lfield
 	// refence type
 	// .DIGIT unsigned
 	pub fn newFieldUDigit(vname: [] const u8,
@@ -1864,7 +1864,7 @@ pub const	fld = struct {
 		return xfield;
 	}
 
-	// New Field DIGIT	---> arraylist panel-lfield
+	// New Field DIGIT ---> arraylist panel-lfield
 	// refence type
 	// .DIGIT SIGNED
 	pub fn newFieldDigit(vname: [] const u8,
@@ -1913,7 +1913,7 @@ pub const	fld = struct {
 		return xfield;
 	}
 
-	// New Field Decimal	---> arraylist panel-lfield
+	// New Field Decimal ---> arraylist panel-lfield
 	// refence type
 	// .DECIMAL UNSIGNED
 	pub fn newFieldUDecimal(vname: [] const u8,
@@ -1954,7 +1954,7 @@ pub const	fld = struct {
 				.actif	= true
 		};
 
-		// caculate len = width add scal add .	
+		// caculate len = width add scal add .
 		if (vscal == 0 ) xfield.nbrcar = xfield.width 
 		else xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
 
@@ -1971,7 +1971,7 @@ pub const	fld = struct {
 		return xfield;
 	}
 
-	// New Field Decimal	---> arraylist panel-lfield
+	// New Field Decimal ---> arraylist panel-lfield
 	// refence type
 	// .DECIMAL SIGNED
 	pub fn newFieldDecimal(vname: [] const u8,
@@ -2191,7 +2191,7 @@ pub const	fld = struct {
 		else return ErrForms.fld_setText_Index_invalide;
 	}
 
-	//	Input Field 
+	// Input Field 
 	pub fn setSwitch(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) {
 			vpnl.field.items[n].zwitch = val;
@@ -2362,23 +2362,12 @@ pub const	fld = struct {
 	}
 
 
-	//----------------------------------------------------==
+	//----------------------------------------------------
 	// Input buffer management modeled on 5250/3270
 	// inspiration ncurse
 	// application hold principe and new langage
-	//----------------------------------------------------==
+	//----------------------------------------------------
 
-
-	// pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
-	// 	const maybe_regex = reg.compile(pattern) ;
-	// 	const maybe_matched = reg.isMatch(testval);
- //            if (maybe_matched) |_| {
- //                return true;
- //            } else {
- //                return false;
- //            }
-   
-	// }
 
 	pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
          const maybe_regex = reg.compile(pattern) ;
@@ -2394,13 +2383,6 @@ pub const	fld = struct {
        
 	 }
 
-	// pub fn isMatchFixed(testval : [] const u8, comptime pattern : [] const u8 ) bool {
-	// 	const ops, const sets  = reg.resourcesNeeded(pattern);
-	// 	const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	//     const maybe_regex = SlimmedDownRegex.compile(pattern);
-	//     if (maybe_regex) |regex| return regex.isMatch(testval) 
-	//     else  return false ;   
-	// }
 
 	pub fn isMatchiFixedIso(testval : [] const u8) bool { 
     
@@ -3507,7 +3489,7 @@ pub const	pnl = struct {
 
 		}
 	}
-	// restor -panel	MATRIX to terminal
+	// restor -panel MATRIX to terminal
 	pub fn rstPanel(comptime T: type , vsrc: *T , vdst : *PANEL) void {
 		if (vdst.actif == false)	return ;
 		if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines	)	return ;
@@ -3689,7 +3671,7 @@ pub const	pnl = struct {
 	/// only the key CtrlH = Aide / Help for field
 	/// only the key CtrlP = call to the program associated with the Field zone
 	/// Reserved keys for FIELD management
-	/// traditionally	UP, DOWN, TAB, STAB, CtrlA, F1..F24,
+	/// traditionally UP, DOWN, TAB, STAB, CtrlA, F1..F24,
 	/// ENTER, HOME, END, RIGTH, LEFt, BACKSPACE, DELETE, INSERT
 	/// FUNC Triggered by ioField function
 	/// predefined and customizable REGEX control

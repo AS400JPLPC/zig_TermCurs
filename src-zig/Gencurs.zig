@@ -117,7 +117,7 @@ pub fn main() !void {
 
 	const MenuPrincipal = mnu.newMenu(
 					"Screen",				// name
-					2, 2,					// posx, posy	
+					2, 2,					// posx, posy
 					mnu.CADRE.line1,		// type line fram
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
