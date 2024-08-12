@@ -181,7 +181,7 @@ fn cleanProgram(vpnl : *pnl.PANEL ) void {
 	vdir = "";
 	pnl.freePanel(vpnl);
 	forms.allocatorForms.destroy(vpnl);
-			
+
 	term.deinitTerm();
 	utl.deinitUtl();
 }

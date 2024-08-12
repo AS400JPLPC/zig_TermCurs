@@ -397,6 +397,19 @@ I'm making progress, and I'm going to create the JSON.<br />
 
 →  2024-08-12<BR/>
 -  upgrade version 0.13 / 0.14 token<br /><br />
+-  debug GRID  add type :<br />
+I made an update in the GRID module:<br />
+
+There are two ways to manage grids:<br />
+a) Combo starts with the letter C.<br />
+b) Grid starts with the letter G.<br />
+
+Why this naming convention? It's for code generation. A Combo handles a single value and is loaded as a fixed value.<br />
+
+For the Grid, it should be considered as a sub-file that can paginate, return multiple values, etc.<br />
+
+Even though both use the same routines, the functionality is different.<br />
+-  add orderGrid :<br /><br />
 
 ------------------------------------------------------------------<br />
 

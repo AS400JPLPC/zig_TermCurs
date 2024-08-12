@@ -375,7 +375,7 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
 		try w.endArray();
 	}
 	const nbrMenu: usize = XMENU.items.len;
-	const nbrGrid: usize = XMENU.items.len;
+	const nbrGrid: usize = XGRID.items.len;
     if ( nbrGrid == 0 and nbrMenu == 0)try w.endObject();
 
 //----------------------------------

@@ -160,7 +160,7 @@ pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
 pub fn Panel_HELP() *pnl.PANEL {
 	var Panel : *pnl.PANEL = pnl.newPanelC("HELP",
 										1, 1,
-										5,
+										6,
 										100 ,
 										forms.CADRE.line1,
 										""
@@ -183,6 +183,11 @@ pub fn Panel_HELP() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
 								"","",
 								"")) catch unreachable ;
+	
+	Panel.field.append(fld.newFieldTextFull("HELP3",4,5,90,"",false,
+								"","",
+								"")) catch unreachable ;
+					
 	fld.setProtect(Panel,0,true) catch unreachable;
 	return Panel;
 	}
@@ -336,7 +341,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 			mnu.CADRE.line1, // type line fram
 			mnu.MNUVH.vertical, // type menu vertical / horizontal
 			&.{ // item
-			"Combo-View",
+			"C-G..View",
 			"Cell-View",
 			"Cell-Order",
 			"Cell-Remove",
@@ -373,7 +378,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 			.F1	 => {
 				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-G add-Grid  Alt-C add-Cell")
 					catch unreachable;
-				fld.setText(pFmtH01,1,"Alt-R remove Grid  AltW Outils")
+				fld.setText(pFmtH01,1,"name -> :Combo C Grid G")
+					catch unreachable;
+				fld.setText(pFmtH01,2,"Alt-R remove Grid   Alt-O order Grid  AltW Outils ")
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
@@ -437,13 +444,19 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 				if (numGrid != 999) {
 					term.offMouse();
 					writeDefCell(&NGRID,numGrid);
-					term.cls();
-					pnl.printPanel(pFmt01);
-					term.onMouse();
 				}
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
 			},
 
-
+			// order Grid
+			.altO => {
+				orderGrid(&NGRID );					// order Grid
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
+			},
 			// Order / Remove
 			.altW => {
 				numGrid = qryCellGrid(pFmt01, &NGRID);
@@ -459,10 +472,10 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 					if (nitem == 1) viewCell(pFmt01,NGRID,numGrid );	// view  Cell
 					if (nitem == 2) orderCell(NGRID,numGrid );			// order Cell
 					if (nitem == 3) removeCell(NGRID,numGrid );			// order Cell
-					term.cls();
-					pnl.printPanel(pFmt01);
-					term.onMouse();
 				}
+				term.cls();
+				pnl.printPanel(pFmt01);
+				term.onMouse();
 			},
 			
 
@@ -519,7 +532,7 @@ fn Panel_defGrid(nposx: usize) *pnl.PANEL {
 
 	Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
 							"required","please enter :text [a-zA-Z]{1,1} [A-z0-9]",
-							"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
+							"^[CG]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
 	fld.setTask(Panel,@intFromEnum(fp02.fname),"TaskName") catch unreachable ;
 
 	Panel.field.append(fld.newFieldUDigit(@tagName(fp02.fposx),3,12,2,"",false,
@@ -1356,7 +1369,106 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
 	savgrid.deinit();
 }
 
-// view GRID
+// order GRID
+pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
+
+	if (vgrd.items.len == 0 ) return;
+
+
+	var newgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+	var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+
+
+	
+	for (vgrd.items) |p| {
+		savgrid.append(p)  
+			catch |err| { @panic(@errorName(err)); };
+	}
+
+
+	
+	var idxligne: usize = 0;
+	var Gkey: grd.GridSelect = undefined;
+
+	const Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		20,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer Gkey.Buf.deinit();
+	defer grd.freeGrid(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
+	grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
+	grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+
+
+	const Order: *grd.GRID = grd.newGridC(
+		"Order",
+		2,
+		50,
+		20,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer grd.freeGrid(Order);
+	defer grd.allocatorGrid.destroy(Order);
+	grd.newCell(Order, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.newCell(Order, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.setHeaders(Order);
+
+	while (true) {
+		grd.resetRows(Origine);
+
+		grd.resetRows(Origine);
+		for (vgrd.items, 0..) |g, idx| {
+			const ridx = usizeToStr(idx);
+			grd.addRows(Origine, &.{ ridx, g.name});
+		}
+
+		Gkey = grd.ioGridKey(Origine, term.kbd.ctrlV, false);
+		if (Gkey.Key == kbd.esc) break;
+		if (Gkey.Key == kbd.ctrlV) break;
+		if (Gkey.Key == kbd.enter) {
+			newgrid.append(vgrd.items[ strToUsize(Gkey.Buf.items[0])])
+				catch |err| { @panic(@errorName(err)); };
+			const ridn =usizeToStr(idxligne);
+			grd.addRows(Order, &.{ ridn, Gkey.Buf.items[1]});
+			idxligne += 1;
+			grd.printGridHeader(Order);
+			grd.printGridRows(Order);
+			const ligne: usize = strToUsize(Gkey.Buf.items[0]);
+			_ = vgrd.orderedRemove(ligne);
+		}
+	}
+
+	vgrd.clearAndFree();
+	vgrd.clearRetainingCapacity();
+	// restor and exit
+	if (Gkey.Key == kbd.esc) {
+		for (savgrid.items) |p| {
+			vgrd.append(p) catch |err| { @panic(@errorName(err)); };
+		}
+	}
+	// new Order and exit
+	else {
+		for (newgrid.items) |p| {
+			vgrd.append(p) catch |err| { @panic(@errorName(err)); };
+		}
+	}
+	newgrid.clearAndFree();
+	newgrid.deinit();
+
+	savgrid.clearAndFree();
+	savgrid.deinit();
+	return;
+}
+
+// view Cell
 pub fn viewCell(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 
 	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
