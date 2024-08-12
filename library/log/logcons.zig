@@ -1,13 +1,12 @@
 	///----------------------------
 	/// looger / historique traçage
-	/// zig 0.12.0 dev
+	/// console
 	///----------------------------
 
 const std = @import("std");
 const builtin = @import("builtin");
 const root = @import("root");
 
-var flog :std.fs.File = undefined;
 
 pub fn customLog(
 	comptime message_level: std.log.Level,
@@ -25,11 +24,6 @@ pub fn customLog(
 	const level_txt = comptime message_level.asText();
 	const scope_name = "(" ++ @tagName(scope) ++ ")";
 
-	// std.debug.getStderrMutex().lock();
-	// defer std.debug.getStderrMutex().unlock();
-	// const w  = flog.writer();
-	// nosuspend w.print("[" ++ level_txt ++ scope_name ++ "] " ++ format ++ "\n", args) 
-	// catch { @panic("file write error zlog.txt");};
 
 	const stderr = std.io.getStdErr().writer();
     var bw = std.io.bufferedWriter(stderr);
@@ -64,14 +58,6 @@ pub fn scoped(comptime scope: @Type(.EnumLiteral)) type {
 	};
 }
 
-pub fn openFile(log:[]const u8) void {
-	flog = std.fs.cwd().createFile(log, .{ .read = true }) 
-		catch { @panic("impossible ouvrir file zlog;txt");};
-}
-
-pub fn closeFile() void {
-	flog.close();
-}
 
 pub const default = scoped(.LOG);
 pub const err = default.err;

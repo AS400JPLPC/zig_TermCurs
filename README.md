@@ -410,7 +410,12 @@ For the Grid, it should be considered as a sub-file that can paginate, return mu
 
 Even though both use the same routines, the functionality is different.<br />
 -  add orderGrid :<br /><br />
+-  add module Gensrc :<br />
+-Added the Gensrc program, restructured logger (file), and added logcons (console). This program will create the reference between the functions areas and the Combo/Grid definitions.<br /><br />
 
+
+
+<br />
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />
