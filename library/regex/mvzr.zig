@@ -92,7 +92,7 @@ const OpMatch = struct {
     i: usize,
 };
 
-const Regex: type = SizedRegex(MAX_REGEX_OPS, MAX_CHAR_SETS);
+pub const Regex: type = SizedRegex(MAX_REGEX_OPS, MAX_CHAR_SETS);
 
 pub fn SizedRegex(ops: comptime_int, char_sets: comptime_int) type {
     return struct {
@@ -119,6 +119,35 @@ pub fn SizedRegex(ops: comptime_int, char_sets: comptime_int) type {
                 };
             } else {
                 return null;
+            }
+        }
+
+        /// Match a regex pattern in `haystack` after `pos`.  Returns a `Match`
+        /// if the pattern is found.
+        pub fn matchPos(regex: *const SizedRegexT, pos: usize, haystack: []const u8) ?Match {
+            if (pos >= haystack.len) return null;
+            const substack = haystack[pos..];
+            const maybe_matched = regex.matchInternal(substack);
+            if (maybe_matched) |m| {
+                const m1 = pos + m[0];
+                const m2 = pos + m[1];
+                return Match{
+                    .slice = haystack[m1..m2],
+                    .start = m1,
+                    .end = m2,
+                };
+            } else {
+                return null;
+            }
+        }
+
+        /// Boolean test if the regex matches in the haystack.
+        pub fn isMatch(regex: *const SizedRegexT, haystack: []const u8) bool {
+            const maybe_matched = regex.matchInternal(haystack);
+            if (maybe_matched) |_| {
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -1778,193 +1807,13 @@ fn parseCharSet(in: []const u8, patt: []RegOp, sets: []CharSet, j: usize, i_in: 
     return .{ i, s };
 }
 
+const logger = std.log.scoped(.mvzr);
+
 fn logError(comptime fmt: []const u8, args: anytype) void {
     if (!builtin.is_test) {
-        std.log.err(fmt, args);
+        logger.err(fmt, args);
     } else {
-        std.log.warn(fmt, args);
+        logger.warn(fmt, args);
     }
 }
-
-//| TESTS
-
-const testing = std.testing;
-const expect = std.testing.expect;
-const expectEqual = std.testing.expectEqual;
-const expectEqualStrings = std.testing.expectEqualStrings;
-
-fn printPattern(patt: []const RegOp) void {
-    _ = printPatternInternal(patt);
-}
-
-fn printRegex(regex: anytype) void {
-    const patt = regex.patt;
-    const set_max = printPatternInternal(&patt);
-    if (set_max) |max| {
-        for (0..max + 1) |i| {
-            std.debug.print("set {d}: ", .{i});
-            printCharSet(regex.sets[i]) catch unreachable;
-        }
-    }
-}
-
-fn printRegexString(in: []const u8) void {
-    const reggie = compile(in);
-    if (reggie) |RRRRRR| {
-        printRegex(&RRRRRR);
-    }
-}
-
-fn printPatternInternal(patt: []const RegOp) ?u8 {
-    var j: usize = 0;
-    var set_max: ?u8 = null;
-    std.debug.print("[", .{});
-    while (j < patt.len and patt[j] != .unused) : (j += 1) {
-        switch (patt[j]) {
-            .char,
-            => |op| {
-                std.debug.print("{s} {u}", .{ @tagName(patt[j]), op });
-            },
-            .some,
-            .up_to,
-            => |op| {
-                std.debug.print("{s} {d}", .{ @tagName(patt[j]), op });
-            },
-            .class,
-            .not_class,
-            => |op| {
-                if (set_max) |max| {
-                    set_max = @max(max, op);
-                } else {
-                    set_max = op;
-                }
-                std.debug.print("{s} {d}", .{ @tagName(patt[j]), op });
-            },
-            else => {
-                std.debug.print("{s}", .{@tagName(patt[j])});
-            },
-        }
-        if (j + 1 < patt.len and patt[j + 1] != .unused) {
-            std.debug.print(", ", .{});
-        }
-    }
-    std.debug.print("]\n", .{});
-    return set_max;
-}
-
-fn printCharSet(set: CharSet) !void {
-    const allocator = std.testing.allocator;
-    var set_str = try std.ArrayList(u8).initCapacity(allocator, @popCount(set.low) + @popCount(set.hi) + 1);
-    defer set_str.deinit();
-    if (@popCount(set.low) != 0) {
-        for (0..64) |i| {
-            const c: u6 = @intCast(i);
-            if ((set.low | (one << c)) == set.low) {
-                try set_str.append(@as(u8, c));
-            }
-        }
-    }
-    if (@popCount(set.hi) != 0) {
-        try set_str.append(' ');
-        for (0..64) |i| {
-            const c: u6 = @intCast(i);
-            if ((set.hi | (one << c)) == set.hi) {
-                const ch = @as(u8, c) | 0b0100_0000;
-                try set_str.append(ch);
-            }
-        }
-    }
-    std.debug.print("{s}\n", .{set_str.items});
-}
-
-fn testMatchAll(needle: []const u8, haystack: []const u8) !void {
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        const maybe_match = regex.match(haystack);
-        if (maybe_match) |m| {
-            try expectEqual(0, m.start);
-            try expectEqual(haystack.len, m.end);
-        } else {
-            try expect(false);
-        }
-    } else {
-        try expect(false);
-    }
-}
-
-fn testMatchEnd(needle: []const u8, haystack: []const u8) !void {
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        const maybe_match = regex.match(haystack);
-        if (maybe_match) |m| {
-            try expectEqual(haystack.len, m.end);
-        } else {
-            try expect(false);
-        }
-    } else {
-        try expect(false);
-    }
-}
-
-fn testMatchAllP(needle: []const u8, haystack: []const u8) !void {
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        printRegex(&regex);
-    }
-    try testMatchAll(needle, haystack);
-}
-
-fn testMatchSlice(needle: []const u8, haystack: []const u8, slice: []const u8) !void {
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        const maybe_match = regex.match(haystack);
-        if (maybe_match) |m| {
-            try expectEqualStrings(slice, m.slice);
-        } else {
-            try expect(false);
-        }
-    } else {
-        try expect(false);
-    }
-}
-
-fn testFail(needle: []const u8, haystack: []const u8) !void {
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        try expectEqual(null, regex.match(haystack));
-    } else {
-        try expect(false);
-    }
-}
-
-fn downStackRegex(RegexT: type, regex: RegexT, allocator: std.mem.Allocator) !*const RegexT {
-    const heap_regex = try regex.toOwnedRegex(allocator);
-    return heap_regex;
-}
-
-fn downStackMatch(matched: Match, allocator: std.mem.Allocator) !Match {
-    const heap_match = try matched.toOwnedMatch(allocator);
-    return heap_match;
-}
-
-fn testOwnedRegex(needle: []const u8, haystack: []const u8) !void {
-    const allocator = std.testing.allocator;
-    const maybe_regex = compile(needle);
-    if (maybe_regex) |regex| {
-        const heap_regex = try downStackRegex(Regex, regex, allocator);
-        defer allocator.destroy(heap_regex);
-        const maybe_match = heap_regex.match(haystack);
-        if (maybe_match) |m| {
-            const matched = try downStackMatch(m, allocator);
-            defer matched.deinit(allocator);
-            try expectEqualStrings(haystack, matched.slice);
-        } else try expect(false);
-    } else {
-        try expect(false);
-    }
-}
-
-
-
-
 
