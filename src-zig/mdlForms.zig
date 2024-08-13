@@ -395,9 +395,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.freePanel(pFmtH01);
 				defer forms.allocatorForms.destroy(pFmtH01);
 				term.deinitTerm();
-				grd.deinitGrid();
 				utl.deinitUtl();
-				// forms.deinitForms();
 				return;
 			},
 			.F12 => {
@@ -406,9 +404,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.freePanel(pFmtH01);
 				defer forms.allocatorForms.destroy(pFmtH01);
 				term.deinitTerm();
-				grd.deinitGrid();
 				utl.deinitUtl();
-				// forms.deinitForms();
 				return;
 			},
 
@@ -742,8 +738,6 @@ fn orderLabel(vpnl: *pnl.PANEL) void {
 
 	savlabel.clearAndFree();
 	savlabel.deinit();
-	grd.deinitGrid();
-	return;
 }
 
 // remove Label
@@ -807,7 +801,6 @@ fn removeLabel(vpnl: *pnl.PANEL) void {
 
 	savlabel.clearAndFree();
 	savlabel.deinit();
-	grd.deinitGrid();
 }
   
 //==========================================
@@ -1284,7 +1277,6 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			return;
 		}
 	}
-	return;
 }
 
 fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1348,7 +1340,6 @@ fn TaskType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			}
 		}
 	}
-	return;
 }
 
 fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1362,7 +1353,6 @@ fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 		vpnl.keyField = kbd.task;
 	}
-	return;
 }
 
 fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1382,7 +1372,6 @@ fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			vpnl.keyField = kbd.task;
 		}
 	} else vfld.text = "";
-	return;
 }
 
 
@@ -1405,7 +1394,6 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			vpnl.keyField = kbd.task;
 		}
 	}
-	return;
 }
 
 fn TaskErrmsg(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1414,7 +1402,6 @@ fn TaskErrmsg(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		vpnl.keyField = kbd.task;
 	}
 
-	return;
 }
 
 fn TaskFunc(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1425,7 +1412,6 @@ fn TaskFunc(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		}
 	}
 
-	return;
 }
 
 fn TaskCall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1441,7 +1427,6 @@ fn TaskCall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		fld.printField(vpnl, vpnl.field.items[i]);
 		fld.displayField(vpnl, vpnl.field.items[i]);
 	}
-	return;
 }
 
 
@@ -1470,7 +1455,6 @@ fn TaskTcall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			vpnl.keyField = kbd.task;
 		}
 	}
-	return;
 }
 
 fn TaskPcall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1485,7 +1469,6 @@ fn TaskPcall(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		fld.printField(vpnl, vpnl.field.items[i]);
 		fld.displayField(vpnl, vpnl.field.items[i]);
 	}
-	return;
 
 }
 
@@ -2080,6 +2063,7 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 					
 				fld.setEdtcar(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.fedtcar)].text)
 					catch |err| { @panic(@errorName(err)); };
+
 					
 				fld.setTask(vpnl, idx, pFmt02.field.items[@intFromEnum(fp02.ftask)].text)
 					catch |err| { @panic(@errorName(err)); };
@@ -2856,8 +2840,6 @@ pub fn orderField(vpnl: *pnl.PANEL) void {
 
 	savfield.clearAndFree();
 	savfield.deinit();
-	grd.deinitGrid();
-	return;
 }
 // remove Field
 fn removeField(vpnl: *pnl.PANEL) void {
@@ -2928,7 +2910,6 @@ fn removeField(vpnl: *pnl.PANEL) void {
 
 	savfield.clearAndFree();
 	savfield.deinit();
-	grd.deinitGrid();
 }
 
 //------------------------------------------------------------------
@@ -3107,8 +3088,6 @@ fn orderHorizontal(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-	grd.deinitGrid();
-	return;
 }
 
 // remove Horizontal
@@ -3171,7 +3150,7 @@ fn removeHorizontal(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-	grd.deinitGrid();
+
 }
 
 
@@ -3352,8 +3331,6 @@ fn orderVertical(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-	grd.deinitGrid();
-	return;
 }
 
 // remove Horizontal
@@ -3416,5 +3393,4 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 
 	savline.clearAndFree();
 	savline.deinit();
-	grd.deinitGrid();
 }

@@ -303,14 +303,14 @@ fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
 pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 				XGRID:  *std.ArrayList(grd.GRID),
 				XMENU:  *std.ArrayList(mnu.DEFMENU),
-				wrk: bool) !void {
+				wrkSav: bool) !void {
 
-	if (XPANEL.items.len == 0 and wrk) return;
+	if (XPANEL.items.len == 0 and wrkSav) return;
 
 
 	
 	var twork: [] const u8 = undefined;
-	if (wrk)  twork = "Save-File-JSON" 
+	if (wrkSav)  twork = "Save-File-JSON" 
 	else twork = "Recovery-File-Json";
 
 	vdir ="";
@@ -336,7 +336,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 			} else lbl.updateText(pFmt01,1,vdir) catch unreachable;
 	}
 
-	if (wrk == false) {
+	if (wrkSav == false) {
 			 try btn.setActif(pFmt01,try btn.getIndex(pFmt01,kbd.F9),false);
 			 try lbl.setActif(pFmt01,2,false);
 			 try fld.setActif(pFmt01,0,false);
@@ -515,7 +515,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 					if ( Gkey.Key == kbd.enter) {
 						nameJson =Gkey.Buf.items[0];
 						pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Working {s} Json", .{nameJson})) ;
-						if (wrk){
+						if (wrkSav){
 							newFile(nameJson);
 							try mdlSjson.SavJson(XPANEL, XGRID, XMENU, vdir ,nameJson);
 						} 

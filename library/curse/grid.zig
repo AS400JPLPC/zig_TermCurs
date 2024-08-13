@@ -14,6 +14,7 @@ const kbd = @import("cursed").kbd;
 // tools utility
 const utl = @import("utils");
 
+
 const os = std.os;
 const io = std.io;
 
@@ -154,7 +155,6 @@ pub const grd = struct {
 		separator,
 		cadre,
 		cell,
-		data
 	};
 	//------------------------------------------
 
@@ -908,9 +908,10 @@ pub const grd = struct {
 
 				.enter => if (self.lignes > 0) {
 					gSelect.Key = kbd.enter;
-					if (self.curspage > 0) {
-						CountLigne = (self.pageRows - 1) * (self.curspage - 1);
-						CountLigne += self.cursligne;
+					if (self.curspage > 1 ) {
+						CountLigne = (self.pageRows  ) * (self.curspage - 1);
+						CountLigne += self.cursligne ;
+						if (CountLigne > (self.data.len - 1) ) CountLigne = self.cursligne ;
 					}
 
 					gSelect.Buf = self.data.items(.buf)[CountLigne];
@@ -964,135 +965,7 @@ pub const grd = struct {
 		}
 	}
 
-	///------------------------------------
-	/// manual = on return pageUp/pageDown no select
-	/// esc    = return no select
-	/// KEY    = return select valide ex: management Grid to Grid
-	/// enter  = return enter and line select
-	/// -----------------------------------
-	pub fn ioGridKey(self: *GRID, gKey: term.kbd, manual: bool) GridSelect {
-		var gSelect: GridSelect = .{ .Key = term.kbd.none, .Buf = std.ArrayList([]const u8).init(allocatorGrid) };
-
-		if (self.actif == false) return gSelect;
-
-		gSelect.Key = term.kbd.none;
-
-		var CountLigne: usize = 0;
-		self.cursligne = 0;
-		printGridHeader(self);
-
-		term.cursHide();
-		term.onMouse();
-
-		var grid_key: term.Keyboard = undefined;
-		while (true) {
-			printGridRows(self);
-
-			grid_key = kbd.getKEY();
-			// bar espace
-			if (grid_key.Key == kbd.char and
-				std.mem.eql(u8, grid_key.Char, " "))
-			{
-				grid_key.Key = kbd.enter;
-				grid_key.Char = "";
-			}
-
-			if (grid_key.Key == kbd.mouse) {
-				grid_key.Key = kbd.none;
-
-				if (term.MouseInfo.scroll) {
-					switch (term.MouseInfo.scrollDir) {
-						term.ScrollDirection.msUp => grid_key.Key = kbd.up,
-						term.ScrollDirection.msDown => grid_key.Key = kbd.down,
-						else => {},
-					}
-				} else {
-					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
-
-					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => grid_key.Key = kbd.enter,
-						term.MouseButton.mbMiddle => grid_key.Key = kbd.enter,
-						term.MouseButton.mbRight => grid_key.Key = kbd.enter,
-						else => {},
-					}
-				}
-			}
-
-			if (grid_key.Key == gKey) {
-				self.cursligne = 0;
-				gSelect.Key = kbd.ctrlV;
-				term.offMouse();
-				return gSelect;
-			}
-
-			switch (grid_key.Key) {
-				.none => continue,
-				.F1 => {},
-				.esc => {
-					self.cursligne = 0;
-					gSelect.Key = kbd.esc;
-					term.offMouse();
-					return gSelect;
-				},
-
-				.enter => if (self.lignes > 0) {
-					gSelect.Key = kbd.enter;
-					if (self.curspage > 0) {
-						CountLigne = (self.pageRows - 1) * (self.curspage - 1);
-						CountLigne += self.cursligne;
-					}
-					gSelect.Buf = self.data.items(.buf)[CountLigne];
-					term.offMouse();
-					self.cursligne = 0;
-					return gSelect;
-				},
-
-				.up => if (CountLigne > 0) {
-					CountLigne -= 1;
-					self.cursligne -= 1;
-				},
-
-				.down => if (CountLigne < self.maxligne) {
-					CountLigne += 1;
-					self.cursligne += 1;
-				},
-
-				.pageUp => {
-					if (self.curspage > 1) {
-						self.curspage -= 1;
-						self.cursligne = 0;
-						CountLigne = 0;
-						printGridHeader(self);
-					} else {
-						if (manual == true) {
-							self.cursligne = 0;
-							gSelect.Key = kbd.pageUp;
-							term.offMouse();
-							return gSelect;
-						}
-					}
-				},
-
-				.pageDown => {
-					if (self.curspage < self.pages) {
-						self.curspage += 1;
-						self.cursligne = 0;
-						CountLigne = 0;
-						printGridHeader(self);
-					} else {
-						if (manual == true) {
-							self.cursligne = 0;
-							gSelect.Key = kbd.pageDown;
-							term.offMouse();
-							return gSelect;
-						}
-					}
-				},
-				else => {},
-			}
-		}
-	}
-
+	
 	// idem iogrid with Static table data
 	pub fn ioCombo(self: *GRID, pos: usize) GridSelect {
 		var CountLigne: usize = 0;
@@ -1108,8 +981,8 @@ pub const grd = struct {
 			var r: usize = 0;
 			var n: usize = 0;
 			self.curspage = 1;
-			while (r < self.lignes) : (r += 1) {
-				if (n == self.pageRows - 1) {
+			while (r <= self.lignes) : (r += 1) {
+				if (n == self.pageRows) {
 					self.curspage += 1;
 					n = 0;
 				}
@@ -1125,15 +998,12 @@ pub const grd = struct {
 			}
 			CountLigne = pos;
 		}
-
-		term.cursHide();
 		term.onMouse();
 
 		var grid_key: term.Keyboard = undefined;
 
 		while (true) {
 			printGridRows(self);
-
 			grid_key = kbd.getKEY();
 
 			// bar espace
@@ -1168,7 +1038,9 @@ pub const grd = struct {
 				.none => continue,
 
 				.esc => {
-					self.cursligne = 0;
+
+					
+															self.cursligne = 0;
 					gSelect.Key = kbd.esc;
 					term.offMouse();
 					return gSelect;
@@ -1176,10 +1048,13 @@ pub const grd = struct {
 
 				.enter => if (self.lignes > 0) {
 					gSelect.Key = kbd.enter;
-					if (self.curspage > 0) {
-						const vline = (self.pageRows - 1) * (self.curspage - 1);
-						CountLigne += vline;
+
+					if (self.curspage > 1 ) {
+						CountLigne = (self.pageRows  ) * (self.curspage - 1);
+						CountLigne += self.cursligne ;
+						if (CountLigne > (self.data.len - 1) ) CountLigne = self.cursligne ;
 					}
+
 					gSelect.Buf = self.data.items(.buf)[CountLigne];
 					term.offMouse();
 					self.cursligne = 0;
@@ -1192,7 +1067,7 @@ pub const grd = struct {
 
 				},
 
-				.down => if (CountLigne < self.maxligne) {
+				.down => if (CountLigne < (self.data.len - 1) ) {
 					CountLigne += 1;
 					self.cursligne += 1;
 				},

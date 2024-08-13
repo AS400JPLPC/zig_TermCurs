@@ -68,6 +68,8 @@ var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
 var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
 
+
+
 //================================
 // defined var global
 

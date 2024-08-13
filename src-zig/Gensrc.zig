@@ -68,6 +68,7 @@ const allocator = std.heap.page_allocator;
 		name:  []const u8,
 		index: usize,
 		objtype: OBJTYPE,
+		func:  []const u8,
 	};
 	pub const DEFJOB = struct {
 		panel: []const u8,
@@ -95,6 +96,7 @@ var nopt : usize	= 0;
 
 const choix = enum {
 	dspf,
+	list,
 	output,
 	clean,
 	exit
@@ -154,9 +156,10 @@ pub fn main() !void {
 					mnu.CADRE.line1,		// type line fram
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
-					"Dspf",	
+					"Dspf",
+					"List",	
 					"outSrc",
-					"clear *all",
+					"Clear *all",
 					"Exit...",
 					}
 					) ;
@@ -164,7 +167,7 @@ pub fn main() !void {
 		pnl.printPanel(base);
 	while (true) {
 
-		// pnl.printPanel(base);
+		pnl.printPanel(base);
 		term.deinitTerm();
 		utl.deinitUtl();
 
@@ -172,11 +175,13 @@ pub fn main() !void {
 		nopt = mnu.ioMenu(MenuPrincipal,0);
 
 		if (nopt == @intFromEnum(choix.exit )) { break; }
+		if (nopt == @intFromEnum(choix.list ))  controlRef(NOBJET, NJOB) ;
 		if (nopt == @intFromEnum(choix.dspf)) { 
 			try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;// use mdlRjson  
 			if (NPANEL.items.len > 0) {
 				for( NPANEL.items,0..) | p , i | {
-					NOBJET.append(DEFOBJET {.name = p.name,.index = i, .objtype = OBJTYPE.PANEL}) catch unreachable;
+					NOBJET.append(DEFOBJET {.name = p.name,.index = i, .objtype = OBJTYPE.PANEL,
+					.func ="" }) catch unreachable;
 					for( p.field.items,0..) | f , x | {
 					NJOB.append(DEFJOB {.panel = p.name, .field = f.name, .index = x,
 					.func = f.procfunc , .task = f.proctask , .call =f.typecall}) catch unreachable;
@@ -184,17 +189,19 @@ pub fn main() !void {
 					}
 				}
 				for( NMENU.items,0..) | m , i | {
-					NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.MENU}) catch unreachable;
+					NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.MENU,
+					.func ="" }) catch unreachable;
 				}
 				for( NGRID.items,0..) | m , i | {
 					  if (m.name[0] == 'C')
-					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.COMBO}) catch unreachable
+					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.COMBO,
+					  	.func = "" }) catch unreachable
 					  else
-					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.SFLD}) catch unreachable;
+					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.SFLD,
+					  	.func = "" }) catch unreachable;
 
 				}		
 			}
-			controlRef(NOBJET, NJOB) ;
 			
 		}
 		
@@ -205,24 +212,28 @@ pub fn main() !void {
 
 fn controlRef(xobjet: std.ArrayList(DEFOBJET), xjob: std.ArrayList(DEFJOB)) void {
 
-deb_Log("ref_01.txt");
+	deb_Log("ref_01.txt");
 
-pref(.main).info("OBJET\n", .{});
+	pref(.main).info("OBJET\n", .{});
 
-	for( xobjet.items) | m | {
-		pref(.NOBJET).info("Name {s} \t Index {d} \t  type {}\n", .{m.name , m.index , m.objtype});
-	}
-pref(.main).info("FIELD\n", .{});
-
-for( xobjet.items) |m | {
-	pref(.NOBJET).info("Name {s} \t Index {d} \t  type {}\n", .{m.name , m.index , m.objtype});
-	for( xjob.items) | f | {
-		if (std.mem.eql(u8 ,m.name, f.panel)) { 
-			if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,""))
-			pref(.NJOB).info("Name: {s} \t0 field: {s}  \t Index: {d} \t func: {s} \t task: {s} \t call: {s} \t \n", 
-			  .{f.panel , f.field , f.index , f.func , f.task, f.call});
+		for( xobjet.items) | m | {
+			pref(.NOBJET).info("Name {s} \t Index {d} \t  type {} \t func: {s}"
+				, .{m.name , m.index , m.objtype, m.func});
 		}
-	}	
-}
-end_Log();
+		
+	pref(.main).info("\n\nFIELD\n", .{});
+
+	for( xobjet.items) |m | {
+		pref(.NOBJET).info("Name {s} \t Index {d} \t  type {}\t  func: {s}"
+			, .{m.name , m.index , m.objtype, m.func});
+		
+		for( xjob.items) | f | {
+			if (std.mem.eql(u8 ,m.name, f.panel)) { 
+				if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,""))
+				pref(.NJOB).info("Name: {s} \t0 field: {s}  \t Index: {d} \t func: {s} \t task: {s} \t call: {s}"
+				,.{f.panel , f.field , f.index , f.func , f.task, f.call});
+			}
+		}	
+	}
+	end_Log();
 }

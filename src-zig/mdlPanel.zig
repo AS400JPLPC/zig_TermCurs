@@ -1496,7 +1496,6 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
-	return;
 }
 
 fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
@@ -1511,7 +1510,6 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
-	return;
 }
 
 fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
@@ -1528,7 +1526,6 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 			pnl.msgErr(vpnl, msg);
 			vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
@@ -1545,7 +1542,6 @@ fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 	}
-	return;
 }
 
 
@@ -1561,7 +1557,6 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 
@@ -1578,7 +1573,6 @@ fn TaskPanel(VPANEL: *std.ArrayList(pnl.PANEL), vpnl: *pnl.PANEL , vfld: *fld.FI
 			return ;
 		}
 	}
-	return;
 }
 
 
@@ -1600,7 +1594,6 @@ fn TaskF9(	VPANEL: *std.ArrayList(pnl.PANEL), vpnl:*pnl.PANEL , vfld: *fld.FIELD
 		if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == panelNum) ) return ;
 
 	}
-	return ;
 }
 
 
@@ -1621,7 +1614,6 @@ fn TaskF11( VPANEL: *std.ArrayList(pnl.PANEL) ,vpnl:*pnl.PANEL , vfld: *fld.FIEL
 		if (std.mem.eql(u8, f.name, vfld.text) and ( 999 == panelNum) ) return ;
 
 	}
-	return ;
 }
 
 //=================================================
@@ -1814,7 +1806,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				NPANEL.clearAndFree();
 				NPANEL.deinit();
 				utl.deinitUtl();
-				grd.deinitGrid();
+
 				return ; 
 			},
 

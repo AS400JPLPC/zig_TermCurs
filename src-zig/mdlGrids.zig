@@ -389,9 +389,6 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 				continue;
 			},
 			.F11 => {
-				// const allocator = std.heap.page_allocator;
-				// XGRID.clearAndFree();
-				// XGRID = XGRID.init(allocator);
 				XGRID.clearRetainingCapacity();
 				for (NGRID.items, 0..) |xgrd,idx| {
 					grd.resetRows(&NGRID.items[idx]);
@@ -662,7 +659,6 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			return;
 		}
 	}
-	return;
 }
 
 
@@ -679,7 +675,6 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 			pnl.msgErr(vpnl, msg);
 			vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 
@@ -692,7 +687,6 @@ fn TaskStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
@@ -705,7 +699,6 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, msg);
 		vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 
@@ -1085,7 +1078,6 @@ fn TcellText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			vpnl.keyField = kbd.task;
 			return;
 		}
-	return;
 }
 
 fn TcellWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
@@ -1099,7 +1091,6 @@ fn TcellWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 		vpnl.keyField = kbd.task;
 	}
-	return;
 }
 fn TcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 	const vReftype = strToEnum(forms.REFTYP, vfld.text);
@@ -1151,7 +1142,6 @@ fn TcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			}
 		}
 	}
-	return;
 }
 fn TcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
@@ -1465,7 +1455,6 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
 
 	savgrid.clearAndFree();
 	savgrid.deinit();
-	return;
 }
 
 // view Cell
@@ -1621,7 +1610,6 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 
 	savcell.clearAndFree();
 	savcell.deinit();
-	return;
 }
 
 
@@ -1698,6 +1686,5 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 
 	savcell.clearAndFree();
 	savcell.deinit();
-	return;
 }
 

@@ -41,6 +41,7 @@ pub fn build(b: *std.Build) void {
 		.imports = &.{
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
+		.{ .name = "logcons",  .module = logcons_mod},
 		},
 	});
 

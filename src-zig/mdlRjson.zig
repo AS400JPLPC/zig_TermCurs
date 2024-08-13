@@ -133,7 +133,7 @@ const ArgData = struct {
 const RGRID = struct { name: []const u8, posx: usize, posy: usize , pageRows: usize, separator: []const u8,
 	 cadre: grd.CADRE, cells: std.ArrayList(DEFCELL), data: std.MultiArrayList(ArgData)};
 
-const Jgrid = enum {name, posx, posy, pagerows, separator, cadre, cells, data};
+const Jgrid = enum {name, posx, posy, pagerows, separator, cadre, cells};
 
 
 //..............................//
@@ -934,8 +934,7 @@ pub fn jsonDecode(my_json: []const u8) !void {
 					}
 					c += 1 ;
 				}
-			},
-			Jgrid.data => {}
+			}
 		}
 	} // Rgrid
 	} //nbrGrid
@@ -1532,7 +1531,4 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),
 
 
 	defer NMENU.clearAndFree();
-	return;
 }
-
-

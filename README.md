@@ -170,8 +170,13 @@ COMBO<BR/>
 &rarr;&nbsp; folder lib:      src xx.H  source files <br />
 &rarr;&nbsp; build: build+source-name ex: buildexemple <br />
 &rarr;&nbsp; makefile <br />
-<br />
+<br /> <br />
+**LIBRARY**
 
+![](assets/20240815_012345_library.png)
+
+
+<br /><br />
 <u>--peculiarity-------------------------------------------------</u><BR />
 test alt-ctrl ctrshift... etc for <br />
 
@@ -413,6 +418,15 @@ Even though both use the same routines, the functionality is different.<br />
 -  add module Gensrc :<br />
 -Added the Gensrc program, restructured logger (file), and added logcons (console). This program will create the reference between the functions areas and the Combo/Grid definitions.<br /><br />
 
+<br /><br />
+
+
+→  2024-08-14<BR/>
+-  debug GRID While testing, I found a bug due to copy-paste Pagination with value return is correct.<br />
+-  the same goes for allocator cleaning (when you want to do too well, you do too much. GRID management is no longer altered when using mdlPanel and mdlForms<br />
+-  I think it will be possible to give names to the labels in order to be able to easily do on offs<br />
+-  avec les test de génération je refait le tour de l'ensemble...<br />
+-  ps : the structures do not move, except that I deleted redundant fn ioGridKeyfn ioGridKey<br /><br />
 
 
 <br />

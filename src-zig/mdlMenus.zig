@@ -686,7 +686,6 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 			return;
 		}
 	}
-	return;
 }
 
 fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
@@ -695,7 +694,6 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, "Cadre is invalide");
 		vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 
@@ -705,7 +703,6 @@ fn TaskSens( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 		pnl.msgErr(vpnl, "Sense is invalide");
 		vpnl.keyField = kbd.task;
 		}
-	return;
 }
 
 

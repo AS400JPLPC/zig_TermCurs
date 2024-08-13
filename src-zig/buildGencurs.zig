@@ -14,7 +14,6 @@ pub fn build(b: *std.Build) void {
 
 
 	// ===========================================================
-	// const logger = b.dependency("library", .{}).module("logger");
     const cursed = b.dependency("library", .{}).module("cursed");
     const utils  = b.dependency("library", .{}).module("utils");
 	const forms  = b.dependency("library", .{}).module("forms");
@@ -137,8 +136,6 @@ pub fn build(b: *std.Build) void {
 	
 	Prog.root_module.addImport("menu" , menu);
 
-	
-	// Prog.root_module.addImport("logger" , logger);
 	
 	Prog.root_module.addImport("mdlPanel" , mdlPanel);
 
