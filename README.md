@@ -280,18 +280,45 @@ Allows for a written record of variables or waypoints.<br />
 "CALLPGM": Executes in Zig mode, manages the call and the wait.<br />
 <br />
 
+→  PANEL<BR/>
+Adding the 'mdlPanel' function.<br />
+- F2   : view panel<BR/>
+- F6   : Choix panel for update<BR/>
+- F9   : Create Panel<BR/>
+- F11  : Update Panel<BR/>
+- F12  : return<BR/>
 
-→  2024-04-23<BR/>
+
+→  FORMS<BR/>
+Adding the 'mdlForms' function.<br />
+- F1   : help<BR/>
+- F11  : update and return<BR/>
+- F12  : return<BR/>
+- Alt-T: Create Title<BR/>
+- Alt-L: Create Label<BR/>
+- Alt-F: Create Field<BR/>
+- Alt-U: Update Field<BR/>
+- Alt-H: Creat Line Horizontal<BR/>
+- Alt-V: Creat Line Vertical<BR/>
+- Alt-W: Tools menu (View ,  Order , Remove )<br />
+
+→  GRID<BR/>
 Adding the 'mdlGrid' function.<br />
+- F1   : help<BR/>
+- F11  : update and return<BR/>
+- F12  : return<BR/>
 - Alt-G: Create GRID definition<BR/>
 - Alt-C: Create text columns<BR/>
 - Alt-R: Remove GRID<BR/>
 - Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell)<br />
 
 
-→  2024-07-27<BR/>
+→  MENU<BR/>
 Added MENU definition function
 you have to understand the menu option as a fixed combo with constant values <br />
+- F1   : help<BR/>
+- F11  : update and return<BR/>
+- F12  : return<BR/>
 - Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
 - Alt-W: Tools menu (View MENU, Remove MENU)<br />
@@ -336,11 +363,12 @@ Even though both use the same routines, the functionality is different.<br />
 -  With the generation tests, I go around the whole thing again...<br />
 -  ps : the structures do not move, except that I deleted redundant fn ioGridKeyfn ioGridKey<br /><br />
 
-<br />
+<br /><br />
 →  2024-08-20<BR/>
 -  Big glitch due to copy-paste reintroduction of ioGridkey function SORRY<br />
+-  Added logsrc specifique for Gensrc<br />
 -  Added reference list: Gensrc  The program is under development but functional It helps me to go around the project again and again.<br />
-<br />
+<br /><br />
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />
