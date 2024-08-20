@@ -47,9 +47,11 @@ const reg = @import("mvzr");
 const mdlFile = @import("mdlFile");
 
 // REFERENCE CONTROL
-const deb_Log = @import("logger").openFile;   // open  file
-const end_Log = @import("logger").closeFile;  // close file
-const pref	  = @import("logger").scoped;     // print file 
+const deb_Log = @import("logsrc").openFile;   // open  file
+const del_Log = @import("logsrc").deleteFile; // delete file
+const end_Log = @import("logsrc").closeFile;  // close file
+const new_Line = @import("logsrc").newLine;   // new line
+const pref	  = @import("logsrc").scoped;     // print file 
 
 const allocator = std.heap.page_allocator;
 
@@ -68,13 +70,14 @@ const allocator = std.heap.page_allocator;
 		name:  []const u8,
 		index: usize,
 		objtype: OBJTYPE,
-		func:  []const u8,
 	};
 	pub const DEFJOB = struct {
 		panel: []const u8,
+		key: usize,
 		field: []const u8,
 		index: usize,
 		func:  []const u8,
+		fgrid: []const u8,
 		task:  []const u8,
 		call:  []const u8,
 	};
@@ -97,6 +100,7 @@ var nopt : usize	= 0;
 const choix = enum {
 	dspf,
 	list,
+	linkcombo,
 	output,
 	clean,
 	exit
@@ -157,7 +161,8 @@ pub fn main() !void {
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
 					"Dspf",
-					"List",	
+					"List",
+					"Link-Combo",
 					"outSrc",
 					"Clear *all",
 					"Exit...",
@@ -176,29 +181,28 @@ pub fn main() !void {
 
 		if (nopt == @intFromEnum(choix.exit )) { break; }
 		if (nopt == @intFromEnum(choix.list ))  controlRef(NOBJET, NJOB) ;
+		if (nopt == @intFromEnum(choix.linkcombo ))  linkCombo(base) ;
 		if (nopt == @intFromEnum(choix.dspf)) { 
 			try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;// use mdlRjson  
 			if (NPANEL.items.len > 0) {
 				for( NPANEL.items,0..) | p , i | {
-					NOBJET.append(DEFOBJET {.name = p.name,.index = i, .objtype = OBJTYPE.PANEL,
-					.func ="" }) catch unreachable;
+					NOBJET.append(DEFOBJET {.name = p.name, .index = i, .objtype = OBJTYPE.PANEL}) catch unreachable;
+					
 					for( p.field.items,0..) | f , x | {
-					NJOB.append(DEFJOB {.panel = p.name, .field = f.name, .index = x,
-					.func = f.procfunc , .task = f.proctask , .call =f.typecall}) catch unreachable;
+					NJOB.append(DEFJOB {.panel = p.name, .key = i , .field = f.name, .index = x,
+					.func = f.procfunc , .fgrid ="",
+					.task = f.proctask , .call =f.typecall}) catch unreachable;
 
 					}
 				}
 				for( NMENU.items,0..) | m , i | {
-					NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.MENU,
-					.func ="" }) catch unreachable;
+					NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.MENU}) catch unreachable;
 				}
 				for( NGRID.items,0..) | m , i | {
 					  if (m.name[0] == 'C')
-					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.COMBO,
-					  	.func = "" }) catch unreachable
+					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.COMBO}) catch unreachable
 					  else
-					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.SFLD,
-					  	.func = "" }) catch unreachable;
+					  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.SFLD}) catch unreachable;
 
 				}		
 			}
@@ -210,30 +214,176 @@ pub fn main() !void {
 	term.disableRawMode();
 }
 
-fn controlRef(xobjet: std.ArrayList(DEFOBJET), xjob: std.ArrayList(DEFJOB)) void {
+//---------------------------------
+// choix panel
+//---------------------------------
+pub fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(DEFOBJET )) usize {
+	const cellPos: usize = 0;
+	var Gkey: grd.GridSelect = undefined;
+	const Xcombo: *grd.GRID = grd.newGridC(
+		"qryPanel",
+		1,
+		1,
+		10,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer Gkey.Buf.deinit();
+	defer grd.freeGrid(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
 
-	deb_Log("ref_01.txt");
+	grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+	grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.setHeaders(Xcombo);
 
-	pref(.main).info("OBJET\n", .{});
+	for (vobjet.items) |p| {
+		if (p.objtype ==  OBJTYPE.PANEL  ){
+		grd.addRows(Xcombo, &.{ usizeToStr(p.index), p.name});
+		}
+	}
 
-		for( xobjet.items) | m | {
-			pref(.NOBJET).info("Name {s} \t Index {d} \t  type {} \t func: {s}"
-				, .{m.name , m.index , m.objtype, m.func});
+	while (true) {
+		Gkey = grd.ioCombo(Xcombo, cellPos);
+
+		if (Gkey.Key == kbd.enter) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			return strToUsize(Gkey.Buf.items[0]);
 		}
 		
-	pref(.main).info("\n\nFIELD\n", .{});
+		if (Gkey.Key == kbd.esc) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			return 999;
+		}
+	}
+}
+// order GRID
+pub fn linkCombo(vpnl :*pnl.PANEL ) void {
+	const numOBJET = qryCellGrid(vpnl, &NOBJET);
+
+
+	if (numOBJET == 999) return;
+
+	
+	var savObjet: std.ArrayList(DEFJOB) = std.ArrayList(DEFJOB).init(utl.allocUtl);
+
+	for (NJOB.items) |p| {
+		savObjet.append(p)  
+		catch |err| { @panic(@errorName(err)); };
+	}
+
+	var Gkey: grd.GridSelect = undefined;
+	const Origine: *grd.GRID = grd.newGridC(
+		"Origine",
+		2,
+		2,
+		20,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer Gkey.Buf.clearAndFree();
+	defer grd.freeGrid(Origine);
+	defer grd.allocatorGrid.destroy(Origine);
+
+
+	grd.newCell(Origine, "Key", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
+	grd.newCell(Origine, "name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "field", 3, grd.REFTYP.TEXT_FREE , term.ForegroundColor.fgYellow);
+	grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "Func", 15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+	grd.newCell(Origine, "COMBO", 15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.setHeaders(Origine);
+
+	while (true) {
+		grd.resetRows(Origine);
+		for (NJOB.items) |g| {
+			if (! std.mem.eql(u8, g.func , "")) {
+			
+				const ridx = usizeToStr(numOBJET);
+			
+
+				const index = usizeToStr(g.index) ;
+				grd.addRows(Origine, &.{ ridx, g.panel, g.field , index, g.func, g.fgrid });
+			}
+		}
+		Gkey = grd.ioGrid(Origine,false);
+		if (Gkey.Key == kbd.esc) break;	
+	}
+
+	if (Gkey.Key == kbd.esc) {
+		NJOB.clearAndFree();
+		NJOB.clearRetainingCapacity();
+
+		for (savObjet.items) |p| {
+			NJOB.append(p) 
+			 catch |err| { @panic(@errorName(err)); };
+		}
+
+		savObjet.clearAndFree();
+		savObjet.deinit();
+	}
+	term.cls();
+}
+
+ fn concatStr(a: []const u8, len: usize) []const u8 {
+ 	var b :[] const u8 = a;
+ 	while ( b.len < len ) {
+		b = std.fmt.allocPrint(	utl.allocUtl,"{s} ",.{ b}) catch unreachable;
+	}
+	return b;	
+}
+fn controlRef(xobjet: std.ArrayList(DEFOBJET), xjob: std.ArrayList(DEFJOB)) void {
+
+	del_Log("ref_01.txt");
+	deb_Log("ref_01.txt");
+
+	pref(.main).list("OBJET\n", .{});
+
+		for( xobjet.items) | m | {
+			pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
+				, .{m.name , m.index , m.objtype});
+		}
+
+	new_Line();
+	
+	pref(.main).list("FIELD\n", .{});
 
 	for( xobjet.items) |m | {
-		pref(.NOBJET).info("Name {s} \t Index {d} \t  type {}\t  func: {s}"
-			, .{m.name , m.index , m.objtype, m.func});
+		if ( m.objtype == OBJTYPE.PANEL) {
+		pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
+			, .{m.name , m.index , m.objtype});
 		
 		for( xjob.items) | f | {
 			if (std.mem.eql(u8 ,m.name, f.panel)) { 
-				if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,""))
-				pref(.NJOB).info("Name: {s} \t0 field: {s}  \t Index: {d} \t func: {s} \t task: {s} \t call: {s}"
-				,.{f.panel , f.field , f.index , f.func , f.task, f.call});
+				if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,"")){
+				
+				const field = concatStr(f.field ,15);
+				const func  = concatStr(f.func  ,15);
+				const fgrid = concatStr(f.fgrid ,15);
+				const task  = concatStr(f.task  ,15);
+				const call  = concatStr(f.call  ,15);
+				pref(.NJOB).detail(
+				"Name: {s} \t Key: {d} \t field: {s} \t Index: {d} \t func: {s} \t grid: {s} \t task: {s} \t call: {s}"
+				,.{f.panel , f.key , field , f.index , func , fgrid, task, call});
+				}
 			}
+		}
+
+		new_Line();
+	
+		for( xjob.items) | e | {
+			if (std.mem.eql(u8 ,m.name, e.panel)) { 
+				if ( ! std.mem.eql(u8 ,e.func ,"") and std.mem.eql(u8 ,e.fgrid,"") ) {
+					const field = concatStr(e.field ,15);
+					const func  = concatStr(e.func  ,15);
+					const fgrid = concatStr(e.fgrid ,15);
+					pref(.NJOB).detail(
+					"field: {s} \t Index: {d} \t func: {s} \t grid: {s} ERROR not assigned to combo"
+					,.{field , e.index , func , fgrid});
+				}
+			}
+		}
 		}	
 	}
 	end_Log();
 }
+

@@ -339,6 +339,7 @@ Even though both use the same routines, the functionality is different.<br />
 <br />
 →  2024-08-20<BR/>
 -  Big glitch due to copy-paste reintroduction of ioGridkey function SORRY
+-  Added reference list: Gensrc  The program is under development but functional It helps me to go around the project again and again.
 <br />
 ------------------------------------------------------------------<br />
 

@@ -14,6 +14,9 @@ pub fn build(b: *std.Build) void {
 	const logcons_mod = b.addModule("logcons", .{
 		.root_source_file =  b.path( "./log/logcons.zig" ),
 	});
+	const logsrc_mod = b.addModule("logsrc", .{
+		.root_source_file =  b.path( "./log/logsrc.zig" ),
+	});
 
 	const cursed_mod = b.addModule("cursed", .{
 		.root_source_file = b.path( "./curse/cursed.zig" ),
@@ -109,7 +112,8 @@ pub fn build(b: *std.Build) void {
 		
 		.{ .name = "logger",	.module = logger_mod },
 		.{ .name = "logcons",	.module = logcons_mod },
-			
+		.{ .name = "logsrc",	.module = logsrc_mod },
+
 		},
 	});
 
