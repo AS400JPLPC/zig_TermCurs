@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.13.0**</u><BR />
+<u>**zig 0.14.DEV**</u><BR />
 <br />
 
 **TESTING** <br />
@@ -282,7 +282,6 @@ Allows for a written record of variables or waypoints.<br />
 
 
 →  2024-04-23<BR/>
-new version zig 0.12.0 stable
 Adding the 'mdlGrid' function.<br />
 - Alt-G: Create GRID definition<BR/>
 - Alt-C: Create text columns<BR/>
