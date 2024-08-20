@@ -280,68 +280,6 @@ Allows for a written record of variables or waypoints.<br />
 "CALLPGM": Executes in Zig mode, manages the call and the wait.<br />
 <br />
 
-<br />
-"INFO"<br />
-Display attributes are in CURSED, e.g., term.ZONATRB, the CURSOR type.<br />
-REFTYP is in Forms and Grid.<br />
-CTRUE/CFALSE are in Forms and Grid.<br />
-CADRE is in Forms and Grid.<br />
-LINE is in Forms.<br />
-"CURSED" and "UTILS" are being called within "Forms", "Grid" and "Menu"<br />
-"MATCH" are being called within "Forms"<br />
-<br />
-<br />
-<br /><br />
-→  2024-01-05<br />
-    I tested with two versions, 0.11.0 and 0.12.0-dev. Everything works fine except in mdlFile.zig:<br />
-
-```
-// 0.11.0 active
-const iter_dir = try std.fs.cwd().openIterableDir(vdir, .{});
-
-// 0.12.0 
-// const iter_dir = std.fs.cwd().openDir(vdir, .{.iterate = true}) catch unreachable;
-```
-
-<BR/>
-→  2024-02-01<br />
-**Significant modification due to the addition of the callPgm function (module.zig).**<br />
-&nbsp;&nbsp;&nbsp;.Exec to the program associated with the Field zone. CTRL+P <br /><br />
-&nbsp;&nbsp;&nbsp;.Look at the example: Exemple.zig, the execve function in the source /deps/callpgm.zig.<br /><br />
-&nbsp;&nbsp;&nbsp;.Several corrections: handling of Fields within the Panel function, plus a few message associations...<br /><br />
-&nbsp;&nbsp;&nbsp;.Addition to the Field structure: progcall zone [] const u8, setCall, and getCall functions.<br /><br />
-→  2024-02-02<br />
-&nbsp;&nbsp;&nbsp;.correction mineur<br />
-------------------------------------------------------------------<br />
-→  2024-02-10<br />
-The 'exemple' folder demonstrates how to use a shared library in your project that may contain multiple programs.<br />
-<br />
-→  2024-02-14<br />
-Correction of the "rstpanel" function.<br />
-Correction of "label.name" (memory issue).<br />
-Possibility of adding the program name to an input field.<br />
-Correct alignment in the Json backup files.<br />
-<br />
-I am progressing slowly (many tests). I have even considered directly addressing the memory.<br />
-<BR/><BR/>
-<BR/>
-→  2024-03-25<BR/>
-&nbsp;&nbsp;&nbsp; update version 0.12.0-dev.3429.<BR/>
-Inclusion of modules callPgmPid, zmmap  only v0.12
-
-Addition of the updateField function from mdlForms
-
-Minor correction in ioCombo, the cursor wasn't moving up
-
-In cursed, the handling of IOCTL has changed with the new Zig version
-
-I've left the lines for downgrading, with 2 or 3 exceptions.(cursed)
-
-Afterwards, I will only work with version 0.12.dev.
-
-test  :  "./Gen"  for Gencurs
-
-I'm still mulling over my design for the table generator.
 
 →  2024-04-23<BR/>
 new version zig 0.12.0 stable
@@ -352,41 +290,12 @@ Adding the 'mdlGrid' function.<br />
 - Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell)<br />
 
 
-→  2024-06-29<BR/>
-new version zig 0.13.0 stable<br />
-Implementation of the lib "library" removal of "deps"<br />
-I'm making progress, this MENU <br />
-
-→  2024-07-03<BR/> 
-curse/forms shell <br />
-
-
-→  2024-07-22<BR/> 
--  big update cursed  F1..F36 extension <br />
--  Change of REGEX module <br />
-Following the work provided by **Sam Atman**, a basic "regex" library allowing on-the-fly constraint testing of a form, all written in ZIG, now my project is in pure ZIG.
--  Therefore, update of the forms module, revision of the mdlPanel module to integrate the functions F1..F36, and correction of an error in mdlJson. <br />
-
-
-→  2024-07-23<BR/>
--  correction of mdlForms following the inclusion of the new regex module. <br />
-
 →  2024-07-27<BR/>
 Added MENU definition function
 you have to understand the menu option as a fixed combo with constant values <br />
 - Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
 - Alt-W: Tools menu (View MENU, Remove MENU)<br />
-
-I'm making progress, and I'm going to create the JSON.<br />
-
-
-→  2024-07-31<BR/>
-**JSON function enabled for grid and menu.**<br />
-- full test GRID/MENU<BR/>
-- various changes due to testing and implementation of the JSON function<BR/>
-- This should not alter the old definitions.<BR/>
-- you will find results in the dspf directory<BR/>
 
 
 →  2024-08-03 / 04 <BR/>
@@ -425,10 +334,12 @@ Even though both use the same routines, the functionality is different.<br />
 -  debug GRID While testing, I found a bug due to copy-paste Pagination with value return is correct.<br />
 -  the same goes for allocator cleaning (when you want to do too well, you do too much. GRID management is no longer altered when using mdlPanel and mdlForms<br />
 -  I think it will be possible to give names to the labels in order to be able to easily do on offs<br />
--  avec les test de génération je refait le tour de l'ensemble...<br />
+-  With the generation tests, I go around the whole thing again...<br />
 -  ps : the structures do not move, except that I deleted redundant fn ioGridKeyfn ioGridKey<br /><br />
 
-
+<br />
+→  2024-08-20<BR/>
+-  Big glitch due to copy-paste reintroduction of ioGridkey function SORRY
 <br />
 ------------------------------------------------------------------<br />
 
