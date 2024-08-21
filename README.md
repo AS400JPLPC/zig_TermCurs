@@ -329,7 +329,7 @@ Added Gensrc definition Programme<br />
 - Dspf       : choix du model <BR/>
 - Control    : list control <BR/>
 - List       : List of the DSPF nomencalature <BR/>
-- Link-Combo : combo assignment<BR/>
+- Link-Combo : combo assignment    CtrlV validation <BR/>
 - outSrc     : ???? <BR/>
 - Clear *all : Cleaning arraylist buffers<BR/> 
 - Exit       : Exit <BR/>

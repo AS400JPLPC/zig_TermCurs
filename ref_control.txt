@@ -1,0 +1,41 @@
+[Objet(NOBJET)] Name Xpanel 	 Index 0 	  type Gensrc.OBJTYPE.PANEL
+[Objet(NOBJET)] Name Gtable 	 Index 0 	  type Gensrc.OBJTYPE.SFLD
+[Objet(NOBJET)] Name CVoiture 	 Index 1 	  type Gensrc.OBJTYPE.COMBO
+[Objet(NOBJET)] Name Cmarque 	 Index 2 	  type Gensrc.OBJTYPE.COMBO
+
+
+[Objet(NOBJET)] Name Xpanel 	 Index 0 	  type Gensrc.OBJTYPE.PANEL
+
+┌────────────┬─────┬─────────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
+│ Name       │ Key │ field           │ Index │ func            │ grid            │ task            │ call            │
+├────────────┼─────┼─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
+│ Xpanel     │   0 │ NOM             │     0 │                 │                 │ TNOM            │                 │
+│ Xpanel     │   0 │ PRENOM          │     1 │                 │                 │ TPRENOM         │                 │
+│ Xpanel     │   0 │ FREE            │     2 │                 │                 │ TFREE           │                 │
+│ Xpanel     │   0 │ FULL            │     3 │                 │                 │ TFULL           │                 │
+│ Xpanel     │   0 │ ALPHA           │     4 │                 │                 │ TALPHA          │                 │
+│ Xpanel     │   0 │ ALPHAUPPER      │     5 │                 │                 │ TALPHAUPPER     │                 │
+│ Xpanel     │   0 │ ALPHANUM        │     6 │                 │                 │ TALPHANUM       │                 │
+│ Xpanel     │   0 │ ALPHANUMUPPER   │     7 │                 │                 │ TALPHANUMUPPER  │                 │
+│ Xpanel     │   0 │ PASSWORD        │     8 │                 │                 │ TPASSWORD       │                 │
+│ Xpanel     │   0 │ YESNO           │     9 │                 │                 │ TYESNO          │                 │
+│ Xpanel     │   0 │ UDIGIT          │    10 │                 │                 │ TUDIGIT         │                 │
+│ Xpanel     │   0 │ DIGIT           │    11 │                 │                 │ TDIGIT          │                 │
+│ Xpanel     │   0 │ UDECIMAL        │    12 │                 │                 │ TUDECIMAL       │                 │
+│ Xpanel     │   0 │ DECIMAL         │    13 │                 │                 │ TDECIMAL        │                 │
+│ Xpanel     │   0 │ DATEISO         │    14 │                 │                 │ TDATEISO        │                 │
+│ Xpanel     │   0 │ DATEFR          │    15 │                 │                 │ TDATEFR         │                 │
+│ Xpanel     │   0 │ DATEUS          │    16 │                 │                 │ TDATEUS         │                 │
+│ Xpanel     │   0 │ TELEPHONE       │    17 │                 │                 │ TTELEPHONE      │                 │
+│ Xpanel     │   0 │ MAILISO         │    18 │                 │                 │ TMAILISO        │                 │
+│ Xpanel     │   0 │ SWITCH          │    19 │                 │                 │ TSWITCH         │                 │
+│ Xpanel     │   0 │ FUNC            │    20 │ FFUNC           │                 │ TFUNC           │                 │
+│ Xpanel     │   0 │ FUNC2           │    21 │ FFUNC2          │                 │ TFUNC2          │                 │
+└────────────┴─────┴─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
+
+┌─────────────────┬───────┬─────────────────┬─────────────────┬─────────────────────────────┐
+│ field           │ Index │ func            │ grid            │                             │
+├─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────────────────┤
+│ FUNC            │    20 │ FFUNC           │                 │ ERROR not assigned to combo │
+│ FUNC2           │    21 │ FFUNC2          │                 │ ERROR not assigned to combo │
+└─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────────────────┘
