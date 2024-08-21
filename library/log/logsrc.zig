@@ -13,22 +13,20 @@ var flog :std.fs.File = undefined;
 
 pub const EnumList = enum {
 	err,
-	list,
 	objet,
-	detail,
+	ligne,
 	
 	pub fn asText(comptime self: EnumList) []const u8 {
 	    return switch (self) {
 	        .err => "error",
-	        .list => "List",
 	        .objet => "Objet",
-	        .detail  => "Detail",
+	        .ligne => "ligne",
 	    };
     }
 };
 
 
-pub fn customLog(
+fn customLog(
 	comptime message_level: EnumList,
 	comptime scope: @Type(.EnumLiteral),
 	comptime format: []const u8,
@@ -45,11 +43,31 @@ pub fn customLog(
 	const scope_name = "(" ++ @tagName(scope) ++ ")";
 
 
-    const writer = flog.writer();
+	const writer = flog.writer();
     	nosuspend {
         	writer.print("[" ++  level_txt ++ scope_name ++  "] " ++ format ++ "\n", args) catch return;
     	}
-	}
+}
+
+
+fn editLog(
+	comptime format: []const u8,
+	args: anytype,
+
+) void {
+	if (builtin.os.tag == .freestanding)
+		@compileError(
+			\\freestanding targets do not have I/O configured;
+			\\please provide at least an empty `log` function declaration
+		);
+
+	 const writer = flog.writer();
+    	nosuspend {
+        	writer.print("" ++ format ++ "\n", args) catch return;
+    	}
+}
+
+
 
 pub fn scoped(comptime scope: @Type(.EnumLiteral))  type {
 	return struct {
@@ -58,19 +76,17 @@ pub fn scoped(comptime scope: @Type(.EnumLiteral))  type {
 			customLog(.err, scope, format, args);
 		}
 
-		pub fn list(comptime format: []const u8, args: anytype) void {
-			customLog(.list, scope, format, args);
-		}
-		
 		pub fn objet(comptime format: []const u8, args: anytype) void {
 			customLog(.objet, scope, format, args);
 		}
 		
-		pub fn detail(comptime format: []const u8, args: anytype) void {
-			customLog(.detail, scope, format, args);
+		pub fn ligne(comptime format: []const u8, args: anytype) void {
+			editLog(format, args);
 		}
+
 	};
 }
+
 
 pub fn openFile(log:[]const u8) void {
 	flog = std.fs.cwd().createFile(log, .{ .read = true }) 
@@ -78,7 +94,14 @@ pub fn openFile(log:[]const u8) void {
 }
 
 pub fn deleteFile(log:[]const u8) void {
-	std.fs.cwd().deleteFile(log) catch unreachable;
+
+		_ = std.fs.cwd().createFile(log, .{ .read = true }) catch |e|
+		switch (e) {
+			error.PathAlreadyExists => std.fs.cwd().deleteFile(log) catch unreachable,
+
+			else =>{} ,
+		};
+	return;	
 }
 
 pub fn closeFile() void {
@@ -97,6 +120,5 @@ pub fn newLine() void {
 pub const default_log_scope = .default;
 pub const default = scoped(default_log_scope);
 pub const err = default.err;
-pub const list = default.list;
 pub const objet  = default.objet;
-pub const detail = default.objet;
+pub const ligne  = default.objet;

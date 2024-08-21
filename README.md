@@ -324,51 +324,20 @@ you have to understand the menu option as a fixed combo with constant values <br
 - Alt-W: Tools menu (View MENU, Remove MENU)<br />
 
 
-→  2024-08-03 / 04 <BR/>
-*backup/restore*<br />
-**add directory choice**<br />
-**sort directory and files**<br />
-- Small bug fixed with testing<br /><br />
-- this morning some big tests:<br /><br />
-- refining uppercase extended ascii mode<br />
-- in-depth regex test MVRZR MACH activation<br />
-- scan and roll test JSON<br /><br />
+→  Gensrc<BR/>
+Added Gensrc definition Programme<br />
+- Dspf       : choix du model <BR/>
+- Control    : list control <BR/>
+- List       : List of the DSPF nomencalature <BR/>
+- Link-Combo : combo assignment<BR/>
+- outSrc     : ???? <BR/>
+- Clear *all : Cleaning arraylist buffers<BR/> 
+- Exit       : Exit <BR/>
 
 
-→  2024-08-12<BR/>
--  upgrade version 0.13 / 0.14 token<br /><br />
--  debug GRID  add type :<br />
-I made an update in the GRID module:<br />
-
-There are two ways to manage grids:<br />
-a) Combo starts with the letter C.<br />
-b) Grid starts with the letter G.<br />
-
-Why this naming convention? It's for code generation. A Combo handles a single value and is loaded as a fixed value.<br />
-
-For the Grid, it should be considered as a sub-file that can paginate, return multiple values, etc.<br />
-
-Even though both use the same routines, the functionality is different.<br />
--  add orderGrid :<br /><br />
--  add module Gensrc :<br />
--Added the Gensrc program, restructured logger (file), and added logcons (console). This program will create the reference between the functions areas and the Combo/Grid definitions.<br /><br />
-
-<br /><br />
-
-
-→  2024-08-14<BR/>
--  debug GRID While testing, I found a bug due to copy-paste Pagination with value return is correct.<br />
--  the same goes for allocator cleaning (when you want to do too well, you do too much. GRID management is no longer altered when using mdlPanel and mdlForms<br />
--  I think it will be possible to give names to the labels in order to be able to easily do on offs<br />
--  With the generation tests, I go around the whole thing again...<br />
--  ps : the structures do not move, except that I deleted redundant fn ioGridKeyfn ioGridKey<br /><br />
-
-<br /><br />
-→  2024-08-20<BR/>
--  Big glitch due to copy-paste reintroduction of ioGridkey function SORRY<br />
--  Added logsrc specifique for Gensrc<br />
--  Added reference list: Gensrc  The program is under development but functional It helps me to go around the project again and again.<br />
-<br /><br />
+→ 2024-08-20<BR/>
+- Test programme Gensrc.   It remains to determine the folders of the lists and the source output<BR/>
+- To see how it works  dspf/ntest 
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />

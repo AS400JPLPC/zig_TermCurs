@@ -638,7 +638,7 @@
   ],
   "GRID": [
     {
-      "name": "grid01",
+      "name": "Ggrid01",
       "posx": 11,
       "posy": 7,
       "pagerows": 5,
@@ -683,33 +683,6 @@
         },
         {
           "text": "exit"
-        }
-      ]
-    },
-    {
-      "name": "menu02",
-      "posx": 13,
-      "posy": 18,
-      "cadre": "line1",
-      "mnuvh": "horizontal",
-      "xitems": [
-        {
-          "text": "a"
-        },
-        {
-          "text": "z"
-        },
-        {
-          "text": "e"
-        },
-        {
-          "text": "r"
-        },
-        {
-          "text": "t"
-        },
-        {
-          "text": "y"
         }
       ]
     }
