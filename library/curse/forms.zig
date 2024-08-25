@@ -79,7 +79,7 @@ pub const REFTYP = enum {
 
 
 
-// function special for developpeur
+/// function special for developpeur
 pub fn debeug(vline : usize, buf: [] const u8) void {
 	
 	const AtrDebug : term.ZONATRB = .{
@@ -1312,8 +1312,9 @@ pub const	fld = struct {
 			.atrCall    = AtrCall,
 			.actif	= true
 		};
-		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
-			"{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
+		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}",.{vregex})
+			 catch |err| { @panic(@errorName(err));} ;
+		
 		return xfield;
 
 	}
@@ -1751,7 +1752,7 @@ pub const	fld = struct {
 
 	// https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 			xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
-			,.{"^[a-zA-Z0-9_!#$%&=.-^~|?*+'`{}/]+@([a-zA-Z0-9.-])+$"})
+			,.{"^[a-zA-Z0-9_!#$%&=.^~|?*+'`{}/-]+@([a-zA-Z0-9.-])+$"})
 			catch |err| { @panic(@errorName(err));};
 			
 			if (xfield.help.len == 0 ) xfield.help = "ex: myname.my_firstname@gmail.com" ;
@@ -2369,19 +2370,11 @@ pub const	fld = struct {
 	//----------------------------------------------------
 
 
+
 	pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
-         const maybe_regex = reg.compile(pattern) ;
-	     if (maybe_regex) |regex|{
-	         const match1 = regex.match(testval);
-	        if (match1) |m1| {
-	            if (testval.len ==  m1.end) return true;
-	        } else {
-	            return false;
-	        }   
-	     }  
-	     return false ;   
-       
-	 }
+	     const maybe_regex = reg.compile(pattern) ;
+	      if (maybe_regex) |regex|{     return regex.isMatch(testval);} else return false;
+	}
 
 
 	pub fn isMatchiFixedIso(testval : [] const u8) bool { 
@@ -2390,15 +2383,7 @@ pub const	fld = struct {
     
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
 	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
-	    if (maybe_regex) |regex|{
-	         const match1 = regex.match(testval);
-	        if (match1) |m1| {
-	            if (testval.len ==  m1.end) return true;
-	        } else {
-	            return false;
-	        }   
-	     }  
-	     return false ; 
+	    if (maybe_regex) |regex|{     return regex.isMatch(testval);} else return false;
 	}
 
 	
@@ -2415,15 +2400,8 @@ pub const	fld = struct {
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
 	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
 
-	   if (maybe_regex) |regex|{
-	         const match1 = regex.match(valtest);
-	        if (match1) |m1| {
-	            if (testval.len ==  m1.end) return true;
-	        } else {
-	            return false;
-	        }   
-	     }  
-	     return false ; 
+	   if (maybe_regex) |regex|{     return regex.isMatch(valtest);} else return false;
+
 	}
 
 	pub fn isMatchiFixedUs(testval : [] const u8) bool {
@@ -2438,15 +2416,7 @@ pub const	fld = struct {
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
 	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
 
-	   if (maybe_regex) |regex|{
-	         const match1 = regex.match(valtest);
-	        if (match1) |m1| {
-	            if (testval.len ==  m1.end) return true;
-	        } else {
-	            return false;
-	        }   
-	     }  
-	     return false ; 
+	   if (maybe_regex) |regex|{     return regex.isMatch(valtest);} else return false;
 	}
 
 
@@ -2868,7 +2838,7 @@ pub const	fld = struct {
 								}
 							},	
 							else => { 
-								if ( ! isMatch(utl.trimStr(utl.listToStr(e_FIELD,)) ,vfld.regex) ) {
+								if ( ! isMatch(ToStr(utl.trimStr(utl.listToStr(e_FIELD))) ,vfld.regex) ) {
 									msgErr(vpnl,vfld,vfld.errmsg);
 									e_curs = e_posy;
 									e_count = 0 ;

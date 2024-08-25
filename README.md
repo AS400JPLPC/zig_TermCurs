@@ -338,6 +338,16 @@ Added Gensrc definition Programme<br />
 → 2024-08-20<BR/>
 - Test programme Gensrc.   It remains to determine the folders of the lists and the source output<BR/>
 - To see how it works  dspf/ntest 
+
+
+
+→ 2024-08-25<BR/>
+- Improved isMatch regex from forms function<BR/>
+- watch the program exemple.zig<BR/>
+
+
+
+
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />

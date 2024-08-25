@@ -204,11 +204,11 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
 	Panel.field.append(fld.newFieldAlphaNumeric("alphaN",7,32,				// Name , posx posy
 										30,									// width
-										"abcd12345",						// text
+										"abécàd12345",						// text
 										true,								// tofill
 										"required",							// error msg
 										"please enter text Alpha Numéric",	// help
-										"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$",	// regex
+										"^[a-zA-Z]{1,}",					// regex
 										)
 	) catch unreachable ;
 
