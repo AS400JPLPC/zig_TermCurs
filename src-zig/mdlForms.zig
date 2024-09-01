@@ -829,7 +829,7 @@ const fp02 = enum {
 
 //  string return enum
 fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
-	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
+	inline for (@typeInfo(EnumTag).@"enum".fields) |f| {
 		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
 	}
 
@@ -1256,12 +1256,10 @@ pub const FuncEnum = enum {
 	}
 
 	fn searchFn(vtext: []const u8) FuncEnum {
-		const max: usize = @typeInfo(FuncEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(FuncEnum).Enum.fields) |f| {
+		inline for (@typeInfo(FuncEnum).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncEnum, @enumFromInt(f.value));
 		}
-		return @as(FuncEnum, @enumFromInt(max));
+		return FuncEnum.none;
 	}
 };
 //---------------------------------------------------------------------------
@@ -1506,12 +1504,10 @@ pub const TaskEnum = enum {
 		}
 	}
 	fn searchFn(vtext: []const u8) TaskEnum {
-		const max: usize = @typeInfo(TaskEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(TaskEnum).Enum.fields) |f| {
+		inline for (@typeInfo(TaskEnum).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskEnum, @enumFromInt(f.value));
 		}
-		return @as(TaskEnum, @enumFromInt(max));
+		return TaskEnum.none;
 	}
 };
 //---------------------------------------------------------------------------

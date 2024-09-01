@@ -1,4 +1,5 @@
-	///-----------------------
+
+		///-----------------------
 	/// prog Exemple 
 	/// zig 0.13.0 dev
 	///-----------------------
@@ -583,10 +584,8 @@ pub const FnEnum = enum {
 	}
 
 	fn searchFn ( vtext: [] const u8 ) FnEnum {
-	var i	 :usize = 0;
-	const max :usize = @typeInfo(FnEnum).Enum.fields.len;
-		while( i < max ) : (i += 1) {
-		if ( std.mem.eql(u8, @tagName(@as(FnEnum,@enumFromInt(i))), vtext)) return @as(FnEnum,@enumFromInt(i));
+		inline for (@typeInfo(FnEnum).@"enum".fields) |f| { 
+				if ( std.mem.eql(u8, f.name , vtext) ) return @as(FnEnum,@enumFromInt(f.value));
 		}
 		return FnEnum.none;
 
@@ -658,12 +657,10 @@ pub const TaskEnum = enum {
 				}
 	}
 	fn searchFn ( vtext: [] const u8 ) TaskEnum {
-		const max :usize = @typeInfo(TaskEnum).Enum.fields.len - 1;
-		
-		inline for (@typeInfo(TaskEnum).Enum.fields) |f| { 
+		inline for (@typeInfo(TaskEnum).@"enum".fields) |f| { 
 				if ( std.mem.eql(u8, f.name , vtext) ) return @as(TaskEnum,@enumFromInt(f.value));
 		}
-		return @as(TaskEnum,@enumFromInt(max));
+		return TaskEnum.none;
 	}
 };
 
@@ -698,9 +695,10 @@ pub const FnProg = enum {
 
 	fn searchFn ( vtext: [] const u8 ) FnProg {
 	var i	 :usize = 0;
-	const max :usize = @typeInfo(FnProg).Enum.fields.len;
+	const max : usize =  @typeInfo(FnProg).@"enum".fields.len;
+	
 		while( i < max ) : (i += 1) {
-		if ( std.mem.eql(u8, @tagName(@as(FnProg,@enumFromInt(i))), vtext)) return @as(FnProg,@enumFromInt(i));
+			if ( std.mem.eql(u8, @tagName(@as(FnProg,@enumFromInt(i))), vtext)) return @as(FnProg,@enumFromInt(i));
 		}
 		return FnProg.none;
 

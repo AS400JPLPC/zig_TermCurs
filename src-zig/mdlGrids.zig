@@ -638,12 +638,10 @@ pub const FuncGrid = enum {
 	}
 
 	fn searchFn(vtext: []const u8) FuncGrid {
-		const max: usize = @typeInfo(FuncGrid).Enum.fields.len - 1 ;
-
-		inline for (@typeInfo(FuncGrid).Enum.fields) |f| {
+		inline for (@typeInfo(FuncGrid).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncGrid, @enumFromInt(f.value));
 		}
-		return @as(FuncGrid, @enumFromInt(max));
+		return FuncGrid.none;
 	}
 };
 
@@ -723,12 +721,10 @@ pub const TaskGrid= enum {
 		}
 	}
 	fn searchFn(vtext: []const u8) TaskGrid {
-		const max: usize = @typeInfo(TaskGrid).Enum.fields.len - 1;
-
-		inline for (@typeInfo(TaskGrid).Enum.fields) |f| {
+		inline for (@typeInfo(TaskGrid).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskGrid, @enumFromInt(f.value));
 		}
-		return @as(TaskGrid, @enumFromInt(max));
+		return TaskGrid.none;
 	}
 };
 //---------------------------------------------------------------------------
@@ -923,7 +919,7 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
 //---------------------------------------------------------------------------
 //  string return enum
 fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
-	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
+	inline for (@typeInfo(EnumTag).@"enum".fields) |f| {
 		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
 	}
 
@@ -1059,12 +1055,10 @@ pub const FcellEnum = enum {
 	}
 
 	fn searchFn(vtext: []const u8) FcellEnum {
-		const max: usize = @typeInfo(FcellEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(FcellEnum).Enum.fields) |f| {
+		inline for (@typeInfo(FcellEnum).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(FcellEnum, @enumFromInt(f.value));
 		}
-		return @as(FcellEnum, @enumFromInt(max));
+		return FcellEnum.none;
 	}
 };
 //---------------------------------------------------------------------------
@@ -1176,12 +1170,10 @@ pub const TcellEnum = enum {
 		}
 	}
 	fn searchFn(vtext: []const u8) TcellEnum {
-		const max: usize = @typeInfo(TcellEnum).Enum.fields.len - 1;
-
-		inline for (@typeInfo(TcellEnum).Enum.fields) |f| {
+		inline for (@typeInfo(TcellEnum).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(TcellEnum, @enumFromInt(f.value));
 		}
-		return @as(TcellEnum, @enumFromInt(max));
+		return TcellEnum.none;
 	}
 };
 //---------------------------------------------------------------------------

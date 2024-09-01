@@ -10,7 +10,7 @@ const root = @import("root");
 
 pub fn customLog(
 	comptime message_level: std.log.Level,
-	comptime scope: @Type(.EnumLiteral),
+	comptime scope: @Type(.@"enum_literal"),
 	comptime format: []const u8,
 	args: anytype,
 
@@ -37,10 +37,9 @@ pub fn customLog(
     	}
 	}
 
-pub fn scoped(comptime scope: @Type(.EnumLiteral)) type {
+pub fn scoped(comptime scope: @Type(.@"enum_literal")) type {
 	return struct {
 		pub fn err(comptime format: []const u8, args: anytype) void {
-			@setCold(true);
 			customLog(.err, scope, format, args);
 		}
 

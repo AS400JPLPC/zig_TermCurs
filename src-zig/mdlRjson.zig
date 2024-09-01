@@ -186,7 +186,7 @@ var NMENU  = std.ArrayList(DEFMENU ).init(allocatorJson);
 //..............................//
 
 fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
-	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
+	inline for (@typeInfo(EnumTag).@"enum".fields) |f| {
 		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
 	}
 

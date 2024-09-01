@@ -101,7 +101,7 @@ fn usizeToStr(v: usize) []const u8 {
 
 
 fn strToEnum(comptime EnumTag: type, vtext: []const u8) EnumTag {
-	inline for (@typeInfo(EnumTag).Enum.fields) |f| {
+	inline for (@typeInfo(EnumTag).@"enum".fields) |f| {
 		if (std.mem.eql(u8, f.name, vtext)) return @field(EnumTag, f.name);
 	}
 
@@ -664,12 +664,10 @@ pub const FuncMenu = enum {
 	}
 
 	fn searchFn(vtext: []const u8) FuncMenu {
-		const max: usize = @typeInfo(FuncMenu).Enum.fields.len - 1 ;
-
-		inline for (@typeInfo(FuncMenu).Enum.fields) |f| {
+		inline for (@typeInfo(FuncMenu).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(FuncMenu, @enumFromInt(f.value));
 		}
-		return @as(FuncMenu, @enumFromInt(max));
+		return FuncMenu.none;
 	}
 };
 
@@ -726,12 +724,10 @@ pub const TaskMenu= enum {
 		}
 	}
 	fn searchFn(vtext: []const u8) TaskMenu {
-		const max: usize = @typeInfo(TaskMenu).Enum.fields.len - 1;
-
-		inline for (@typeInfo(TaskMenu).Enum.fields) |f| {
+		inline for (@typeInfo(TaskMenu).@"enum".fields) |f| {
 			if (std.mem.eql(u8, f.name, vtext)) return @as(TaskMenu, @enumFromInt(f.value));
 		}
-		return @as(TaskMenu, @enumFromInt(max));
+		return TaskMenu.none;
 	}
 };
 //---------------------------------------------------------------------------

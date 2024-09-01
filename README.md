@@ -344,9 +344,13 @@ Added Gensrc definition Programme<br />
 → 2024-08-25<BR/>
 - Improved isMatch regex from forms function<BR/>
 - watch the program exemple.zig<BR/>
+<BR/>
 
 
-
+→ 2024-09-01<BR/>
+- be careful from branch 0.14. dev 1391 there are changes ex: @typeInfo(EnumTag).@"enum".fields (before .enum.fields)<BR/>
+-  delete -> setClod(true)<BR/>
+<BR/>
 
 ------------------------------------------------------------------<br />
 
