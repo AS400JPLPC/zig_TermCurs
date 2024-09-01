@@ -154,14 +154,12 @@ pub const mnu = struct {
 			if (xmenu.mnuvh == MNUVH.horizontal) {
 				for (xmenu.xitems) |txt| {
 					if (txt.len > 0) {
-						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
 						xmenu.cols += utl.nbrCharStr(txt) + mnuspc;
 						xmenu.nbr += 1;
 						xmenu.actif = true;
 					}
 				}
 				xmenu.lines = 3 ;
-				xmenu.cols -= mnuspc;
 				xmenu.cols += 1;
 			}
 		return xmenu;
@@ -291,12 +289,12 @@ pub const mnu = struct {
 					}
 					if (edt) {
 
-						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
-						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
+						else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
 						term.writeStyled(trait, vmnu.attribut);
 					} else {
-						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
-						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
+						else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
 						term.writeStyled(" ", vmnu.attribut);
 					}
 
@@ -314,8 +312,8 @@ pub const mnu = struct {
 		var n: usize = 0;
 		var h: usize = 0;
 
-		const x: usize = vmnu.posx + 1;
-		const y: usize = vmnu.posy + 1;
+		const x: usize = vmnu.posx ;
+		const y: usize = vmnu.posy ;
 
 		if ( !vmnu.actif) return;
 		printMenu(vmnu);
@@ -341,7 +339,6 @@ pub const mnu = struct {
 					else
 						term.gotoXY(x + 1, h + y + 1);
 				}
-				//var xcell = utl.Trim(cell);
 				if (pos == n)
 					term.writeStyled(cell, vmnu.attrBar)
 				else
@@ -365,8 +362,8 @@ pub const mnu = struct {
 		var pos: usize = npos;
 		var n: usize = 0;
 		var h: usize = 0;
-		const x: usize = vmnu.posx + 1;
-		const y: usize = vmnu.posy + 1;
+		const x: usize = vmnu.posx ;
+		const y: usize = vmnu.posy ;
 
 		term.onMouse();
 		term.cursHide();

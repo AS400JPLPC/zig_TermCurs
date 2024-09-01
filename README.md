@@ -322,6 +322,9 @@ you have to understand the menu option as a fixed combo with constant values <br
 - Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
 - Alt-W: Tools menu (View MENU, Remove MENU)<br />
+- Alt-X: Fixed display menu<br />
+- Alt-R: Fefresh terminal<br />
+
 
 
 →  Gensrc<BR/>
@@ -350,6 +353,9 @@ Added Gensrc definition Programme<br />
 → 2024-09-01<BR/>
 - be careful from branch 0.14. dev 1391 there are changes ex: @typeInfo(EnumTag).@"enum".fields (before .enum.fields)<BR/>
 -  delete -> setClod(true)<BR/>
+-  add Alt-X function display menu<BR/>
+-  add Alt-R function display terminal actif<BR/>
+-  x,y menu positioning fix<BR/>
 <BR/>
 
 ------------------------------------------------------------------<br />

@@ -225,7 +225,7 @@ pub fn Panel_HELP() *pnl.PANEL {
 	Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
 								"","",
 								"")) catch unreachable ;
-	fld.setProtect(Panel,0,true) catch unreachable;
+	fld.setProtect(Panel,1,true) catch unreachable;
 	return Panel;
 	}
 
@@ -420,7 +420,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 			.F1	 => {
 				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-M add-Menu  Alt-C add-Cell")
 					catch unreachable;
-				fld.setText(pFmtH01,1,"AltW  view  / remove")
+				fld.setText(pFmtH01,1,"AltW  view  / remove  Alt-X fixed display menu  Alt-R refresh")
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
@@ -511,7 +511,31 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 					term.onMouse();
 				}
 			},
-			
+			// view
+			.altX => {
+				numMenu = qryCellMenu(pFmt01, &NMENU);
+
+				if (numMenu != 999) {
+					term.offMouse();
+					const Menudisplay = mnu.newMenu(
+									NMENU.items[numMenu].name,			// name
+									NMENU.items[numMenu].posx,			// posx
+									NMENU.items[numMenu].posy,			// posy
+									NMENU.items[numMenu].cadre,			// type line fram
+									NMENU.items[numMenu].mnuvh,			// type menu vertical / horizontal
+									NMENU.items[numMenu].xitems,			// Item const 
+									) ;
+					_= mnu.ioMenu(Menudisplay,0);
+					term.gotoXY(1,1);
+					term.onMouse();
+				}
+			},
+			// view
+			.altR => {
+					term.cls();
+					pnl.printPanel(pFmt01);
+					term.onMouse();
+			},
 			else => {},
 		}
 	}
