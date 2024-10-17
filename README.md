@@ -297,6 +297,7 @@ Adding the 'mdlForms' function.<br />
 - Alt-T: Create Title<BR/>
 - Alt-L: Create Label<BR/>
 - Alt-F: Create Field<BR/>
+- Alt-G: View Grid<BR/>
 - Alt-U: Update Field<BR/>
 - Alt-H: Creat Line Horizontal<BR/>
 - Alt-V: Creat Line Vertical<BR/>
@@ -363,12 +364,17 @@ Added Gensrc definition Programme<br />
 <BR/>
 
 → 2024-10-17<BR/>
--  update module MENU -> improved sketch<BR/>
--  update module FILE -> changed function key text, more clarity<BR/>
+-  update module MDLMENU -> improved sketch<BR/>
+-  update module MDLFILE -> changed function key text, more clarity<BR/>
 -  update Gensrc -> Generation Source type "mainMenu" with a skeleton<BR/>
 -  Several minor changes due to testing<BR/>
-
 <BR/>
+
+→ 2024-10-17 19:00<BR/>
+-  update module MDLFORMS -> add function Alt-G View GRID<BR/>
+-  update module MDLGRID  -> Best Grid Order/Remove Adaptation<BR/>
+<BR/>
+
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />

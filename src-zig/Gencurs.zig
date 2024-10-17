@@ -147,7 +147,7 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.exit )) { break; }
 
 		if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
-		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL) ;
+		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL, &NGRID) ;
 		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
 		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
 

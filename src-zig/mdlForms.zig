@@ -44,6 +44,8 @@ const utl = @import("utils");
 const reg = @import("mvzr");
 
 var numPanel: usize = undefined;
+var numGrid : usize = undefined;
+var NGRID : std.ArrayList(grd.GRID) = undefined;
 
 pub const ErrMain = error{
 	main_append_XPANEL_invalide,
@@ -177,12 +179,16 @@ var minX: usize = 0;
 var X: usize = 0;
 var Y: usize = 0;
 
-
 //pub fn main() !void {
-pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
+pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID)) void {
 	term.cls();
 
 	numPanel = qryPanel(XPANEL);
+
+	NGRID = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+	for (XGRID.items) |xgrd| { NGRID.append(xgrd) catch unreachable; }
+	defer NGRID.clearAndFree();
+	defer NGRID.deinit();
 
 	if (numPanel == 999) return;
 
@@ -450,7 +456,17 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL)) void {
 				pnl.printPanel(pFmt01);
 				term.onMouse();
 			},
+			
+			// display GRID
+			.altG => {
+				numGrid = qryCellGrid(pFmt01,&NGRID);
 
+				if (numGrid != 999) {
+					term.offMouse();
+					viewGrid(pFmt01,NGRID,numGrid);
+				}
+				term.onMouse();
+			},
 			// update field
 			.altU => {
 				term.getCursor();
@@ -3390,3 +3406,105 @@ fn removeVertical(vpnl: *pnl.PANEL) void {
 	savline.clearAndFree();
 	savline.deinit();
 }
+
+
+
+//=================================================
+// description Function
+// choix work Grid
+pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
+	const cellPos: usize = 0;
+	var Gkey: grd.GridSelect = undefined;
+
+	const Xcombo: *grd.GRID = grd.newGridC(
+		"qryPanel",
+		1,
+		1,
+		10,
+		grd.gridStyle,
+		grd.CADRE.line1,
+	);
+	defer Gkey.Buf.deinit();
+	defer grd.freeGrid(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
+
+	grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
+	grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+	grd.setHeaders(Xcombo);
+
+	for (vgrd.items, 0..) |p, idx| {
+		grd.addRows(Xcombo, &.{ usizeToStr(idx), p.name});
+	}
+
+	while (true) {
+		Gkey = grd.ioCombo(Xcombo, cellPos);
+
+		if (Gkey.Key == kbd.enter) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			return strToUsize(Gkey.Buf.items[0]);
+		}
+		
+		if (Gkey.Key == kbd.esc) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			return 999;
+		}
+	}
+}
+
+
+//=================================================
+// description Function
+// view GRID
+
+
+pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
+
+	if (vgrd.items[gridNum].cell.items.len == 0 ) return;
+	const cellPos: usize = 0;
+	var Gkey: grd.GridSelect = undefined;
+
+	const Xcombo: *grd.GRID = grd.newGridC(
+		vgrd.items[gridNum].name,
+		vgrd.items[gridNum].posx,
+		vgrd.items[gridNum].posy,
+		vgrd.items[gridNum].pageRows,
+		vgrd.items[gridNum].separator,
+		vgrd.items[gridNum].cadre,
+	);
+	defer Gkey.Buf.deinit();
+	defer grd.freeGrid(Xcombo);
+	defer grd.allocatorGrid.destroy(Xcombo);
+
+	for (vgrd.items[numGrid].cell.items, 0..) |p, idx| {
+	grd.newCell(Xcombo, p.text, p.long, p.reftyp, p.atrCell.foregr);
+	grd.setCellEditCar(&Xcombo.cell.items[idx], p.edtcar);
+	}
+	grd.setHeaders(Xcombo);
+
+	const vlist = std.ArrayList([] const u8);
+	var m = vlist.init(grd.allocatorGrid);
+	for (vgrd.items[gridNum].cell.items) |p|  {
+		var vText: []u8= std.heap.page_allocator.alloc(u8, p.long) catch unreachable;
+		@memset(vText[0..p.long], '#');
+		m.append(vText) catch unreachable;
+	}
+	for (vgrd.items[gridNum].pageRows) |_| {
+		Xcombo.data.append(grd.allocatorArgData, .{ .buf = m }) catch |err| {
+			@panic(@errorName(err));
+		};
+	}
+	grd.setPageGrid(Xcombo);
+
+	while (true) {
+		Gkey = grd.ioCombo(Xcombo, cellPos);
+
+		if (Gkey.Key == kbd.esc) {
+			pnl.rstPanel(grd.GRID,Xcombo, vpnl);
+			break;
+		}
+		if (Gkey.Key == kbd.enter) {
+			break;
+		}
+	}
+}
+

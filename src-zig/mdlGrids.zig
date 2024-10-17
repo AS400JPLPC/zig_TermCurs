@@ -1525,6 +1525,7 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 	defer grd.freeGrid(Origine);
 	defer grd.allocatorGrid.destroy(Origine);
 
+	grd.newCell(Origine, "col"  , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.newCell(Origine, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -1633,6 +1634,7 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 	defer grd.freeGrid(Origine);
 	defer grd.allocatorGrid.destroy(Origine);
 
+	grd.newCell(Origine, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
 	grd.newCell(Origine, "len"   , 3,  grd.REFTYP.UDIGIT, 	term.ForegroundColor.fgGreen);
 	grd.newCell(Origine, "Type"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
