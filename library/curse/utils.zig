@@ -567,9 +567,9 @@ pub fn isMailStr(str: []const u8) bool {
 			'~' => continue,
 			'^' => continue,
 			else => {
-				if (x >= 191 and x <= 255) return false;
 				if (isLetterStr(ch)) continue;
 				if (isDigitStr(ch)) continue;
+				if (x >= 191 and x <= 255) return false;
 				b = false;
 			},
 		}

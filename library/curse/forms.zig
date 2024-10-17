@@ -276,7 +276,10 @@ pub fn subStrForms( a: []const u8,pos: usize, n:usize) []const u8 {
 // read ioField -> getKEY()
  pub fn dspMouse(vpnl: *pnl.PANEL) void {
 		const AtrDebug: term.ZONATRB = .{
-				.styled = [_]u32{ @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) },
+				.styled = [_]u32{ @intFromEnum(term.Style.notStyle),
+					 			@intFromEnum(term.Style.notStyle),
+								@intFromEnum(term.Style.notStyle),
+								@intFromEnum(term.Style.notStyle) },
 				.backgr = term.BackgroundColor.bgBlack,
 				.foregr = term.ForegroundColor.fgRed,
 		};
@@ -292,8 +295,10 @@ pub fn subStrForms( a: []const u8,pos: usize, n:usize) []const u8 {
 // function special for developpeur
 pub fn dspCursor(vpnl: *pnl.PANEL, x_posx: usize, x_posy: usize, text:[] const u8) void {
 		const AtrDebug: term.ZONATRB = .{
-				.styled = [_]u32{ @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle),
-								 @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) },
+				.styled = [_]u32{ @intFromEnum(term.Style.notStyle),
+								@intFromEnum(term.Style.notStyle),
+								@intFromEnum(term.Style.notStyle),
+								@intFromEnum(term.Style.notStyle) },
 				.backgr = term.BackgroundColor.bgBlack,
 				.foregr = term.ForegroundColor.fgRed,
 		};
@@ -2379,10 +2384,10 @@ pub const	fld = struct {
 
 	pub fn isMatchiFixedIso(testval : [] const u8) bool { 
     
-	  const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
+	  	const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
     
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");
 	    if (maybe_regex) |regex|{     return regex.isMatch(testval);} else return false;
 	}
 
@@ -2395,11 +2400,10 @@ pub const	fld = struct {
 			"{s}-{s}-{s}",
 			.{ testval[6..10], testval[3..5], testval[0..2]}) catch unreachable;
 	
-	       const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
+	       const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)"); 
     
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
-
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");
 	   if (maybe_regex) |regex|{     return regex.isMatch(valtest);} else return false;
 
 	}
@@ -2414,8 +2418,7 @@ pub const	fld = struct {
 	       const ops, const sets = reg.resourcesNeeded("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)");  
     
 	    const SlimmedDownRegex = reg.SizedRegex(ops, sets);
-	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)") ;
-
+	    const maybe_regex = SlimmedDownRegex.compile("([0-9]{4}[-]?((0[13-9]|1[012])[-]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-]?31|02[-]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-]?02[-]?29)"); 
 	   if (maybe_regex) |regex|{     return regex.isMatch(valtest);} else return false;
 	}
 

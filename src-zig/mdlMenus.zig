@@ -156,13 +156,13 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 //=================================================
 // description Function
 // choix work Grid
-pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.DEFMENU)) usize {
+pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.DEFMENU), posx: usize) usize {
 	const cellPos: usize = 0;
 	var Gkey: grd.GridSelect = undefined;
 
 	const Xcombo: *grd.GRID = grd.newGridC(
 		"qryPanel",
-		1,
+		1 + posx,
 		1,
 		10,
 		grd.gridStyle,
@@ -378,17 +378,6 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 		catch |err| { @panic(@errorName(err)); };
 	}
 
-
-	var mChoix = mnu.newMenu("Choix", // name
-			1, 1, // posx, posy
-			mnu.CADRE.line1, // type line fram
-			mnu.MNUVH.vertical, // type menu vertical / horizontal
-			
-			&.{ // item
-			"Menu-View",
-			"Menu-Remove",
-			}
-		);
   
 	pnl.printPanel(pFmt01);
 
@@ -418,9 +407,9 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 
 		switch (Tkey.Key) {
 			.F1	 => {
-				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-M add-Menu  Alt-C add-Cell")
+				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-M add-Menu Alt-D remove Alt-C add-Cell")
 					catch unreachable;
-				fld.setText(pFmtH01,1,"AltW  view  / remove  Alt-X fixed display menu  Alt-R refresh")
+				fld.setText(pFmtH01,1,"AltV view  Alt-H/L fixed menu high/low Alt-R refresh")
 					catch unreachable;
 
 				_= pnl.ioPanel(pFmtH01);
@@ -481,7 +470,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 
 			// def field
 			.altC => {
-				numMenu = qryCellMenu(pFmt01, &NMENU);
+				numMenu = qryCellMenu(pFmt01, &NMENU,0);
 
 				if (numMenu != 999) {
 					term.offMouse();
@@ -493,27 +482,31 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 			},
 
 
-			// view
-			.altW => {
-				numMenu = qryCellMenu(pFmt01, &NMENU);
+			// view 
+			.altV => {
+				numMenu = qryCellMenu(pFmt01, &NMENU,0);
 
 				if (numMenu != 999) {
-					var nitem: usize = 0;
-					nitem = mnu.ioMenu( mChoix, nitem);
 					term.offMouse();
-					pnl.rstPanel(mnu.MENU,&mChoix,pFmt01);
-					term.onMouse();
-
-					if (nitem == 0) viewMenu(pFmt01,NMENU,numMenu );
-					if (nitem == 1) removeMenu(&NMENU);
+					viewMenu(pFmt01,NMENU,numMenu );
 					term.cls();
 					pnl.printPanel(pFmt01);
 					term.onMouse();
-				}
+				}	
 			},
-			// view
-			.altX => {
-				numMenu = qryCellMenu(pFmt01, &NMENU);
+
+
+			// remove
+			.altD => {
+					removeMenu(&NMENU);
+					term.cls();
+					pnl.printPanel(pFmt01);
+					term.onMouse();
+			},
+			
+			// view high
+			.altH => {
+				numMenu = qryCellMenu(pFmt01, &NMENU,0);
 
 				if (numMenu != 999) {
 					term.offMouse();
@@ -530,7 +523,27 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 					term.onMouse();
 				}
 			},
-			// view
+			// view low
+			.altL => {
+				numMenu = qryCellMenu(pFmt01, &NMENU,20);
+
+				if (numMenu != 999) {
+					term.offMouse();
+					const Menudisplay = mnu.newMenu(
+									NMENU.items[numMenu].name,			// name
+									NMENU.items[numMenu].posx,			// posx
+									NMENU.items[numMenu].posy,			// posy
+									NMENU.items[numMenu].cadre,			// type line fram
+									NMENU.items[numMenu].mnuvh,			// type menu vertical / horizontal
+									NMENU.items[numMenu].xitems,			// Item const 
+									) ;
+					_= mnu.ioMenu(Menudisplay,0);
+					term.gotoXY(1,1);
+					term.onMouse();
+				}
+			},
+		
+			// clear
 			.altR => {
 					term.cls();
 					pnl.printPanel(pFmt01);

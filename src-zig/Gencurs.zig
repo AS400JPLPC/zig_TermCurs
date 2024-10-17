@@ -94,7 +94,7 @@ const choix = enum {
 
 pub fn main() !void {
 	//term.offscrool();
-	// open terminal and config and offMouse , cursHide->(cursor hide)
+	//open terminal and config and offMouse , cursHide->(cursor hide)
 	term.enableRawMode();
 	defer term.disableRawMode() ;
 
@@ -120,7 +120,7 @@ pub fn main() !void {
 	const MenuPrincipal = mnu.newMenu(
 					"Screen",				// name
 					2, 2,					// posx, posy
-					mnu.CADRE.line1,		// type line fram
+					mnu.CADRE.line1,		// type line 
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
 					"Panel..",

@@ -51,7 +51,7 @@ f_readPos() {	#commande de positionnement	lines + coln + text
 }
 
 # resize 
-printf '\e[8;'32';'80't'
+printf '\e[8;'35';'80't'
 
 envCPP="1"
 envZIG="2"
@@ -70,39 +70,41 @@ do
 	f_dsplyPos  3  24 $faGras$fcJaune '------------compile cpp-----------------'
 	f_dsplyPos  4  20 $faGras$fcRouge' 1.'; f_dsplyPos  4  24 $faGras$fcGreen 'Terminal-Gen'
 	f_dsplyPos  5  20 $faGras$fcRouge' 2.'; f_dsplyPos  5  24 $faGras$fcGreen 'APPTERM'
+	f_dsplyPos  6  20 $faGras$fcRouge' 3.'; f_dsplyPos  6  24 $faGras$fcGreen 'APPSRC'
 
-	f_dsplyPos  6  24 $faGras$fcJaune '------------compile Zig-----------------'
-	f_dsplyPos  7  20 $faGras$fcRouge'11.'; f_dsplyPos  7  24 $faGras$fcGreen 'Gencurs'
-	f_dsplyPos  8  20 $faGras$fcRouge'12.'; f_dsplyPos  8  24 $faGras$fcGreen 'Exemple'
-	f_dsplyPos  9  20 $faGras$fcRouge'13.'; f_dsplyPos  9  24 $faGras$fcGreen 'exCallpgm'
-	f_dsplyPos 10  20 $faGras$fcRouge'15.'; f_dsplyPos 10  24 $faGras$fcGreen 'Gensrc'
-	f_dsplyPos 11  20 $faGras$fcRouge'20.'; f_dsplyPos 11  24 $faGras$fcGreen 'test'
-    f_dsplyPos 12  20 $faGras$fcRouge'21.'; f_dsplyPos 12  24 $faGras$fcGreen 'test2'
+	f_dsplyPos  7  24 $faGras$fcJaune '------------compile Zig-----------------'
+	f_dsplyPos  8  20 $faGras$fcRouge'11.'; f_dsplyPos  8  24 $faGras$fcGreen 'Gencurs'
+	f_dsplyPos  9  20 $faGras$fcRouge'12.'; f_dsplyPos  9  24 $faGras$fcGreen 'Exemple'
+	f_dsplyPos 10  20 $faGras$fcRouge'13.'; f_dsplyPos 10  24 $faGras$fcGreen 'exCallpgm'
+	f_dsplyPos 11  20 $faGras$fcRouge'15.'; f_dsplyPos 11  24 $faGras$fcGreen 'Gensrc'
+	f_dsplyPos 12  20 $faGras$fcRouge'16.'; f_dsplyPos 12  24 $faGras$fcGreen 'mdlSrc'
+	f_dsplyPos 13  20 $faGras$fcRouge'20.'; f_dsplyPos 13  24 $faGras$fcGreen 'test'
+    f_dsplyPos 14  20 $faGras$fcRouge'21.'; f_dsplyPos 14  24 $faGras$fcGreen 'test2'
 
-	f_dsplyPos 13  24 $faGras$fcJaune '----------------------------------------'
+	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
-	f_dsplyPos 14  20 $faGras$fcRouge'33.'; f_dsplyPos 14  24 $faGras$fcGreen 'Debug codelldb'
+	f_dsplyPos 17  20 $faGras$fcRouge'33.'; f_dsplyPos 17  24 $faGras$fcGreen 'Debug codelldb'
 
-	f_dsplyPos 16  20 $faGras$fcRouge'44.'; f_dsplyPos 16  24 $faGras$fcCyan  'enScript Printer'
+	f_dsplyPos 19  20 $faGras$fcRouge'44.'; f_dsplyPos 19  24 $faGras$fcCyan  'enScript Printer'
 
-	f_dsplyPos 18  20 $faGras$fcRouge'50.'; f_dsplyPos 18  24 $faGras$fcCyan  'Edit my library'	
+	f_dsplyPos 21  20 $faGras$fcRouge'50.'; f_dsplyPos 21  24 $faGras$fcCyan  'Edit my library'	
 
-	f_dsplyPos 20  20 $faGras$fcRouge'55.'; f_dsplyPos 20  24 $faGras$fcCyan  'Edit my project'
+	f_dsplyPos 23  20 $faGras$fcRouge'55.'; f_dsplyPos 23  24 $faGras$fcCyan  'Edit my project'
 
-	f_dsplyPos 22  20 $faGras$fcRouge'66.'; f_dsplyPos 22  24 $faGras$fcCyan  'Edit last source used'
+	f_dsplyPos 24  20 $faGras$fcRouge'66.'; f_dsplyPos 24  24 $faGras$fcCyan  'Edit last source used'
 
-	f_dsplyPos 24  20 $faGras$fcRouge'77.'; f_dsplyPos 24  24 $faGras$fcCyan  'clear helix.log'
+	f_dsplyPos 26  20 $faGras$fcRouge'77.'; f_dsplyPos 26  24 $faGras$fcCyan  'clear helix.log'
 
-	f_dsplyPos 26  20 $faGras$fcRouge'88.'; f_dsplyPos 26  24 $faGras$fcGreen 'Console'
+	f_dsplyPos 28  20 $faGras$fcRouge'88.'; f_dsplyPos 28  24 $faGras$fcGreen 'Console'
 
-	f_dsplyPos 28  20 $faGras$fcRouge'99.'; f_dsplyPos 28 24 $faGras$fcRouge  'Exit'
+	f_dsplyPos 30  20 $faGras$fcRouge'99.'; f_dsplyPos 30 24 $faGras$fcRouge  'Exit'
 
-	f_dsplyPos 29  24 $faGras$fcBleu '----------------------------------------'
-	f_readPos  31  20  'Votre choix  :'; choix=$REPLY;
+	f_dsplyPos 32  24 $faGras$fcBleu '----------------------------------------'
+	f_readPos  34  20  'Votre choix  :'; choix=$REPLY;
 	
 	# Recherche de caractères non numériques dans les arguments.
 	if echo $choix | tr -d [:blank:] | tr -d [:digit:] | grep . &> /dev/null; then
-		f_readPos 31 70  'erreur de saisie Enter'
+		f_readPos 34 70  'erreur de saisie Enter'
 	else
 
  		case "$choix" in
@@ -114,6 +116,10 @@ do
 # APPTERM
 		2)
 			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
+		;;
+# APPSRC
+		2)
+			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPSRC"
 		;;
 
 #Gencurs
@@ -135,6 +141,13 @@ do
 		15)
 			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gensrc"
 		;;
+
+#mdlSrc
+		16)
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "mdlSrc"
+		;;
+
+
 #study 
         20)
 			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test"	
@@ -198,7 +211,7 @@ do
 	esac 
 	fi # fintest option
 
-printf '\e[8;'32';'80't'
+printf '\e[8;'35';'80't'
 
 done
 

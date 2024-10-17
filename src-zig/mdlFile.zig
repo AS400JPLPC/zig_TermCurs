@@ -76,7 +76,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 									kbd.F6,			// function
 									true,			// show
 									false,			// check field
-									"Exit",			// title 
+									"Dir",			// title 
 									)
 								) catch unreachable ;
 
@@ -108,7 +108,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 
 	Panel.field.append(fld.newFieldAlphaNumeric("nameJson",4,12,30,"",false,
 								"required","please enter text ex:Panel09",
-								"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
+								"^[a-z]{1,1}[a-z0-9]{0,}$")) catch unreachable ;
 
 	return Panel;
 }
@@ -198,7 +198,6 @@ fn cmpByData( a: [] const u8, b: [] const u8) bool {
     }
 }
 
-
 fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
 
 	vdir ="";
@@ -224,7 +223,7 @@ fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
 	    if ( n > 1 ){
 	        while (n > 1) : (i +=1) { 
 	            if (reverse == false ) {
-	                if (cmpByData(list_fileD.items[i].data, list_fileD.items[r].data) ) {
+	                if (cmpByData(list_fileD.items[i].data,list_fileD.items[r].data)) {
 	                    try list_xD.append(Data{.data =list_fileD.items[i].data}) ;
 	                    _=list_fileD.orderedRemove(i);
 	                    n = list_fileD.items.len;                     

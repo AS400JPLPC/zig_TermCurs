@@ -73,7 +73,7 @@ const allocator = std.heap.page_allocator;
 	};
 	const DEFFIELD = struct {
 		panel: []const u8,
-		key: usize,
+		npnl: usize,
 		field: []const u8,
 		index: usize,
 		func:  []const u8,
@@ -84,28 +84,28 @@ const allocator = std.heap.page_allocator;
 
 	const DEFLABEL = struct {
 		panel: []const u8,
-		key: usize,
+		npnl: usize,
 		label: []const u8,
 		index: usize,
 	};
 
 	const DEFLINEH = struct {
 		panel: []const u8,
-		key: usize,
+		npnl: usize,
 		line: []const u8,
 		index: usize,
 	};
 
 	const DEFLINEV = struct {
 		panel: []const u8,
-		key: usize,
+		npnl: usize,
 		line: []const u8,
 		index: usize,
 	};
 	
 	const DEFBUTTON = struct {
 		panel: []const u8,
-		key: usize,	
+		npnl: usize,	
 		button: []const u8,
 		index: usize,
 		title:   []const u8,
@@ -130,16 +130,17 @@ var numMenu : usize = undefined;
 
 var nopt : usize	= 0;
 
-
 const choix = enum {
 	dspf,
 	control,
 	list,
 	linkcombo,
-	output,
+	outsrc,
 	clean,
 	exit
 };
+
+
 
 const e0 = "─┬─";
 
@@ -149,7 +150,15 @@ const e2 = "─┼─";
 
 const e9 = "─┴─";
 
-
+// define attribut default LABEL
+const atrText : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.styleDim),
+										@intFromEnum(term.Style.styleItalic),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgGreen,
+};
 
 fn strToUsize(v: []const u8) usize {
 	if (v.len == 0) return 0;
@@ -218,7 +227,7 @@ pub fn main() !void {
 					"Control",
 					"List",
 					"Link-Combo",
-					"outSrc",
+					"wrtSrc",
 					"Clear *all",
 					"Exit...",
 					}
@@ -237,6 +246,7 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.exit )) { break; }
 		if (nopt == @intFromEnum(choix.control )) controlRef(NOBJET, NFIELD) ;
 		if (nopt == @intFromEnum(choix.list )) listRef(NOBJET, NFIELD, NLABEL, NLINEH, NLINEV, NBUTTON) ;
+		if (nopt == @intFromEnum(choix.outsrc )) wrtSrc(NOBJET) ;
 		if (nopt == @intFromEnum(choix.linkcombo )) linkCombo(base, &NFIELD) ;
 		if (nopt == @intFromEnum(choix.dspf)) { 
 			try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;// use mdlRjson  
@@ -245,28 +255,28 @@ pub fn main() !void {
 					NOBJET.append(DEFOBJET {.name = p.name, .index = i, .objtype = OBJTYPE.PANEL}) catch unreachable;
 					
 					for( p.field.items,0..) | f , x | {
-					NFIELD.append(DEFFIELD {.panel = p.name, .key = i , .field = f.name, .index = x,
+					NFIELD.append(DEFFIELD {.panel = p.name, .npnl = i , .field = f.name, .index = x,
 					.func = f.procfunc , .fgrid ="",
 					.task = f.proctask , .call =f.typecall}) catch unreachable;
 					}
 					
 					for( p.label.items,0..) | l , y | {
-					NLABEL.append(DEFLABEL {.panel = p.name, .key = i , .label = l.name, .index = y
+					NLABEL.append(DEFLABEL {.panel = p.name, .npnl = i , .label = l.name, .index = y
 					}) catch unreachable;
 					}
 					
 					for( p.lineh.items,0..) | h , y | {
-					NLINEH.append(DEFLINEH {.panel = p.name, .key = i , .line = h.name, .index = y
+					NLINEH.append(DEFLINEH {.panel = p.name, .npnl = i , .line = h.name, .index = y
 					}) catch unreachable;
 					}
 					
 					for( p.linev.items,0..) | v , y | {
-					NLINEV.append(DEFLINEV {.panel = p.name, .key = i , .line = v.name, .index = y
+					NLINEV.append(DEFLINEV {.panel = p.name, .npnl = i , .line = v.name, .index = y
 					}) catch unreachable;
 					}
 										
 					for( p.button.items,0..) | b , y | {
-					NBUTTON.append(DEFBUTTON {.panel = p.name, .key = i ,
+					NBUTTON.append(DEFBUTTON {.panel = p.name, .npnl = i ,
 						 .button = b.name, .index = y, .title = b.title
 					}) catch unreachable;
 					}
@@ -421,8 +431,10 @@ pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(DEFFIELD) ) void {
 			ftext = addCombo(vpnl);
 			
 			for (NFIELD.items , 0..) | f , idx | {
-					if ( strToUsize(Gkey.Buf.items[0]) == f.key and
-							 strToUsize(Gkey.Buf.items[3]) == f.index ) xfield.items[idx].fgrid = ftext;
+				if ( strToUsize(Gkey.Buf.items[0]) == f.npnl and strToUsize(Gkey.Buf.items[3]) == f.index ) {
+				 	xfield.items[idx].fgrid = ftext;
+				 	NPANEL.items[f.npnl].field.items[f.index].procfunc = ftext;
+				}
 			}
 		}
 	}
@@ -446,7 +458,7 @@ pub fn addCombo(vpnl :*pnl.PANEL ) [] const u8 {
 	const Origine: *grd.GRID = grd.newGridC(
 		"Origine",
 		2,
-		2,
+		70,
 		20,
 		grd.gridStyle,
 		grd.CADRE.line1,
@@ -503,20 +515,23 @@ fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) 
 		new_Line();
 		
 		pref(.NFIELD).ligne(
-				"┌───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┐"
+			\\"┌───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+			\\{s}────────────────┐"
 				,.{e0, e0, e0, e0, e0, e0, e0});
 		pref(.NFIELD).ligne(
-				"│ Name      {s}Key{s}field          {s}Index{s}func           {s}grid           {s}task           {s}call            │"
+			\\"│ Name      {s}Npnl{s}field          {s}Index{s}func           {s}grid           {s}task           
+			\\{s}call            │"
 				,.{e1, e1, e1, e1, e1, e1, e1});
 		pref(.NFIELD).ligne(
-				"├───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┤"
+			\\"├───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+			\\{s}────────────────┤"
 				,.{e2, e2, e2, e2, e2, e2, e2});
 		
 		for( xfield.items) | f | {
 			if (std.mem.eql(u8 ,m.name, f.panel)) {
 				if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,"")){
 				const panel = padingRight(f.panel ,10);
-				const key   = padingLeft(usizeToStr(f.key),3);
+				const npnl  = padingLeft(usizeToStr(f.npnl),4);
 				const field = padingRight(f.field ,15);
 				const index = padingLeft(usizeToStr(f.index),5);
 				const func  = padingRight(f.func  ,15);
@@ -526,12 +541,13 @@ fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) 
 				
 				pref(.NFIELD).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, field, e1, index, e1, func, e1, fgrid, e1, task, e1, call});
+				,.{panel, e1, npnl, e1, field, e1, index, e1, func, e1, fgrid, e1, task, e1, call});
 				}
 			}
 		}
 		pref(.NFIELD).ligne(
-				"└───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┘"
+				\\"└───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+				\\{s}────────────────┘"
 				,.{e9, e9, e9, e9, e9, e9, e9});
 		
 		new_Line();
@@ -586,7 +602,6 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 	del_Log("ref_list.txt");
 	deb_Log("ref_list.txt");
 
-
 		for( xobjet.items) | m | {
 			pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
 				, .{m.name , m.index , m.objtype});
@@ -608,20 +623,23 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 		new_Line();
 		
 		pref(.NFIELD).ligne(
-				"┌───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┐"
+				\\"┌───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+				\\{s}────────────────┐"
 				,.{e0, e0, e0, e0, e0, e0, e0});
 		pref(.NFIELD).ligne(
-				"│ Name      {s}Key{s}field          {s}Index{s}func           {s}grid           {s}task           {s}call            │"
+				\\"│ Name      {s}Npnl{s}field          {s}Index{s}func           {s}grid           {s}task           
+				\\{s}call            │"
 				,.{e1, e1, e1, e1, e1, e1, e1});
 		pref(.NFIELD).ligne(
-				"├───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┤"
+				\\"├───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+				\\{s}────────────────┤"
 				,.{e2, e2, e2, e2, e2, e2, e2});
 		
 		for( xfield.items) | f | {
 			if (std.mem.eql(u8 ,m.name, f.panel)) {
 				if ( ! std.mem.eql(u8 ,f.func ,"") or ! std.mem.eql(u8 ,f.task ,"") or ! std.mem.eql(u8 ,f.call ,"")){
 				const panel = padingRight(f.panel ,10);
-				const key   = padingLeft(usizeToStr(f.key),3);
+				const npnl  = padingLeft(usizeToStr(f.npnl),4);
 				const field = padingRight(f.field ,15);
 				const index = padingLeft(usizeToStr(f.index),5);
 				const func  = padingRight(f.func  ,15);
@@ -631,12 +649,13 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 				
 				pref(.NFIELD).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, field, e1, index, e1, func, e1, fgrid, e1, task, e1, call});
+				,.{panel, e1, npnl, e1, field, e1, index, e1, func, e1, fgrid, e1, task, e1, call});
 				}
 			}
 		}
 		pref(.NFIELD).ligne(
-				"└───────────{s}───{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────{s}────────────────┘"
+				\\"└───────────{s}────{s}───────────────{s}─────{s}───────────────{s}───────────────{s}───────────────
+				\\{s}────────────────┘"
 				,.{e9, e9, e9, e9, e9, e9, e9});
 		
 		
@@ -647,29 +666,29 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 
 		new_Line();
 		pref(.NLABEL).ligne(
-				"┌───────────{s}───{s}───────────────{s}──────┐"
+				"┌───────────{s}────{s}───────────────{s}──────┐"
 				,.{e0, e0, e0});
 		pref(.NLABEL).ligne(
-				"│ Name      {s}Key{s}label          {s}Index │"
+				"│ Name      {s}Npnl{s}label          {s}Index │"
 				,.{e1, e1, e1});
 		pref(.NLABEL).ligne(
-				"├───────────{s}───{s}───────────────{s}──────┤"
+				"├───────────{s}────{s}───────────────{s}──────┤"
 				,.{e2, e2, e2});
 		
 		for( xlabel.items) | l | {
 			if (std.mem.eql(u8 ,m.name, l.panel)) {
 				const panel = padingRight(l.panel ,10);
-				const key   = padingLeft(usizeToStr(l.key),3);
+				const npnl   = padingLeft(usizeToStr(l.npnl),4);
 				const label = padingRight(l.label ,15);
 				const index = padingLeft(usizeToStr(l.index),5);
 				
 				pref(.NLABEL).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, label, e1, index});
+				,.{panel, e1, npnl, e1, label, e1, index});
 			}
 		}
 		pref(.NLABEL).ligne(
-				"└───────────{s}───{s}───────────────{s}──────┘"
+				"└───────────{s}────{s}───────────────{s}──────┘"
 				,.{e9, e9, e9});
 
 		
@@ -679,29 +698,29 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 
 		new_Line();
 		pref(.NLINEH).ligne(
-				"┌───────────{s}───{s}───────────────{s}──────┐"
+				"┌───────────{s}────{s}───────────────{s}──────┐"
 				,.{e0, e0, e0});
 		pref(.NLINEH).ligne(
-				"│ Name      {s}Key{s}line Horizontal{s}Index │"
+				"│ Name      {s}Npnl{s}line Horizontal{s}Index │"
 				,.{e1, e1, e1});
 		pref(.NLINEH).ligne(
-				"├───────────{s}───{s}───────────────{s}──────┤"
+				"├───────────{s}────{s}───────────────{s}──────┤"
 				,.{e2, e2, e2});
 		
 		for( xlineh.items) | h | {
 			if (std.mem.eql(u8 ,m.name, h.panel)) {
 				const panel = padingRight(h.panel ,10);
-				const key   = padingLeft(usizeToStr(h.key),3);
+				const npnl   = padingLeft(usizeToStr(h.npnl),4);
 				const line  = padingRight(h.line ,15);
 				const index = padingLeft(usizeToStr(h.index),5);
 				
 				pref(.NLINEH).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, line, e1, index});
+				,.{panel, e1, npnl, e1, line, e1, index});
 			}
 		}
 		pref(.NLINEH).ligne(
-				"└───────────{s}───{s}───────────────{s}──────┘"
+				"└───────────{s}────{s}───────────────{s}──────┘"
 				,.{e9, e9, e9});
 
 		
@@ -711,29 +730,29 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 
 		new_Line();
 		pref(.NLINEV).ligne(
-				"┌───────────{s}───{s}───────────────{s}──────┐"
+				"┌───────────{s}────{s}───────────────{s}──────┐"
 				,.{e0, e0, e0});
 		pref(.NLINEV).ligne(
-				"│ Name      {s}Key{s}line vertical  {s}Index │"
+				"│ Name      {s}Npnl{s}line vertical  {s}Index │"
 				,.{e1, e1, e1});
 		pref(.NLINEV).ligne(
-				"├───────────{s}───{s}───────────────{s}──────┤"
+				"├───────────{s}────{s}───────────────{s}──────┤"
 				,.{e2, e2, e2});
 		
 		for( xlinev.items) | v | {
 			if (std.mem.eql(u8 ,m.name, v.panel)) {
 				const panel = padingRight(v.panel ,10);
-				const key   = padingLeft(usizeToStr(v.key),3);
+				const npnl   = padingLeft(usizeToStr(v.npnl),4);
 				const line  = padingRight(v.line ,15);
 				const index = padingLeft(usizeToStr(v.index),5);
 				
 				pref(.NLINEV).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, line, e1, index});
+				,.{panel, e1, npnl, e1, line, e1, index});
 			}
 		}
 		pref(.NLINEV).ligne(
-				"└───────────{s}───{s}───────────────{s}──────┘"
+				"└───────────{s}────{s}───────────────{s}──────┘"
 				,.{e9, e9, e9});
 		
 	
@@ -745,30 +764,30 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 		//=========================================================================
 		new_Line();
 		pref(.NBUTTON).ligne(
-				"┌───────────{s}───{s}───────────────{s}─────{s}────────────────┐"
+				"┌───────────{s}────{s}───────────────{s}─────{s}────────────────┐"
 				,.{e0, e0, e0, e0});
 		pref(.NBUTTON).ligne(
-				"│ Name      {s}Key{s}Button         {s}Index{s}Title           │"
+				"│ Name      {s}Npnl{s}Button         {s}Index{s}Title           │"
 				,.{e1, e1, e1, e1});
 		pref(.NBUTTON).ligne(
-				"├───────────{s}───{s}───────────────{s}─────{s}────────────────┤"
+				"├───────────{s}────{s}───────────────{s}─────{s}────────────────┤"
 				,.{e2, e2, e2, e2});
 		
 		for( xbutton.items) | b | {
 			if (std.mem.eql(u8 ,m.name, b.panel)) {
 				const panel = padingRight(b.panel ,10);
-				const key   = padingLeft(usizeToStr(b.key),3);
+				const npnl   = padingLeft(usizeToStr(b.npnl),4);
 				const button = padingRight(b.button ,15);
 				const index = padingLeft(usizeToStr(b.index),5);
 				const title = padingRight(b.title ,15);
 				
 				pref(.NBUTTON).ligne(
 				"│ {s}{s}{s}{s}{s}{s}{s}{s}{s} │"
-				,.{panel, e1, key, e1, button, e1, index, e1, title});
+				,.{panel, e1, npnl, e1, button, e1, index, e1, title});
 			}
 		}
 		pref(.NBUTTON).ligne(
-				"└───────────{s}───{s}───────────────{s}─────{s}────────────────┘"
+				"└───────────{s}────{s}───────────────{s}─────{s}────────────────┘"
 				,.{e9, e9, e9, e9});
 	}
 	}
@@ -776,4 +795,167 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 	utl.deinitUtl();
 
 }
+
+
+
+
+fn wrtSrc(xobjet: std.ArrayList(DEFOBJET))  void {
+	 
+// fn wrtSrc(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
+//  xlabel: std.ArrayList(DEFLABEL)
+//  , xlineh: std.ArrayList(DEFLINEH), xlinev: std.ArrayList(DEFLINEV)
+//  , xbutton: std.ArrayList(DEFBUTTON)) void {
+
+	var nsrc : usize	= 0;
+	var ndef : usize	= 0;
+	
+	const source = enum {
+		mainMenu,
+		mainModule,
+		mainAll,
+		exit
+	};
+	
+	const MenuSource = mnu.newMenu(
+		"Source",				// name
+		5, 2,					// posx, posy
+		mnu.CADRE.line1,		// type line fram
+		mnu.MNUVH.vertical,		// type menu vertical / horizontal
+		&.{
+		"MainMenu",
+		"MainModule",
+		"Exit",
+		}
+	) ;
+
+	const srcdef = enum {
+		def,
+		next,
+		exit
+	};
+	const MenuDef = mnu.newMenu(
+		"Definition",				// name
+		5, 2,					// posx, posy
+		mnu.CADRE.line1,		// type line fram
+		mnu.MNUVH.vertical,		// type menu vertical / horizontal
+		&.{
+		"Def",
+		"Next",
+		"Exit",
+		}
+	) ;
+
+		
+	nsrc = mnu.ioMenu(MenuSource,0);		
+	if (nsrc == @intFromEnum(source.exit )) { return; }
+
+
+	const file = std.fs.cwd().createFile(
+        "src_file.txt", .{ .read = true } ) catch unreachable;
+    defer file.close();
+    const wrt = file.writer();
+
+    
+	if (nsrc == @intFromEnum(source.mainMenu )) {
+	wrt.print("//----------------------\n",.{}) catch {};
+	wrt.print("//---date text----------\n",.{}) catch {};
+	wrt.print("//----------------------\n",.{}) catch {};
+	wrt.print("\n\n\nconst std = @import(\"std\");\n",.{}) catch {};
+
+	wrt.print("// terminal Fonction\n",.{}) catch {};
+	wrt.print("const term = @import(\"cursed\");\n",.{}) catch {};
+
+	wrt.print("\n// menu Fonction\n",.{}) catch {};
+	wrt.print("const mnu = @import(\"menu\").mnu;\n",.{}) catch {};
+
+	
+	wrt.print("\nconst allocator = std.heap.page_allocator;\n",.{}) catch {};
+	wrt.print("var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);\n",.{}) catch {};
+	}
+
+
+	for( xobjet.items) | m | {
+			term.cls();
+			term.gotoXY(2,2);
+			term.writeStyled(m.name,atrText);		
+			ndef = mnu.ioMenu(MenuDef,0);
+	
+			if (ndef == @intFromEnum(srcdef.exit )) { break; }
+			if (ndef == @intFromEnum(srcdef.next )) { continue; }
+			
+			if (m.objtype == OBJTYPE.PANEL)	{
+			wrt.print("\n\n\n//----------------------\n",.{}) catch {};
+			wrt.print("var {s} : *pnl.PANEL = pnl.newPanelC(\"{s}\",\n", .{ 
+					NPANEL.items[m.index].name, NPANEL.items[m.index].name }) catch {};
+
+			wrt.print("\t\t\t{d}, {d}\n", .{ NPANEL.items[m.index].posx, NPANEL.items[m.index].posy} ) catch {};
+			wrt.print("\t\t\t{d}, {d}\n", .{ NPANEL.items[m.index].lines, NPANEL.items[m.index].cols}) catch {};
+			wrt.print("\t\t\tforms.CADRE.{s},\n", .{ @tagName(NPANEL.items[m.index].frame.cadre)}) catch {};
+			wrt.print("\t\t\t\"{s}\");\n", .{ NPANEL.items[m.index].frame.title} ) catch {};
+		}
+
+		if (m.objtype == OBJTYPE.MENU)	{
+
+			wrt.print("\n\n\n//----------------------\n",.{}) catch {};
+			wrt.print("// Define Global DSPF\n",.{}) catch {};
+			wrt.print("//----------------------\n",.{}) catch {};
+						
+			wrt.print("const x{s} = enum {{\n", 
+				.{NMENU.items[m.index].name}) catch {};
+			for(NMENU.items[m.index].xitems) |text| {
+				wrt.print("\t\t\t{s},\n", .{text}) catch {};
+			}
+			wrt.print("\t\t\t}};\n\n", .{}) catch {};
+
+			
+			wrt.print("const {s} = mnu.newMenu(\n", 
+				.{NMENU.items[m.index].name}) catch {};
+			wrt.print("\t\t\t\"{s}\",\n", 
+				.{NMENU.items[m.index].name}) catch {};
+			wrt.print("\t\t\t{d}, {d},\n",
+				 .{ NMENU.items[m.index].posx, NMENU.items[m.index].posy} ) catch {};
+			wrt.print("\t\t\tmnu.CADRE.{s},\n", 
+				.{ @tagName(NMENU.items[m.index].cadre)}) catch {};
+			wrt.print("\t\t\tmnu.MNUVH.{s},\n", 
+				.{ @tagName(NMENU.items[m.index].mnuvh)}) catch {};
+			wrt.print("\t\t\t&.{{\n", .{}) catch {};
+			for(NMENU.items[m.index].xitems) |text| {
+				wrt.print("\t\t\t\"{s}\",\n", .{text}) catch {};
+			}
+			wrt.print("\t\t\t}}\n", .{}) catch {};
+			wrt.print("\t\t\t);\n", .{}) catch {};
+		}
+
+		
+	}
+
+	
+	if (nsrc == @intFromEnum(source.mainMenu )) {
+		wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
+		wrt.print("// squelette\n",.{}) catch {};
+		wrt.print("//----------------------------------\n\n",.{}) catch {};
+
+		wrt.print("pub fn main() !void {{\n",.{}) catch {};
+	    wrt.print("// init terminal\n",.{}) catch {};
+	    wrt.print("term.enableRawMode();\n",.{}) catch {};
+	    wrt.print("defer term.disableRawMode() ;\n\n",.{}) catch {};
+    
+		wrt.print("// Initialisation\n",.{}) catch {};
+		wrt.print("term.titleTerm(\"MY-TITLE\");\n\n",.{}) catch {};
+	
+		wrt.print("term.resizeTerm(44,168);\n",.{}) catch {};
+		wrt.print("term.cls();\n\n",.{}) catch {};
+	
+		wrt.print("var nopt : usize = 0;\n",.{}) catch {};
+
+		wrt.print("\twhile (true) {{\n",.{}) catch {};
+		wrt.print("\tnopt = mnu.ioMenu(menu??,nopt);\n",.{}) catch {};
+		wrt.print("\t\tif (nopt == @intFromEnum(xmnu??.Exit )) break;\n\n",.{}) catch {};
+		wrt.print("\t\t//--- ---\n\n",.{}) catch {};
+		wrt.print("\t\t}}\n\n",.{}) catch {};
+		wrt.print("}}\n\n",.{}) catch {};
+	}
+
+}
+
 

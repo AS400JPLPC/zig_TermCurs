@@ -321,8 +321,11 @@ you have to understand the menu option as a fixed combo with constant values <br
 - F12  : return<BR/>
 - Alt-M: Create MENU definition<BR/>
 - Alt-C: Create / UPDATE  text columns<BR/> 
-- Alt-W: Tools menu (View MENU, Remove MENU)<br />
-- Alt-X: Fixed display menu<br />
+- Alt-V: View MENU<br />
+- Alt-D: Remove MENU<br />
+- Alt-H: display higth MENU<BR>
+- Alt-L: display low MENU<BR>
+- Alt-X: Fixed display work menu<br />
 - Alt-R: Fefresh terminal<br />
 
 
@@ -333,7 +336,7 @@ Added Gensrc definition Programme<br />
 - Control    : list control <BR/>
 - List       : List of the DSPF nomencalature <BR/>
 - Link-Combo : combo assignment    CtrlV validation <BR/>
-- outSrc     : ???? <BR/>
+- outSrc     : output srs-lst <BR/>
 - Clear *all : Cleaning arraylist buffers<BR/> 
 - Exit       : Exit <BR/>
 
@@ -357,7 +360,15 @@ Added Gensrc definition Programme<br />
 -  add Alt-R function display terminal actif<BR/>
 -  x,y menu positioning fix<BR/>
 <BR/>
+<BR/>
 
+→ 2024-10-17<BR/>
+-  update module MENU -> improved sketch<BR/>
+-  update module FILE -> changed function key text, more clarity<BR/>
+-  update Gensrc -> Generation Source type "mainMenu" with a skeleton<BR/>
+-  Several minor changes due to testing<BR/>
+
+<BR/>
 ------------------------------------------------------------------<br />
 
 Now that the entire designer allows for saving and restoring the code, this has allowed me to test my functions, and especially to take a little tour of the Zig language. I opted for working and writing with maximum use of the Zig language, so I don't use addressing or hex code; everything is in Zig.<br /> <br />
