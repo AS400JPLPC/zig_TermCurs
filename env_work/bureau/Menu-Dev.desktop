@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Zterm
+Comment=
+Exec=gnome-terminal --hide-menubar   --geometry="80x26+5+5"  --title="MENU-DEV" --window-with-profile=NoScrollbar -- /home/soleil/Zterm/MenuDEV.sh
+Icon=applications-development
+Terminal=false
+StartupNotify=true
+Path=

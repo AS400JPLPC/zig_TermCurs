@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=TermHX
+Comment=
+Exec=gnome-terminal --hide-menubar   --geometry="80x26"  --title="MENU-HX" -- /home/soleil/TerminalHX/MenuHX.sh
+Icon=applications-development
+Path=/home/soleil/TerminalHX
+Terminal=false
+StartupNotify=true

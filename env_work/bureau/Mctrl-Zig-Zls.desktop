@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=M-Zig-Zls
+Comment=
+Exec=/home/soleil/Mctrl-Zig-Zls.sh
+Icon=apport
+Path=
+Terminal=true
+StartupNotify=false
