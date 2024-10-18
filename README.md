@@ -9,6 +9,8 @@ terminal access function <br />
 
 **os linux** <br />
 <u>Normally should work POSIX </u><br />
+<br>
+<u> Folder: "env_work" --> Understanding my environment</u><br />
 <br />
 **the termcurs library, does what ncurse does (hopefully).<br />
 it manages the interface between the terminal and the user.<br />
