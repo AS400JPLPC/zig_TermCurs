@@ -39,7 +39,9 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("mvzr");
 
-
+const deb_Log = @import("logger").openFile;   // open  file
+const end_Log = @import("logger").closeFile;  // close file
+const plog   = @import("logger").scoped;      // print file 
 
 // sauvegarde JSON
 const mdlSjson = @import("mdlSjson");
@@ -106,9 +108,9 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 	Panel.label.append(lbl.newLabel("nameJson"	 ,4,2, "name.....:") ) catch unreachable ;
 
 
-	Panel.field.append(fld.newFieldAlphaNumeric("nameJson",4,12,30,"",false,
+	Panel.field.append(fld.newFieldTextFull  ("nameJson",4,12,30,"",false,
 								"required","please enter text ex:Panel09",
-								"^[a-z]{1,1}[a-z0-9]{0,}$")) catch unreachable ;
+								"^[a-z]{1,1}[a-z0-9.]{0,}$")) catch unreachable ;
 
 	return Panel;
 }
@@ -151,6 +153,9 @@ pub fn Panel_Fmt00(title: [] const u8) *pnl.PANEL {
 
 var vdir : []const u8 = "";
 const vbool = true;
+
+
+
 fn isFile(name: []const u8 ) bool {
 
 	
@@ -170,7 +175,7 @@ fn newFile(name: []const u8 ) void {
 
 	
 	const cDIR = std.fs.cwd().openDir(vdir,.{}) catch unreachable;
-	
+
 	var file = cDIR.openFile(name, .{}) catch unreachable;
 	cDIR.deleteFile(name) catch unreachable;
 	file= cDIR.createFile(name, .{ .read = true }) catch unreachable;	
@@ -187,81 +192,114 @@ fn cleanProgram(vpnl : *pnl.PANEL ) void {
 }
 
 const Data = struct {
-  data: [] const u8,
-  
+  dta : [] const u8 ,
 };
+
+
 fn cmpByData( a: [] const u8, b: [] const u8) bool {
    const order = std.mem.order(u8, a, b);
     switch (order) {
-        .lt => return true,
-        else => return false,
+        .lt => return false,
+        else => return true,
     }
 }
 
-fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
+pub fn swapData(table :std.ArrayList(Data), r: usize, i: usize) void {
+            
 
-	vdir ="";
-	_= std.fs.cwd().openDir(xdir,.{})
-		catch try std.fs.cwd().makeDir(xdir);
-	const iter_dir= std.fs.cwd().openDir(xdir,.{.iterate = true}) catch unreachable;
+            const old_item = table.items[r];
+            table.items[r] = table.items[i];
+            table.items[i] = old_item ;
+}
 
-	// list file and sort 
-	var iteratorD = iter_dir.iterate();
-	var list_fileD = std.ArrayList(Data).init(utl.allocUtl);
-					
-	while (try iteratorD.next()) |path| {
-        if (path.kind == .directory)
-       	 	try list_fileD.append(Data{.data =path.name}) ;
-	}
-	var list_xD = std.ArrayList(Data).init(utl.allocUtl);
+const typeQuery = enum { folder , file} ;
+
+const myallocator = std.heap.page_allocator;
+
+var list_Sorted = std.ArrayList(Data).init(myallocator);
+
+fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
+
+
+	var list_Query = std.ArrayList(Data).init(myallocator);
+	defer list_Query.clearAndFree();
+ 	list_Sorted.clearAndFree();
+
+	// query *all folder this program
+	var iterdir= try std.fs.cwd().openDir(myDir,.{ .iterate = true}) ;
+    defer iterdir.close();
 	
-	var n:usize = list_fileD.items.len; 
+	var iterabledir = iterdir.iterate();
+
+	switch(choix) {
+		.folder => {
+			 while (try iterabledir.next()) |e| {
+				switch(e.kind) {
+			       .directory  => { 
+				       var new_buf = try std.fmt.allocPrint(myallocator,"{s}",.{e.name}) ;
+				       try	list_Query.append(Data{.dta = new_buf[0..] }) ;
+				       // std.debug.print("{s}: {s}\r\n", .{@tagName(e.kind), e.name});
+				    },
+					else => {},
+				}
+	       	}
+       	},
+		.file => {
+			while (try iterabledir.next()) |e| {
+				switch(e.kind) {
+				       .file  => { 
+					       var new_buf = try std.fmt.allocPrint(myallocator,"{s}",.{e.name}) ;
+					       try	list_Query.append(Data{.dta = new_buf[0..] }) ;
+					       // std.debug.print("{s}: {s}\r\n", .{@tagName(e.kind), e.name});
+					    },
+						else => {},
+				}
+	       	}
+	    }
+	}
+	
+	var n:usize = list_Query.items.len; 
 	while ( n > 0) {
-	    var i:usize = 0;
-	    var r:usize = 0;
-	    var reverse : bool  = false ;
-	    if ( n > 1 ){
-	        while (n > 1) : (i +=1) { 
-	            if (reverse == false ) {
-	                if (cmpByData(list_fileD.items[i].data,list_fileD.items[r].data)) {
-	                    try list_xD.append(Data{.data =list_fileD.items[i].data}) ;
-	                    _=list_fileD.orderedRemove(i);
-	                    n = list_fileD.items.len;                     
-	                    reverse = false;
-	                    break ; 
-	                }
-	            }
-	            else {
-	                if (cmpByData(list_fileD.items[r].data, list_fileD.items[i].data) ) {
-	                    try list_xD.append(Data{.data =list_fileD.items[r].data}) ;
-	                    _=list_fileD.orderedRemove(r);
-	                    n = list_fileD.items.len;                     
-	                    reverse = false;
-	                    break ; 
-	                }
-	            }
+		var i:usize = 1;
+		var r:usize = 0;
+		if ( n > 1 ){
+			while (n > 1) : (i +=1) { 
+				if (cmpByData(list_Query.items[r].dta, list_Query.items[i].dta)) {
+					 swapData(list_Query, r,i   );
+				}
+				if (i == n - 1 ) { 
+					try list_Sorted.append(Data{.dta =list_Query.items[r].dta}) ;
+                    _=list_Query.orderedRemove(0);
+                    n = list_Query.items.len;
+                    r = 0; i = 0; 
+				}
+			}
+		}
+		else {
+		        try list_Sorted.append(Data{.dta =list_Query.items[r].dta}) ;
+		        _=list_Query.orderedRemove(r);
+		        break ; 
+			}
+	} // end list sortc
+}
 
-	            if ( i == n - 1) { reverse = true ; i = 0 ; r = 0;}
-	        }
-	    }
-	    else {
-	        try list_xD.append(Data{.data =list_fileD.items[0].data}) ;
-	        _=list_fileD.orderedRemove(0);
-	        break ; 
-	    }
+fn wrkDir(pnlFmt :*pnl.PANEL, xDir : []const u8) !void {
+    vdir ="";
+    // folder my program
+    const path = try std.fs.realpathAlloc(utl.allocUtl,xDir) ;
+    defer utl.allocUtl.free(path);
+	try queryTree(path , .folder);
 
-	}   
-	// end list sort
 
 	const Grid00 : *grd.GRID =	grd.newGridC(
 	"Grid01",			// Name
-	5, 2,				// posx, posy
+	5, 50,				// posx, posy
 	20,					// numbers lines
 	grd.gridStyle,		// separator | or space
 	grd.CADRE.line1,	// type line 1
 	);
 	defer grd.freeGrid(Grid00);
-	var ok_file= false;
+
 	var Gkey :grd.GridSelect = undefined ;
 
 	grd.resetRows(Grid00);
@@ -272,12 +310,11 @@ fn wrkDir(pnlFmt :*pnl.PANEL, xdir : [] const u8) !void {
 		grd.printGridHeader(Grid00);
 	}
 	
-	for (list_xD.items) |f| {
-		ok_file = true;
-		grd.addRows(Grid00, &.{f.data});
+	for (list_Sorted.items) |f| {
+		grd.addRows(Grid00, &.{f.dta});
 	}	
 
-	if (!ok_file) {return; }
+	if (list_Sorted.items.len == 0) {return; }
 	while (vbool ){
 		Gkey =grd.ioCombo(Grid00,0);
 
@@ -306,7 +343,6 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 
 	if (XPANEL.items.len == 0 and wrkSav) return;
 
-
 	
 	var twork: [] const u8 = undefined;
 	if (wrkSav)  twork = "Save-File-JSON" 
@@ -318,10 +354,11 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 	const pFmt00 = Panel_Fmt00(twork);
 	defer pnl.freePanel(pFmt00);
 	defer forms.allocatorForms.destroy(pFmt00);
- 
-	while(std.mem.eql(u8 ,vdir, "") == true) {
+ 	defer list_Sorted.clearAndFree();
+ 	
+ 	while(std.mem.eql(u8 ,vdir, "") == true) {
 		
-			wrkDir(pFmt00,"./")  catch |err| {	@panic(@errorName(err));};
+			wrkDir(pFmt00, ".") catch unreachable ;
 			if (std.mem.eql(u8 ,vdir, "")) {
 				pnl.msgErr(pFmt00, "no directory available");
 				Tkey.Key = pnl.ioPanel(pFmt00);
@@ -373,7 +410,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 				if (!std.mem.eql(u8,vdir ,"" ))  {
 					var sdir:[] const u8 = "";
 					while( true) {
-						if (std.mem.eql(u8,vdir , "")) { vdir = "./" ; sdir =""; }
+						if (std.mem.eql(u8,vdir , "")) { vdir = "." ; sdir =""; }
 						else  sdir =utl.concatStr(vdir,"/") ;
 						
 						wrkDir(pFmt00,vdir)  catch unreachable;
@@ -435,60 +472,9 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 					lbl.updateText(pFmt01,1,vdir) catch unreachable;
 					continue;
 				}
-				const iter_dir= std.fs.cwd().openDir(vdir[0..],.{.iterate = true}) catch unreachable;
-
-				// list file and sort 
-				var iterator = iter_dir.iterate();
-				var list_file = std.ArrayList(Data).init(utl.allocUtl);
-								
-				while (try iterator.next()) |path| {
-                    if (path.kind == .file)
-		           	 	try list_file.append(Data{.data =path.name}) ;
-				}
-
-				if (list_file.items.len == 0 ) return;
-				var list_x = std.ArrayList(Data).init(utl.allocUtl);
-						
-				var n:usize = list_file.items.len; 
-				while ( n > 0) {
-				    var i:usize = 0;
-				    var r:usize = 0;
-				    var reverse : bool  = false ;
-				    if ( n > 1 ){
-				        while (n > 1) : (i +=1) { 
-				            if (reverse == false ) {
-				                if (cmpByData(list_file.items[i].data, list_file.items[r].data) ) {
-				                    try list_x.append(Data{.data =list_file.items[i].data}) ;
-				                    _=list_file.orderedRemove(i);
-				                    n = list_file.items.len;                     
-				                    reverse = false;
-				                    break ; 
-				                }
-				            }
-				            else {
-				                if (cmpByData(list_file.items[r].data, list_file.items[i].data) ) {
-				                    try list_x.append(Data{.data =list_file.items[r].data}) ;
-				                    _=list_file.orderedRemove(r);
-				                    n = list_file.items.len;                     
-				                    reverse = false;
-				                    break ; 
-				                }
-				            }
-
-				            if ( i == n - 1) { reverse = true ; i = 0 ; r = 0;}
-				        }
-				    }
-				    else {
-				        try list_x.append(Data{.data =list_file.items[0].data}) ;
-				        _=list_file.orderedRemove(0);
-				        break ; 
-				    }
-    
-				}   
-				// end list sort
-
+				try queryTree(vdir , .file);
+				if (list_Sorted.items.len == 0) { pnl.msgErr(pFmt01, "no file available"); continue; }
 				
-				var ok_file= false;
 				var Gkey :grd.GridSelect = undefined ;
 
 				grd.resetRows(Grid01);
@@ -499,12 +485,10 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 					grd.printGridHeader(Grid01);
 				}
 				
-				for (list_x.items) |f| {
-					ok_file = true;
-					grd.addRows(Grid01, &.{f.data});
+				for (list_Sorted.items) |f| {
+					grd.addRows(Grid01, &.{f.dta});
 				}	
 
-				if (!ok_file) { pnl.msgErr(pFmt01, "no file available"); continue; }
 				while (vbool ){
 					Gkey =grd.ioGrid(Grid01,false);
 

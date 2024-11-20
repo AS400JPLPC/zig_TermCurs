@@ -237,7 +237,6 @@ pub const grd = struct {
 
 		var e_FIELD: []const u8 = text;
 		var e_signed: []const u8 = undefined;
-
 		if (cell.reftyp == REFTYP.PASSWORD) {
 			i = 0;
 			e_FIELD = "";

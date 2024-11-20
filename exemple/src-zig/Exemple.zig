@@ -15,7 +15,7 @@ const kbd = @import("cursed").kbd;
 // error
 const dsperr = @import("forms").dsperr;
 
-// full delete for produc
+// cadre line  
 const forms = @import("forms");
 
 // frame

@@ -14,6 +14,8 @@ pub fn build(b: *std.Build) void {
 
 
 	// ===========================================================
+	const logger = b.dependency("library", .{}).module("logger");
+ 
 	const logsrc = b.dependency("library", .{}).module("logsrc");
     const cursed = b.dependency("library", .{}).module("cursed");
     const utils  = b.dependency("library", .{}).module("utils");
@@ -52,6 +54,7 @@ pub fn build(b: *std.Build) void {
 	const mdlFile = b.createModule(.{
 		.root_source_file = b.path( "./mdlFile.zig" ),
 		.imports= &.{
+			.{ .name = "logger", .module = logger },
 			.{ .name = "cursed", .module = cursed },
 			.{ .name = "utils",  .module = utils },
 			.{ .name = "forms",  .module = forms },
