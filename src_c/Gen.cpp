@@ -1,4 +1,3 @@
-/// -----------------------------------------------------------------
 /// Jean-Pierre Laroche
 /// projet 2018-08-08  (C) 2018   Copyright 2018  <laroche.jeanpierre@gmail.com>
 /// but :     terminal rapide    / flexible / respectant le code escape
@@ -22,14 +21,15 @@
 /// si test cout
 //#include <iostream>
 
+
+#define _DEBUG_ 1 /// ALT_F4 ACTIVE
+
 ///------------------------------------------
 /// paramétrage spécifique
 /// ex:
 ///------------------------------------------
 
 #define WORKPGM        "./Gencurs"
-
-bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 
 #define MESSAGE_ALT_F4 "vous devez activer uniquement \n en développemnt  \n Confirm destroy Application --> DEBUG"
 
@@ -39,12 +39,13 @@ bool _DEBUG_  = true; /// ALT_F4 ATVIVE  _DEBUG_ = true
 ///-----------------------------------------
 #define VTENAME "VTE-TERM3270"
 
-unsigned int COL=    132;    /// max 132
+unsigned int COL=    168;    /// max 132
 
-unsigned int ROW =    42;        /// max 42 including a line for the system
+unsigned int ROW =    44;        /// max 42 including a line for the system
 
-/// defined not optional
-#define VTEFONT    "Noto Sans Mono  Regular"
+/// Font DejaVu Sans Mono -> xfce4-terminal
+/// defined not optional  -> gnome-terminal
+#define VTEFONT    "Source Code Pro"
 
 //*******************************************************
 // PROGRAME
@@ -100,8 +101,7 @@ void close_window()
 ///-------------------------------------
 gboolean key_press_ALTF4()
 {
-    if (_DEBUG_ == 1)
-    {
+
         GtkWidget *dialog;
         const gchar* _MSG_ =  MESSAGE_ALT_F4;
 
@@ -132,8 +132,7 @@ gboolean key_press_ALTF4()
                                     //break;
         }
 
-    }
-    // not active ALT_F4
+
     return GDK_EVENT_STOP;
 }
 
@@ -157,21 +156,20 @@ void    init_Terminal()
     char * font_terminal = new char[30] ;
 
 
-    /// Font DejaVu Sans Mono -> xfce4-terminal
     /// confortable and extend numbers columns and rows
 
     if ( s->width <= 1600 && s->height >=1024 ) {                    // ex: 13"... 15"
-        sprintf(font_terminal,"%s %s" , VTEFONT,"11");
-        COL = 132;
-        ROW = 32;
+        sprintf(font_terminal,"%s %s" , VTEFONT,"10");
+        COL = 168;
+        ROW = 44;
         }
     else if ( s->width <= 1920 && s->height >=1080 ) {            // ex: 17"... 32"
         sprintf(font_terminal,"%s %s" , VTEFONT,"12");
-        COL = 158;
-        ROW = 42;
+        COL = 168;
+        ROW = 44;
         }
     else if ( s->width > 1920  ) {                                          //  ex: 2560 x1600 > 27"  font 13
-        sprintf(font_terminal,"%s %s" , VTEFONT,"15");        //  ex: 3840 x2160 > 32"  font 15
+        sprintf(font_terminal,"%s %s" , VTEFONT,"13");        //  ex: 3840 x2160 > 32"  font 15
         COL = 168;
         ROW = 44;
     }
@@ -287,14 +285,14 @@ int main(int argc, char *argv[])
 
     if (argc == 1 )  {
         if ( false == ctrlPgm(WORKPGM))                    return EXIT_FAILURE;    // contrôle file autorisation
-        if ( false == exists_File(WORKPGM) )             return EXIT_FAILURE;    // contrôle si programme
+        if ( false == exists_File(WORKPGM) )               return EXIT_FAILURE;    // contrôle si programme
         dir = std::filesystem::path(WORKPGM).parent_path().c_str();
         command = arg_1;
     }
     if (argc == 2 )  {
-        if ( false == ctrlPgm((char*)argv[1]))            return EXIT_FAILURE;    // contrôle file autorisation
-        if ( false == extention_File((char*)argv[1]) )    return EXIT_FAILURE;    // contrôle extention
-        if ( false == isDir_File((char*)argv[1]) )         return EXIT_FAILURE;     // contrôle is directorie
+        if ( false == ctrlPgm((char*)argv[1]))             return EXIT_FAILURE;    // contrôle file autorisation
+        if ( false == extention_File((char*)argv[1]) )     return EXIT_FAILURE;    // contrôle extention
+        if ( false == isDir_File((char*)argv[1]) )         return EXIT_FAILURE;    // contrôle is directorie
         if ( false == exists_File((char*)argv[1]) )        return EXIT_FAILURE;    // contrôle si programme
         dir = std::filesystem::path((const char*)(char*)argv[1]).parent_path().c_str();
         command = arg_2;
@@ -314,10 +312,14 @@ int main(int argc, char *argv[])
     gtk_init(&argc,&argv);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
+    //gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
     gtk_window_set_resizable (GTK_WINDOW(window),false);
-    gtk_window_set_deletable (GTK_WINDOW(window),false);
- 
+
+    #ifdef _DEBUG_  
+        gtk_window_set_deletable (GTK_WINDOW(window),true);
+    #else
+        gtk_window_set_deletable (GTK_WINDOW(window),false);
+    #endif
 
     /* Initialise the terminal */
     terminal = vte_terminal_new();

@@ -284,7 +284,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	) catch unreachable ;
 	
 	Panel.field.append(fld.newFieldDateISO("dateiso",18,32,			// Name , posx posy
-										"1951-10-12",				// text
+										"",				// text
 										true,						// tofill
 										"date out of calendar",		// error msg
 										"",							// help default
@@ -293,7 +293,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 	// test with a calendar file to know the opening days
 	// single digit test
 	
-	// fld.setTask(Panel,fld.getIndex(Panel,"dateiso") catch unreachable,"TaskIso") catch unreachable ;
+	//fld.setTask(Panel,fld.getIndex(Panel,"dateiso") catch unreachable,"TaskDateIso") catch unreachable ;
 
 	
 	Panel.field.append(fld.newFieldDateFR("datefr",19,32,			// Name , posx posy
@@ -303,7 +303,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"",							// help default
 										)
 	) catch unreachable ;
-	fld.setTask(Panel,fld.getIndex(Panel,"datefr") catch unreachable,"TaskFr") catch unreachable ;
+	fld.setTask(Panel,fld.getIndex(Panel,"datefr") catch unreachable,"TaskDateFr") catch unreachable ;
 	
 	Panel.field.append(fld.newFieldDateUS("dateus",20,32,			// Name , posx posy
 										"07/04/1776",				// text
@@ -312,7 +312,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"",							// help default
 										)
 	) catch unreachable ;
-	fld.setTask(Panel,fld.getIndex(Panel,"dateus") catch unreachable,"TaskUs") catch unreachable ;
+	fld.setTask(Panel,fld.getIndex(Panel,"dateus") catch unreachable,"TaskDateUs") catch unreachable ;
 
 	Panel.field.append(fld.newFieldTelephone("telephone",22,32,		// Name , posx posy
 										25,							// width
@@ -569,6 +569,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 	return ;
 }
 
+
 /// run emun Function ex: combo
 pub const FnEnum = enum {
 	comboFn01,
@@ -595,8 +596,8 @@ var callFunc: FnEnum = undefined;
 
 
 
-var callTask: TaskEnum = undefined;
-fn TaskIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+
+fn TaskDateIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	if ( ! fld.isMatchiFixedIso(vfld.text) ) {
 
@@ -611,7 +612,7 @@ fn TaskIso( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 
-fn TaskFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskDateFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	if ( ! fld.isMatchiFixedFr(vfld.text) ) {
 
@@ -626,7 +627,7 @@ fn TaskFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 
-fn TaskUs( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
+fn TaskDateUs( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 	if ( ! fld.isMatchiFixedUs(vfld.text) ) {
 
@@ -641,16 +642,16 @@ fn TaskUs( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 }
 
 pub const TaskEnum = enum {
-	TaskIso,
-	TaskFr,
-	TaskUs,
+	TaskDateIso,
+	TaskDateFr,
+	TaskDateUs,
 	none,
 
 	pub fn run(self: TaskEnum, 	vpnl : *pnl.PANEL, vfld: *fld.FIELD) void	{
 				switch (self) {
-				.TaskIso	=> TaskIso(vpnl,vfld),
-				.TaskFr		=> TaskFr(vpnl,vfld),
-				.TaskUs		=> TaskUs(vpnl,vfld),
+				.TaskDateIso	=> TaskDateIso(vpnl,vfld),
+				.TaskDateFr		=> TaskDateFr(vpnl,vfld),
+				.TaskDateUs		=> TaskDateUs(vpnl,vfld),
 
 				else => dsperr.errorForms(vpnl,	Error.main_run_EnumTask_invalide),
 
@@ -663,7 +664,7 @@ pub const TaskEnum = enum {
 		return TaskEnum.none;
 	}
 };
-
+var callTask: TaskEnum = undefined;
 
 
 var callProg: FnProg = undefined;

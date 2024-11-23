@@ -184,7 +184,7 @@
           "edtcar": "",
           "errmsg": "Type obligatoire",
           "help": "Type de zone",
-          "procfunc": "Ftype",
+          "procfunc": "Ctype",
           "proctask": "TctrlType",
           "progcall": "",
           "typecall": "",
@@ -320,6 +320,32 @@
           "posy": 6,
           "edtcar": "",
           "atrcell": "fgMagenta"
+        }
+      ]
+    },
+    {
+      "name": "Ctype",
+      "posx": 5,
+      "posy": 78,
+      "pagerows": 7,
+      "separator": "│",
+      "cadre": "line1",
+      "cells": [
+        {
+          "text": "Type",
+          "long": 4,
+          "reftyp": "TEXT_FREE",
+          "posy": 0,
+          "edtcar": "",
+          "atrcell": "fgGreen"
+        },
+        {
+          "text": "Label",
+          "long": 10,
+          "reftyp": "TEXT_FREE",
+          "posy": 1,
+          "edtcar": "",
+          "atrcell": "fgYellow"
         }
       ]
     }

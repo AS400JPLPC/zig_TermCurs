@@ -42,9 +42,19 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("mvzr");
 
+// src def
+const def = @import("srcdef");
 
 // management JSON
 const mdlFile = @import("mdlFile");
+
+// Description MENU
+const wrtMenu = @import("srcMenu").wrtMenu;
+
+// Description FORMULAIRE
+const wrtForms = @import("srcForms").wrtForms;
+
+
 
 // REFERENCE CONTROL
 const deb_Log = @import("logsrc").openFile;   // open  file
@@ -64,60 +74,14 @@ const allocator = std.heap.page_allocator;
 	// MENU = list: behaves like a choice with an index return
 
 
-	const OBJTYPE = enum { PANEL, SFLD ,COMBO , MENU };
-	
-	const DEFOBJET = struct {
-		name:  []const u8,
-		index: usize,
-		objtype: OBJTYPE,
-	};
-	const DEFFIELD = struct {
-		panel: []const u8,
-		npnl: usize,
-		field: []const u8,
-		index: usize,
-		func:  []const u8,
-		fgrid: []const u8,
-		task:  []const u8,
-		call:  []const u8,
-	};
 
-	const DEFLABEL = struct {
-		panel: []const u8,
-		npnl: usize,
-		label: []const u8,
-		index: usize,
-	};
 
-	const DEFLINEH = struct {
-		panel: []const u8,
-		npnl: usize,
-		line: []const u8,
-		index: usize,
-	};
-
-	const DEFLINEV = struct {
-		panel: []const u8,
-		npnl: usize,
-		line: []const u8,
-		index: usize,
-	};
-	
-	const DEFBUTTON = struct {
-		panel: []const u8,
-		npnl: usize,	
-		button: []const u8,
-		index: usize,
-		title:   []const u8,
-		
-	};	
-
-var NOBJET = std.ArrayList(DEFOBJET).init(allocator);
-var NFIELD = std.ArrayList(DEFFIELD).init(allocator);
-var NLABEL = std.ArrayList(DEFLABEL).init(allocator);
-var NLINEH = std.ArrayList(DEFLINEH).init(allocator);
-var NLINEV = std.ArrayList(DEFLINEV).init(allocator);
-var NBUTTON= std.ArrayList(DEFBUTTON).init(allocator);
+var NOBJET = std.ArrayList(def.DEFOBJET).init(allocator);
+var NFIELD = std.ArrayList(def.DEFFIELD).init(allocator);
+var NLABEL = std.ArrayList(def.DEFLABEL).init(allocator);
+var NLINEH = std.ArrayList(def.DEFLINEH).init(allocator);
+var NLINEV = std.ArrayList(def.DEFLINEV).init(allocator);
+var NBUTTON= std.ArrayList(def.DEFBUTTON).init(allocator);
 
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
@@ -131,11 +95,12 @@ var numMenu : usize = undefined;
 var nopt : usize	= 0;
 
 const choix = enum {
-	dspf,
+	folder,
 	control,
 	list,
 	linkcombo,
-	outsrc,
+	srcmenu,
+	srcforms,
 	clean,
 	exit
 };
@@ -223,11 +188,12 @@ pub fn main() !void {
 					mnu.CADRE.line1,		// type line fram
 					mnu.MNUVH.vertical,		// type menu vertical / horizontal
 					&.{
-					"Dspf",
+					"Folder",
 					"Control",
 					"List",
 					"Link-Combo",
-					"wrtSrc",
+					"SrcMenu",
+					"SrcForms",
 					"Clear *all",
 					"Exit...",
 					}
@@ -246,50 +212,60 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.exit )) { break; }
 		if (nopt == @intFromEnum(choix.control )) controlRef(NOBJET, NFIELD) ;
 		if (nopt == @intFromEnum(choix.list )) listRef(NOBJET, NFIELD, NLABEL, NLINEH, NLINEV, NBUTTON) ;
-		if (nopt == @intFromEnum(choix.outsrc )) wrtSrc(NOBJET, NFIELD) ;
+		
+		if (nopt == @intFromEnum(choix.srcmenu ) and NMENU.items.len > 0) wrtMenu(NMENU) ;
+		
+		if (nopt == @intFromEnum(choix.srcforms ) and NPANEL.items.len > 0)
+		 wrtForms(NPANEL,NGRID,NMENU,NOBJET,NFIELD,NLABEL,NLINEH,NLINEV,NBUTTON) ;
+
+		 
 		if (nopt == @intFromEnum(choix.linkcombo )) linkCombo(base, &NFIELD) ;
-		if (nopt == @intFromEnum(choix.dspf)) { 
+		if (nopt == @intFromEnum(choix.folder)) { 
 			try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;// use mdlRjson  
 			if (NPANEL.items.len > 0) {
 				for( NPANEL.items,0..) | p , i | {
-					NOBJET.append(DEFOBJET {.name = p.name, .index = i, .objtype = OBJTYPE.PANEL}) catch unreachable;
+					NOBJET.append(def.DEFOBJET {.name = p.name, .index = i, .objtype = def.OBJTYPE.PANEL})
+						 catch unreachable;
 					
 					for( p.field.items,0..) | f , x | {
-					NFIELD.append(DEFFIELD {.panel = p.name, .npnl = i , .field = f.name, .index = x,
+					NFIELD.append(def.DEFFIELD {.panel = p.name, .npnl = i , .field = f.name, .index = x,
 					.func = f.procfunc , .fgrid ="",
 					.task = f.proctask , .call =f.typecall}) catch unreachable;
 					}
 					
 					for( p.label.items,0..) | l , y | {
-					NLABEL.append(DEFLABEL {.panel = p.name, .npnl = i , .label = l.name, .index = y
+					NLABEL.append(def.DEFLABEL {.panel = p.name, .npnl = i , .label = l.name, .index = y
 					}) catch unreachable;
 					}
 					
 					for( p.lineh.items,0..) | h , y | {
-					NLINEH.append(DEFLINEH {.panel = p.name, .npnl = i , .line = h.name, .index = y
+					NLINEH.append(def.DEFLINEH {.panel = p.name, .npnl = i , .line = h.name, .index = y
 					}) catch unreachable;
 					}
 					
 					for( p.linev.items,0..) | v , y | {
-					NLINEV.append(DEFLINEV {.panel = p.name, .npnl = i , .line = v.name, .index = y
+					NLINEV.append(def.DEFLINEV {.panel = p.name, .npnl = i , .line = v.name, .index = y
 					}) catch unreachable;
 					}
 										
 					for( p.button.items,0..) | b , y | {
-					NBUTTON.append(DEFBUTTON {.panel = p.name, .npnl = i ,
+					NBUTTON.append(def.DEFBUTTON {.panel = p.name, .npnl = i ,
 						 .button = b.name, .index = y, .title = b.title
 					}) catch unreachable;
 					}
 				}
 			}	
 			for( NMENU.items,0..) | m , i | {
-				NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.MENU}) catch unreachable;
+				NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.MENU})
+					 catch unreachable;
 				}
 			for( NGRID.items,0..) | m , i | {
 				if (m.name[0] == 'C')
-				  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.COMBO}) catch unreachable
-				 else
-				  	NOBJET.append(DEFOBJET {.name = m.name,.index = i, .objtype = OBJTYPE.SFLD}) catch unreachable;
+				  	NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.COMBO})
+				  		 catch unreachable
+				else
+				  	NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.SFLD})
+				  		 catch unreachable;
 			}
 			
 		}
@@ -335,7 +311,7 @@ pub fn main() !void {
 //---------------------------------
 // choix panel
 //---------------------------------
-fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(DEFOBJET )) usize {
+fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(def.DEFOBJET )) usize {
 	const cellPos: usize = 0;
 	var Gkey: grd.GridSelect = undefined;
 	const Xcombo: *grd.GRID = grd.newGridC(
@@ -355,7 +331,7 @@ fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(DEFOBJET )) usize {
 	grd.setHeaders(Xcombo);
 
 	for (vobjet.items) |p| {
-		if (p.objtype ==  OBJTYPE.PANEL  ){
+		if (p.objtype ==  def.OBJTYPE.PANEL  ){
 		grd.addRows(Xcombo, &.{ usizeToStr(p.index), p.name});
 		}
 	}
@@ -376,14 +352,14 @@ fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(DEFOBJET )) usize {
 }
 
 // affectation GRID
-pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(DEFFIELD) ) void {
+pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(def.DEFFIELD) ) void {
 	const numOBJET = qryCellGrid(vpnl, &NOBJET);
 	var ftext : [] const u8 = undefined;
 
 	if (numOBJET == 999) return;
 
 	
-	var savObjet: std.ArrayList(DEFFIELD) = std.ArrayList(DEFFIELD).init(utl.allocUtl);
+	var savObjet: std.ArrayList(def.DEFFIELD) = std.ArrayList(def.DEFFIELD).init(utl.allocUtl);
 
 	for (NFIELD.items) |p| {
 		savObjet.append(p)  
@@ -473,7 +449,7 @@ pub fn addCombo(vpnl :*pnl.PANEL ) [] const u8 {
 	grd.setHeaders(Origine);
 
 	for (NOBJET.items) |g| {
-			if ( g.objtype == OBJTYPE.COMBO) {
+			if ( g.objtype == def.OBJTYPE.COMBO) {
 				const index = usizeToStr(g.index) ;
 				grd.addRows(Origine, &.{ g.name, index, "COMBO"});
 			}
@@ -493,24 +469,25 @@ pub fn addCombo(vpnl :*pnl.PANEL ) [] const u8 {
 	}	
 }
 
-fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) void {
+fn controlRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEFFIELD)) void {
 
 	del_Log("ref_control.txt");
 	deb_Log("ref_control.txt");
 
 
 		for( xobjet.items) | m | {
+			const name = padingRight(m.name ,10);
 			pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
-				, .{m.name , m.index , m.objtype});
+				, .{name , m.index , m.objtype});
 		}
 
 	new_Line();
 	new_Line();
 	for( xobjet.items) |m | {
-		if ( m.objtype == OBJTYPE.PANEL) {
-
-		pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
-			, .{m.name , m.index , m.objtype});
+		if ( m.objtype == def.OBJTYPE.PANEL) {
+			const name = padingRight(m.name ,10);
+			pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
+			, .{name , m.index , m.objtype});
 		
 		new_Line();
 		
@@ -550,7 +527,8 @@ fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) 
 		var ok = true;
 		for( xfield.items) | e | {
 			if (std.mem.eql(u8 ,m.name, e.panel)) { 
-				if ( ! std.mem.eql(u8 ,e.func ,"") and std.mem.eql(u8 ,e.fgrid,"") ) {
+				if ( ! std.mem.eql(u8 ,e.func ,"") and std.mem.eql(u8 ,e.fgrid,"") 
+													or !std.mem.eql(u8 ,e.func , e.fgrid)) {
 				if ( ok) {
 				pref(.NFIELD).ligne(
 				"┌────────────────{s}─────{s}───────────────{s}───────────────{s}────────────────────────────┐"
@@ -571,7 +549,7 @@ fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) 
 					const func  = padingRight(e.func  ,15);
 					const fgrid = padingRight(e.fgrid ,15);
 					pref(.NFIELD).ligne(
-					"│ {s}{s}{s}{s}{s}{s}{s}{s}ERROR not assigned to combo │"
+					"│ {s}{s}{s}{s}{s}{s}{s}{s}ERROR combo ≠ Func          │"
 					,.{field, e1, index, e1, func, e1, fgrid, e1});
 				}
 			}
@@ -590,26 +568,28 @@ fn controlRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD)) 
 
 
 
-fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
-			 xlabel: std.ArrayList(DEFLABEL)
-			 , xlineh: std.ArrayList(DEFLINEH), xlinev: std.ArrayList(DEFLINEV)
-			 , xbutton: std.ArrayList(DEFBUTTON)) void {
+fn listRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEFFIELD),
+			 xlabel: std.ArrayList(def.DEFLABEL)
+			 , xlineh: std.ArrayList(def.DEFLINEH), xlinev: std.ArrayList(def.DEFLINEV)
+			 , xbutton: std.ArrayList(def.DEFBUTTON)) void {
 
 	del_Log("ref_list.txt");
 	deb_Log("ref_list.txt");
 
 		for( xobjet.items) | m | {
+			const name = padingRight(m.name ,10);
 			pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
-				, .{m.name , m.index , m.objtype});
+				, .{name , m.index , m.objtype});
 		}
 
 	new_Line();
 	new_Line();
 
 	for( xobjet.items) |m | {
-	if ( m.objtype == OBJTYPE.PANEL) {
+	if ( m.objtype == def.OBJTYPE.PANEL) {
+		const name = padingRight(m.name ,10);
 		pref(.NOBJET).objet("Name {s} \t Index {d} \t  type {}"
-			, .{m.name , m.index , m.objtype});
+			, .{name , m.index , m.objtype});
 		
 		
 		//=========================================================================
@@ -785,499 +765,5 @@ fn listRef(xobjet: std.ArrayList(DEFOBJET), xfield: std.ArrayList(DEFFIELD),
 	}
 	end_Log();
 	utl.deinitUtl();
-
-}
-
-
-
-
-fn wrtSrc(xobjet: std.ArrayList(DEFOBJET ) , xfield: std.ArrayList(DEFFIELD))  void {
-	 
-
-	var nsrc : usize	= 0;
-	var ndef : usize	= 0;
-	
-	const source = enum {
-		mainMenu,
-		mainForms,
-		mainAll,
-		exit
-	};
-	
-	const MenuSource = mnu.newMenu(
-		"Source",				// name
-		5, 2,					// posx, posy
-		mnu.CADRE.line1,		// type line fram
-		mnu.MNUVH.vertical,		// type menu vertical / horizontal
-		&.{
-		"MainMenu",
-		"MainForms",
-		"Exit",
-		}
-	) ;
-
-	const srcdef = enum {
-		def,
-		next,
-		exit
-	};
-	const MenuDef = mnu.newMenu(
-		"Definition",			// name
-		5, 2,					// posx, posy
-		mnu.CADRE.line1,		// type line fram
-		mnu.MNUVH.vertical,		// type menu vertical / horizontal
-		&.{
-		"Def",
-		"Next",
-		"Exit",
-		}
-	) ;
-
-		
-	nsrc = mnu.ioMenu(MenuSource,0);		
-	if (nsrc == @intFromEnum(source.exit )) { return; }
-
-
-	const file = std.fs.cwd().createFile(
-        "src_file.zig", .{ .read = true } ) catch unreachable;
-    defer file.close();
-    const wrt = file.writer();
-
-    
-	if (nsrc == @intFromEnum(source.mainMenu )) {
-	wrt.print("//----------------------\n",.{}) catch {};
-	wrt.print("//---date text----------\n",.{}) catch {};
-	wrt.print("//----------------------\n",.{}) catch {};
-	wrt.print("\n\n\nconst std = @import(\"std\");\n",.{}) catch {};
-
-	wrt.print("// terminal Fonction\n",.{}) catch {};
-	wrt.print("const term = @import(\"cursed\");\n",.{}) catch {};
-
-	wrt.print("\n// menu Fonction\n",.{}) catch {};
-	wrt.print("const mnu = @import(\"menu\").mnu;\n",.{}) catch {};
-
-	
-	wrt.print("\nconst allocator = std.heap.page_allocator;\n",.{}) catch {};
-	wrt.print("var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);\n",.{}) catch {};
-	}
-
-
-    
-	if (nsrc == @intFromEnum(source.mainForms)) {
-	wrt.print("//----------------------\n",.{}) catch {};
-	wrt.print("//---date text----------\n",.{}) catch {};
-	wrt.print("//----------------------\n",.{}) catch {};
-	wrt.print("\n\n\nconst std = @import(\"std\");\n",.{}) catch {};
-
-	wrt.print("// terminal Fonction\n",.{}) catch {};
-	wrt.print("const term = @import(\"cursed\");\n",.{}) catch {};
-
-	wrt.print("// keyboard\n",.{}) catch {};
-	wrt.print("const kbd = @import(\"cursed\").kbd;\n",.{}) catch {};
-
-	wrt.print("\n// cadre\n",.{}) catch {};
-	wrt.print("const cdr = @import(\"forms\").cadre;\n",.{}) catch {};
-	wrt.print("const lne = @import(\"forms\").line;\n",.{}) catch {}
-	
-	;	
-	wrt.print("\n// Error\n",.{}) catch {};
-	wrt.print("const dsperr = @import(\"forms\").dsperr;\n",.{}) catch {};
-	
-	wrt.print("\n// frame\n",.{}) catch {};
-	wrt.print("const frm = @import(\"forms\").frm;\n",.{}) catch {};
-	
-	wrt.print("\n// panel\n",.{}) catch {};
-	wrt.print("const pnl = @import(\"forms\").pnl;\n",.{}) catch {};
-	
-	wrt.print("\n// button\n",.{}) catch {};
-	wrt.print("const btn = @import(\"forms\").btn;\n",.{}) catch {};
-	
-	wrt.print("\n// label\n",.{}) catch {};
-	wrt.print("const lbl = @import(\"forms\").lbl;\n",.{}) catch {};
-	
-	wrt.print("\n// flied\n",.{}) catch {};
-	wrt.print("const fld = @import(\"forms\").fld;\n",.{}) catch {};
-	
-	wrt.print("\n// line horizontal\n",.{}) catch {};
-	wrt.print("const lnh = @import(\"forms\").lnh;\n",.{}) catch {};
-	
-	wrt.print("\n// line vertival\n",.{}) catch {};
-	wrt.print("const lnv = @import(\"forms\").lnv;\n",.{}) catch {};
-	
-	for( xobjet.items) | m | {
-		if (m.objtype == OBJTYPE.SFLD or m.objtype == OBJTYPE.COMBO)	{
-			wrt.print("\n// line grid/combo\n",.{}) catch {};
-			wrt.print("const grd = @import(\"grid\").grd;\n",.{}) catch {};
-			break;
-		}
-	}
-	
-	for( xobjet.items) | m | {
-		if (m.objtype == OBJTYPE.MENU)	{
-			wrt.print("\n// menu\n",.{}) catch {};
-			wrt.print("const mnu = @import(\"menu\").mnu;\n",.{}) catch {};
-			break;
-		}
-	}
-
-	for( xfield.items) | f | {
-		if ( ! std.mem.eql(u8 ,f.call ,"")){
-			wrt.print("\n// tools execve Pgm\n",.{}) catch {};
-			wrt.print("\nconst mdl = @import(\"callpgm\");\n",.{}) catch {};
-			break;
-		}	
-	}		
-	wrt.print("\n// tools utility\n",.{}) catch {};
-	wrt.print("const utl = @import(\"utils\");\n",.{}) catch {};
-}
-
-
-	for( xobjet.items) | m | {
-		term.cls();
-		term.gotoXY(2,2);
-		term.writeStyled(m.name,atrText);		
-		ndef = mnu.ioMenu(MenuDef,0);
-	
-		if (ndef == @intFromEnum(srcdef.exit )) { break; }
-		if (ndef == @intFromEnum(srcdef.next )) { continue; }
-
-
-
-
-		if (m.objtype == OBJTYPE.PANEL and nsrc == @intFromEnum(source.mainForms) )	{
-
-			wrt.print("\n\n\n//----------------------\n",.{}) catch {};
-			wrt.print("// Define Global DSPF PANEL\n",.{}) catch {};
-			wrt.print("//----------------------\n",.{}) catch {};
-			
-			wrt.print("\n\n\npub fn Panel_{s}() *pnl.PANEL{{\n",.{NPANEL.items[m.index].name}) catch {};
-			
-			wrt.print("\t\t\t//----------------------\n",.{}) catch {};
-			wrt.print("\t\t\tvar Panel : *pnl.PANEL = pnl.newPanelC(\"{s}\",\n", 
-				.{NPANEL.items[m.index].name }) catch {};
-
-			wrt.print("\t\t\t{d}, {d},\n", .{ NPANEL.items[m.index].posx, NPANEL.items[m.index].posy} ) catch {};
-			wrt.print("\t\t\t{d}, {d},\n", .{ NPANEL.items[m.index].lines, NPANEL.items[m.index].cols}) catch {};
-			wrt.print("\t\t\tcdr.CADRE.{s},\n", .{ @tagName(NPANEL.items[m.index].frame.cadre)}) catch {};
-			wrt.print("\t\t\t\"{s}\");\n", .{ NPANEL.items[m.index].frame.title} ) catch {};
-
-
-// Button
-		if (NBUTTON.items.len > 0) {
-			wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
-			for( NPANEL.items[m.index].button.items) | b | {
-					wrt.print("\t\t\tPanel.button.append(btn.newButton(kbd.{s},{},{},\"{s}\")) catch unreachable ;\n"
-					,.{@tagName(b.key), b.show, b.check, b.title}) catch {} ;
-			}
-		}
-
-// Label
-		if (NLABEL.items.len > 0) {
-			wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
-			for( NPANEL.items[m.index].label.items) | l | {
-				if (l.title == true ) {
-					wrt.print("\t\t\tPanel.label.append(lbl.newTitle(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
-					,.{l.name, l.posx, l.posy, l.text}) catch {} ;
-					}
-					else {
-					wrt.print("\t\t\tPanel.label.append(lbl.newLabel(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
-					,.{l.name, l.posx, l.posy, l.text}) catch {} ;
-					}
-			}
-		}
-
-
-// Field
-		if (NFIELD.items.len > 0) {
-			wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
-			for( NPANEL.items[m.index].field.items) | f | {
-				wrt.print("\n",.{}) catch {};
-				switch(f.reftyp) {
-				forms.REFTYP.TEXT_FREE => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldTextFree(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.TEXT_FULL => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldTextFull(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.ALPHA => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldAlpha(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.ALPHA_UPPER => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.ALPHA_NUMERIC => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaNumeric(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-	
-				forms.REFTYP.ALPHA_NUMERIC_UPPER=> {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaNumericUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.PASSWORD => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldPassword(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.YES_NO => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldYesNo(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
-				},
-				
-				forms.REFTYP.UDIGIT => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldUDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.DIGIT => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.UDECIMAL => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldUDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.scal, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.DECIMAL => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.scal, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.DATE_ISO => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldDateISO(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
-				},
-				
-				forms.REFTYP.DATE_FR => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldDateFR(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
-				},
-				
-				forms.REFTYP.DATE_US => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldDateUS(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
-				},
-				
-				forms.REFTYP.TELEPHONE => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldTelephone(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.MAIL_ISO => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldMail(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
-				},
-				
-				forms.REFTYP.SWITCH => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldSwitchl(\"{s}\",{d},{d},{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy,f.zwitch,f.errmsg, f.help}) catch {} ;
-				},
-				
-				forms.REFTYP.FUNC => {
-				wrt.print("\t\t\tPanel.field.append(fld.newFieldFunc(\"{s}\",{d},{d},{d},\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
-				,.{f.name, f.posx, f.posy, f.width,f.requier, f.procfunc, f.errmsg, f.help}) catch {} ;
-				},
-
-				}
-			
-			}
-		}	
-// Line H
-			if (NLINEH.items.len > 0) {
-				wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
-				for( NPANEL.items[m.index].lineh.items) | h | {
-					wrt.print("\t\t\tPanel.lineh.append(lnh.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
-						,.{h.name, h.posx, h.posy, h.lng,@tagName(h.trace)}) catch {} ;
-				}
-			}
-// Line V
-			if (NLINEV.items.len > 0) {
-				wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
-				for( NPANEL.items[m.index].linev.items) | v | {
-					wrt.print("\t\t\tPanel.linev.append(lnv.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
-						,.{v.name, v.posx, v.posy, v.lng,@tagName(v.trace)}) catch {} ;
-				}
-			}
-
-
-			wrt.print("\n\n\t\t\treturn Panel;\n",.{}) catch {};
-			wrt.print("\n\n\t}}\n",.{}) catch {};
-		}
-		
-
-		
-
-		if (m.objtype == OBJTYPE.MENU)	{
-
-			wrt.print("\n\n\n//----------------------\n",.{}) catch {};
-			wrt.print("// Define Global DSPF MENU\n",.{}) catch {};
-			wrt.print("//----------------------\n",.{}) catch {};
-						
-			wrt.print("const x{s} = enum {{\n", 
-				.{NMENU.items[m.index].name}) catch {};
-			for(NMENU.items[m.index].xitems) |text| {
-				wrt.print("\t\t\t{s},\n", .{text}) catch {};
-			}
-			wrt.print("\t\t\t}};\n\n", .{}) catch {};
-
-			
-			wrt.print("const {s} = mnu.newMenu(\n", 
-				.{NMENU.items[m.index].name}) catch {};
-			wrt.print("\t\t\t\"{s}\",\n", 
-				.{NMENU.items[m.index].name}) catch {};
-			wrt.print("\t\t\t{d}, {d},\n",
-				 .{ NMENU.items[m.index].posx, NMENU.items[m.index].posy} ) catch {};
-			wrt.print("\t\t\tmnu.CADRE.{s},\n", 
-				.{ @tagName(NMENU.items[m.index].cadre)}) catch {};
-			wrt.print("\t\t\tmnu.MNUVH.{s},\n", 
-				.{ @tagName(NMENU.items[m.index].mnuvh)}) catch {};
-			wrt.print("\t\t\t&.{{\n", .{}) catch {};
-			for(NMENU.items[m.index].xitems) |text| {
-				wrt.print("\t\t\t\"{s}\",\n", .{text}) catch {};
-			}
-			wrt.print("\t\t\t}}\n", .{}) catch {};
-			wrt.print("\t\t\t);\n", .{}) catch {};
-		}
-
-		
-	}
-
-	if (nsrc == @intFromEnum(source.mainForms )) {
-		wrt.print("\n\n\n\t//Errors\n",.{}) catch {};
-		wrt.print("\tpub const Error = error{{\n",.{}) catch {};
-		wrt.print("\t\tmain_function_Enum_invalide,\n",.{}) catch {};
-		wrt.print("\t\tmain_run_EnumTask_invalide,\n",.{}) catch {};
-		wrt.print("\t}};\n\n\n",.{}) catch {};
-				
-		wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
-		wrt.print("//  run emun Function ex: combo\n",.{}) catch {};
-		wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
-		wrt.print("\tpub const FnEnum = enum {{\n",.{}) catch {};
-	// comboFn01,
-	// comboFn02,
-		wrt.print("\t\tnone,\n",.{}) catch {};
-
-		wrt.print("\t\tpub fn run(self: FnEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void {{\n",.{}) catch {};
-
-		wrt.print("\t\t\tswitch (self) {{\n",.{}) catch {};
-			// .comboFn01 => comboFn01(vpnl,vfld),
-			// .comboFn02 => comboFn02(vpnl,vfld),
-		wrt.print("\t\t\telse => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),\n",.{}) catch {};
-		wrt.print("\t\t\t}}\n",.{}) catch {};
-		wrt.print("\t\t}}\n",.{}) catch {};
-
-		wrt.print("\t\tfn searchFn ( vtext: [] const u8 ) FnEnum {{\n",.{}) catch {};
-
-		wrt.print("\t\t\tinline for (@typeInfo(FnEnum).@\"{s}\".fields) |f| {{\n",.{"enum"}) catch {}; 
-		wrt.print("\t\t\t\tif ( std.mem.eql(u8, f.name , vtext) ) return @as(FnEnum,@enumFromInt(f.value));\n"
-			,.{}) catch {};
-		wrt.print("\t\t\t}}\n",.{}) catch {};
-		wrt.print("\t\t\treturn FnEnum.none;\n",.{}) catch {};
-		wrt.print("\t\t}}\n",.{}) catch {};
-		wrt.print("\t}};\n",.{}) catch {};
-		wrt.print("\tvar callFunc: FnEnum = undefined;\n",.{}) catch {};
-	}
-
-	
-	if (nsrc == @intFromEnum(source.mainMenu )) {
-		wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
-		wrt.print("// squelette\n",.{}) catch {};
-		wrt.print("//----------------------------------\n\n",.{}) catch {};
-
-		wrt.print("pub fn main() !void {{\n",.{}) catch {};
-	    wrt.print("// init terminal\n",.{}) catch {};
-	    wrt.print("term.enableRawMode();\n",.{}) catch {};
-	    wrt.print("defer term.disableRawMode() ;\n\n",.{}) catch {};
-    
-		wrt.print("// Initialisation\n",.{}) catch {};
-		wrt.print("term.titleTerm(\"MY-TITLE\");\n\n",.{}) catch {};
-	
-		wrt.print("term.resizeTerm(44,168);\n",.{}) catch {};
-		wrt.print("term.cls();\n\n",.{}) catch {};
-	
-		wrt.print("var nopt : usize = 0;\n",.{}) catch {};
-
-		wrt.print("\twhile (true) {{\n",.{}) catch {};
-		wrt.print("\tnopt = mnu.ioMenu(menu??,nopt);\n",.{}) catch {};
-		wrt.print("\t\tif (nopt == @intFromEnum(xmnu??.Exit )) break;\n\n",.{}) catch {};
-		wrt.print("\t\t//--- ---\n\n",.{}) catch {};
-		wrt.print("\t\t}}\n\n",.{}) catch {};
-		wrt.print("}}\n\n",.{}) catch {};
-	}
-
-	
-	if (nsrc == @intFromEnum(source.mainForms )) {
-		wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
-		wrt.print("// squelette\n",.{}) catch {};
-		wrt.print("//----------------------------------\n\n",.{}) catch {};
-
-		wrt.print("pub fn main() !void {{\n",.{}) catch {};
-	    wrt.print("// init terminal\n",.{}) catch {};
-	    wrt.print("term.enableRawMode();\n",.{}) catch {};
-	    wrt.print("defer term.disableRawMode() ;\n\n",.{}) catch {};
-    
-		wrt.print("// Initialisation\n",.{}) catch {};
-		wrt.print("term.titleTerm(\"MY-TITLE\");\n\n",.{}) catch {};
-	
-		wrt.print("term.cls();\n\n",.{}) catch {};
-		
-		wrt.print("// define Panel\n",.{}) catch {};
-		wrt.print("var p{s} = Panel_{s}();\n\n",.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		
-		wrt.print("// work Panel-01\n",.{}) catch {};
-		wrt.print("term.resizeTerm(p{s}.lines,p{s}.cols);\n\n",.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-
-		wrt.print("// defines the receiving structure of the keyboard\n",.{}) catch {};
-		wrt.print("var Tkey : term.Keyboard = undefined ;\n\n",.{}) catch {};
-		
-		wrt.print("\twhile (true) {{\n",.{}) catch {};
-		wrt.print("\t\tTkey.Key = pnl.ioPanel(p{s});\n",.{NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t//--- ---\n\n",.{}) catch {};
-		
-		wrt.print("\t\tswitch (Tkey.Key) {{\n",.{}) catch {};
-
-		wrt.print("\t\t\t.func => {{\n",.{}) catch {};
-
-		wrt.print("\t\t\tcallFunc = FnEnum.searchFn(p{s}.field.items[p{s}.idxfld].procfunc);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {}; 
-		wrt.print("\t\t\tcallFunc.run(p{s}, &p{s}.field.items[p{s}.idxfld]);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t\t}},\n\n",.{}) catch {};
-
-		wrt.print("\t\t\t// call proc contrôl chek value\n",.{}) catch {};
-		wrt.print("\t\t\t.task => {{\n",.{}) catch {};
-		wrt.print("\t\t\tcallTask = TaskEnum.searchFn(p{s}.field.items[p{s}.idxfld].proctask);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t\tcallTask.run(p{s}, &p{s}.field.items[p{s}.idxfld]);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t\t}},\n\n",.{}) catch {};
-
-		wrt.print("\t\t\t.call => {{\n",.{}) catch {};
-
-		wrt.print("\t\t\tcallProg = FnProg.searchFn(p{s}.field.items[p{s}.idxfld].progcall);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t\tcallProg.run(p{s}, &p{s}.field.items[p{s}.idxfld]);\n"
-			,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-		wrt.print("\t\t\t}},\n\n",.{}) catch {};
-
-		wrt.print("\t\t\telse => {{}},\n\n",.{}) catch {};
-		
-		wrt.print("\t\t}}\n\n",.{}) catch {};
-		
-		
-		wrt.print("\t\tif (Tkey.Key == kbd.F3) break; // end work\n",.{}) catch {};
-		wrt.print("\t}}\n\n",.{}) catch {};
-		wrt.print("}}\n\n",.{}) catch {};
-	}
 
 }

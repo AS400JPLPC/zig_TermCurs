@@ -462,8 +462,8 @@ pub const mnu = struct {
 				} else {
 					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
 					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => Tkey.Key = kbd.enter,
-						term.MouseButton.mbMiddle => Tkey.Key = kbd.enter,
+						term.MouseButton.mbLeft => Tkey.Key = kbd.none,
+						term.MouseButton.mbMiddle => Tkey.Key = kbd.none,
 						term.MouseButton.mbRight => Tkey.Key = kbd.enter,
 						else => {},
 					}

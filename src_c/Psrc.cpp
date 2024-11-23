@@ -1,4 +1,3 @@
-/// -----------------------------------------------------------------
 /// Jean-Pierre Laroche
 /// projet 2018-08-08  (C) 2018   Copyright 2018  <laroche.jeanpierre@gmail.com>
 /// but :     terminal rapide    / flexible / respectant le code escape
@@ -7,25 +6,11 @@
 ///            plus souple que XTERM et plus sécuritaire que les terminal public  pour des applicatifs
 ///            outil pour développer une application de type 5250 / 3270 ou terminal semi-graphic
 ///            tool to develop a 5250/3270 or terminal semi-graphic application
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
-*/
 
 
 ///  GTK3 and X11
+
+
 
 #include <filesystem>
 #include <sys/stat.h>
@@ -33,9 +18,9 @@
 #include <pango/pango.h>
 #include <gdk/gdkx.h>
 
-
 /// si test cout
 //#include <iostream>
+
 
 #define _DEBUG_ 1 /// ALT_F4 ACTIVE
 
@@ -44,7 +29,7 @@
 /// ex:
 ///------------------------------------------
 
-#define WORKPGM        "./Exemple"
+#define WORKPGM        ""
 
 #define MESSAGE_ALT_F4 "vous devez activer uniquement \n en développemnt  \n Confirm destroy Application --> DEBUG"
 
@@ -54,11 +39,12 @@
 ///-----------------------------------------
 #define VTENAME "VTE-TERM3270"
 
-unsigned int COL=    132;      /// max 132
+unsigned int COL=    168;    /// max 132
 
-unsigned int ROW =    42;        /// max 42 including a line for the system
+unsigned int ROW =    44;        /// max 42 including a line for the system
 
-/// defined not optional
+/// Font DejaVu Sans Mono -> xfce4-terminal
+/// defined not optional  -> gnome-terminal
 #define VTEFONT    "Source Code Pro"
 
 //*******************************************************
@@ -66,12 +52,10 @@ unsigned int ROW =    42;        /// max 42 including a line for the system
 //*******************************************************
 
 
+
 GtkWidget    *window, *terminal;
 
 GPid child_pid = 0;
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //    function alphanumeric switch
@@ -94,8 +78,8 @@ bool ctrlPgm(std::string v_TEXT)
     std::filesystem::path p(v_TEXT.c_str());
                                             switch(strswitch(p.stem().c_str()))
                                             {
-                                                case  strswitch("Exemple")            : b_pgm =true;        break;
-                                                case  strswitch("exCallpgm")          : b_pgm =true;        break;
+                                                case  strswitch("menusrc")        : b_pgm =true;        break;
+                                                case  strswitch("formsrc")        : b_pgm =true;        break;
                                             }
     return b_pgm;
 }
@@ -167,11 +151,12 @@ void    init_Terminal()
     //determines the maximum size for screens
     Display* d = XOpenDisplay(NULL);
     Screen*  s = DefaultScreenOfDisplay(d);
-    char * font_terminal = new char[30] ;
+    // obsolète
     //gint width  = gdk_screen_width();
     //gint height = gdk_screen_height();
+    char * font_terminal = new char[30] ;
 
-    /// Font DejaVu Sans Mono -> xfce4-terminal
+
     /// confortable and extend numbers columns and rows
 
     if ( s->width <= 1600 && s->height >=1024 ) {                    // ex: 13"... 15"
@@ -189,31 +174,33 @@ void    init_Terminal()
         COL = 168;
         ROW = 44;
     }
-
-
     //COL = 132;
     //ROW = 32;
     // resize  title  font
-    VTE = VTE_TERMINAL (terminal);
+  VTE = VTE_TERMINAL (terminal);
 
-    vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));        /// font utilisé
+  vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));        /// font utilisé
 
-    vte_terminal_set_size (VTE, COL, ROW);                                                                    /// size du terminal
+    vte_terminal_set_size (VTE, COL, ROW);                                                /// size du terminal
 
-    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                                                  /// titre du terminal de base
+    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                                    /// titre du terminal de base
 
     vte_terminal_set_scrollback_lines (VTE,0);                                             ///    désactiver historique.
 
     vte_terminal_set_scroll_on_output(VTE,FALSE);                                        /// pas de défilement en cas de nouvelle sortie
 
-    vte_terminal_set_scroll_on_keystroke(VTE,FALSE);                                /// pas de défilement en bas s’il y a interaction de l’utilisateur
+    vte_terminal_set_scroll_on_keystroke(VTE,FALSE);                                    /// pas de défilement en bas s’il y a interaction de l’utilisateur
 
     vte_terminal_set_mouse_autohide(VTE, TRUE);                                            /// cacher le curseur de la souris quand le clavier est utilisé.
 
-    vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);        /// cursor blink on
+    vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);                        /// cursor blink on
 
-    vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);          /// define cursor 'block'
+    vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);                            /// define cursor 'block'
+
+
+
 }
+
 
 /// -----------------------------------------------------------------------------
 /// Callback for vte_terminal_spawn_async    retrived PID terminal ONLY
@@ -242,6 +229,10 @@ void on_resize_window(GtkWidget *terminal, guint  _col, guint _row)
     gtk_widget_show_all(window);
 }
 
+
+
+
+
 /// -----------------------------------------------------------------------------
 ///  libvte function putting the terminal function active
 /// -----------------------------------------------------------------------------
@@ -261,16 +252,17 @@ inline bool exists_File (const std::string& name) {
 
 // programme linux pas d'extention windows ".exe"
 inline bool extention_File(const std::string& name) {
-    std::filesystem::path filePath = name.c_str();
-    if (filePath.extension()!= "") return false;
-    return true;
+        std::filesystem::path filePath = name.c_str();
+        if (filePath.extension()!= "") return false;
+        return true;
 }
 
 inline bool isDir_File(const std::string& name) {
-    std::string strdir = std::filesystem::path(name.c_str()).parent_path();
-    if (strdir.empty() ) return false;
-    return true;
+        std::string strdir = std::filesystem::path(name.c_str()).parent_path();
+        if (strdir.empty() ) return false;
+        return true;
 }
+
 
 
 
@@ -294,13 +286,13 @@ int main(int argc, char *argv[])
 
     if (argc == 1 )  {
         if ( false == ctrlPgm(WORKPGM))                    return EXIT_FAILURE;    // contrôle file autorisation
-        if ( false == exists_File(WORKPGM) )               return EXIT_FAILURE;    // contrôle si programme
+        if ( false == exists_File(WORKPGM) )             return EXIT_FAILURE;    // contrôle si programme
         dir = std::filesystem::path(WORKPGM).parent_path().c_str();
         command = arg_1;
     }
     if (argc == 2 )  {
-        if ( false == ctrlPgm((char*)argv[1]))             return EXIT_FAILURE;    // contrôle file autorisation
-        if ( false == extention_File((char*)argv[1]) )     return EXIT_FAILURE;    // contrôle extention
+        if ( false == ctrlPgm((char*)argv[1]))            return EXIT_FAILURE;    // contrôle file autorisation
+        if ( false == extention_File((char*)argv[1]) )    return EXIT_FAILURE;    // contrôle extention
         if ( false == isDir_File((char*)argv[1]) )         return EXIT_FAILURE;     // contrôle is directorie
         if ( false == exists_File((char*)argv[1]) )        return EXIT_FAILURE;    // contrôle si programme
         dir = std::filesystem::path((const char*)(char*)argv[1]).parent_path().c_str();
@@ -330,9 +322,6 @@ int main(int argc, char *argv[])
         gtk_window_set_deletable (GTK_WINDOW(window),false);
     #endif
 
-
-
-
     /* Initialise the terminal */
     terminal = vte_terminal_new();
 
@@ -345,7 +334,7 @@ int main(int argc, char *argv[])
         VTE_PTY_DEFAULT, // VtePtyFlags pty_flags,
 
         dir,            // const char *working_directory
-       command,        // command
+        command,        // command
 
         NULL,            // environment
         (GSpawnFlags)(G_SPAWN_SEARCH_PATH |G_SPAWN_FILE_AND_ARGV_ZERO),                // spawn flags
@@ -362,8 +351,6 @@ int main(int argc, char *argv[])
 
     // Connect some signals
     g_signal_connect(GTK_WINDOW(window),"delete_event", G_CALLBACK(key_press_ALTF4), NULL);
-  //gtk_widget_set_events (window, GDK_KEY_PRESS_MASK);
-  //g_signal_connect (G_OBJECT (window), "key_press_event",G_CALLBACK (key_press_event), NULL);
 
 
     g_signal_connect(terminal, "child-exited",  G_CALLBACK (close_window), NULL);
@@ -373,19 +360,11 @@ int main(int argc, char *argv[])
     g_signal_connect(terminal, "resize-window", G_CALLBACK(on_resize_window),NULL);
 
 
-
-
-
     /* Put widgets together and run the main loop */
     gtk_container_add(GTK_CONTAINER(window), terminal);
 
-    //gtk_widget_hide(window);            // hide = ignore flash
+    gtk_widget_hide(window);            // hide = ignore flash
     gtk_widget_show_all(window);        // for test invalide contrôle protection
-
-
-
-
-
 
     gtk_main();
 

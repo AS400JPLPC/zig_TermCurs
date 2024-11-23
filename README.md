@@ -333,52 +333,35 @@ you have to understand the menu option as a fixed combo with constant values <br
 
 →  Gensrc<BR/>
 Added Gensrc definition Programme<br />
-- Dspf       : choix du model <BR/>
+- Folder       : choix du model <BR/>
 - Control    : list control <BR/>
 - List       : List of the DSPF nomencalature <BR/>
 - Link-Combo : combo assignment    CtrlV validation <BR/>
-- outSrc     : output srs-lst <BR/>
+- SrcMenu    : output srs-lst <BR/>
+- SrcForms   : output srs-lst <BR/>
 - Clear *all : Cleaning arraylist buffers<BR/> 
 - Exit       : Exit <BR/>
 
-
-→ 2024-08-20<BR/>
-- Test programme Gensrc.   It remains to determine the folders of the lists and the source output<BR/>
-- To see how it works  dspf/ntest 
-
-
-
-→ 2024-08-25<BR/>
-- Improved isMatch regex from forms function<BR/>
-- watch the program exemple.zig<BR/>
-<BR/>
-
-
-→ 2024-09-01<BR/>
-- be careful from branch 0.14. dev 1391 there are changes ex: @typeInfo(EnumTag).@"enum".fields (before .enum.fields)<BR/>
--  add Alt-X function display menu<BR/>
--  add Alt-R function display terminal actif<BR/>
--  x,y menu positioning fix<BR/>
 <BR/>
 <BR/>
-
-→ 2024-10-17<BR/>
--  update module MDLMENU -> improved sketch<BR/>
--  update module MDLFILE -> changed function key text, more clarity<BR/>
--  update Gensrc -> Generation Source type "mainMenu" with a skeleton<BR/>
--  Several minor changes due to testing<BR/>
 <BR/>
-
-→ 2024-10-17 19:00<BR/>
--  update module MDLFORMS -> add function Alt-G View GRID<BR/>
--  update module MDLGRID  -> Best Grid Order/Remove Adaptation<BR/>
 <BR/>
-
 
 → 2024-11-20 15:40<BR/>
 -  update library CURSED  -> Modification of keyboard key retrieval for a terminal in a more functional way. <BR/>
 -  update module MDLFILE  -> Improved sorting algorithm integrated, with the ability to add a file attribute.<BR/>
--  I am currently testing source code generation, and sometimes I question my code, particularly the way I approach the matrix.
+-  I am currently testing source code generation, and sometimes I question my code, particularly the way I approach the matrix.<BR/>
+<BR/>
+
+→ 2024-11-23 15:40<BR/>
+-  update MOUSE  -> click Left Middle = none click Right Enter for MENU and GRID <BR/>
+-  new module    -> Gensrc SrcMenu SrcForms générate source main<BR/>
+-  I am currently testing source code generation, and sometimes I question my code, particularly the way I approach the matrix.<BR/>
+-  update ENV-WORK<BR/>
+-  update MenuDEV.sh new MenuTEST.sh<br/>
+-  First test Gensrc - srcforms - srcMenu <BR/>
+-  folder OUT-ZIG to test <BR/>
+-  use for test only folder(repertoire) 
 <BR/>
 
 ------------------------------------------------------------------<br />

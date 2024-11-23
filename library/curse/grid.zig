@@ -888,8 +888,8 @@ pub const grd = struct {
 				} else {
 					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
 					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => grid_key.Key = kbd.enter,
-						term.MouseButton.mbMiddle => grid_key.Key = kbd.enter,
+						term.MouseButton.mbLeft => grid_key.Key = kbd.none,
+						term.MouseButton.mbMiddle => grid_key.Key = kbd.none,
 						term.MouseButton.mbRight => grid_key.Key = kbd.enter,
 						else => {},
 					}
@@ -1011,8 +1011,8 @@ pub const grd = struct {
 					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
 
 					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => grid_key.Key = kbd.enter,
-						term.MouseButton.mbMiddle => grid_key.Key = kbd.enter,
+						term.MouseButton.mbLeft => grid_key.Key = kbd.none,
+						term.MouseButton.mbMiddle => grid_key.Key = kbd.none,
 						term.MouseButton.mbRight => grid_key.Key = kbd.enter,
 						else => {},
 					}
@@ -1159,8 +1159,8 @@ pub const grd = struct {
 				} else {
 					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
 					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => grid_key.Key = kbd.enter,
-						term.MouseButton.mbMiddle => grid_key.Key = kbd.enter,
+						term.MouseButton.mbLeft => grid_key.Key = kbd.none,
+						term.MouseButton.mbMiddle => grid_key.Key = kbd.none,
 						term.MouseButton.mbRight => grid_key.Key = kbd.enter,
 						else => {},
 					}

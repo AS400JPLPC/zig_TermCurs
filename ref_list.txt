@@ -1,83 +1,51 @@
-[Objet(NOBJET)] Name Xpanel 	 Index 0 	  type Gensrc.OBJTYPE.PANEL
-[Objet(NOBJET)] Name Gtable 	 Index 0 	  type Gensrc.OBJTYPE.SFLD
-[Objet(NOBJET)] Name CVoiture 	 Index 1 	  type Gensrc.OBJTYPE.COMBO
-[Objet(NOBJET)] Name Cmarque 	 Index 2 	  type Gensrc.OBJTYPE.COMBO
+[Objet(NOBJET)] Name DEFREP     	 Index 0 	  type srcdef.OBJTYPE.PANEL
+[Objet(NOBJET)] Name Grept      	 Index 0 	  type srcdef.OBJTYPE.SFLD
+[Objet(NOBJET)] Name Ctype      	 Index 1 	  type srcdef.OBJTYPE.COMBO
 
 
-[Objet(NOBJET)] Name Xpanel 	 Index 0 	  type Gensrc.OBJTYPE.PANEL
+[Objet(NOBJET)] Name DEFREP     	 Index 0 	  type srcdef.OBJTYPE.PANEL
 
-┌────────────┬─────┬─────────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
-│ Name       │ Key │ field           │ Index │ func            │ grid            │ task            │ call            │
-├────────────┼─────┼─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-│ Xpanel     │   0 │ NOM             │     0 │                 │                 │ TNOM            │                 │
-│ Xpanel     │   0 │ PRENOM          │     1 │                 │                 │ TPRENOM         │                 │
-│ Xpanel     │   0 │ FREE            │     2 │                 │                 │ TFREE           │                 │
-│ Xpanel     │   0 │ FULL            │     3 │                 │                 │ TFULL           │                 │
-│ Xpanel     │   0 │ ALPHA           │     4 │                 │                 │ TALPHA          │                 │
-│ Xpanel     │   0 │ ALPHAUPPER      │     5 │                 │                 │ TALPHAUPPER     │                 │
-│ Xpanel     │   0 │ ALPHANUM        │     6 │                 │                 │ TALPHANUM       │                 │
-│ Xpanel     │   0 │ ALPHANUMUPPER   │     7 │                 │                 │ TALPHANUMUPPER  │                 │
-│ Xpanel     │   0 │ PASSWORD        │     8 │                 │                 │ TPASSWORD       │                 │
-│ Xpanel     │   0 │ YESNO           │     9 │                 │                 │ TYESNO          │                 │
-│ Xpanel     │   0 │ UDIGIT          │    10 │                 │                 │ TUDIGIT         │                 │
-│ Xpanel     │   0 │ DIGIT           │    11 │                 │                 │ TDIGIT          │                 │
-│ Xpanel     │   0 │ UDECIMAL        │    12 │                 │                 │ TUDECIMAL       │                 │
-│ Xpanel     │   0 │ DECIMAL         │    13 │                 │                 │ TDECIMAL        │                 │
-│ Xpanel     │   0 │ DATEISO         │    14 │                 │                 │ TDATEISO        │                 │
-│ Xpanel     │   0 │ DATEFR          │    15 │                 │                 │ TDATEFR         │                 │
-│ Xpanel     │   0 │ DATEUS          │    16 │                 │                 │ TDATEUS         │                 │
-│ Xpanel     │   0 │ TELEPHONE       │    17 │                 │                 │ TTELEPHONE      │                 │
-│ Xpanel     │   0 │ MAILISO         │    18 │                 │                 │ TMAILISO        │                 │
-│ Xpanel     │   0 │ SWITCH          │    19 │                 │                 │ TSWITCH         │                 │
-│ Xpanel     │   0 │ FUNC            │    20 │ FFUNC           │ CVoiture        │ TFUNC           │                 │
-│ Xpanel     │   0 │ FUNC2           │    21 │ FFUNC2          │ Cmarque         │ TFUNC2          │                 │
-└────────────┴─────┴─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
+┌────────────┬──────┬─────────────────┬───────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
+│ Name       │ Npnl │ field           │ Index │ func            │ grid            │ task            │ call            │
+├────────────┼──────┼─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
+│ DEFREP     │    0 │ MNEXTD          │     0 │                 │                 │ TctlName        │                 │
+│ DEFREP     │    0 │ MNEMO           │     2 │                 │                 │ TctlMnemo       │                 │
+│ DEFREP     │    0 │ TYPE            │     3 │ Ctype           │ Ctype           │ TctrlType       │                 │
+│ DEFREP     │    0 │ LONG            │     4 │                 │                 │ TcrtlLong       │                 │
+│ DEFREP     │    0 │ WIDTH           │     5 │                 │                 │ TctrlWidth      │                 │
+│ DEFREP     │    0 │ SCAL            │     6 │                 │                 │ TctrlScal       │                 │
+└────────────┴──────┴─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
 
-┌────────────┬─────┬─────────────────┬───────┐
-│ Name       │ Key │ label           │ Index │
-├────────────┼─────┼─────────────────┼───────┤
-│ Xpanel     │   0 │ L39             │     0 │
-│ Xpanel     │   0 │ L59             │     1 │
-│ Xpanel     │   0 │ L79             │     2 │
-│ Xpanel     │   0 │ L480            │     3 │
-│ Xpanel     │   0 │ L680            │     4 │
-│ Xpanel     │   0 │ L880            │     5 │
-│ Xpanel     │   0 │ L1080           │     6 │
-│ Xpanel     │   0 │ L1280           │     7 │
-│ Xpanel     │   0 │ L1480           │     8 │
-│ Xpanel     │   0 │ L1680           │     9 │
-│ Xpanel     │   0 │ L1880           │    10 │
-│ Xpanel     │   0 │ L2080           │    11 │
-│ Xpanel     │   0 │ L2280           │    12 │
-│ Xpanel     │   0 │ L2480           │    13 │
-│ Xpanel     │   0 │ L2680           │    14 │
-│ Xpanel     │   0 │ L2880           │    15 │
-│ Xpanel     │   0 │ L3080           │    16 │
-│ Xpanel     │   0 │ L3280           │    17 │
-│ Xpanel     │   0 │ L3480           │    18 │
-│ Xpanel     │   0 │ L3680           │    19 │
-│ Xpanel     │   0 │ L3880           │    20 │
-│ Xpanel     │   0 │ L4080           │    21 │
-│ Xpanel     │   0 │ L40127          │    22 │
-└────────────┴─────┴─────────────────┴───────┘
+┌────────────┬──────┬─────────────────┬───────┐
+│ Name       │ Npnl │ label           │ Index │
+├────────────┼──────┼─────────────────┼───────┤
+│ DEFREP     │    0 │ L33             │     0 │
+│ DEFREP     │    0 │ L320            │     1 │
+│ DEFREP     │    0 │ L371            │     2 │
+│ DEFREP     │    0 │ L378            │     3 │
+│ DEFREP     │    0 │ L380            │     4 │
+│ DEFREP     │    0 │ L385            │     5 │
+│ DEFREP     │    0 │ L391            │     6 │
+└────────────┴──────┴─────────────────┴───────┘
 
-┌────────────┬─────┬─────────────────┬───────┐
-│ Name       │ Key │ line Horizontal │ Index │
-├────────────┼─────┼─────────────────┼───────┤
-│ Xpanel     │   0 │ H89             │     0 │
-│ Xpanel     │   0 │ H423            │     1 │
-└────────────┴─────┴─────────────────┴───────┘
+┌────────────┬──────┬─────────────────┬───────┐
+│ Name       │ Npnl │ line Horizontal │ Index │
+├────────────┼──────┼─────────────────┼───────┤
+└────────────┴──────┴─────────────────┴───────┘
 
-┌────────────┬─────┬─────────────────┬───────┐
-│ Name       │ Key │ line vertical   │ Index │
-├────────────┼─────┼─────────────────┼───────┤
-│ Xpanel     │   0 │ V38             │     0 │
-│ Xpanel     │   0 │ V277            │     1 │
-└────────────┴─────┴─────────────────┴───────┘
+┌────────────┬──────┬─────────────────┬───────┐
+│ Name       │ Npnl │ line vertical   │ Index │
+├────────────┼──────┼─────────────────┼───────┤
+└────────────┴──────┴─────────────────┴───────┘
 
-┌────────────┬─────┬─────────────────┬───────┬─────────────────┐
-│ Name       │ Key │ Button          │ Index │ Title           │
-├────────────┼─────┼─────────────────┼───────┼─────────────────┤
-│ Xpanel     │   0 │ F1              │     0 │ Help            │
-│ Xpanel     │   0 │ F3              │     1 │ Exit            │
-└────────────┴─────┴─────────────────┴───────┴─────────────────┘
+┌────────────┬──────┬─────────────────┬───────┬─────────────────┐
+│ Name       │ Npnl │ Button          │ Index │ Title           │
+├────────────┼──────┼─────────────────┼───────┼─────────────────┤
+│ DEFREP     │    0 │ F1              │     0 │ Help            │
+│ DEFREP     │    0 │ F3              │     1 │ Exit            │
+│ DEFREP     │    0 │ F5              │     2 │ display GRID    │
+│ DEFREP     │    0 │ F9              │     3 │ Enrg.           │
+│ DEFREP     │    0 │ F11             │     4 │ Update          │
+│ DEFREP     │    0 │ F12             │     5 │ Return          │
+│ DEFREP     │    0 │ F23             │     6 │ Delette         │
+└────────────┴──────┴─────────────────┴───────┴─────────────────┘

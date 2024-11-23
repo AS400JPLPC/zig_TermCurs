@@ -10,6 +10,7 @@ Work environment<br>
   - MgetZig -> get  night last Version<br>
   - MgetZls -> get source and compile night last Version<br>
   - MgetHelix -> get source and compile night last Version<br>
+  - Mctrl-zig-zls ->  get zls and zig last Master version<br>
 <br><br>
   2. Init<br>
   - copy to bashrc & bash_profile files<br>

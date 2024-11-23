@@ -74,7 +74,6 @@ var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
 // defined var global
 
 
-
 var nopt : usize	= 0;
 
 
@@ -150,8 +149,6 @@ pub fn main() !void {
 		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL, &NGRID) ;
 		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
 		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
-
-
 		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, true) ;
 		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;
 		
@@ -164,6 +161,7 @@ pub fn main() !void {
 			grd.deinitGrid();
 			utl.deinitUtl();
 			forms.deinitForms();
+			
 			mdlMenus.deinitMenu();
 
 			if (NPANEL.items.len > 0) {

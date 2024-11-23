@@ -54,7 +54,7 @@ f_readPos() {	#commande de positionnement	lines + coln + text
 printf '\e[8;'35';'80't'
 
 envCPP="1"
-envZIG="2"
+envZIG="4"
 PROJECT="ZTERM"
 LIBPROJECT="/home/soleil/Zterm/"
 LIBRARY="/home/soleil/Zterm/library/"
@@ -68,18 +68,14 @@ do
 	f_dsplyPos  1  24 $faGras$fcJaune 'Project: '$faGras$fcCyan$PROJECT
 
 	f_dsplyPos  3  24 $faGras$fcJaune '------------compile cpp-----------------'
-	f_dsplyPos  4  20 $faGras$fcRouge' 1.'; f_dsplyPos  4  24 $faGras$fcGreen 'Gen'
-	f_dsplyPos  5  20 $faGras$fcRouge' 2.'; f_dsplyPos  5  24 $faGras$fcGreen 'APPTERM'
-	f_dsplyPos  6  20 $faGras$fcRouge' 3.'; f_dsplyPos  6  24 $faGras$fcGreen 'Src'
+
+	f_dsplyPos  5  20 $faGras$fcRouge ' 1.'; f_dsplyPos  5  24 $faGras$fcGreen 'Psrc'
 
 	f_dsplyPos  7  24 $faGras$fcJaune '------------compile Zig-----------------'
-	f_dsplyPos  8  20 $faGras$fcRouge'11.'; f_dsplyPos  8  24 $faGras$fcGreen 'Gencurs'
-	f_dsplyPos  9  20 $faGras$fcRouge'12.'; f_dsplyPos  9  24 $faGras$fcGreen 'Exemple'
-	f_dsplyPos 10  20 $faGras$fcRouge'13.'; f_dsplyPos 10  24 $faGras$fcGreen 'exCallpgm'
-	f_dsplyPos 11  20 $faGras$fcRouge'15.'; f_dsplyPos 11  24 $faGras$fcGreen 'Gensrc'
 
-	f_dsplyPos 14  20 $faGras$fcRouge'20.'; f_dsplyPos 14  24 $faGras$fcGreen 'test'
-    f_dsplyPos 15  20 $faGras$fcRouge'21.'; f_dsplyPos 15  24 $faGras$fcGreen 'test2'
+	f_dsplyPos  9  20 $faGras$fcRouge' 10'; f_dsplyPos  9  24 $faGras$fcGreen 'menusrc'
+	f_dsplyPos 10  20 $faGras$fcRouge' 11'; f_dsplyPos 10  24 $faGras$fcGreen 'formsrc'
+
 
 	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
@@ -109,48 +105,21 @@ do
 
  		case "$choix" in
 
-# Gen
-		1)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Gen"
-		;;
+
 # APPTERM
-		2)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
-		;;
-# Src
-		3)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Src"
+		1)
+			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Psrc"
 		;;
 
-#Gencurs
+
+#Menusrc
+		10)
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "menusrc"
+		;;
+
+#formsrc
 		11)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gencurs"
-		;;
-
-#Example
-		12)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Exemple"
-		;;
-
-#callExample
-		13)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "exCallpgm"
-		;;
-
-#Gensrc
-		15)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gensrc"
-		;;
-
-
-#study 
-        20)
-			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test"	
-		;;
-
-#study 
-        21)
-			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test2"	
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "formsrc"
 		;;
 
 
@@ -173,7 +142,7 @@ do
 
 #project
 		55)
-			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"src-zig"
+			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"out-zig"
 			#sleep 2
 			#break
 		;;

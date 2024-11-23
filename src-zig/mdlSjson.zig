@@ -461,8 +461,6 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
 					try w.endArray();
 					try w.endObject();
 				},	
-				.data => {
-				},
 			}
 		}
     }
@@ -536,5 +534,4 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
 	try w.endArray();
 	} 
   	if ( nbrMenu > 0 )  try w.endObject(); 
-return ;
 }

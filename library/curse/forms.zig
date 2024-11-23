@@ -177,6 +177,7 @@ pub const ErrForms = error{
 				fld_setRequier_Index_invalide,
 				fld_setEdtcar_Index_invalide,
 				fld_setRegex_Index_invalide,
+				fld_setfunc_Index_invalide,
 				fld_setTask_Index_invalide,
 				fld_setCall_Index_invalide,
 				fld_setTypeCall_Index_invalide,
@@ -1586,7 +1587,7 @@ pub const	fld = struct {
 				.text	  = vtext,
 				.zwitch   = false,
 				.procfunc ="",
-				.proctask ="",
+				.proctask ="TaskDateFr",
 				.progcall ="",
 				.typecall ="",
 				.parmcall = false,
@@ -1639,7 +1640,7 @@ pub const	fld = struct {
 				.text	 = vtext,
 				.zwitch   = false,
 				.procfunc ="",
-				.proctask ="",
+				.proctask ="TaskDateUs",
 				.progcall ="",
 				.typecall ="",
 				.parmcall = false,
@@ -1692,7 +1693,7 @@ pub const	fld = struct {
 				.text	 = vtext,
 				.zwitch   = false,
 				.procfunc ="",
-				.proctask ="",
+				.proctask ="TaskDateIso",
 				.progcall ="",
 				.typecall ="",
 				.parmcall = false,
@@ -2223,6 +2224,10 @@ pub const	fld = struct {
 	pub fn setRegex(vpnl: *pnl.PANEL , n: usize, val:[] const u8)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].reftyp = val
 		else return ErrForms.fld_setRegex_Index_invalide;
+	}
+	pub fn setFunc(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].procfunc = val
+		else return ErrForms.fld_setFunc_Index_invalide;
 	}
 	pub fn setTask(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].proctask = val

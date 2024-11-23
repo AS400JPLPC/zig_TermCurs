@@ -1056,8 +1056,8 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		"", // text
 		false, // required
 		"required Function", // Msg err
-		"please enter Name Function  F.....", // help
-		"^[F]{1}[a-zA-Z0-9]{1,}$" // regex
+		"please enter Name Function  Combo", // help
+		"^[C]{1}[a-zA-Z0-9]{1,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); }; 
 
 	fld.setTask(Panel, @intFromEnum(fp02.ffunc), "TaskFunc") catch |err| {
@@ -1087,7 +1087,7 @@ fn Panel_Fmt02(nposx: usize) *pnl.PANEL {
 		"", // text
 		false, // required
 		"Value invalid", // Msg err
-		"please enter Name Exec <Proram>", // help
+		"please enter Name Exec <Program>", // help
 		"^[A-Z]{1}[a-zA-Z0-9]{1,}$" // regex
 	)) catch |err| { @panic(@errorName(err)); };
 	

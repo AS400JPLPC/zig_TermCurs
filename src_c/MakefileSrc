@@ -40,7 +40,7 @@ ifeq ($(PROD), true)
  			-Wsign-compare -fpermissive 	-fstack-clash-protection	-fstack-protector-all \
  			`pkg-config --cflags vte-2.91`
 #  -no-pie because it's the master program of the project so the caller  `pkg-config gmodule-2.0 --libs`
-LDFLAGS =	-lX11 -no-pie `pkg-config --libs vte-2.91` -licuuc
+LDFLAGS =	-lX11 -no-pie  `pkg-config --libs vte-2.91` -licuuc
 
 OPTIMIZE = -fexpensive-optimizations -Os -s
 
@@ -54,7 +54,7 @@ CPPFLAGS=	-std=c++20 -ggdb -g3  \
 			-Wsign-compare -fpermissive \
 			`pkg-config --cflags vte-2.91`
 
-LDFLAGS =	-lX11   -no-pie  `pkg-config --libs vte-2.91` -licuuc
+LDFLAGS =	-lX11  -no-pie  `pkg-config --libs vte-2.91` -licuuc
 
 OPTIMIZE =
 endif

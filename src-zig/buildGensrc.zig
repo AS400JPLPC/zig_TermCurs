@@ -24,8 +24,12 @@ pub fn build(b: *std.Build) void {
 	const menu   = b.dependency("library", .{}).module("menu");
 	const mvzr   = b.dependency("library", .{}).module("mvzr");
 
-		
-	 
+
+	const srcdef = b.createModule(.{
+		.root_source_file = b.path("./srcdef.zig" ),
+		.imports= &.{},
+	});
+ 
 	const mdlSjson = b.createModule(.{
 		.root_source_file = b.path("./mdlSjson.zig" ),
 		.imports= &.{
@@ -66,6 +70,32 @@ pub fn build(b: *std.Build) void {
 		},
 	});
 
+	const srcMenu = b.createModule(.{
+		.root_source_file = b.path( "./srcMenu.zig" ),
+		.imports= &.{
+			.{ .name = "logsrc", .module = logsrc },
+			.{ .name = "cursed", .module = cursed },
+			.{ .name = "utils",  .module = utils },
+			.{ .name = "menu",   .module = menu  },
+			.{ .name = "srcdef", .module = srcdef  },
+		},
+	});
+
+
+
+	const srcForms = b.createModule(.{
+		.root_source_file = b.path( "./srcForms.zig" ),
+		.imports= &.{
+			.{ .name = "logsrc", .module = logsrc },
+			.{ .name = "cursed", .module = cursed },
+			.{ .name = "utils",  .module = utils },
+			.{ .name = "forms",  .module = forms },
+			.{ .name = "grid",   .module = grid  },
+			.{ .name = "menu",   .module = menu  },
+			.{ .name = "mvzr",   .module = mvzr  },
+			.{ .name = "srcdef", .module = srcdef  },
+		},
+	});
 	// Building the executable
 
 	const Prog = b.addExecutable(.{
@@ -90,10 +120,13 @@ pub fn build(b: *std.Build) void {
 	
 	Prog.root_module.addImport("menu" , menu);
 
+	Prog.root_module.addImport("srcdef" , srcdef);
+
 
 
 	Prog.root_module.addImport("mdlFile"  , mdlFile);
-
+	Prog.root_module.addImport("srcMenu"  , srcMenu);
+	Prog.root_module.addImport("srcForms" , srcForms);
 
 
 	b.installArtifact(Prog);
