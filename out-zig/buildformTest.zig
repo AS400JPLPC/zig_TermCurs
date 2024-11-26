@@ -25,8 +25,8 @@ pub fn build(b: *std.Build) void {
 	// Building the executable
 
 	const Prog = b.addExecutable(.{
-	.name = "formsrc",
-	.root_source_file = b.path( "./formsrc.zig" ),
+	.name = "formTest",
+	.root_source_file = b.path( "./formTest.zig" ),
 	.target = target,
 	.optimize = optimize,
 	});

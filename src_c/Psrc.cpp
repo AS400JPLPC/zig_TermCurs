@@ -78,8 +78,8 @@ bool ctrlPgm(std::string v_TEXT)
     std::filesystem::path p(v_TEXT.c_str());
                                             switch(strswitch(p.stem().c_str()))
                                             {
-                                                case  strswitch("menusrc")        : b_pgm =true;        break;
-                                                case  strswitch("formsrc")        : b_pgm =true;        break;
+                                                case  strswitch("menuTest")        : b_pgm =true;        break;
+                                                case  strswitch("formTest")        : b_pgm =true;        break;
                                             }
     return b_pgm;
 }

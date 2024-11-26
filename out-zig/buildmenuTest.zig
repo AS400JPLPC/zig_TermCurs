@@ -22,8 +22,8 @@ pub fn build(b: *std.Build) void {
 	// Building the executable
 
 	const Prog = b.addExecutable(.{
-	.name = "menusrc",
-	.root_source_file = b.path( "./menusrc.zig" ),
+	.name = "menuTest",
+	.root_source_file = b.path( "./menuTest.zig" ),
 	.target = target,
 	.optimize = optimize,
 	});

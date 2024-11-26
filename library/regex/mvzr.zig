@@ -4,6 +4,7 @@
 //! A minimalistic, but y'know, viable, Zig regex library.
 //!
 //! Focused on basic support of runtime-provided regular expressions.
+
 const std = @import("std");
 const builtin = @import("builtin");
 const assert = std.debug.assert;
@@ -203,7 +204,7 @@ pub fn SizedRegex(ops: comptime_int, char_sets: comptime_int) type {
                 },
                 else => {
                     var matchlen: usize = 0;
-                    while (matchlen < haystack.len) : (matchlen += 1) {
+                    while (matchlen <= haystack.len) : (matchlen += 1) {
                         const matched = matchOuterPattern(patt, &regex.sets, haystack, matchlen);
                         if (matched) |m| {
                             return .{ matchlen, m.i };
@@ -329,7 +330,22 @@ fn matchPattern(patt: []const RegOp, sets: []const CharSet, haystack: []const u8
                         return null;
                     }
                 },
-                .begin, .plus, .lazy_plus, .eager_plus, .some, .dot, .class, .not_class, .digit, .not_digit, .alpha, .not_alpha, .whitespace, .not_whitespace, .char => return null,
+                .begin,
+                .plus,
+                .lazy_plus,
+                .eager_plus,
+                .some,
+                .dot,
+                .class,
+                .not_class,
+                .digit,
+                .not_digit,
+                .alpha,
+                .not_alpha,
+                .whitespace,
+                .not_whitespace,
+                .char,
+                => return null,
                 .right, .alt, .unused => unreachable,
             }
         }
@@ -464,7 +480,7 @@ fn matchStar(patt: []const RegOp, sets: []const CharSet, haystack: []const u8, i
         i -= 1;
     } // This might be ok (alts)
 
-    return OpMatch{ .i = i_in, .j = nextPattern(next_patt) };
+    return OpMatch{ .i = i_in, .j = next_patt };
 }
 
 fn matchPlus(patt: []const RegOp, sets: []const CharSet, haystack: []const u8, i: usize) ?OpMatch {
@@ -578,7 +594,7 @@ fn matchLazyOptional(patt: []const RegOp, sets: []const CharSet, haystack: []con
     const maybe_match = matchPattern(nextPattern(patt), sets, haystack, i);
     if (maybe_match) |m| {
         return m;
-    } // TODO matchEagerOptional prevents a spurious nextPattern test (post refactor)
+    }
     return matchEagerOptional(patt, sets, haystack, i);
 }
 
@@ -840,7 +856,7 @@ fn nextPatternForSome(patt: []const RegOp) usize {
                 return 1 + nextPatternForSome(patt[1..]);
             }
         },
-        .unused => return 0, // or unreachable idk
+        .unused => unreachable,
         else => return 1,
     }
 }
@@ -1154,7 +1170,6 @@ fn prefixModifier(patt: []RegOp, j: usize, op: RegOp) bool {
     // If we already have a modifier, two are not kosher:
     if (find_j > 0) {
         switch (patt[find_j - 1]) {
-            .alt,
             .plus,
             .lazy_optional,
             .lazy_star,
@@ -1279,7 +1294,6 @@ pub fn compile(in: []const u8) ?Regex {
     return compileRegex(Regex, in);
 }
 
-// TODO this should throw errors
 /// Compile a regex.
 fn compileRegex(RegexT: type, in: []const u8) ?RegexT {
     var out = RegexT{};
@@ -1817,3 +1831,401 @@ fn logError(comptime fmt: []const u8, args: anytype) void {
     }
 }
 
+//| TESTS
+
+const testing = std.testing;
+const expect = std.testing.expect;
+const expectEqual = std.testing.expectEqual;
+const expectEqualStrings = std.testing.expectEqualStrings;
+
+fn printPattern(patt: []const RegOp) void {
+    _ = printPatternInternal(patt);
+}
+
+fn printRegex(regex: anytype) void {
+    const patt = regex.patt;
+    const set_max = printPatternInternal(&patt);
+    if (set_max) |max| {
+        for (0..max + 1) |i| {
+            std.debug.print("set {d}: ", .{i});
+            printCharSet(regex.sets[i]) catch unreachable;
+        }
+    }
+}
+
+fn printRegexString(in: []const u8) void {
+    const reggie = compile(in);
+    if (reggie) |RRRRRR| {
+        printRegex(&RRRRRR);
+    }
+}
+
+fn printPatternInternal(patt: []const RegOp) ?u8 {
+    var j: usize = 0;
+    var set_max: ?u8 = null;
+    std.debug.print("[", .{});
+    while (j < patt.len and patt[j] != .unused) : (j += 1) {
+        switch (patt[j]) {
+            .char,
+            => |op| {
+                std.debug.print("{s} {u}", .{ @tagName(patt[j]), op });
+            },
+            .some,
+            .up_to,
+            => |op| {
+                std.debug.print("{s} {d}", .{ @tagName(patt[j]), op });
+            },
+            .class,
+            .not_class,
+            => |op| {
+                if (set_max) |max| {
+                    set_max = @max(max, op);
+                } else {
+                    set_max = op;
+                }
+                std.debug.print("{s} {d}", .{ @tagName(patt[j]), op });
+            },
+            else => {
+                std.debug.print("{s}", .{@tagName(patt[j])});
+            },
+        }
+        if (j + 1 < patt.len and patt[j + 1] != .unused) {
+            std.debug.print(", ", .{});
+        }
+    }
+    std.debug.print("]\n", .{});
+    return set_max;
+}
+
+fn printCharSet(set: CharSet) !void {
+    const allocator = std.testing.allocator;
+    var set_str = try std.ArrayList(u8).initCapacity(allocator, @popCount(set.low) + @popCount(set.hi) + 1);
+    defer set_str.deinit();
+    if (@popCount(set.low) != 0) {
+        for (0..64) |i| {
+            const c: u6 = @intCast(i);
+            if ((set.low | (one << c)) == set.low) {
+                try set_str.append(@as(u8, c));
+            }
+        }
+    }
+    if (@popCount(set.hi) != 0) {
+        try set_str.append(' ');
+        for (0..64) |i| {
+            const c: u6 = @intCast(i);
+            if ((set.hi | (one << c)) == set.hi) {
+                const ch = @as(u8, c) | 0b0100_0000;
+                try set_str.append(ch);
+            }
+        }
+    }
+    std.debug.print("{s}\n", .{set_str.items});
+}
+
+fn testMatchAll(needle: []const u8, haystack: []const u8) !void {
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        const maybe_match = regex.match(haystack);
+        if (maybe_match) |m| {
+            try expectEqual(0, m.start);
+            try expectEqual(haystack.len, m.end);
+        } else {
+            try expect(false);
+        }
+    } else {
+        try expect(false);
+    }
+}
+
+fn testMatchEnd(needle: []const u8, haystack: []const u8) !void {
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        const maybe_match = regex.match(haystack);
+        if (maybe_match) |m| {
+            try expectEqual(haystack.len, m.end);
+        } else {
+            try expect(false);
+        }
+    } else {
+        try expect(false);
+    }
+}
+
+fn testMatchAllP(needle: []const u8, haystack: []const u8) !void {
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        printRegex(&regex);
+    }
+    try testMatchAll(needle, haystack);
+}
+
+fn testMatchSlice(needle: []const u8, haystack: []const u8, slice: []const u8) !void {
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        const maybe_match = regex.match(haystack);
+        if (maybe_match) |m| {
+            try expectEqualStrings(slice, m.slice);
+        } else {
+            try expect(false);
+        }
+    } else {
+        try expect(false);
+    }
+}
+
+fn testFail(needle: []const u8, haystack: []const u8) !void {
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        try expectEqual(null, regex.match(haystack));
+    } else {
+        try expect(false);
+    }
+}
+
+fn downStackRegex(RegexT: type, regex: RegexT, allocator: std.mem.Allocator) !*const RegexT {
+    const heap_regex = try regex.toOwnedRegex(allocator);
+    return heap_regex;
+}
+
+fn downStackMatch(matched: Match, allocator: std.mem.Allocator) !Match {
+    const heap_match = try matched.toOwnedMatch(allocator);
+    return heap_match;
+}
+
+fn testOwnedRegex(needle: []const u8, haystack: []const u8) !void {
+    const allocator = std.testing.allocator;
+    const maybe_regex = compile(needle);
+    if (maybe_regex) |regex| {
+        const heap_regex = try downStackRegex(Regex, regex, allocator);
+        defer allocator.destroy(heap_regex);
+        const maybe_match = heap_regex.match(haystack);
+        if (maybe_match) |m| {
+            const matched = try downStackMatch(m, allocator);
+            defer matched.deinit(allocator);
+            try expectEqualStrings(haystack, matched.slice);
+        } else try expect(false);
+    } else {
+        try expect(false);
+    }
+}
+
+test "match some things" {
+    try testMatchAll("abc", "abc");
+    try testMatchAll("[a-z]", "d");
+    try testMatchAll("\\W\\w", "!a");
+    try testMatchAll("\\w+", "abdcdFG");
+    try testMatchAll("a*b+", "aaaaabbbbbbbb");
+    try testMatchAll("a?b*", "abbbbb");
+    try testMatchAll("a?b*", "bbbbbb");
+    try testMatchAll("a*", "aaaaa");
+    try testFail("a+", "b");
+    try testMatchAll("a?", "a");
+    try testMatchAll("^\\w*?abc", "qqqqabc");
+    // Fail if pattern isn't complete
+    try testFail("^\\w*?abcd", "qqqqabc");
+    try testMatchAll("^a*?abc", "abc");
+    try testMatchAll("^1??abc", "abc");
+    try testMatchAll("^1??abc", "1abc");
+    try testMatchAll("^1??1abc", "1abc");
+    try testMatchAll("[^abc]+", "defgh");
+    try testMatchAll("^1??1abc$", "1abc");
+    try testFail("^1??1abc$", "1abccc");
+    try testMatchAll("foo|bar|baz", "foo");
+    try testMatchAll("foo|bar|baz", "bar");
+    try testMatchAll("foo|bar|baz", "baz");
+    try testMatchAll("foo|bar|baz|quux+", "quuxxxxx");
+    try testMatchAll("foo|bar|baz|bux|quux|quuux|quuuux", "quuuux");
+    try testMatchAll("foo|bar|(baz|bux|quux|quuux)|quuuux", "quuuux");
+    try testMatchAll("(abc)+d", "abcabcabcd");
+    try testMatchAll("\t\n\r\xff\xff", "\t\n\r\xff\xff");
+    try testMatchAll("[\t\r\n]+", "\t\t\r\r\n\t\n\r");
+    try testMatchAll("[fd\\x03\\x04]+", "f\x03d\x04dfd\x03");
+    try testMatchAll("a+b", "ab");
+    try testMatchAll("a*aaa", "aaaaaaaaaaaaaa");
+    try testMatchAll("\\w+foo", "abcdefoo");
+    try testFail("\\w+foo", "foo");
+    try testMatchAll("\\w*foo", "foo");
+    try testFail("a++a", "aaaaaaaa");
+    try testFail("a*+a", "aaaaaaaa");
+    try testMatchAll("(aaa)?aaa", "aaa");
+    try testFail("(aaa)?+aaa", "aaa");
+    try testMatchAll("ab?", "ab");
+    try testMatchAll("ab?", "a");
+    try testMatchAll("^a{3,6}a", "aaaaaa");
+    try testMatchAll("^a{3,4}", "aaaa");
+    try testMatchAll("^a{3,5}", "aaaaa");
+    try testMatchAll("^a{3,5}", "aaa");
+    try testMatchAll("\\w{3,5}bc", "abbbc");
+    try testMatchAll("\\w{3,5}", "abb");
+    try testMatchAll("!{,3}", "!!!");
+    try testMatchAll("abc(def(ghi)jkl)mno", "abcdefghijklmno");
+    try testMatchAll("abc(def(ghi?)jkl)mno", "abcdefghijklmno");
+    try testMatchAll("abc(def(ghi)?jkl)mno", "abcdefjklmno");
+    try testMatchAll("abc(def(ghi?)jkl)mno", "abcdefghjklmno");
+    try testFail("abc(def(ghi?)jkl)mno", "abcdefjklmno");
+    try testMatchAll("abc(def((ghi)?)jkl)mno", "abcdefjklmno");
+    try testMatchAll("(abc){5}?", "abcabcabcabcabc");
+    try testMatchAll("(abc){3,5}?", "abcabcabcabcabc");
+    try testMatchAll("^\\w+?$", "glebarg");
+    try testMatchAll("[A-Za-z]+$", "Pabcex");
+    try testMatchAll("^[^\n]+$", "a single line");
+    try testFail("^[^\n]+$", "several \n lines");
+    // Empty stuff
+    try testFail("[]+", "abc");
+    try testFail("[]", "a");
+    try testMatchAll("abc()d", "abcd");
+    try testMatchAll("abc(|||)d", "abcd");
+    // No infinite loops
+    try testMatchAll("(a*?)*aa", "aaa");
+    try testMatchAll("(){0,1}q$", "q");
+    try testMatchAll("(){1,2}q$", "q");
+    try testMatchAll("(abc){3,5}?$", "abcabcabcabcabc");
+    try testMatchAll("()+q$", "q");
+    try testMatchAll("^(q*)*$", "qqqq");
+    try testMatchEnd("[bc]*(cd)+", "cbcdcd");
+    // MD5 hash?
+    try testMatchAll("^[a-f0-9]{32}", "0800fc577294c34e0b28ad2839435945");
+    try testMatchAll("ab+c|de+f", "abbbc");
+    try testMatchAll("ab+c|de+f", "deeeef");
+    try testFail("^ab+c|de+f", "abdef");
+    try testMatchAll("employ(er|ee|ment|ing|able)", "employee");
+    try testMatchAll("employ(er|ee|ment|ing|able)", "employer");
+    try testMatchAll("employ(er|ee|ment|ing|able)", "employment");
+    try testMatchAll("employ(er|ee|ment|ing|able)", "employable");
+    try testMatchAll("employ(er|ee|ment|ing|able)", "employing");
+    try testMatchAll("employ(|er|ee|ment|ing|able)", "employ");
+    try testMatchAll("employ(|er|ee|ment|ing|able)$", "employee");
+    // Character escaping
+    try testMatchAll("\\$\\.\\(\\)\\*\\+\\?\\[\\\\]\\^\\{\\|\\}", "$.()*+?[\\]^{|}");
+    try testMatchAll("[\\x41-\\x5a]+", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    // Again, without the doubled backslashes;
+    const test_escapes =
+        \\\$\.\(\)\*\+\?\[\\]\^\{\|\}
+    ;
+    try testMatchAll(test_escapes, "$.()*+?[\\]^{|}");
+    // Character classes in character sets
+    try testMatchAll("[^\\Wf]+", "YyIcMy9Z");
+    try testFail("[^\\Wf]+$", "YyIcMy9Zf");
+    try testMatchAll("[\\x48-\\x4c$]+", "HIJ$KL");
+    try testMatchAll("[^^]+", "abXdea!@#$!%$#$%$&$");
+    try testFail("^[^^]+", "^abXdea!@#$!%$#$%$&$");
+    // Newlines at end
+    try testMatchAll("To the Bitter End$", "To the Bitter End\n");
+    try testMatchAll(
+        "William Gates Jr. Sucks.$",
+        "William Gates Jr. Sucks.\r\n",
+    );
+    // Backtrack star correctly
+    try testMatchAll("(fob)*boba$", "fobboba");
+    try testFail("^(fob)*boba$", "fobfobfoboba");
+    try testMatchSlice("(fob)*boba", "fobfobfoboba", "boba");
+    // Word boundary
+    try testMatchAll("\\bsnap\\b", "snap");
+    try testMatchAll("\\bsnap\\b!", "snap!");
+    try testMatchAll("\\b4\\b", "4");
+    try testMatchSlice("\\bword\\b", "an isolated word ", "word");
+    try testFail("\\bword\\b", "password");
+    try testFail("\\bword\\b", "wordpress");
+    try testMatchAll("out\\Brage\\Bous", "outrageous");
+    try testMatchSlice("\\Brage\\B", "outrageous", "rage");
+    try testFail("\\Brage\\B", "rage within the machine");
+    try testMatchAll("a{3,5}+a", "aaaaaa");
+    try testFail("(a[bc]){3,5}+ac", "abacabacac");
+    try testMatchAll("(a[bc]){3,5}ac", "abacabacac");
+
+    // https://github.com/mnemnion/mvzr/issues/1#issuecomment-2235265209
+    try testMatchAll("[0-9]{4}", "1951");
+    try testMatchAll("(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4}", "10/12/1951");
+    try testMatchAll("[\\x09]", "\t");
+    // https://github.com/mnemnion/mvzr/issues/1#issuecomment-2238087036
+    try testMatchAll("^[a-zA-Z0-9_!#$%&.-]+@([a-zA-Z0-9.-])+$", "myname.myfirst_name@gmail.com");
+
+    // Non-catastropic backtracking #1
+    try testFail("(a+a+)+b", "a" ** 2048);
+    // Non-catastropic backtracking #2
+    try testFail("(a+?a+?)+?b", "a" ** 2048);
+    // Non-catastropic backtracking #3
+    try testFail("^(.*?,){254}P", "12345," ** 255);
+}
+
+test "heap allocated regex and match" {
+    try testOwnedRegex("abcde", "abcde");
+    try testOwnedRegex("^[a-f0-9]{32}", "0800fc577294c34e0b28ad2839435945");
+}
+
+test "badblood" {
+    //
+}
+
+test "Get the char sets you asked for" { // https://github.com/mnemnion/mvzr/issues/1#issuecomment-2235265209
+    const test_patt = "(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4}";
+    const j, const s = resourcesNeeded(test_patt);
+    try expectEqual(6, s); // Deduplicated from 9
+    const ProperSize = SizedRegex(j, s);
+    const haystack = "10/12/1951";
+    const bigger_regex = ProperSize.compile(test_patt);
+    if (bigger_regex) |reggie| {
+        const match1 = reggie.match(haystack);
+        if (match1) |m1| {
+            try expectEqual(haystack.len, m1.end);
+        } else {
+            try expect(false);
+        }
+    } else {
+        try expect(false);
+    }
+}
+
+test "iteration" {
+    const foo_str = "foobarbazfoo";
+    var r_iter = compile("foo|bar|baz").?.iterator(foo_str);
+    var matched = r_iter.next().?;
+    try expectEqualStrings("foo", matched.slice);
+    try expectEqualStrings("foo", foo_str[matched.start..matched.end]);
+    matched = r_iter.next().?;
+    try expectEqualStrings("bar", matched.slice);
+    try expectEqualStrings("bar", foo_str[matched.start..matched.end]);
+    matched = r_iter.next().?;
+    try expectEqualStrings("baz", matched.slice);
+    try expectEqualStrings("baz", foo_str[matched.start..matched.end]);
+    matched = r_iter.next().?;
+    try expectEqualStrings("foo", matched.slice);
+    try expectEqualStrings("foo", foo_str[matched.start..matched.end]);
+    try expectEqual(null, r_iter.next());
+}
+
+test "matchPos" {
+    const regex = Regex.compile("abcd").?;
+    const matched = regex.matchPos(4, "abcdabcd").?;
+    try expectEqual(4, matched.start);
+    try expectEqualStrings("abcd", matched.slice);
+    try expectEqual(8, matched.end);
+}
+
+test "comptime regex" {
+    const comp_regex = comptime compile("foo+").?;
+    const run_match = comp_regex.match("foofoofoo");
+    try expect(run_match != null);
+    const comptime_match = comptime comp_regex.match("foofoofoo");
+    try expect(comptime_match != null);
+}
+
+test "date regex" {
+    const match_date = Regex.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}T([0-9]{2}:){2}[0-9]{2}([+|-][0-9]{2}:[0-9]{2})?").?;
+    try expect(match_date.isMatch("2024-01-01T00:00:00"));
+}
+
+test "alt | on repetition qualifiers" {
+    const regex = Regex.compile("0x[a-fA-F0-9]{2,}|[a-fA-F0-9]{2,}").?;
+    try expect(regex.isMatch("derived dedicated cede 0xdeadDEAD"));
+}
+
+test "repetition and word break" {
+    const regex = Regex.compile("[de]{2,}\\b").?;
+    try expect(!regex.isMatch("defense"));
+}
+
+test "match end" {
+    const regex = Regex.compile("a*$").?;
+    try std.testing.expect(regex.isMatch("bb"));
+}

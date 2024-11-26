@@ -3594,23 +3594,23 @@ pub const	pnl = struct {
 	fn isNextIO(vpnl: *PANEL, idx : usize ) usize {
 		var i : usize = idx + 1;
 		if (idx == vpnl.field.items.len) i = 0;
-		while ( i < vpnl.field.items.len) : (i += 1) {
+		while ( i < vpnl.field.items.len - 1) : (i += 1) {
 			if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
 		}
-		if (i == vpnl.field.items.len) i = vpnl.field.items.len - 1;
-		if (vpnl.field.items[i].actif  and vpnl.field.items[i].protect ) i = isPriorIO(vpnl, i);
+		if (i == vpnl.field.items.len - 1 and vpnl.field.items[i].protect )  i = isPriorIO(vpnl, 1);
+
 		return i;
 	}
 
 	///search there available field
 	fn isPriorIO(vpnl: *PANEL, idx : usize) usize {
-		const x : i64 = @intCast(idx - 1) ;
 		var i : usize = 0;
-		if ( x > 0) i = @intCast(x);
+		const x : i64 = @intCast(idx - 1) ;
+		if ( x > 0 ) i = @intCast(x);
 		while ( i > 0 ) : (i -= 1) {
 			if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
 		}
-		if (vpnl.field.items[i].actif  and vpnl.field.items[i].protect ) i = isNextIO(vpnl, i);
+			if (vpnl.field.items[i].actif  and vpnl.field.items[i].protect ) i = isNextIO(vpnl, i);
 		return i;
 	}
 
@@ -3691,7 +3691,7 @@ pub const	pnl = struct {
 									vpnl.idxfld = nField;
 								},
 								.up	=> {
-									if (nField == 0) nField = nbrFieldIO - 1
+									if (nField == 0) nField = isPriorIO(vpnl, nbrFieldIO - 1 )
 									else nField= isPriorIO(vpnl,nField);
 									vpnl.idxfld = nField;
 								},

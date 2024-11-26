@@ -684,7 +684,8 @@ pub const FnProg = enum {
 								" module {s} invalide appeller service Informatique ",
 								.{vfld.progcall}) catch unreachable;
 								defer utl.allocUtl.free(msgerr);
-								forms.debeug(9999,msgerr);
+								@panic(msgerr);
+								//forms.debeug(9999,msgerr);
 								},
 								else => unreachable,
 						};

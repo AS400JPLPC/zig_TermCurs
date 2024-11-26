@@ -14,7 +14,10 @@ const kbd = @import("cursed").kbd;
 const cdr = @import("forms").CADRE;
 const lne = @import("forms").LINE;
 
-// Error
+
+// const dsp = @import("forms").debeug;
+
+// // Error
 const dsperr = @import("forms").dsperr;
 
 // frame
@@ -44,7 +47,17 @@ const grd = @import("grid").grd;
 // tools utility
 const utl = @import("utils");
 
+// tools regex
+const reg = @import("mvzr");
 
+// arena allocator 
+var arenaProg = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+var  alloc = arenaProg.allocator();
+fn deinitForms() void {
+	arenaProg.deinit();
+	arenaProg = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+	alloc = arenaProg.allocator();
+}
 
 //----------------------
 // Define Global DSPF PANEL
@@ -74,60 +87,73 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			Panel.label.append(lbl.newLabel("L320",3,20,"Text")) catch unreachable ;
 			Panel.label.append(lbl.newLabel("L371",3,71,"MNEMO")) catch unreachable ;
 			Panel.label.append(lbl.newLabel("L378",3,78,"T")) catch unreachable ;
-			Panel.label.append(lbl.newLabel("L380",3,80,"Long")) catch unreachable ;
-			Panel.label.append(lbl.newLabel("L385",3,85,"Width")) catch unreachable ;
-			Panel.label.append(lbl.newLabel("L391",3,91,"Scal")) catch unreachable ;
+			Panel.label.append(lbl.newLabel("L380",3,80,"Width")) catch unreachable ;
+			Panel.label.append(lbl.newLabel("L386",3,86,"Scal")) catch unreachable ;
+			Panel.label.append(lbl.newLabel("L391",3,91,"Long")) catch unreachable ;
 
 			//----------------------
 
+			// info task != "" -> requires= false
+
 			Panel.field.append(fld.newFieldTextFree("MNEXTD",4,4,15,
 			"",
-			true,
+			false, // requires
 			"Le nom est obligantoire",
 			"Nom de la zone étendue",
-			"")) catch unreachable ;
+			"^[a-z]{1,1}[a-z0-9\\-]{1,}$")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"MNEXTD") catch unreachable,"TctlName") catch unreachable ;
 
+ 
 			Panel.field.append(fld.newFieldTextFree("TEXT",4,20,50,
 			"",
-			true,
+			false,
 			"Text Invalide",
 			"Libellé de la zone NAME Extended",
 			"")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"TEXT") catch unreachable,"TctlText") catch unreachable ;
 
 			Panel.field.append(fld.newFieldAlphaNumericUpper("MNEMO",4,71,6,
 			"",
-			true,
+			false,
 			"Mnemonic onmigatoire",
 			"mnemoniqque de la zone MXEXTD",
 			"")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"MNEMO") catch unreachable,"TctlMnemo") catch unreachable ;
 
 			Panel.field.append(fld.newFieldFunc("TYPE",4,78,1,
-			"?",
-			true,
+			"",
+			false,
 			"Ctype",
 			"Type obligatoire",
 			"Type de zone")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"TYPE") catch unreachable,"TctrlType") catch unreachable ;
 
-			Panel.field.append(fld.newFieldUDigit("LONG",4,81,3,
-			"",
-			true,
-			"Longueur de la zone extended Invalide",
-			"Longueur de la zone",
-			"[0-9]{1,3}")) catch unreachable ;
 
-			Panel.field.append(fld.newFieldUDigit("WIDTH",4,87,3,
+			Panel.field.append(fld.newFieldUDigit("WIDTH",4,82,3,
 			"",
-			true,
+			false,
 			"Width Obligatoire",
 			"longueur de la zone numérique",
 			"[0-9]{1,3}")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"WIDTH") catch unreachable,"TctrlWidth") catch unreachable ;
 
-			Panel.field.append(fld.newFieldUDigit("SCAL",4,92,3,
+			Panel.field.append(fld.newFieldUDigit("SCAL",4,87,3,
 			"",
-			true,
+			false,
 			"Scal Obligatoire",
 			"partie decimale",
 			"[0-9]{1,3}")) catch unreachable ;
+			fld.setTask(Panel,fld.getIndex(Panel,"SCAL") catch unreachable,"TctrlScal") catch unreachable ;
+
+
+			Panel.field.append(fld.newFieldUDigit("LONG",4,92,3,
+			"",
+			false,
+			"Longueur extended Invalide",
+			"Longueur de la zone",
+			"[0-9]{1,3}")) catch unreachable ;
+			fld.setProtect(Panel,fld.getIndex(Panel,"LONG") catch unreachable, true) catch unreachable ; 
+			fld.setTask(Panel,fld.getIndex(Panel,"LONG") catch unreachable,"TcrtlLong") catch unreachable ; 
 
 
 			return Panel;
@@ -143,7 +169,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		main_run_EnumTask_invalide,
 	};
 
-
+	var check : bool = false;
 
 
 
@@ -155,7 +181,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		const Xcombo : *grd.GRID = grd.newGridC(
 				"Ctype",
 				5, 78,
-				7,
+				3,
 				grd.gridStyle,
 				grd.CADRE.line1,
 		);
@@ -190,12 +216,12 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 
 
 	const FuncEnum = enum {
-		Ftype,
+		Ctype,
 
 		none,
 		fn run(self: FuncEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void {
 			switch (self) {
-			.Ftype => Ctype(vpnl,vfld),
+			.Ctype => Ctype(vpnl,vfld),
 			else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
 			}
 		}
@@ -217,57 +243,124 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		if (std.mem.eql(u8, vfld.text ,"")) {
 			pnl.msgErr(vpnl, "Le nom est obligantoire");
 			vpnl.keyField = kbd.task;
+			check = true;
 		}
 	}
+
+	fn TctlText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+		if (std.mem.eql(u8, vfld.text ,"")) {
+			pnl.msgErr(vpnl, "Text Invalide");
+			vpnl.keyField = kbd.task;
+			check = true;
+		}
+	}
+
 	fn TctlMnemo(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
 			pnl.msgErr(vpnl, "Mnemonic onmigatoire");
 			vpnl.keyField = kbd.task;
+			check = true;
 		}
 	}
 	fn TctrlType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
 			pnl.msgErr(vpnl, "Type obligatoire");
 			vpnl.keyField = kbd.task;
+			check = true;
 		}
 	}
-	fn TcrtlLong(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
-		if (std.mem.eql(u8, vfld.text ,"")) {
-			pnl.msgErr(vpnl, "Longueur de la zone extended Invalide");
-			vpnl.keyField = kbd.task;
-		}
-	}
+		
 	fn TctrlWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
 			pnl.msgErr(vpnl, "Width Obligatoire");
 			vpnl.keyField = kbd.task;
+			check = true;
 		}
+
+		const xx = fld.getText(vpnl,fld.getIndex(vpnl,"TYPE") catch unreachable) catch unreachable;
+		if (std.mem.eql(u8, xx ,"B")  ) vfld.text ="1";
+		if (std.mem.eql(u8, xx ,"N")  ) {
+			var width : u64  = 0;
+			width = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
+			if (width > 34 ) {
+				pnl.msgErr(vpnl, "zone numérique trop grande");
+				vpnl.keyField = kbd.task;
+				check = true;
+			}
+		}
+		fld.printField(vpnl, vpnl.field.items[vpnl.idxfld]);
+		fld.displayField(vpnl, vpnl.field.items[vpnl.idxfld]);
 	}
+	
 	fn TctrlScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
 			pnl.msgErr(vpnl, "Scal Obligatoire");
 			vpnl.keyField = kbd.task;
+			check = true;
+		}
+		var xx = fld.getText(vpnl,fld.getIndex(vpnl,"TYPE") catch unreachable) catch unreachable;
+		if (!std.mem.eql(u8, xx ,"N")  ) vfld.text ="0"
+		else {
+			var width : u64  = 0;
+			var scal : u64  = 0;
+			xx = fld.getText(vpnl,fld.getIndex(vpnl,"WIDTH") catch unreachable) catch unreachable;
+			width = std.fmt.parseUnsigned( u64, xx , 10) catch unreachable ;
+			scal = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
+			if (width + scal  > 34 ) {
+				pnl.msgErr(vpnl, "zone numérique width + scal trop grande max: 34");
+				vpnl.keyField = kbd.task;
+				check = true;
+			}
+		}
+		fld.printField(vpnl, vpnl.field.items[vpnl.idxfld]);
+		fld.displayField(vpnl, vpnl.field.items[vpnl.idxfld]);
+	}
+	
+	fn TcrtlLong(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
+		var width : u64  = 0;
+		var xx = fld.getText(vpnl,fld.getIndex(vpnl,"WIDTH") catch unreachable) catch unreachable;
+		if (!std.mem.eql(u8, xx ,"")) { width = std.fmt.parseUnsigned( u64, xx , 10) catch unreachable ;}
+		
+		var scal : u64  = 0;
+		xx = fld.getText(vpnl,fld.getIndex(vpnl,"SCAL") catch unreachable) catch unreachable;
+		if (!std.mem.eql(u8, xx ,"")) { scal = std.fmt.parseUnsigned( u64, xx , 10) catch unreachable ;}
+
+		
+		width += scal;
+		vfld.text =  std.fmt.allocPrint(alloc, "{d}", .{width}) catch unreachable;
+
+		fld.printField(vpnl, vpnl.field.items[vpnl.idxfld]);
+		fld.displayField(vpnl, vpnl.field.items[vpnl.idxfld]);
+
+		if (std.mem.eql(u8, vfld.text ,"0")) {
+			pnl.msgErr(vpnl, "Longueur extended Invalide");
+			vpnl.keyField = kbd.task;
+			check = true;
 		}
 	}
 
-
 	const TaskEnum = enum {
 		TctlName,
+
+		TctlText,
 
 		TctlMnemo,
 
 		TctrlType,
 
-		TcrtlLong,
-
 		TctrlWidth,
 
 		TctrlScal,
 
+		TcrtlLong,
+	
+
 		none,
 		fn run(self: TaskEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void {
+			check = false;
 			switch (self) {
 			.TctlName => TctlName(vpnl,vfld),
+			.TctlText => TctlText(vpnl,vfld),
 			.TctlMnemo => TctlMnemo(vpnl,vfld),
 			.TctrlType => TctrlType(vpnl,vfld),
 			.TcrtlLong => TcrtlLong(vpnl,vfld),
@@ -302,30 +395,60 @@ term.titleTerm("MY-TITLE");
 term.cls();
 
 // define Panel
-var pDEFREP = Panel_DEFREP();
+var DEFREP = Panel_DEFREP();
 
 // work Panel-01
-term.resizeTerm(pDEFREP.lines,pDEFREP.cols);
+term.resizeTerm(DEFREP.lines,DEFREP.cols);
 
 // defines the receiving structure of the keyboard
 var Tkey : term.Keyboard = undefined ;
 
 	while (true) {
-		Tkey.Key = pnl.ioPanel(pDEFREP);
+		Tkey.Key = pnl.ioPanel(DEFREP);
 		//--- ---
 
 		switch (Tkey.Key) {
+			// call function Combo ... 
 			.func => {
-			callFunc = FuncEnum.searchFn(pDEFREP.field.items[pDEFREP.idxfld].procfunc);
-			callFunc.run(pDEFREP, &pDEFREP.field.items[pDEFREP.idxfld]);
+			callFunc = FuncEnum.searchFn(DEFREP.field.items[DEFREP.idxfld].procfunc);
+			callFunc.run(DEFREP, &DEFREP.field.items[DEFREP.idxfld]);
 			},
 
 			// call proc contrôl chek value
 			.task => {
-			callTask = TaskEnum.searchFn(pDEFREP.field.items[pDEFREP.idxfld].proctask);
-			callTask.run(pDEFREP, &pDEFREP.field.items[pDEFREP.idxfld]);
+			callTask = TaskEnum.searchFn(DEFREP.field.items[DEFREP.idxfld].proctask);
+			callTask.run(DEFREP, &DEFREP.field.items[DEFREP.idxfld]);
 			},
-
+			// add enrg.
+			.F9 => {
+				for(DEFREP.field.items, 0..) | f , idxfld | {
+					if ( !std.mem.eql(u8,f.proctask,"") ) {
+						DEFREP.idxfld = idxfld ;
+						callTask = TaskEnum.searchFn(f.proctask);
+						callTask.run(DEFREP, &DEFREP.field.items[idxfld]);
+						if ( check ) break; 
+					}
+				}
+				if (! check ) {
+					// work enrg.
+					// ...
+				}
+			},
+			// update enrg.
+			.F11 => {
+				for( DEFREP.field.items, 0..) | f , idxfld | {
+					if ( !std.mem.eql(u8,f.proctask,"") ) {
+						DEFREP.idxfld = idxfld ;
+						callTask = TaskEnum.searchFn(f.proctask);
+						callTask.run(DEFREP, &DEFREP.field.items[idxfld]);
+						if ( check ) break; 
+					}
+				}
+				if (! check ) {
+					// work update.
+					// ...
+				}
+			},
 			else => {},
 
 		}

@@ -364,7 +364,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
 	term.onMouse();
 	var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
-	const pFmtH01 = Panel_HELP();
+
 	while (true) {
 		term.cursShow();
 		Tkey = kbd.getKEY();
@@ -376,6 +376,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
 		switch (Tkey.Key) {
 			.F1	 => {
+				const pFmtH01 = Panel_HELP();
 				fld.setText(pFmtH01,0,"F11 ENRG  F12 Abort  Alt-G add-Grid  Alt-C add-Cell")
 					catch unreachable;
 				fld.setText(pFmtH01,1,"name -> :Combo C Grid G")

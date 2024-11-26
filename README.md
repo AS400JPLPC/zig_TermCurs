@@ -62,7 +62,7 @@ https://github.com/kissy24/zig-logger/<BR /> <br />
 
 
 | Field                | Regex        | Text     | Type                                   |
-| ---------------------- | -------------- | ---------- | ---------------------------------------- |
+| -------------------- | ------------ | -------- | -------------------------------------- |
 | TEXT_FREE            | Y            | Y        | Free                                   |
 | TEXT_FULL            | Y            | Y        | Letter Digit Char-special              |
 | ALPHA                | Y            | Y        | Letter                                 |
@@ -86,6 +86,7 @@ https://github.com/kissy24/zig-logger/<BR /> <br />
 | CALL                 | N            | y        | **dynamic call exter                   |
 |                      |              |          |                                        |
 
+
 <BR/>
 MOUSE<BR/>
 
@@ -102,6 +103,8 @@ MOUSE<BR/>
 FIELD<BR/>
 
 
+
+
 | KEY       | text                                           |
 | ----------- | ---------------------------------------------|
 | MOUSE     | mouse array reference                          |
@@ -114,7 +117,6 @@ FIELD<BR/>
 | tab       | Position + 1 of area                           |
 | left      | Position - 1 of area                           |
 | shift tab | Position - 1 of area                           |
-| bacspace  | Position -1 of area and delete char            |
 | bacspace  | Position  of area and delete char              |
 | insert    | Position  of area   change cursor              |
 | enter     | Control valide update origine next field       |
@@ -362,6 +364,18 @@ Added Gensrc definition Programme<br />
 -  First test Gensrc - srcforms - srcMenu <BR/>
 -  folder OUT-ZIG to test <BR/>
 -  use for test only folder(repertoire) 
+<BR/><BR/>
+→ 2024-11-26 20:28<BR/>
+Please refer to the files in the directory: dspf/repertoire/.<BR/>
+You will notice that function keys are assigned, such as F9 for adding a record and F11 for updating a record; these are standard industrial practices recommended in management.<BR/>
+You can compare the output source with the SRC program.<BR/>
+<BR/>
+I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
+You can see the source generation of formsrc and formtest, which has been reworked.<BR/>
+<BR/>
+Keep in mind that the generation is a skeleton; I am trying to reduce the repetitive overhead of programming so we can focus on the requested functionality.<BR/>
+I haven't finished yet; I still need to make changes, for example, the GRID SFLD, which is a grid with data, etc.<BR/>
+<BR/>
 <BR/>
 
 ------------------------------------------------------------------<br />
