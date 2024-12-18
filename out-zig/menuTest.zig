@@ -20,26 +20,26 @@ var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
 // Define Global DSPF MENU
 //----------------------
 const xmnu01 = enum {
-			Repertoire,
-			Table,
-			Logique,
-			Join,
-			Exit,
-			};
+            Repertoire,
+            Table,
+            Logique,
+            Join,
+            Exit,
+            };
 
 const mnu01 = mnu.newMenu(
-			"mnu01",
-			12, 43,
-			mnu.CADRE.line1,
-			mnu.MNUVH.horizontal,
-			&.{
-			"Repertoire",
-			"Table",
-			"Logique",
-			"Join",
-			"Exit",
-			}
-			);
+            "mnu01",
+            12, 43,
+            mnu.CADRE.line1,
+            mnu.MNUVH.horizontal,
+            &.{
+            "Repertoire",
+            "Table",
+            "Logique",
+            "Join",
+            "Exit",
+            }
+            );
 
 
 
@@ -47,22 +47,22 @@ const mnu01 = mnu.newMenu(
 // Define Global DSPF MENU
 //----------------------
 const xmnurep = enum {
-			Work,
-			List,
-			Exit,
-			};
+            Work,
+            List,
+            Exit,
+            };
 
 const mnurep = mnu.newMenu(
-			"mnurep",
-			14, 43,
-			mnu.CADRE.line1,
-			mnu.MNUVH.vertical,
-			&.{
-			"Work",
-			"List",
-			"Exit",
-			}
-			);
+            "mnurep",
+            14, 43,
+            mnu.CADRE.line1,
+            mnu.MNUVH.vertical,
+            &.{
+            "Work",
+            "List",
+            "Exit",
+            }
+            );
 
 
 
@@ -82,13 +82,13 @@ term.resizeTerm(44,168);
 term.cls();
 
 var nopt : usize = 0;
-	while (true) {
-	nopt = mnu.ioMenu(mnu01,nopt);
-		if (nopt == @intFromEnum(xmnu01.Exit )) break;
+    while (true) {
+    nopt = mnu.ioMenu(mnu01,nopt);
+        if (nopt == @intFromEnum(xmnu01.Exit )) break;
 
-		//--- ---
+        //--- ---
 
-		}
+        }
 
 }
 

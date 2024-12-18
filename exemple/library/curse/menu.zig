@@ -1,7 +1,6 @@
-	///----------------------
-	/// gestion de menu
-	/// zig 0.12.0 dev
-	///----------------------
+    ///----------------------
+    /// gestion de menu
+    ///----------------------
 
 
 
@@ -24,437 +23,476 @@ const io = std.io;
 ///-------------------------------
 /// Errors that may occur when using String
 pub const ErrMenu = error{
-	mnu_getIndex_Name_Menu_Invalide,
+    mnu_getIndex_Name_Menu_Invalide,
 
-	mnu_getName_Index_invalide,
-	mnu_getPosx_Index_invalide,
-	mnu_getPosy_Index_invalide,
-	mnu_getText_Index_invalide,
-	mnu_getActif_Index_invalide,
+    mnu_getName_Index_invalide,
+    mnu_getPosx_Index_invalide,
+    mnu_getPosy_Index_invalide,
+    mnu_getText_Index_invalide,
+    mnu_getActif_Index_invalide,
 
-	mnu_dltRows_Index_invalide,
+    mnu_dltRows_Index_invalide,
 };
 
 // defined Menu
 pub const mnu = struct {
-	pub const CADRE = enum { line0, line1, line2 };
+    pub const CADRE = enum { line0, line1, line2 };
 
-	pub const MNUVH = enum { vertical, horizontal };
-	// nbr espace intercaler
-	pub var mnuspc: usize = 1;
+    pub const MNUVH = enum { vertical, horizontal };
+    // nbr espace intercaler
+    const mnuspc: usize = 1 ;
 
-	// define attribut default CADRE
-	pub var AtrMnu: term.ZONATRB = .{
-		.styled = [_]u32{
-			@intFromEnum(term.Style.styleDim),
-			@intFromEnum(term.Style.notStyle),
-			@intFromEnum(term.Style.notStyle),
-			@intFromEnum(term.Style.notStyle)
-		},
-		.backgr = term.BackgroundColor.bgBlack,
-		.foregr = term.ForegroundColor.fgRed
-	};
+    // define attribut default CADRE
+    pub const AtrMnu: term.ZONATRB = .{
+        .styled = [_]u32{
+            @intFromEnum(term.Style.styleDim),
+            @intFromEnum(term.Style.notStyle),
+            @intFromEnum(term.Style.notStyle),
+            @intFromEnum(term.Style.notStyle)
+        },
+        .backgr = term.BackgroundColor.bgBlack,
+        .foregr = term.ForegroundColor.fgRed
+    };
 
-	pub var AtrBar: term.ZONATRB = .{
-		.styled = [_]u32{
-			@intFromEnum(term.Style.styleReverse),
-			@intFromEnum(term.Style.styleItalic),
-			@intFromEnum(term.Style.notStyle),
-			@intFromEnum(term.Style.notStyle)
-		},
-		.backgr = term.BackgroundColor.bgBlack,
-		.foregr = term.ForegroundColor.fgWhite
-	 };
+    pub const AtrBar: term.ZONATRB = .{
+        .styled = [_]u32{
+            @intFromEnum(term.Style.styleReverse),
+            @intFromEnum(term.Style.styleItalic),
+            @intFromEnum(term.Style.notStyle),
+            @intFromEnum(term.Style.notStyle)
+        },
+        .backgr = term.BackgroundColor.bgBlack,
+        .foregr = term.ForegroundColor.fgWhite
+     };
 
-	pub var AtrCell: term.ZONATRB = .{
-		.styled = [_]u32{
-			@intFromEnum(term.Style.styleItalic),
-			@intFromEnum(term.Style.notStyle),
-			@intFromEnum(term.Style.notStyle),
-			@intFromEnum(term.Style.notStyle)
-		},
-		.backgr = term.BackgroundColor.bgBlack,
-		.foregr = term.ForegroundColor.fgWhite,
-	};
+    pub const AtrCell: term.ZONATRB = .{
+        .styled = [_]u32{
+            @intFromEnum(term.Style.styleItalic),
+            @intFromEnum(term.Style.notStyle),
+            @intFromEnum(term.Style.notStyle),
+            @intFromEnum(term.Style.notStyle)
+        },
+        .backgr = term.BackgroundColor.bgBlack,
+        .foregr = term.ForegroundColor.fgWhite,
+    };
 
 
-	//------------------------------------------
-	// def management JSON
-	pub const Emenu = enum {
-		name,
-		posx,
-		posy,
-		cadre,
-		mnuvh,
-		xitems
-	};
-	pub const Eopt = enum {
-		text,
-	};	
-	
-	//------------------------------------------
-	
-	// define MENU itemm ALL
-	pub const DEFMENU = struct {
-		 name:  []const u8,
-		 posx:  usize,
-		 posy:  usize,
-		 cadre: CADRE,
-		 mnuvh: MNUVH,
-		 xitems: [][]const u8,
-	};
-	
-	// define MENU
-	pub const MENU = struct {
-		 name:  []const u8,
-		 posx:  usize,
-		 posy:  usize,
-		 lines: usize,
-		 cols:  usize,
-		 cadre: CADRE,
-		 mnuvh: MNUVH,
-		 attribut: term.ZONATRB,
-		 attrBar:  term.ZONATRB,
-		 attrCell: term.ZONATRB,
-		 xitems: []const []const u8,
-		 nbr: usize,
-		 actif: bool
-	};
+    //------------------------------------------
+    // def management JSON
+    pub const Emenu = enum {
+        name,
+        posx,
+        posy,
+        cadre,
+        mnuvh,
+        xitems
+    };
+    pub const Eopt = enum {
+        text,
+    };    
+    
+    //------------------------------------------
+    
+    // define MENU itemm ALL
+    pub const DEFMENU = struct {
+         name:  []const u8,
+         posx:  usize,
+         posy:  usize,
+         cadre: CADRE,
+         mnuvh: MNUVH,
+         xitems: [][]const u8,
+    };
+    
+    // define MENU
+    pub const MENU = struct {
+         name:  []const u8,
+         posx:  usize,
+         posy:  usize,
+         lines: usize,
+         cols:  usize,
+         cadre: CADRE,
+         mnuvh: MNUVH,
+         attribut: term.ZONATRB,
+         attrBar:  term.ZONATRB,
+         attrCell: term.ZONATRB,
+         xitems: []const []const u8,
+         nbr: usize,
+         spc: usize,
+         actif: bool
+    };
 
-	// NEW MENU
-	pub fn newMenu(vname: []const u8, vposx: usize, vposy: usize, vcadre: CADRE,
-									 vmnuvh: MNUVH, vitems: []const []const u8) MENU {
-		
-		var xmenu = MENU{
-			.name = vname,
-			.posx = vposx,
-			.posy = vposy,
-			.lines = 0,
-			.cols  = 0,
-			.cadre = vcadre,
-			.mnuvh = vmnuvh,
-			.attribut = AtrMnu,
-			.attrBar  = AtrBar,
-			.attrCell = AtrCell,
-			.xitems = vitems,
-			.nbr = 0,
-			.actif = false
-			};
-			if (xmenu.mnuvh == MNUVH.vertical) {
-				for (xmenu.xitems) |txt| {
-					if (txt.len > 0) {
-						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
-						xmenu.nbr += 1;
-						xmenu.actif = true;
-					}
-				}
-				xmenu.lines += xmenu.nbr + 2; //nbr ligne + header =cadre
-				xmenu.cols += 2;
-			}			
-			if (xmenu.mnuvh == MNUVH.horizontal) {
-				for (xmenu.xitems) |txt| {
-					if (txt.len > 0) {
-						xmenu.cols += utl.nbrCharStr(txt) + mnuspc;
-						xmenu.nbr += 1;
-						xmenu.actif = true;
-					}
-				}
-				xmenu.lines = 3 ;
-				xmenu.cols += 1;
-			}
-		return xmenu;
-	}
+    // NEW MENU
+    pub fn newMenu(vname: []const u8, vposx: usize, vposy: usize, vcadre: CADRE,
+                                     vmnuvh: MNUVH, vitems: []const []const u8) MENU {
+        
+        var xmenu = MENU{
+            .name = vname,
+            .posx = vposx,
+            .posy = vposy,
+            .lines = 0,
+            .cols  = 0,
+            .cadre = vcadre,
+            .mnuvh = vmnuvh,
+            .attribut = AtrMnu,
+            .attrBar  = AtrBar,
+            .attrCell = AtrCell,
+            .xitems = vitems,
+            .nbr = 0,
+            .spc = mnuspc,
+            .actif = false
+            };
+            if (xmenu.mnuvh == MNUVH.vertical) {
+                for (xmenu.xitems) |txt| {
+                    if (txt.len > 0) {
+                        if (xmenu.cols < txt.len) xmenu.cols = txt.len;
+                        xmenu.nbr += 1;
+                        xmenu.actif = true;
+                    }
+                }
+                xmenu.lines += xmenu.nbr + 2; //nbr ligne + header =cadre
+                xmenu.cols += 2;
+            }            
+            if (xmenu.mnuvh == MNUVH.horizontal) {
+                for (xmenu.xitems) |txt| {
+                    if (txt.len > 0) {
+                        xmenu.cols += (txt.len + xmenu.spc);
+                        xmenu.nbr += 1;
+                        xmenu.actif = true;
+                    }
+                }
+                xmenu.lines = 3 ;
+                xmenu.cols += 1;
+            }
+        return xmenu;
+    }
 
-	// return index-menu ---> arraylist panel-menu
-	pub fn getIndex(vmnu: *mnu.MENU, name: []const u8) ErrMenu!usize {
-		for (vmnu.items, 0..) |l, idx| {
-			if (std.mem.eql(u8, l.name, name)) return idx;
-		}
-		return ErrMenu.mnu_getIndex_Name_Menu_Invalide;
-	}
+    // NEW MENU
+    pub fn newMenuH(vname: []const u8, vposx: usize, vposy: usize, vcadre: CADRE,
+                                     vspc: usize, vitems: []const []const u8) MENU {
+        
+        var xmenu = MENU{
+            .name = vname,
+            .posx = vposx,
+            .posy = vposy,
+            .lines = 0,
+            .cols  = 0,
+            .cadre = vcadre,
+            .mnuvh = MNUVH.horizontal,
+            .attribut = AtrMnu,
+            .attrBar  = AtrBar,
+            .attrCell = AtrCell,
+            .xitems = vitems,
+            .nbr = 0,
+            .spc = vspc,
+            .actif = false
+            };
+        
+            if (xmenu.mnuvh == MNUVH.horizontal) {
+                for (xmenu.xitems) |txt| {
+                    if (txt.len > 0) {
+                        xmenu.cols += (txt.len + xmenu.spc);
+                        xmenu.nbr += 1;
+                        xmenu.actif = true;
+                    }
+                }
+                xmenu.lines = 3 ;
+                xmenu.cols += 1;
+            }
+        return xmenu;
+    }
 
-	// return name-menu ---> arraylist panel-menu
-	pub fn getName(vmnu: *mnu.MENU, n: usize) ErrMenu![]const u8 {
-		if (n < vmnu.items.len) return vmnu.items[n].name;
-		return ErrMenu.mnu_getName_Index_invalide;
-	}
 
-	// return posx-menu ---> arraylist panel-menu
-	pub fn getPosx(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
-		if (n < vmnu.items.len) return vmnu.items[n].posx;
-		return ErrMenu.mnu_getPosx_Index_invalide;
-	}
 
-	// return posy-menu ---> arraylist panel-menu
-	pub fn getPosy(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
-		if (n < vmnu.items.len) return vmnu.items[n].posy;
-		return ErrMenu.mnu_getPosy_Index_invalide;
-	}
+    // return index-menu ---> arraylist panel-menu
+    pub fn getIndex(vmnu: *mnu.MENU, name: []const u8) ErrMenu!usize {
+        for (vmnu.items, 0..) |l, idx| {
+            if (std.mem.eql(u8, l.name, name)) return idx;
+        }
+        return ErrMenu.mnu_getIndex_Name_Menu_Invalide;
+    }
 
-	// return Text-menu ---> arraylist panel-menu
-	pub fn getText(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
-		if (n < vmnu.items.len) return vmnu.items[n].text;
-		return ErrMenu.mnu_getText_Index_invalide;
-	}
+    // return name-menu ---> arraylist panel-menu
+    pub fn getName(vmnu: *mnu.MENU, n: usize) ErrMenu![]const u8 {
+        if (n < vmnu.items.len) return vmnu.items[n].name;
+        return ErrMenu.mnu_getName_Index_invalide;
+    }
 
-	// return ON/OFF-menu ---> arraylist panel-menu
-	pub fn getActif(vmnu: *mnu.MENU, n: usize) ErrMenu!bool {
-		if (n < vmnu.items.len) return vmnu.items[n].actif;
-		return ErrMenu.mnu_getActif_Index_invalide;
-	}
+    // return posx-menu ---> arraylist panel-menu
+    pub fn getPosx(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
+        if (n < vmnu.items.len) return vmnu.items[n].posx;
+        return ErrMenu.mnu_getPosx_Index_invalide;
+    }
 
-	// delete -menu ---> arraylist panel-menu
-	pub fn dltRows(vmnu: *mnu.MENU, n: usize) ErrMenu!void {
-		if (n < vmnu.items.len) _ = vmnu.orderedRemove(n) else return ErrMenu.mnu_dltRows_Index_invalide;
-	}
+    // return posy-menu ---> arraylist panel-menu
+    pub fn getPosy(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
+        if (n < vmnu.items.len) return vmnu.items[n].posy;
+        return ErrMenu.mnu_getPosy_Index_invalide;
+    }
 
-	// assign -menu MATRIX TERMINALi ---> arraylist panel-menu
-	fn printMenu(vmnu: MENU) void {
-		if (vmnu.actif == false) return;
-		const ACS_Hlines = "─";
-		const ACS_Vlines = "│";
-		const ACS_UCLEFT = "┌";
-		const ACS_UCRIGHT = "┐";
-		const ACS_LCLEFT = "└";
-		const ACS_LCRIGHT = "┘";
+    // return Text-menu ---> arraylist panel-menu
+    pub fn getText(vmnu: *mnu.MENU, n: usize) ErrMenu!usize {
+        if (n < vmnu.items.len) return vmnu.items[n].text;
+        return ErrMenu.mnu_getText_Index_invalide;
+    }
 
-		const ACS_Hline2 = "═";
-		const ACS_Vline2 = "║";
-		const ACS_UCLEFT2 = "╔";
-		const ACS_UCRIGHT2 = "╗";
-		const ACS_LCLEFT2 = "╚";
-		const ACS_LCRIGHT2 = "╝";
+    // return ON/OFF-menu ---> arraylist panel-menu
+    pub fn getActif(vmnu: *mnu.MENU, n: usize) ErrMenu!bool {
+        if (n < vmnu.items.len) return vmnu.items[n].actif;
+        return ErrMenu.mnu_getActif_Index_invalide;
+    }
 
-		var trait: []const u8 = "";
-		var edt: bool = undefined;
+    // delete -menu ---> arraylist panel-menu
+    pub fn dltRows(vmnu: *mnu.MENU, n: usize) ErrMenu!void {
+        if (n < vmnu.items.len) _ = vmnu.orderedRemove(n) else return ErrMenu.mnu_dltRows_Index_invalide;
+    }
 
-		var row: usize = 1;
-		var y: usize = 0;
-		var col: usize = 0;
-				
-		var x: usize = vmnu.posx;
+    // assign -menu MATRIX TERMINALi ---> arraylist panel-menu
+    fn printMenu(vmnu: MENU) void {
+        if (vmnu.actif == false) return;
+        const ACS_Hlines = "─";
+        const ACS_Vlines = "│";
+        const ACS_UCLEFT = "┌";
+        const ACS_UCRIGHT = "┐";
+        const ACS_LCLEFT = "└";
+        const ACS_LCRIGHT = "┘";
 
-		// if line 0 ex: directory tab
-		if (CADRE.line0 != vmnu.cadre) {
-			while (row <= vmnu.lines) : (row += 1) {
-				y = vmnu.posy;
-				col = 1;
-				while (col <= vmnu.cols) {
-					edt = false;
-					if (row == 1) {
-						if (col == 1) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_UCLEFT;
-							} else trait = ACS_UCLEFT2;
-							edt = true;
-						}
-						if (col == vmnu.cols) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_UCRIGHT;
-							} else trait = ACS_UCRIGHT2;
-							edt = true;
-						}
-						if (col > 1 and col < vmnu.cols) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_Hlines;
-							} else trait = ACS_Hline2;
-							edt = true;
-						}
-					} else if (row == vmnu.lines) {
-						if (col == 1) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_LCLEFT;
-							} else trait = ACS_LCLEFT2;
-							edt = true;
-						}
-						if (col == vmnu.cols) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_LCRIGHT;
-							} else trait = ACS_LCRIGHT2;
-							edt = true;
-						}
-						if (col > 1 and col < vmnu.cols) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_Hlines;
-							} else trait = ACS_Hline2;
-							edt = true;
-						}
-					} else if (row > 1 and row < vmnu.lines) {
-						if (col == 1 or col == vmnu.cols) {
-							if (CADRE.line1 == vmnu.cadre) {
-								trait = ACS_Vlines;
-							} else trait = ACS_Vline2;
-							edt = true;
-						}
-					}
-					if (edt) {
+        const ACS_Hline2 = "═";
+        const ACS_Vline2 = "║";
+        const ACS_UCLEFT2 = "╔";
+        const ACS_UCRIGHT2 = "╗";
+        const ACS_LCLEFT2 = "╚";
+        const ACS_LCRIGHT2 = "╝";
 
-						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
-						else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
-						term.writeStyled(trait, vmnu.attribut);
-					} else {
-						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
-						else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
-						term.writeStyled(" ", vmnu.attribut);
-					}
+        var trait: []const u8 = "";
+        var edt: bool = undefined;
 
-					y += 1;
-					col += 1;
-				}
-				x += 1;
-			}
-		}
-	}
+        var row: usize = 1;
+        var y: usize = 0;
+        var col: usize = 0;
+                
+        var x: usize = vmnu.posx;
 
-	// display MATRIX to terminal ---> arraylist panel-menu
-	fn displayMenu(vmnu: MENU, npos: usize) void {
-		var pos: usize = npos;
-		var n: usize = 0;
-		var h: usize = 0;
+        // if line 0 ex: directory tab
+        if (CADRE.line0 != vmnu.cadre) {
+            while (row <= vmnu.lines) : (row += 1) {
+                y = vmnu.posy;
+                col = 1;
+                while (col <= vmnu.cols) {
+                    edt = false;
+                    if (row == 1) {
+                        if (col == 1) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_UCLEFT;
+                            } else trait = ACS_UCLEFT2;
+                            edt = true;
+                        }
+                        if (col == vmnu.cols) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_UCRIGHT;
+                            } else trait = ACS_UCRIGHT2;
+                            edt = true;
+                        }
+                        if (col > 1 and col < vmnu.cols) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_Hlines;
+                            } else trait = ACS_Hline2;
+                            edt = true;
+                        }
+                    } else if (row == vmnu.lines) {
+                        if (col == 1) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_LCLEFT;
+                            } else trait = ACS_LCLEFT2;
+                            edt = true;
+                        }
+                        if (col == vmnu.cols) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_LCRIGHT;
+                            } else trait = ACS_LCRIGHT2;
+                            edt = true;
+                        }
+                        if (col > 1 and col < vmnu.cols) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_Hlines;
+                            } else trait = ACS_Hline2;
+                            edt = true;
+                        }
+                    } else if (row > 1 and row < vmnu.lines) {
+                        if (col == 1 or col == vmnu.cols) {
+                            if (CADRE.line1 == vmnu.cadre) {
+                                trait = ACS_Vlines;
+                            } else trait = ACS_Vline2;
+                            edt = true;
+                        }
+                    }
+                    if (edt) {
 
-		const x: usize = vmnu.posx ;
-		const y: usize = vmnu.posy ;
+                        if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
+                        else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
+                        term.writeStyled(trait, vmnu.attribut);
+                    } else {
+                        if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx - 1, col + vmnu.posy - 1)
+                        else term.gotoXY(row  + vmnu.posx - 1, col + vmnu.posy - 1);
+                        term.writeStyled(" ", vmnu.attribut);
+                    }
 
-		if ( !vmnu.actif) return;
-		printMenu(vmnu);
+                    y += 1;
+                    col += 1;
+                }
+                x += 1;
+            }
+        }
+    }
 
-		term.onMouse();
-		term.cursHide();
+    // display MATRIX to terminal ---> arraylist panel-menu
+    fn displayMenu(vmnu: MENU, npos: usize) void {
+        var pos: usize = npos;
+        var n: usize = 0;
+        var h: usize = 0;
 
-		if (npos > vmnu.nbr or npos == 0) pos = 0;
+        const x: usize = vmnu.posx ;
+        const y: usize = vmnu.posy ;
 
-		n = 0;
-		h = 0;
-		for (vmnu.xitems) |cell| {
-			if (cell.len  > 0 ) {
-				if (vmnu.mnuvh == MNUVH.vertical) {
-					if (vmnu.cadre == CADRE.line0)
-						term.gotoXY(x + n, y)
-					else
-						term.gotoXY(x + n + 1, y + 1);
-				}
-				if (vmnu.mnuvh == MNUVH.horizontal) {
-					if (vmnu.cadre == CADRE.line0)
-						term.gotoXY(x, h + y)
-					else
-						term.gotoXY(x + 1, h + y + 1);
-				}
-				if (pos == n)
-					term.writeStyled(cell, vmnu.attrBar)
-				else
-					term.writeStyled(cell, vmnu.attrCell);
+        if ( !vmnu.actif) return;
+        printMenu(vmnu);
 
-				n += 1;
-				h += utl.nbrCharStr(cell);
-				if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
-			}
-		}
-	}
+        term.onMouse();
+        term.cursHide();
 
-	//----------------------------------------------------------------
-	// menu enter = select 1..n 0 = abort (Escape)
-	// Turning on the mouse
-	// UP DOWN LEFT RIGHT
-	// movement width the wheel and validation width the clik
-	//----------------------------------------------------------------
-	pub fn ioMenu(vmnu: MENU, npos: usize) usize {
-		if (vmnu.actif == false) return 999;
-		var pos: usize = npos;
-		var n: usize = 0;
-		var h: usize = 0;
-		const x: usize = vmnu.posx ;
-		const y: usize = vmnu.posy ;
+        if (npos > vmnu.nbr or npos == 0) pos = 0;
 
-		term.onMouse();
-		term.cursHide();
+        n = 0;
+        h = 0;
+        for (vmnu.xitems) |cell| {
+            if (cell.len  > 0 ) {
+                if (vmnu.mnuvh == MNUVH.vertical) {
+                    if (vmnu.cadre == CADRE.line0)
+                        term.gotoXY(x + n, y)
+                    else
+                        term.gotoXY(x + n + 1, y + 1);
+                }
+                if (vmnu.mnuvh == MNUVH.horizontal) {
+                    if (vmnu.cadre == CADRE.line0)
+                        term.gotoXY(x, h + y)
+                    else
+                        term.gotoXY(x + 1, h + y + 1);
+                }
+                if (pos == n)
+                    term.writeStyled(cell, vmnu.attrBar)
+                else
+                    term.writeStyled(cell, vmnu.attrCell);
 
-		if (npos > vmnu.nbr or npos == 0) pos = 0;
+                n += 1;
+                h += utl.nbrCharStr(cell);
+                if (vmnu.mnuvh == MNUVH.horizontal) h += vmnu.spc;
+            }
+        }
+    }
 
-		displayMenu(vmnu, pos);
+    //----------------------------------------------------------------
+    // menu enter = select 1..n 0 = abort (Escape)
+    // Turning on the mouse
+    // UP DOWN LEFT RIGHT
+    // movement width the wheel and validation width the clik
+    //----------------------------------------------------------------
+    pub fn ioMenu(vmnu: MENU, npos: usize) usize {
+        if (vmnu.actif == false) return 999;
+        var pos: usize = npos;
+        var n: usize = 0;
+        var h: usize = 0;
+        const x: usize = vmnu.posx ;
+        const y: usize = vmnu.posy ;
 
-		term.flushIO();
-		while (true) {
-			n = 0;
-			h = 0;
-			for (vmnu.xitems) |cell| {
-				if (vmnu.mnuvh == MNUVH.vertical) {
-					if (vmnu.cadre == CADRE.line0)
-						term.gotoXY(x + n, y)
-					else
-						term.gotoXY(x + n + 1, y + 1);
-				}
-				if (vmnu.mnuvh == MNUVH.horizontal) {
-					if (vmnu.cadre == CADRE.line0)
-						term.gotoXY(x, h + y)
-					else
-						term.gotoXY(x + 1, h + y + 1);
-				}
-				if (pos == n)
-					term.writeStyled(cell, vmnu.attrBar)
-				else
-					term.writeStyled(cell, vmnu.attrCell);
+        term.onMouse();
+        term.cursHide();
 
-				n += 1;
-				h += utl.nbrCharStr(cell);
-				if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
-			}
+        if (npos > vmnu.nbr or npos == 0) pos = 0;
 
-			var Tkey = kbd.getKEY();
+        displayMenu(vmnu, pos);
 
-			if (Tkey.Key == kbd.char and
-				std.mem.eql(u8, Tkey.Char, " "))
-			{
-				Tkey.Key = kbd.enter;
-				Tkey.Char = "";
-			}
+        term.flushIO();
+        while (true) {
+            n = 0;
+            h = 0;
+            for (vmnu.xitems) |cell| {
+                if (vmnu.mnuvh == MNUVH.vertical) {
+                    if (vmnu.cadre == CADRE.line0)
+                        term.gotoXY(x + n, y)
+                    else
+                        term.gotoXY(x + n + 1, y + 1);
+                }
+                if (vmnu.mnuvh == MNUVH.horizontal) {
+                    if (vmnu.cadre == CADRE.line0)
+                        term.gotoXY(x, h + y)
+                    else
+                        term.gotoXY(x + 1, h + y + 1);
+                }
+                if (pos == n)
+                    term.writeStyled(cell, vmnu.attrBar)
+                else
+                    term.writeStyled(cell, vmnu.attrCell);
 
-			if (Tkey.Key == kbd.mouse) {
-				Tkey.Key = kbd.none;
-				if (term.MouseInfo.scroll) {
-					if (term.MouseInfo.scrollDir == term.ScrollDirection.msUp) {
-						if (vmnu.mnuvh == MNUVH.vertical) Tkey.Key = kbd.up;
-						if (vmnu.mnuvh == MNUVH.horizontal) Tkey.Key = kbd.left;
-					}
+                n += 1;
+                h += utl.nbrCharStr(cell);
+                if (vmnu.mnuvh == MNUVH.horizontal) h += vmnu.spc;
+            }
 
-					if (term.MouseInfo.scrollDir == term.ScrollDirection.msDown) {
-						if (vmnu.mnuvh == MNUVH.vertical) Tkey.Key = kbd.down;
-						if (vmnu.mnuvh == MNUVH.horizontal) Tkey.Key = kbd.right;
-					}
-				} else {
-					if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
-					switch (term.MouseInfo.button) {
-						term.MouseButton.mbLeft => Tkey.Key = kbd.enter,
-						term.MouseButton.mbMiddle => Tkey.Key = kbd.enter,
-						term.MouseButton.mbRight => Tkey.Key = kbd.enter,
-						else => {},
-					}
-				}
-			}
+            var Tkey = kbd.getKEY();
 
-			switch (Tkey.Key) {
-				.none => continue,
-				.esc => {
-					term.offMouse();
-					return 9999;
-				},
-				.enter => {
-					term.offMouse();
-					return pos;
-				},
-				.down => {
-					if (pos < vmnu.nbr - 1) pos += 1;
-				},
-				.up => {
-					if (pos > 0) pos -= 1;
-				},
-				.right => {
-					if (pos < vmnu.nbr - 1) pos += 1;
-				},
-				.left => {
-					if (pos > 0) pos -= 1;
-				},
-				else => {},
-			}
-		}
-	}
+            if (Tkey.Key == kbd.char and
+                std.mem.eql(u8, Tkey.Char, " "))
+            {
+                Tkey.Key = kbd.enter;
+                Tkey.Char = "";
+            }
+
+            if (Tkey.Key == kbd.mouse) {
+                Tkey.Key = kbd.none;
+                if (term.MouseInfo.scroll) {
+                    if (term.MouseInfo.scrollDir == term.ScrollDirection.msUp) {
+                        if (vmnu.mnuvh == MNUVH.vertical) Tkey.Key = kbd.up;
+                        if (vmnu.mnuvh == MNUVH.horizontal) Tkey.Key = kbd.left;
+                    }
+
+                    if (term.MouseInfo.scrollDir == term.ScrollDirection.msDown) {
+                        if (vmnu.mnuvh == MNUVH.vertical) Tkey.Key = kbd.down;
+                        if (vmnu.mnuvh == MNUVH.horizontal) Tkey.Key = kbd.right;
+                    }
+                } else {
+                    if (term.MouseInfo.action == term.MouseAction.maReleased) continue;
+                    switch (term.MouseInfo.button) {
+                        term.MouseButton.mbLeft => Tkey.Key = kbd.none,
+                        term.MouseButton.mbMiddle => Tkey.Key = kbd.none,
+                        term.MouseButton.mbRight => Tkey.Key = kbd.enter,
+                        else => {},
+                    }
+                }
+            }
+
+            switch (Tkey.Key) {
+                .none => continue,
+                .esc => {
+                    term.offMouse();
+                    return 9999;
+                },
+                .enter => {
+                    term.offMouse();
+                    return pos;
+                },
+                .down => {
+                    if (pos < vmnu.nbr - 1) pos += 1;
+                },
+                .up => {
+                    if (pos > 0) pos -= 1;
+                },
+                .right => {
+                    if (pos < vmnu.nbr - 1) pos += 1;
+                },
+                .left => {
+                    if (pos > 0) pos -= 1;
+                },
+                else => {},
+            }
+        }
+    }
 };

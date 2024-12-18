@@ -1,7 +1,6 @@
-	///-----------------------
-	/// prog Gencurs 
-	/// zig 0.13.0 dev
-	///-----------------------
+///-----------------------
+/// prog Gencurs 
+///-----------------------
 
 const std = @import("std");
 
@@ -74,117 +73,117 @@ var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
 // defined var global
 
 
-var nopt : usize	= 0;
+var nopt : usize    = 0;
 
 
 const choix = enum {
-	panel,
-	forms,
-	grid,
-	menu,
-	sjson,
-	rjson,
-	clean,
-	exit
+    panel,
+    forms,
+    grid,
+    menu,
+    sjson,
+    rjson,
+    clean,
+    exit
 };
 
 
 // main----------------------------------
 
 pub fn main() !void {
-	//term.offscrool();
-	//open terminal and config and offMouse , cursHide->(cursor hide)
-	term.enableRawMode();
-	defer term.disableRawMode() ;
+    //term.offscrool();
+    //open terminal and config and offMouse , cursHide->(cursor hide)
+    term.enableRawMode();
+    defer term.disableRawMode() ;
 
-	// Initialisation
-	term.titleTerm("DESIGNER");
-
-
-	term.resizeTerm(44,168);
-	const termSize = term.getSize();
+    // Initialisation
+    term.titleTerm("DESIGNER");
 
 
-	fld.MouseDsp = true ; // active display cursor x/y mouse
-
-	var base : *pnl.PANEL = pnl.newPanelC("base",
-					1, 1,
-					termSize.height,
-					termSize.width ,
-					forms.CADRE.line1,
-					"") ;
-	//-------------------------------------------------
-	//the menu is not double buffered it is not a Panel
-
-	const MenuPrincipal = mnu.newMenu(
-					"Screen",				// name
-					2, 2,					// posx, posy
-					mnu.CADRE.line1,		// type line 
-					mnu.MNUVH.vertical,		// type menu vertical / horizontal
-					&.{
-					"Panel..",
-					"Forms..",
-					"Grid...",
-					"Menu...",
-					"SavJson.",
-					"RstJson",
-					"clear *all",
-					"Exit...",
-					}
-					) ;
+    term.resizeTerm(44,168);
+    const termSize = term.getSize();
 
 
-	while (true) {
+    fld.MouseDsp = true ; // active display cursor x/y mouse
 
-		pnl.printPanel(base);
-		term.deinitTerm();
-		utl.deinitUtl();
+    var base : *pnl.PANEL = pnl.newPanelC("base",
+                    1, 1,
+                    termSize.height,
+                    termSize.width ,
+                    forms.CADRE.line1,
+                    "") ;
+    //-------------------------------------------------
+    //the menu is not double buffered it is not a Panel
+
+    const MenuPrincipal = mnu.newMenu(
+                    "Screen",                // name
+                    2, 2,                    // posx, posy
+                    mnu.CADRE.line1,        // type line 
+                    mnu.MNUVH.vertical,        // type menu vertical / horizontal
+                    &.{
+                    "Panel..",
+                    "Forms..",
+                    "Grid...",
+                    "Menu...",
+                    "SavJson.",
+                    "RstJson",
+                    "clear *all",
+                    "Exit...",
+                    }
+                    ) ;
 
 
-		nopt = mnu.ioMenu(MenuPrincipal,0);
+    while (true) {
 
-		if (nopt == @intFromEnum(choix.exit )) { break; }
+        pnl.printPanel(base);
+        term.deinitTerm();
+        utl.deinitUtl();
 
-		if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
-		if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL, &NGRID) ;
-		if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
-		if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
-		if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, true) ;
-		if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;
-		
-		
-		// clean allocator *all
-		if (nopt == @intFromEnum(choix.clean)) {
-			pnl.freePanel(base);
 
-			term.deinitTerm();
-			grd.deinitGrid();
-			utl.deinitUtl();
-			forms.deinitForms();
-			
-			mdlMenus.deinitMenu();
+        nopt = mnu.ioMenu(MenuPrincipal,0);
 
-			if (NPANEL.items.len > 0) {
-				NPANEL.clearAndFree();
-				NPANEL.deinit();
-			}
-			if (NGRID.items.len > 0) {
-				NGRID.clearAndFree();
-				NGRID.deinit();
-			}
-			if (NMENU.items.len > 0) {
-				NMENU.clearAndFree();
-				NMENU.deinit();
-			}
-			base = pnl.newPanelC("base",
-			1, 1,
-			termSize.height,
-			termSize.width ,
-			forms.CADRE.line1,
-			"") ;
+        if (nopt == @intFromEnum(choix.exit )) { break; }
 
-		}
-	
-	}
-	term.disableRawMode();
+        if (nopt == @intFromEnum(choix.panel)) mdlPanel.fnPanel(&NPANEL) ;
+        if (nopt == @intFromEnum(choix.forms)) mdlForms.fnPanel(&NPANEL, &NGRID) ;
+        if (nopt == @intFromEnum(choix.grid))  mdlGrids.fnPanel(&NPANEL, &NGRID) ;
+        if (nopt == @intFromEnum(choix.menu))  mdlMenus.fnPanel(&NPANEL, &NGRID, &NMENU) ;
+        if (nopt == @intFromEnum(choix.sjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, true) ;
+        if (nopt == @intFromEnum(choix.rjson)) try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;
+        
+        
+        // clean allocator *all
+        if (nopt == @intFromEnum(choix.clean)) {
+            pnl.freePanel(base);
+
+            term.deinitTerm();
+            grd.deinitGrid();
+            utl.deinitUtl();
+            forms.deinitForms();
+            
+            mdlMenus.deinitMenu();
+
+            if (NPANEL.items.len > 0) {
+                NPANEL.clearAndFree();
+                NPANEL.deinit();
+            }
+            if (NGRID.items.len > 0) {
+                NGRID.clearAndFree();
+                NGRID.deinit();
+            }
+            if (NMENU.items.len > 0) {
+                NMENU.clearAndFree();
+                NMENU.deinit();
+            }
+            base = pnl.newPanelC("base",
+            1, 1,
+            termSize.height,
+            termSize.width ,
+            forms.CADRE.line1,
+            "") ;
+
+        }
+    
+    }
+    term.disableRawMode();
 }

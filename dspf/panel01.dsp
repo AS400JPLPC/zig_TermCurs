@@ -296,9 +296,9 @@
           "help": "help ALPHAUPPER",
           "procfunc": "",
           "proctask": "TvALPHAUPPER",
-          "progcall": "",
-          "typecall": "",
-          "parmcall": false,
+          "progcall": "TestCall",
+          "typecall": "APPTERM",
+          "parmcall": true,
           "regex": ""
         },
         {

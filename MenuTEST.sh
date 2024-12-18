@@ -73,9 +73,9 @@ do
 
 	f_dsplyPos  7  24 $faGras$fcJaune '------------compile Zig-----------------'
 
-	f_dsplyPos  9  20 $faGras$fcRouge' 10'; f_dsplyPos  9  24 $faGras$fcGreen 'menuTest'
-	f_dsplyPos 10  20 $faGras$fcRouge' 11'; f_dsplyPos 10  24 $faGras$fcGreen 'formTest'
-
+	f_dsplyPos 10  20 $faGras$fcRouge' 10'; f_dsplyPos 10  24 $faGras$fcGreen 'menuTest'
+	f_dsplyPos 11  20 $faGras$fcRouge' 11'; f_dsplyPos 11  24 $faGras$fcGreen 'formTest'
+	f_dsplyPos 12  20 $faGras$fcRouge' 12'; f_dsplyPos 12  24 $faGras$fcGreen 'Test'
 
 	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
@@ -121,7 +121,10 @@ do
 		11)
 			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "formTest"
 		;;
-
+#testc
+		11)
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Test"
+		;;
 
 #debug
 		33)

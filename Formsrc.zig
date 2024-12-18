@@ -46,8 +46,6 @@ const grd = @import("grid").grd;
 // tools utility
 const utl = @import("utils");
 
-
-
 // tools regex
 const reg = @import("mvzr");
 
@@ -80,7 +78,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			//----------------------
 			Panel.button.append(btn.newButton(kbd.F1,true,false,"Help")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F3,true,false,"Exit")) catch unreachable ;
-			Panel.button.append(btn.newButton(kbd.F5,true,false,"display GRID")) catch unreachable ;
+			Panel.button.append(btn.newButton(kbd.F7,true,false,"Display GRID")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F9,true,false,"Enrg.")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F11,true,false,"Update")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F12,true,false,"Return")) catch unreachable ;
