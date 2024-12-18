@@ -215,7 +215,9 @@ void term_spawn_callback(VteTerminal *terminal, GPid pid, GError *error, gpointe
 
 void on_title_changed(GtkWidget *terminal)
 {
-    gtk_window_set_title(GTK_WINDOW(window), vte_terminal_get_window_title(VTE_TERMINAL(terminal)));
+    const char *title;
+    title = vte_terminal_get_termprop_string_by_id(VTE_TERMINAL(terminal), VTE_PROPERTY_ID_XTERM_TITLE, NULL);
+    gtk_window_set_title (GTK_WINDOW(window), title);
 }
 
 /// -----------------------------------------------------------------------------
