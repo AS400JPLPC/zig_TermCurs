@@ -1,10 +1,6 @@
 const std = @import("std");
 const utf = @import("std").unicode;
 
-
-/// A variable length collection of characters
-pub const ZFIELD = struct {
-
     var arenaZfld = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     var allocZfld = arenaZfld.allocator();
 	pub fn deinitZfld() void {
@@ -12,6 +8,9 @@ pub const ZFIELD = struct {
 	    arenaZfld = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 	    allocZfld = arenaZfld.allocator();
 	}
+/// A variable length collection of characters
+pub const ZFIELD = struct {
+
     /// The internal character buffer
     buffer: ?[]u8,
 
