@@ -379,7 +379,9 @@ For decimal, see my Git repository Zdecimal; the number of digits goes far beyon
 <BR/>
 → 2024-12-19 04:20<BR/>
 add ztring 
-
+<BR/>
+→ 2024-12-21 04:20<BR/>
+  harmonization of functions between ZSTRING AND DECIMAL, in order to have a simplification in programming<br>
 <BR/>
 I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
 You can see the source generation of formsrc and formtest, which has been reworked.<BR/>

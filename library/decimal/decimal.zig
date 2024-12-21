@@ -63,6 +63,12 @@ pub var CTX_ADDR: c.mpd_context_t = undefined;
 
 var startContext : bool = false ;
 
+
+
+
+
+
+
 const dcmlError = error {
 	Failed_Init_iEntier_iScale,
 	Failed_set_precision_cMaxDigit,
@@ -80,50 +86,57 @@ const dcmlError = error {
 
 
 
-pub const dcml = struct{
-	var arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	var allocDcml = arenaDcml.allocator();
-	pub fn deinitDcml() void {
-	    arenaDcml.deinit();
-	    arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDcml = arenaDcml.allocator();
-	}
+pub const CMP = enum (u8) {
+		  LT ,
+		  EQ ,
+		  GT ,
+};
 
-	var result :[] u8 = undefined;
-	pub const DCMLFX = struct {
+var arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+var allocDcml = arenaDcml.allocator();
+pub fn deinitDcml() void {
+    arenaDcml.deinit();
+    arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocDcml = arenaDcml.allocator();
+}
+
+pub const DCMLFX = struct {
 		number  : [*c]c.mpd_t ,	 // number 
 		entier  : u8 ,			 // Left  part of the number
 		scale   : u8 ,			 // Right part of the number
 
-		
+
+
+	var result :[] u8 = undefined;
+	var work:[] u8 = undefined ;
 	//--------------------------------------------------------------
 	// Definition ex: for management -> accounting, stock, order...
 	//--------------------------------------------------------------
 	// MPD_DECIMAL32 = 32     MPD_ROUND_HALF_EVEN  
 	// MPD_DECIMAL64 = 64     MPD_ROUND_HALF_EVEN   
 	// MPD_DECIMAL128 = 128   MPD_ROUND_HALF_EVEN 34   digit IEE754
-	// MPD_DECIMAL256 = 256   MPD_ROUND_HALF_EVEN 70
-	// MPD_DECIMAL512 = 512   MPD_ROUND_HALF_EVEN 142
+	// MPD_DECIMAL256 = 256   MPD_ROUND_HALF_EVEN 70   laboratoire
+	// MPD_DECIMAL512 = 512   MPD_ROUND_HALF_EVEN 142  spatial
 	fn openContext() void {
 		c.mpd_maxcontext(&CTX_ADDR)  ;
-		_= c.mpd_ieee_context(&CTX_ADDR, 512);
+		_= c.mpd_ieee_context(&CTX_ADDR, 128);  // 128  256  512
 		_= c.mpd_qsetround(&CTX_ADDR, 6); // default MPD_ROUND_HALF_EVEN
 		startContext = true ;
 	}
 
 
-
-
-	pub fn init(iEntier: u8 , iScale : u8   ) ! DCMLFX {
+	pub fn init(iEntier: u8 , iScale : u8   ) DCMLFX {
 		if (!startContext) openContext();
 		if ((iEntier + iScale  > c.mpd_getprec(&CTX_ADDR)) or 
-			( iEntier == 0 and iScale == 0 ) ) return dcmlError.Failed_Init_iEntier_iScale;
+			( iEntier == 0 and iScale == 0 ) ) @panic("Failed_Init_iEntier_iScale") ;
 		const snum  = DCMLFX {
 			.number = c.mpd_new(&CTX_ADDR) ,
 			.entier = iEntier ,
 			.scale  = iScale,
 		};
-		c.mpd_set_flags(snum.number,128);
+
+		c.mpd_set_string(@ptrCast(snum.number), @ptrCast("0"),  &CTX_ADDR);
+
 		return snum;
 	}
 
@@ -132,10 +145,10 @@ pub const dcml = struct{
 
 	// Frees the storage memory of DCMLFX.number
 	pub fn deinit(cnbr: DCMLFX) void {
-		
 		c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(""), &CTX_ADDR );
 		c.mpd_del(cnbr.number);
 		allocDcml.free(result);
+		allocDcml.free(work);
 	}
 
 
@@ -206,9 +219,8 @@ pub const dcml = struct{
 
 	// Validity check Overflow
 	pub fn isOverflow (cnbr: DCMLFX) ! void {
-		const str = std.mem.span(c.mpd_to_eng(cnbr.number, 0));
-
-		var iter = iteratDcml.iterator(str);
+		work = std.fmt.allocPrint(allocDcml,"{s}", .{std.mem.span(c.mpd_to_eng(cnbr.number, 0))}) catch unreachable;
+		var iter = iteratDcml.iterator(work);
 		defer iter.deinit();
 		var e: usize = 0 ;	// nbr carctère entier
 		var s: usize = 0 ;	// nbr carctère scale
@@ -234,8 +246,6 @@ pub const dcml = struct{
 			c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast("0"),  &CTX_ADDR );
 			return;
 		}
-		
-// isValid(cnbr, str) catch | err | {return err ;} ;
 		c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(str),  &CTX_ADDR );
 	}
 
@@ -312,14 +322,11 @@ pub const dcml = struct{
 	// Returns a formatted string for gestion, statistique ...
 	pub fn string(cnbr: DCMLFX ) [] const u8 {
 		if ( c.mpd_isnan(cnbr.number) != 0 )  @panic("undefine_dcml");
- 
-		// attention output [*c]
-		const cstring = c.mpd_to_eng(cnbr.number, 0);
 
-		// convetion from [*c] to [] const u8 
-		var str  = std.mem.span(cstring);
 
-		var iterA = iteratDcml.iterator(str);
+		work = std.fmt.allocPrint(allocDcml,"{s}",.{std.mem.span(c.mpd_to_eng(cnbr.number, 0))}) catch unreachable;
+
+		var iterA = iteratDcml.iterator(work);
 		defer iterA.deinit();
 		var s: usize = 0 ;	// nbr carctère scale
 		var p: bool =false;   // '.' 
@@ -334,8 +341,10 @@ pub const dcml = struct{
 
 		if ( s > cnbr.scale ) { 
 			cnbr.round(); 
-			str  = std.mem.span(c.mpd_to_eng(cnbr.number, 0));
-			var iterB = iteratDcml.iterator(str);
+			work = std.fmt.allocPrint(allocDcml,"{s}", .{std.mem.span(c.mpd_to_eng(cnbr.number, 0))})
+				 catch unreachable;
+
+			var iterB = iteratDcml.iterator(work);
 			defer iterB.deinit();
 			s = 0 ;  
 			p =false;   
@@ -351,18 +360,17 @@ pub const dcml = struct{
 
 		if ( cnbr.scale > 0 ) {
 			var n : usize = cnbr.scale - s;
-			result = std.fmt.allocPrint(allocDcml,"{s}", .{str}) catch unreachable;
-			// if (!p) result =  std.fmt.allocPrint(allocDcml,"{s}", .{result}) catch unreachable;
-
+			result = std.fmt.allocPrint(allocDcml,"{s}", .{work}) catch unreachable;
 			while (true) {
 				if (n == 0) break;
-				result  = std.fmt.allocPrint(allocDcml,"{s}", .{result}) catch unreachable;
-				n -= 1;
+				 if (!p) { result =  std.fmt.allocPrint(allocDcml,"{s}.", .{result}) catch unreachable; p =true;}
+				 result  = std.fmt.allocPrint(allocDcml,"{s}0", .{result}) catch unreachable;
+				 n -= 1;
 			}
 		
 			return  result;
 		}
-		else return str ;
+		else return work ;
 	}
 
 
@@ -514,53 +522,36 @@ pub const dcml = struct{
 
 
 
-};
-	
 
-pub const CMP = enum (u8) {
-		  LT ,
-		  EQ ,
-		  GT ,
-};
-
-// compare a , b returns EQ LT GT
-pub fn cmp(a: DCMLFX ,b: DCMLFX) ! CMP {
-	const rep :  c_int  = c.mpd_cmp(a.number ,b.number, &CTX_ADDR);
-	switch (rep) {
-		-1 => return CMP.LT ,
-		0  => return CMP.EQ ,
-		1  => return CMP.GT ,
-		else => return dcmlError.cmp_impossible
-	}
-}
+};	
 
 
-// Shows mode debug serious programming errors
-pub const  dsperr = struct {	
-		pub fn errorDcml(errpgm :anyerror ) void { 
-			const allocator = std.heap.page_allocator;
-			const msgerr:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) catch unreachable; 
-			@panic(msgerr);
+
+	// Shows mode debug serious programming errors
+	pub fn dsperr(errpgm :anyerror ) void { 
+		const allocator = std.heap.page_allocator;
+		const msgerr:[]const u8 = std.fmt.allocPrint(allocator,"To report: {any} ",.{errpgm }) catch unreachable; 
+		@panic(msgerr);
 	}
 
+	// debug context
+	pub fn debugContext() void {
+		std.debug.print("{any}\n", .{CTX_ADDR});
+	}
 
-};
-
-
-// debug context
-pub fn debugContext() void {
-	std.debug.print("{any}\n", .{CTX_ADDR});
-}
-
-
+	// compare a , b returns EQ LT GT
+	pub fn cmp(a: DCMLFX ,b: DCMLFX) ! CMP {
+		const rep :  c_int  = c.mpd_cmp(a.number ,b.number, &CTX_ADDR);
+		switch (rep) {
+			-1 => return CMP.LT ,
+			0  => return CMP.EQ ,
+			1  => return CMP.GT ,
+			else => return dcmlError.cmp_impossible
+		}
+	}
 
 const iteratDcml = struct {
 	var strbuf:[] const u8 = undefined;
-    var arenaIter = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    
-    //defer arena.deinit();
-    const allocIter = arenaIter.allocator();
-   
 		/// Errors that may occur when using String
 		const ErrNbrch = error{
 			InvalideAllocBuffer,
@@ -573,7 +564,7 @@ const iteratDcml = struct {
 			index: usize ,
 
 			fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			 	const buf = allocIter.alloc(u8, size) catch {
+			 	const buf = allocDcml.alloc(u8, size) catch {
 					return ErrNbrch.InvalideAllocBuffer;
 				 };
 				return buf;
@@ -581,10 +572,9 @@ const iteratDcml = struct {
 
 			        /// Deallocates the internal buffer
 	        fn deinit(self: *Dcmliterator) void {
-	            if (self.buf.len > 0) allocIter.free(self.buf);
+	            if (self.buf.len > 0) allocDcml.free(self.buf);
 	            strbuf = "";
 	            self.index =0;
-	            // arenaIter.deinit();
 	        }
 	        
 
@@ -641,4 +631,3 @@ const iteratDcml = struct {
 		}
 	};
 
-};
