@@ -9,10 +9,16 @@
 │ Name       │ Npnl │ field           │ Index │ func            │ grid            │ task            │ call            │
 ├────────────┼──────┼─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ DEFREP     │    0 │ MNEXTD          │     0 │                 │                 │ TctlName        │                 │
+│ DEFREP     │    0 │ TEXT            │     1 │                 │                 │ TctlText        │                 │
 │ DEFREP     │    0 │ MNEMO           │     2 │                 │                 │ TctlMnemo       │                 │
-│ DEFREP     │    0 │ TYPE            │     3 │ Ctype           │ Ctype           │ TctrlType       │                 │
-│ DEFREP     │    0 │ LONG            │     4 │                 │                 │ TcrtlLong       │                 │
-│ DEFREP     │    0 │ WIDTH           │     5 │                 │                 │ TctrlWidth      │                 │
-│ DEFREP     │    0 │ SCAL            │     6 │                 │                 │ TctrlScal       │                 │
+│ DEFREP     │    0 │ TYPE            │     3 │ Ftype           │ Ctype           │ TctrlType       │                 │
+│ DEFREP     │    0 │ WIDTH           │     4 │                 │                 │ TctrlWidth      │                 │
+│ DEFREP     │    0 │ SCAL            │     5 │                 │                 │ TctrlScal       │                 │
+│ DEFREP     │    0 │ LONG            │     6 │                 │                 │ TcrtlLong       │                 │
 └────────────┴──────┴─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
 
+┌─────────────────┬───────┬─────────────────┬─────────────────┬─────────────────────────────┐
+│ field           │ Index │ func            │ grid            │                             │
+├─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────────────────┤
+│ TYPE            │     3 │ Ftype           │ Ctype           │ ERROR combo ≠ Func          │
+└─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────────────────┘

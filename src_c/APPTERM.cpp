@@ -198,17 +198,17 @@ void    init_Terminal()
 
     vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));        /// font utilisé
 
-    vte_terminal_set_size (VTE, COL, ROW);                                                                    /// size du terminal
+    vte_terminal_set_size (VTE, COL, ROW);                                         /// size du terminal
 
-    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                                                  /// titre du terminal de base
+    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                             /// titre du terminal de base
 
-    vte_terminal_set_scrollback_lines (VTE,0);                                             ///    désactiver historique.
+    vte_terminal_set_scrollback_lines (VTE,0);                                     ///    désactiver historique.
 
-    vte_terminal_set_scroll_on_output(VTE,FALSE);                                        /// pas de défilement en cas de nouvelle sortie
+    vte_terminal_set_scroll_on_output(VTE,FALSE);                                  /// pas de défilement en cas de nouvelle sortie
 
-    vte_terminal_set_scroll_on_keystroke(VTE,FALSE);                                /// pas de défilement en bas s’il y a interaction de l’utilisateur
+    vte_terminal_set_scroll_on_keystroke(VTE,FALSE);                              /// pas de défilement en bas s’il y a interaction de l’utilisateur
 
-    vte_terminal_set_mouse_autohide(VTE, TRUE);                                            /// cacher le curseur de la souris quand le clavier est utilisé.
+    vte_terminal_set_mouse_autohide(VTE, TRUE);                                   /// cacher le curseur de la souris quand le clavier est utilisé.
 
     vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);        /// cursor blink on
 
@@ -229,7 +229,9 @@ void term_spawn_callback(VteTerminal *terminal, GPid pid, GError *error, gpointe
 
 void on_title_changed(GtkWidget *terminal)
 {
-    gtk_window_set_title(GTK_WINDOW(window), vte_terminal_get_window_title(VTE_TERMINAL(terminal)));
+    const char *title;
+    title = vte_terminal_get_termprop_string_by_id(VTE_TERMINAL(terminal), VTE_PROPERTY_ID_XTERM_TITLE, NULL);
+    gtk_window_set_title (GTK_WINDOW(window), title);
 }
 
 /// -----------------------------------------------------------------------------

@@ -46,8 +46,6 @@ const grd = @import("grid").grd;
 // tools utility
 const utl = @import("utils");
 
-
-
 // tools regex
 const reg = @import("mvzr");
 
@@ -80,7 +78,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			//----------------------
 			Panel.button.append(btn.newButton(kbd.F1,true,false,"Help")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F3,true,false,"Exit")) catch unreachable ;
-			Panel.button.append(btn.newButton(kbd.F5,true,false,"display GRID")) catch unreachable ;
+			Panel.button.append(btn.newButton(kbd.F7,true,false,"Display GRID")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F9,true,false,"Enrg.")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F11,true,false,"Update")) catch unreachable ;
 			Panel.button.append(btn.newButton(kbd.F12,true,false,"Return")) catch unreachable ;
@@ -180,7 +178,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		var cellPos:usize = 0;
 		const Xcombo : *grd.GRID = grd.newGridC(
 				"Ctype",
-				5, 78,
+				4, 76,
 				3,
 				grd.gridStyle,
 				grd.CADRE.line1,
@@ -217,7 +215,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		none,
 		fn run(self: FuncEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void {
 			switch (self) {
-			.Ftype => Ctype(vpnl,vfld),
+			.Ftype => (vpnl,vfld),
 			else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
 			}
 		}

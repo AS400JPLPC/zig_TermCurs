@@ -9,11 +9,12 @@
 │ Name       │ Npnl │ field           │ Index │ func            │ grid            │ task            │ call            │
 ├────────────┼──────┼─────────────────┼───────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
 │ DEFREP     │    0 │ MNEXTD          │     0 │                 │                 │ TctlName        │                 │
+│ DEFREP     │    0 │ TEXT            │     1 │                 │                 │ TctlText        │                 │
 │ DEFREP     │    0 │ MNEMO           │     2 │                 │                 │ TctlMnemo       │                 │
-│ DEFREP     │    0 │ TYPE            │     3 │ Ctype           │ Ctype           │ TctrlType       │                 │
-│ DEFREP     │    0 │ LONG            │     4 │                 │                 │ TcrtlLong       │                 │
-│ DEFREP     │    0 │ WIDTH           │     5 │                 │                 │ TctrlWidth      │                 │
-│ DEFREP     │    0 │ SCAL            │     6 │                 │                 │ TctrlScal       │                 │
+│ DEFREP     │    0 │ TYPE            │     3 │ Ftype           │ Ctype           │ TctrlType       │                 │
+│ DEFREP     │    0 │ WIDTH           │     4 │                 │                 │ TctrlWidth      │                 │
+│ DEFREP     │    0 │ SCAL            │     5 │                 │                 │ TctrlScal       │                 │
+│ DEFREP     │    0 │ LONG            │     6 │                 │                 │ TcrtlLong       │                 │
 └────────────┴──────┴─────────────────┴───────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
 
 ┌────────────┬──────┬─────────────────┬───────┐
@@ -24,7 +25,7 @@
 │ DEFREP     │    0 │ L371            │     2 │
 │ DEFREP     │    0 │ L378            │     3 │
 │ DEFREP     │    0 │ L380            │     4 │
-│ DEFREP     │    0 │ L385            │     5 │
+│ DEFREP     │    0 │ L386            │     5 │
 │ DEFREP     │    0 │ L391            │     6 │
 └────────────┴──────┴─────────────────┴───────┘
 

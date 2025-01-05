@@ -20,10 +20,11 @@ pub const crypto	= @import("crypto");
 
 
 pub const dcml		= @import("decimal");
+pub const zfld		= @import("zfield");
 
 
 pub const logger	= @import("logger");
 
 pub const logcons	= @import("logcons");
 
-pub const logsrc	= @import("logsrcs");
+pub const logsrc	= @import("logsrc");
