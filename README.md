@@ -388,6 +388,7 @@ add ztring
     err: for (vgrd.items[gridNum].pageRows)...<BR/>
     ex: for (0..vgrd.items[gridNum].pageRows)...><BR/>
 <BR/>
+→ 2025-01-05 18:31 update Terminal.7z clear cache <BR/>
 <BR/>
 <BR/>
 I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
