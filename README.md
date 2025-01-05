@@ -369,6 +369,26 @@ Added Gensrc definition Programme<br />
 Please refer to the files in the directory: dspf/repertoire/.<BR/>
 You will notice that function keys are assigned, such as F9 for adding a record and F11 for updating a record; these are standard industrial practices recommended in management.<BR/>
 You can compare the output source with the SRC program.<BR/>
+<BR/><BR/><BR/>
+→ 2024-12:18 00:00<BR/>
+
+"I have refactored all the sources to make them compatible with Zig's LSP and code editors: all indentation tabs are spaces '....' and not '→'.
+At the moment, I just finished testing the decimal function, and I now need to test the zstring function to ensure everything complies with industrial SQL database standards, such as varchar(10) or decimal(5,2).
+For decimal, see my Git repository Zdecimal; the number of digits goes far beyond the limitations of C or Zig."
+
+<BR/>
+→ 2024-12-19 04:20<BR/>
+add ztring 
+<BR/>
+→ 2024-12-21 04:20<BR/>
+  harmonization of functions between ZSTRING AND DECIMAL, in order to have a simplification in programming<br>
+<BR/>
+→ 2025-01-05 02:52<BR/>
+    Fixed bug for range detected zig 0.14.0-dev.2598 from "mdlforms" / "mdlgrids".<BR/>
+    err: for (vgrd.items[gridNum].pageRows)...<BR/>
+    ex: for (0..vgrd.items[gridNum].pageRows)...><BR/>
+<BR/>
+<BR/>
 <BR/>
 I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
 You can see the source generation of formsrc and formtest, which has been reworked.<BR/>
