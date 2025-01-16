@@ -13,9 +13,9 @@ pub fn build(b: *std.Build) void {
 
 
     // ===========================================================
-    const cursed = b.dependency("library", .{}).module("cursed");
-    const utils  = b.dependency("library", .{}).module("utils");
-    const menu   = b.dependency("library", .{}).module("menu");
+    const cursed = b.dependency("libtui", .{}).module("cursed");
+    const utils  = b.dependency("libtui", .{}).module("utils");
+    const menu   = b.dependency("libtui", .{}).module("menu");
 
 
     // Building the executable

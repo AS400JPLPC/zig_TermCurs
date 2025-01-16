@@ -18,11 +18,6 @@ pub const zmmap		= @import("zmmap");
 pub const crypto	= @import("crypto");
 
 
-
-pub const dcml		= @import("decimal");
-pub const zfld		= @import("zfield");
-
-
 pub const logger	= @import("logger");
 
 pub const logcons	= @import("logcons");

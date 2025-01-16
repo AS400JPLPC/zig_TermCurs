@@ -57,7 +57,7 @@ envCPP="1"
 envZIG="2"
 PROJECT="ZTERM"
 LIBPROJECT="/home/soleil/Zterm/"
-LIBRARY="/home/soleil/Zterm/library/"
+LIBRARY="/home/soleil/Zterm/libtui/"
 choix=""
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -87,9 +87,9 @@ do
 
 	f_dsplyPos 19  20 $faGras$fcRouge'44.'; f_dsplyPos 19  24 $faGras$fcCyan  'enScript Printer'
 
-	f_dsplyPos 21  20 $faGras$fcRouge'50.'; f_dsplyPos 21  24 $faGras$fcCyan  'Edit my library'	
+	f_dsplyPos 21  20 $faGras$fcRouge'50.'; f_dsplyPos 21  24 $faGras$fcCyan  'Edit my library LIBTUI'	
 
-	f_dsplyPos 23  20 $faGras$fcRouge'55.'; f_dsplyPos 23  24 $faGras$fcCyan  'Edit my project'
+	f_dsplyPos 23  20 $faGras$fcRouge'60.'; f_dsplyPos 23  24 $faGras$fcCyan  'Edit my project'
 
 	f_dsplyPos 24  20 $faGras$fcRouge'66.'; f_dsplyPos 24  24 $faGras$fcCyan  'Edit last source used'
 
@@ -172,7 +172,7 @@ do
 		;;
 
 #project
-		55)
+		60)
 			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"src-zig"
 			#sleep 2
 			#break

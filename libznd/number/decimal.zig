@@ -3,7 +3,7 @@ const utf = @import("std").unicode;
 
 
 
-const c = @cImport( { @cInclude("mpdecimal.h"); } );
+const c = @cImport(  @cInclude("mpdecimal.h") );
 
 //---------------------------------------------------------------------------------
 // begin  decimal

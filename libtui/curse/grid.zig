@@ -86,16 +86,17 @@ pub const grd = struct {
         FUNC, // call Function
     };
 
-    pub const allocatorArgData = std.heap.page_allocator;
     var arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     pub var allocatorGrid = arenaGrid.allocator();
     pub fn deinitGrid() void {
         arenaGrid.deinit();
         arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
         allocatorGrid = arenaGrid.allocator();
+        
     }
 
-    // define attribut default GRID
+    pub const allocatorArgData = std.heap.page_allocator;
+
     pub var AtrGrid: term.ZONATRB = .{ .styled = [_]u32{
         @intFromEnum(term.Style.styleDim),
         @intFromEnum(term.Style.notStyle),
@@ -570,9 +571,9 @@ pub const grd = struct {
         while (self.data.len > 0) {
             self.data.orderedRemove(self.data.len - 1);
         }
-
+        self.data.clearAndFree(allocatorArgData);
         self.data.deinit(allocatorArgData);
-
+        
         self.headers.clearAndFree();
         self.headers.deinit();
         self.cell.clearAndFree();

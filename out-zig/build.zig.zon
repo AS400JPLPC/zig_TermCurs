@@ -2,8 +2,8 @@
     .name = "program",
     .version = "0.0.0",
     .dependencies = .{
-        .library = .{
-            .path = "../library",
+        .libtui = .{
+            .path = "../libtui",
         },
     },
     .paths = .{

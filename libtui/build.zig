@@ -24,6 +24,9 @@ pub fn build(b: *std.Build) void {
 
 	const utils_mod = b.addModule("utils", .{
 		.root_source_file = b.path( "./curse/utils.zig" ),
+		.imports= &.{
+		.{ .name = "cursed", .module = cursed_mod },
+		},
 	});
 
 	const mvzr_mod = b.addModule("mvzr", .{
@@ -79,23 +82,6 @@ pub fn build(b: *std.Build) void {
 	});
 
 
-	const decimal_mod = b.addModule("decimal", .{
-		.root_source_file = b.path( "./decimal/decimal.zig" ),
-	});
-
-
-	const zfield_mod = b.addModule("zfield", .{
-		.root_source_file = b.path( "./zfield/zfield.zig" ),
-	});
-
-
-
-
-
-
- 	decimal_mod.addSystemIncludePath(.{ .cwd_relative ="/usr/include/mpdecimal.h"});
-	decimal_mod.link_libc = true;
-	decimal_mod.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
 
 	
 	const library_mod = b.addModule("library", .{
@@ -104,11 +90,10 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "cursed",	.module = cursed_mod },
 		.{ .name = "utils",		.module = utils_mod },
 		.{ .name = "mvzr",		.module = mvzr_mod },
+
 		.{ .name = "forms",		.module = forms_mod },
 		.{ .name = "grid",		.module = grid_mod },
 		.{ .name = "menu",		.module = menu_mod },
-		.{ .name = "decimal",	.module = decimal_mod },
-		.{ .name = "zfield",	.module = zfield_mod },
 		
 		.{ .name = "callpgm",	.module = callpgm_mod },
 		.{ .name = "zmmap",		.module = zmmap_mod },

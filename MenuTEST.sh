@@ -57,7 +57,7 @@ envCPP="1"
 envZIG="4"
 PROJECT="ZTERM"
 LIBPROJECT="/home/soleil/Zterm/"
-LIBRARY="/home/soleil/Zterm/library/"
+LIBRARY="/home/soleil/Zterm/libtui/"
 choix=""
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -75,16 +75,17 @@ do
 
 	f_dsplyPos 10  20 $faGras$fcRouge' 10'; f_dsplyPos 10  24 $faGras$fcGreen 'menuTest'
 	f_dsplyPos 11  20 $faGras$fcRouge' 11'; f_dsplyPos 11  24 $faGras$fcGreen 'formTest'
-f
+	f_dsplyPos 12  20 $faGras$fcRouge' 12'; f_dsplyPos 12  24 $faGras$fcGreen 'Test'
+
 	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
 	f_dsplyPos 17  20 $faGras$fcRouge'33.'; f_dsplyPos 17  24 $faGras$fcGreen 'Debug codelldb'
 
 	f_dsplyPos 19  20 $faGras$fcRouge'44.'; f_dsplyPos 19  24 $faGras$fcCyan  'enScript Printer'
 
-	f_dsplyPos 21  20 $faGras$fcRouge'50.'; f_dsplyPos 21  24 $faGras$fcCyan  'Edit my library'	
+	f_dsplyPos 21  20 $faGras$fcRouge'50.'; f_dsplyPos 21  24 $faGras$fcCyan  'Edit my library libtui'	
 
-	f_dsplyPos 23  20 $faGras$fcRouge'55.'; f_dsplyPos 23  24 $faGras$fcCyan  'Edit my project'
+	f_dsplyPos 23  20 $faGras$fcRouge'60.'; f_dsplyPos 23  24 $faGras$fcCyan  'Edit my project'
 
 	f_dsplyPos 24  20 $faGras$fcRouge'66.'; f_dsplyPos 24  24 $faGras$fcCyan  'Edit last source used'
 
@@ -120,6 +121,10 @@ f
 		11)
 			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "formTest"
 		;;
+#test
+		12)
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Test"
+		;;
 
 #debug
 		33)
@@ -139,7 +144,7 @@ f
 		;;
 
 #project
-		55)
+		60)
 			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"out-zig"
 			#sleep 2
 			#break

@@ -13,14 +13,8 @@ pub fn build(b: *std.Build) void {
 
 
     // Definition of module
-    const cursed = b.dependency("library", .{}).module("cursed");
-    const utils  = b.dependency("library", .{}).module("utils");
-    const forms  = b.dependency("library", .{}).module("forms");
-    const grid   = b.dependency("library", .{}).module("grid");
-    const menu   = b.dependency("library", .{}).module("menu");
-    const mvzr   = b.dependency("library", .{}).module("mvzr");
-    const callpgm  = b.dependency("library", .{}).module("callpgm");
-    // const logger  = b.dependency("library", .{}).module("logger");
+    const zenlib_tui = b.dependency("libtui", .{});
+    // const logger  = b.dependency("libtui", .{}).module("logger");
 
     // Building the executable
     
@@ -34,20 +28,23 @@ pub fn build(b: *std.Build) void {
     Prog.linkLibC();
     Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
 
-    Prog.root_module.addImport("cursed", cursed);
+    Prog.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
 
-    Prog.root_module.addImport("utils", utils);
+    Prog.root_module.addImport("utils",    zenlib_tui.module("utils"));
 
-    Prog.root_module.addImport("mvzr", mvzr);
+    Prog.root_module.addImport("mvzr",     zenlib_tui.module("mvzr"));
     
-    Prog.root_module.addImport("forms", forms);
+    Prog.root_module.addImport("forms",    zenlib_tui.module("forms"));
     
-    Prog.root_module.addImport("grid" , grid);
+    Prog.root_module.addImport("grid" ,    zenlib_tui.module("grid"));
     
-    Prog.root_module.addImport("menu" , menu);
+    Prog.root_module.addImport("menu" ,    zenlib_tui.module("menu"));
     
-    Prog.root_module.addImport("callpgm" , callpgm);
-    
+    Prog.root_module.addImport("callpgm" , zenlib_tui.module("callpgm"));
+
+    // Prog.root_module.addImport("logger" , zenlib_tui.module("logger"));
+
+        
     const install_exe = b.addInstallArtifact(Prog, .{});
     b.getInstallStep().dependOn(&install_exe.step); 
 

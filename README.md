@@ -4,6 +4,21 @@ terminal access function <br />
 <u>**zig 0.14.DEV**</u><BR />
 <br />
 
+**Major library restructuring:**
+remove library
+Libtui (curse, log, calling, crypt, mmap,regex)
+Libznd (decimal,field,date)
+libsql currently only includes sqlite, postgresql to follow
+
+All builds have been changed accordingly 
+
+The aim is to make projects independent
+
+
+
+
+
+
 **TESTING** <br />
 *look at the bottom of the testing page* <br />
 
@@ -166,10 +181,11 @@ COMBO<BR/>
 
 <u>---Organization-project------------------------------------------</u><BR />
 &rarr;&nbsp; folder deps: Filing of files zig including reference sources <br />
-&rarr;&nbsp; folder library:  zig       source files <br />
+&rarr;&nbsp; folder libtui:   zig       source files <br />
+&rarr;&nbsp; folder libznd:   zig       source files <br />
+&rarr;&nbsp; folder libsql:   zig       source files <br />
 &rarr;&nbsp; folder src_c:    C/C++     source files <br />
 &rarr;&nbsp; folder src_zig:  ZIG-lang  source files <br />
-&rarr;&nbsp; folder lib:      src xx.H  source files <br />
 &rarr;&nbsp; build: build+source-name ex: buildexemple <br />
 &rarr;&nbsp; makefile <br />
 <br /> <br />
@@ -390,6 +406,18 @@ add ztring
 <BR/>
 → 2025-01-05 18:31 update Terminal.7z clear cache <BR/>
 <BR/>
+→ 2025-01-16 104:32 <BR/>
+Bonjour,  désolé pour le bug dans la saisie de zone, j'ai essayé de courir après les fuites euuhh une grosse baffe. <BR/>
+Bref, tout ça est réparé.<BR/>
+J'ai travaillé sur les dates et cela m'a amené à restructurer l'ensemble des bibliothèques pour un avenir plus serin. <BR/>
+J'ai retesté et seulement compilé. <BR/>
+LIBTUI   : comporte tout ce qui est lié au terminal et son exécution.<BR/>
+LIBZND : traitement -> Decimal, Zfield, Date-time.<BR/>
+LIBSQL : en préparation maintenant que j'ai fini DATE-TIME<BR/>
+<BR/>
+je vais travailler sur open date space  pour que les FIELD soient faciles d'accès. <BR/>
+<BR/>
+le générateur de source n'est pas terminé, je voudrais traiter les GRID, c'est pour cela que je suis sur sql.....<BR/>
 <BR/>
 I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
 You can see the source generation of formsrc and formtest, which has been reworked.<BR/>

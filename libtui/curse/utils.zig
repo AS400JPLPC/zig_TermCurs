@@ -68,47 +68,76 @@ pub fn usizeToStr(v: usize) []const u8 {
     };
 }
 
+
+
 /// Iterator support iteration string
 pub const iteratStr = struct {
+	var strbuf:[] const u8 = undefined;
 
-    pub const StringIterator = struct {
-        buf: []u8,
-        index: usize,
-
-        /// Deallocates the internal buffer
-        pub fn deinit(self: *StringIterator) void {
-            if (self.buf.len > 0) allocUtl.free(self.buf);
-            self.index = 0;
-        }
+	/// Errors that may occur when using String
+	pub const ErrNbrch = error{
+		InvalideAllocBuffer,
+	};
+	
 
 
-        pub fn next(it: *StringIterator) ?[]const u8 {
-            if ( it.buf.len == 0 ) return null;
-            
-            if (it.index >= it.buf.len) return null;
-            const i = it.index;
-            it.index += getUTF8Size(it.buf[i]);
-            return it.buf[i..it.index];
-        }
+	pub const StringIterator = struct {
+		buf: []u8 ,
+		index: usize ,
 
-    };
 
-    /// iterator String
-    pub fn iterator(str: []const u8) StringIterator {
+		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
+			const buf = allocUtl.alloc(u8, size) catch {
+				return ErrNbrch.InvalideAllocBuffer;
+			};
+			return buf;
+		}
 
-        return StringIterator{
-            .buf = allocUtl.dupe(u8,str) catch unreachable,
-            .index = 0,
-        };
-    }
+		/// Deallocates the internal buffer
+		pub fn deinit(self: *StringIterator) void {
+			if (self.buf.len > 0)	allocUtl.free(self.buf);
+			strbuf = undefined;
+		}
 
-    /// Returns the UTF-8 character's size
-    fn getUTF8Size(char: u8) u3 {
-        return std.unicode.utf8ByteSequenceLength(char) catch |err| {
-            @panic(@errorName(err));
-        };
-    }
+		pub fn next(it: *StringIterator) ?[]const u8 {
+			const optional_buf: ?[]u8	= allocBuffer(strbuf.len) catch return null;
+			
+			it.buf= optional_buf orelse "";
+			var idx : usize = 0;
+
+			while (true) {
+				if (idx >= strbuf.len) break;
+				it.buf[idx] = strbuf[idx];
+				idx += 1;
+			}
+
+			if (it.index == it.buf.len) return null;
+			idx = it.index;
+			it.index += getUTF8Size(it.buf[idx]);
+			return it.buf[idx..it.index];
+		}
+
+	};
+
+	/// iterator String
+	pub fn iterator(str:[] const u8) StringIterator {
+		// strbuf = std.fmt.allocPrint(allocUtl,"{s}", str) catch |err| {@panic(@errorName(err));};
+        strbuf = str;
+		return StringIterator{
+			.buf = undefined,
+			.index = 0,
+		};
+	}
+
+	/// Returns the UTF-8 character's size
+	fn getUTF8Size(char: u8) u3 {
+		return std.unicode.utf8ByteSequenceLength(char) 
+			catch |err| { @panic(@errorName(err));};
+	}
 };
+
+
+
 
 /// number characters String
 pub fn nbrCharStr(str: []const u8) usize {
@@ -676,19 +705,18 @@ pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void {
 pub fn addListStr(self: *std.ArrayList([]const u8), text: []const u8) void {
     var iter = iteratStr.iterator(text);
     defer iter.deinit();
-
     while (iter.next()) |ch| {
-        self.append(ch) catch |err| {
-            @panic(@errorName(err));
-        };
-    }
-}
+        self.append(ch) catch |err| { @panic(@errorName(err)); };
+     }
+ }
 
 /// ArrayList to String
 pub fn listToStr(self: std.ArrayList([]const u8)) []const u8 {
     var result: []const u8 = "";
-    for (self.items) |ch| {
-        result = concatStr(result, ch);
+    var idx : usize = 0;
+    for (self.items) |_| {
+        result = concatStr(result,self.items[idx]);
+        idx += 1;
     }
     return result;
 }
@@ -723,4 +751,3 @@ pub fn cboolToBool(v: []const u8) bool {
 pub fn cboolToStr(v: []const u8) []const u8 {
     return if (std.mem.eql(u8, v, CTRUE)) "1" else "0";
 }
-

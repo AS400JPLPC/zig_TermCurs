@@ -14,12 +14,12 @@ pub fn build(b: *std.Build) void {
 
 
     // ===========================================================
-    const cursed = b.dependency("library", .{}).module("cursed");
-    const utils  = b.dependency("library", .{}).module("utils");
-    const forms  = b.dependency("library", .{}).module("forms");
-    const grid   = b.dependency("library", .{}).module("grid");
-    const menu   = b.dependency("library", .{}).module("menu");
-    const mvzr   = b.dependency("library", .{}).module("mvzr");
+    const cursed = b.dependency("libtui", .{}).module("cursed");
+    const utils  = b.dependency("libtui", .{}).module("utils");
+    const forms  = b.dependency("libtui", .{}).module("forms");
+    const grid   = b.dependency("libtui", .{}).module("grid");
+    const menu   = b.dependency("libtui", .{}).module("menu");
+    const mvzr   = b.dependency("libtui", .{}).module("mvzr");
 
         
     const mdlPanel = b.createModule(.{
