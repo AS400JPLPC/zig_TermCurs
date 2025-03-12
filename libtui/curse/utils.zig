@@ -576,8 +576,7 @@ pub fn upperStr(str: []const u8) []const u8 {
     while (iter.next()) |ch | {
         const view = std.unicode.Utf8View.init(str) catch |err| {@panic(@errorName(err)); };
         var iter2 = view.iterator();
-        var x : u21 = undefined;
-        while (iter2.nextCodepoint()) |u| { x = u ;}
+        const x : u21 = iter2.nextCodepoint() orelse 0  ; 
         r = 0 ;
         if ( x >= 97 and x <= 122 )  r = x - 32;
         if ( x >= 224 and x <= 255 )  r = x - 32;
