@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.14.DEV**</u><BR />
+<u>**zig 0.14.0**</u><BR />
 <br />
 
 **Major library restructuring:**
@@ -406,7 +406,10 @@ add ztring
 <BR/>
 → 2025-01-05 18:31 update Terminal.7z clear cache <BR/>
 <BR/>
-→ 2025-01-16 104:32 <BR/>
+→ 2025-01-16 10:32 <BR/>
+</BR>
+<BR/>
+→ 2025-03-12 02:52   update 0.14.0<BR/>
 </BR>
 **big bug input  change module utils of libtui**<BR/>
 Anyway, it's all fixed now.<BR/>

@@ -24,11 +24,11 @@
           "title": "Exit"
         },
         {
-          "name": "F5",
-          "key": "F5",
+          "name": "F7",
+          "key": "F7",
           "show": true,
           "check": false,
-          "title": "display GRID"
+          "title": "Display GRID"
         },
         {
           "name": "F9",
@@ -325,8 +325,8 @@
     },
     {
       "name": "Ctype",
-      "posx": 5,
-      "posy": 78,
+      "posx": 4,
+      "posy": 76,
       "pagerows": 3,
       "separator": "│",
       "cadre": "line1",

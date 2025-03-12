@@ -1,18 +1,18 @@
 .{
-    .name = "program",
+    .name = .as400jplpc,
     .version = "0.0.0",
+    .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .libtui = .{
             .path = "../libtui",
         },
-        .libzoning = .{
-            .path = "../libzoning",
+        .libznd = .{
+            .path = "../libznd",
         },
         .libsql = .{
             .path = "../libsql",
         },
     },
-    .paths = .{
-        "",
-    },
+    .paths = .{""},
+    .fingerprint = 0xbbebb3706425d0a9,
 }

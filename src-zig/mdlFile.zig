@@ -167,7 +167,7 @@ fn isFile(name: []const u8 ) bool {
         };
 
     defer file.close();
-    return false;
+    return true;
 }
 
 fn newFile(name: []const u8 ) void {

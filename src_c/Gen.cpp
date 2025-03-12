@@ -158,17 +158,17 @@ void    init_Terminal()
 
     /// confortable and extend numbers columns and rows
 
-    if ( s->width <= 1600 && s->height >=1024 ) {                    // ex: 13"... 15"
+    if ( s->width <= 1600 && s->height >=1024 ) {             // ex: 13"... 15"
         sprintf(font_terminal,"%s %s" , VTEFONT,"10");
         COL = 168;
         ROW = 44;
         }
-    else if ( s->width <= 1920 && s->height >=1080 ) {            // ex: 17"... 32"
+    else if ( s->width <= 1920 && s->height >=1080 ) {        // ex: 17"... 32"
         sprintf(font_terminal,"%s %s" , VTEFONT,"12");
         COL = 168;
         ROW = 44;
         }
-    else if ( s->width > 1920  ) {                                          //  ex: 2560 x1600 > 27"  font 13
+    else if ( s->width > 1920  ) {                            //  ex: 2560 x1600 > 27"  font 13
         sprintf(font_terminal,"%s %s" , VTEFONT,"13");        //  ex: 3840 x2160 > 32"  font 15
         COL = 168;
         ROW = 44;
@@ -178,23 +178,23 @@ void    init_Terminal()
     // resize  title  font
   VTE = VTE_TERMINAL (terminal);
 
-  vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));        /// font utilisé
+    vte_terminal_set_font (VTE,pango_font_description_from_string(font_terminal));      /// font utilisé
 
-    vte_terminal_set_size (VTE, COL, ROW);                                                /// size du terminal
+    vte_terminal_set_size (VTE, COL, ROW);                                              /// size du terminal
 
-    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                                    /// titre du terminal de base
+    gtk_window_set_title(GTK_WINDOW(window), VTENAME);                                  /// titre du terminal de base
 
-    vte_terminal_set_scrollback_lines (VTE,0);                                             ///    désactiver historique.
+    vte_terminal_set_scrollback_lines (VTE,0);                                          /// désactiver historique.
 
-    vte_terminal_set_scroll_on_output(VTE,FALSE);                                        /// pas de défilement en cas de nouvelle sortie
+    vte_terminal_set_scroll_on_output(VTE,FALSE);                                       /// pas de défilement en cas de nouvelle sortie
 
     vte_terminal_set_scroll_on_keystroke(VTE,FALSE);                                    /// pas de défilement en bas s’il y a interaction de l’utilisateur
 
-    vte_terminal_set_mouse_autohide(VTE, TRUE);                                            /// cacher le curseur de la souris quand le clavier est utilisé.
+    vte_terminal_set_mouse_autohide(VTE, TRUE);                                         /// cacher le curseur de la souris quand le clavier est utilisé.
 
-    vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);                        /// cursor blink on
+    vte_terminal_set_cursor_blink_mode(VTE, VTE_CURSOR_BLINK_ON);                       /// cursor blink on
 
-    vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);                            /// define cursor 'block'
+    vte_terminal_set_cursor_shape(VTE,VTE_CURSOR_SHAPE_BLOCK);                          /// define cursor 'block'
 
 
 
