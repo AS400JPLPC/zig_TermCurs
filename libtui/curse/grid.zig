@@ -3,7 +3,6 @@
 ///----------------------------
 
 const std = @import("std");
-const utf = @import("std").unicode;
 
 /// terminal Fonction
 const term = @import("cursed");

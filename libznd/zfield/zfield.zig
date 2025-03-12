@@ -646,8 +646,12 @@ pub const ZFIELD = struct {
         	var car :[]const u8 = undefined;
         	var r : u21 = 0 ;
         	while (iter.next()) |ch | {
-        	    const x = utf.utf8Decode(ch) catch unreachable;
-         		r = 0 ;
+        	    const view = std.unicode.Utf8View.init(ch) catch |err| {@panic(@errorName(err)); };
+                var iter2 = view.iterator();
+                var x : u21 = undefined;
+                while (iter2.nextCodepoint()) |u| { x = u ;}
+                
+                r = 0 ;
         		if ( x >= 65 and x <= 90 )  r = x + 32;
                 if ( x >= 192 and x <= 223 )  r = x + 32;
                 if ( x == 339 )  r = x + 1;
@@ -681,7 +685,11 @@ pub const ZFIELD = struct {
         	var car :[]const u8 = undefined;
         	var r : u21 = 0 ;
         	while (iter.next()) |ch | {
-        	    const x = utf.utf8Decode(ch) catch unreachable;
+        	    const view = std.unicode.Utf8View.init(ch) catch |err| {@panic(@errorName(err)); };
+                var iter2 = view.iterator();
+                var x : u21 = undefined;
+                while (iter2.nextCodepoint()) |u| { x = u ;}
+
                 r = 0 ;
         		if ( x >= 97 and x <= 122 )  r = x - 32;
                 if ( x >= 224 and x <= 255 )  r = x - 32;
@@ -719,7 +727,11 @@ pub const ZFIELD = struct {
 
         	while (iter.next()) |ch| {
         	    
-        	    const x = utf.utf8Decode(ch) catch unreachable;
+        	    const view = std.unicode.Utf8View.init(ch) catch |err| {@panic(@errorName(err)); };
+                var iter2 = view.iterator();
+                var x : u21 = undefined;
+                while (iter2.nextCodepoint()) |u| { x = u ;}
+                
         	    if (x == 32) {
                     is_new_word = true;
                     str = std.fmt.allocPrint(allocZfld, "{s}{s}", .{str ," "}) catch unreachable;

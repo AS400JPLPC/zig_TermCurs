@@ -3004,14 +3004,13 @@ pub const    fld = struct {
                                         e_curs    += 1;
                                         if (e_count == e_nbrcar) {
                                             e_count -= 1;
-                                            e_curs    -= 1;
+                                            e_curs  -= 1;
                                         }
                                     }
                                 },
                                 .UDECIMAL => {
                                     if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) or 
-                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
-                                        !std.mem.eql(u8, Fkey.Char, "-") and ! std.mem.eql(u8, Fkey.Char, "+") ) {
+                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) ){
 
                                         if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue ;
                                         
@@ -3029,7 +3028,7 @@ pub const    fld = struct {
                                     }
                                 },
                                 .DECIMAL => {
-                                    if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) and e_count > 0 or 
+                                    if (e_count < e_nbrcar and utl.isDecimalStr(Fkey.Char) and e_count > 0 or 
                                         (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
                                         (std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
                                         (std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
