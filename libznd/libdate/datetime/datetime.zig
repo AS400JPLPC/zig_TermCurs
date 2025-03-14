@@ -564,13 +564,8 @@ pub const DATE = struct {
     // Return date in ISO format YYYY-MM-DD
     const ISO_DATE_FMT = "{:0>4}-{:0>2}-{:0>2}";
     pub fn string(self: DATE) []const u8 {
-        if (!isBad(self)) {
-            const s = @src();
-            @panic( std.fmt.allocPrint(allocDate,
-            "\n\n\r file:{s} line:{d} column:{d} func:{s} out-of-service  err:{} >>{d}-{d}-{d}\n\r"
-            ,.{s.file, s.line, s.column,s.fn_name,Error.Failed_zone, self.year, self.month, self.day})
-            	catch unreachable);
-        }
+        if (!isBad(self)) return "";
+
         return std.fmt.allocPrint(allocDate, ISO_DATE_FMT,
             .{ self.year, self.month, self.day }) catch unreachable;
     }
@@ -578,13 +573,7 @@ pub const DATE = struct {
    // Return date in FR format DD/MM/YYYY
     const FR_DATE_FMT = "{:0>2}/{:0>2}/{:0>4}";
     pub fn stringFR(self: DATE) []const u8 {
-        if (!isBad(self)) {
-			const s = @src();
-            @panic( std.fmt.allocPrint(allocDate,
-            "\n\n\r file:{s} line:{d} column:{d} func:{s} out-of-service  err:{} >>{d}-{d}-{d}\n\r"
-            ,.{s.file, s.line, s.column,s.fn_name,Error.Failed_zone, self.year, self.month, self.day})
-            	catch unreachable);
-        }
+        if (!isBad(self)) return "";
         return std.fmt.allocPrint(allocDate, FR_DATE_FMT,
             .{ self.day, self.month, self.year }) catch unreachable;
     }
@@ -592,13 +581,7 @@ pub const DATE = struct {
    // Return date in FR format MM/DD/YYYY
     const US_DATE_FMT = "{:0>2}/{:0>2}/{:0>4}";
     pub fn stringUS(self: DATE) []const u8 {
-        if (!isBad(self)) {
-			const s = @src();
-            @panic( std.fmt.allocPrint(allocDate,
-            "\n\n\r file:{s} line:{d} column:{d} func:{s} out-of-service  err:{} >>{d}-{d}-{d}\n\r"
-            ,.{s.file, s.line, s.column,s.fn_name,Error.Failed_zone, self.year, self.month, self.day})
-            	catch unreachable);
-        }
+        if (!isBad(self)) return "";
         return std.fmt.allocPrint(allocDate, US_DATE_FMT,
             .{ self.month, self.day, self.year }) catch unreachable;
     }
