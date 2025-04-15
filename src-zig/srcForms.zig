@@ -666,6 +666,8 @@ if (workTask) {
             wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format ISO \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
             wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
             wrt.print("\t\t\tvpnl.keyField = kbd.task;\n",.{}) catch {};
             wrt.print("\t\t}}\n",.{}) catch {};
@@ -681,6 +683,8 @@ if (workTask) {
             wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format Fr \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
             wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
             wrt.print("\t\t\tvpnl.keyField = kbd.task;\n",.{}) catch {};
             wrt.print("\t\t}}\n",.{}) catch {};
@@ -696,6 +700,8 @@ if (workTask) {
             wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format Us \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
             wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
             wrt.print("\t\t\tvpnl.keyField = kbd.task;\n",.{}) catch {};
             wrt.print("\t\t}}\n",.{}) catch {};
@@ -705,6 +711,8 @@ if (workTask) {
         else {
             wrt.print("\tfn {s}(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {{\n",.{t.task}) catch {};
             wrt.print("\t\tif (std.mem.eql(u8, vfld.text ,\"\")) {{\n",.{}) catch {};
+            wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
+            wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, \"{s}\");\n",.{NPANEL.items[t.npnl].field.items[t.index].errmsg}) 
                 catch {};
             wrt.print("\t\t\tvpnl.keyField = kbd.task;\n",.{}) catch {};
