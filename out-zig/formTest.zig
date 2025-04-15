@@ -181,7 +181,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
         const Xcombo : *grd.GRID = grd.newGridC(
                 "Ctype",
                 5, 78,
-                3,
+                5,
                 grd.gridStyle,
                 grd.CADRE.line1,
         );
@@ -196,11 +196,15 @@ pub fn Panel_DEFREP() *pnl.PANEL{
         // data
         grd.addRows(Xcombo , &.{"T","Text"});
         grd.addRows(Xcombo , &.{"N","Numéric"});
+        grd.addRows(Xcombo , &.{"D","Date"});
         grd.addRows(Xcombo , &.{"B","Bool"});
+        grd.addRows(Xcombo , &.{"I","Int64"});
 
         if (std.mem.eql(u8,vfld.text,"T") == true)     cellPos = 0;
         if (std.mem.eql(u8,vfld.text,"N") == true)     cellPos = 1;
-        if (std.mem.eql(u8,vfld.text,"B") == true)     cellPos = 2;
+        if (std.mem.eql(u8,vfld.text,"D") == true)     cellPos = 2;
+        if (std.mem.eql(u8,vfld.text,"B") == true)     cellPos = 3;
+        if (std.mem.eql(u8,vfld.text,"I") == true)     cellPos = 4;
 
         // Interrogation
         var Gkey :grd.GridSelect = undefined ;
@@ -241,7 +245,9 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 //----------------------------------
     fn TctlName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
-            pnl.msgErr(vpnl, "Le nom est obligantoire");
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
+			pnl.msgErr(vpnl, "Le nom est obligantoire");
             vpnl.keyField = kbd.task;
             check = true;
         }
@@ -249,6 +255,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 
     fn TctlText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Text Invalide");
             vpnl.keyField = kbd.task;
             check = true;
@@ -257,6 +265,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 
     fn TctlMnemo(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Mnemonic onmigatoire");
             vpnl.keyField = kbd.task;
             check = true;
@@ -264,6 +274,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
     }
     fn TctrlType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Type obligatoire");
             vpnl.keyField = kbd.task;
             check = true;
@@ -272,6 +284,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
         
     fn TctrlWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Width Obligatoire");
             vpnl.keyField = kbd.task;
             check = true;
@@ -281,9 +295,24 @@ pub fn Panel_DEFREP() *pnl.PANEL{
         if (std.mem.eql(u8, xx ,"B")  ) vfld.text ="1";
         if (std.mem.eql(u8, xx ,"N")  ) {
             var width : u64  = 0;
-            width = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
+            if ( !std.mem.eql(u8,vfld.text,""))
+                    width = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
             if (width > 34 ) {
+                term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			    term.writeStyled(vfld.text,pnl.FldErr);
                 pnl.msgErr(vpnl, "zone numérique trop grande");
+                vpnl.keyField = kbd.task;
+                check = true;
+            }
+        }
+        if (std.mem.eql(u8, xx ,"D")  ) {
+            var width : u64  = 0;
+            if ( !std.mem.eql(u8,vfld.text,""))
+                    width = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
+            if (width != 10 ) {
+                term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			    term.writeStyled(vfld.text,pnl.FldErr);
+                pnl.msgErr(vpnl, "zone date invalide  long = 10 ");
                 vpnl.keyField = kbd.task;
                 check = true;
             }
@@ -294,6 +323,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
     
     fn TctrlScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text ,"")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Scal Obligatoire");
             vpnl.keyField = kbd.task;
             check = true;
@@ -304,9 +335,12 @@ pub fn Panel_DEFREP() *pnl.PANEL{
             var width : u64  = 0;
             var scal : u64  = 0;
             xx = fld.getText(vpnl,fld.getIndex(vpnl,"WIDTH") catch unreachable) catch unreachable;
-            width = std.fmt.parseUnsigned( u64, xx , 10) catch unreachable ;
+            if ( !std.mem.eql(u8,xx,""))
+                    width = std.fmt.parseUnsigned( u64, xx , 10) catch unreachable ;
             scal = std.fmt.parseUnsigned( u64, vfld.text , 10) catch unreachable ;
             if (width + scal  > 34 ) {
+                term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			    term.writeStyled(vfld.text,pnl.FldErr);
                 pnl.msgErr(vpnl, "zone numérique width + scal trop grande max: 34");
                 vpnl.keyField = kbd.task;
                 check = true;
@@ -333,6 +367,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
         fld.displayField(vpnl, vpnl.field.items[vpnl.idxfld]);
 
         if (std.mem.eql(u8, vfld.text ,"0")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Longueur extended Invalide");
             vpnl.keyField = kbd.task;
             check = true;
