@@ -45,34 +45,27 @@ pub const typeCursor = enum(u8) { cDefault, cBlink, cSteady, cBlinkUnderline, cS
 
 // def standard color fgd dull color  fg higth color
 pub const ForegroundColor = enum(u8) { // terminal's foreground colors
-    fgdBlack = 30, // black
-    fgdRed, // red
-    fgdGreen, // green
-    fgdYellow, // yellow
-    fgdBlue, // blue
-    fgdMagenta, // magenta
-    fgdCyan, // cyan
-    fgdWhite, // white
-    fgBlack = 90, // black
-    fgRed, // red
-    fgGreen, // green
-    fgYellow, // yellow
-    fgBlue, // blue
-    fgMagenta, // magenta
-    fgCyan, // cyan
-    fgWhite , // white
+    fgBlack   = 0,  // black
+    fgRed     = 9,  // red
+    fgGreen   = 10, // green
+    fgYellow  = 11, // yellow
+    fgBlue    = 12, // blue
+    fgMagenta = 13, // magenta
+    fgCyan    = 14, // cyan
+    fgWhite   = 15, // white
+    fgGray    = 8,  // Gray
 };
 
 pub const BackgroundColor = enum(u8) { // terminal's background colors
-    bgBlack = 40, // black
-    bgRed, // red
-    bgGreen, // green
-    bgYellow, // yellow
-    bgBlue, // blue
-    bgMagenta, // magenta
-    bgCyan = 106, // cyan
-    bgWhite = 47, // white
-    bgGray = 100, // Gray
+    bgBlack   = 0,  // black
+    bgRed     = 9,  // red
+    bgGreen   = 10, // green
+    bgYellow  = 11, // yellow
+    bgBlue    = 12, // blue
+    bgMagenta = 13, // magenta
+    bgCyan    = 14, // cyan
+    bgWhite   = 15, // white
+    bgGray    = 8,  // Gray
 };
 
 // attribut standard
@@ -255,7 +248,9 @@ fn convIntCursor(x: u8) usize {
 
 pub fn getCursor() void {
     // get Cursor form terminal
-    var cursBuf: [16]u8 = [_]u8{0} ** 16;    posCurs.x = 0;
+    var cursBuf: [16]u8 = [_]u8{0} ** 16;
+
+    posCurs.x = 0;
 
     posCurs.y = 0;
 
@@ -328,12 +323,12 @@ fn setStyle(style: [4]u32) void {
 
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: ForegroundColor) void {
-    stdout.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
+    stdout.print("\x1b[38;5;{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: BackgroundColor) void {
-    stdout.print("\x1b[{d}m", .{@intFromEnum(color)}) catch {};
+    stdout.print("\x1b[48;5;{d}m", .{@intFromEnum(color)}) catch {};
 }
 
 /// write text and attribut
@@ -741,7 +736,7 @@ pub const kbd = enum {
         if (iter.nextCodepoint()) |c0| switch (c0) {
             '\x1b' => {
                 // MOUSE
-                if (c >= 10 ) return parse_csiFunc(keybuf[2..c]); 
+                if (c >= 9 ) return parse_csiFunc(keybuf[2..c]); 
                 // KEY 
                     var xcode : u64 = 0;
                     for (keybuf[0..c])  |xx| {
@@ -1204,9 +1199,9 @@ pub const kbd = enum {
 
     fn parse_csiFunc(csibuf: []const u8) Keyboard {
         var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
+        // std.debug.print("{any}\r\n",.{csibuf});
         switch (csibuf[0]) {
             // keys
-
             '<' => { // mouse
                 MouseInfo.action = MouseAction.maNone;
                 MouseInfo.button = MouseButton.mbNone;
@@ -1220,17 +1215,17 @@ pub const kbd = enum {
                 var i: usize = 3;
                 while (true) {
                     if (csibuf[i] != 59 and MouseInfo.y == 0) MouseInfo.y = convIntMouse(csibuf[3]);
-                    if (csibuf[i] == 59) break;
-                    if (csibuf[i] != 59 and i > 3) MouseInfo.y = (MouseInfo.y * 10) + convIntMouse(csibuf[i]);
                     i += 1;
+                    if (csibuf[i] == 59) break;
+                    if (csibuf[i] != 59 ) MouseInfo.y = (MouseInfo.y * 10) + convIntMouse(csibuf[i]);
                 }
 
                 var u: usize = i + 1;
                 while (true) {
-                    if (csibuf[u] != 59 and MouseInfo.x == 0) MouseInfo.x = convIntMouse(csibuf[u]);
-                    if (csibuf[u] == 59 or csibuf[u] == 77 or csibuf[u] == 109) break;
-                    if (csibuf[u] != 59 and u > (i + 1)) MouseInfo.x = (MouseInfo.x * 10) + convIntMouse(csibuf[u]);
+                    if (csibuf[u] != 59 and MouseInfo.x == 0) { MouseInfo.x = convIntMouse(csibuf[u]); continue;}
                     u += 1;
+                    if (csibuf[u] == 59 or csibuf[u] == 77 or csibuf[u] == 109) break;
+                    if (csibuf[u] != 59 ) MouseInfo.x = (MouseInfo.x * 10) + convIntMouse(csibuf[u]);
                 }
 
                 if (csibuf.len == 7) {
@@ -1272,7 +1267,7 @@ pub const kbd = enum {
                     MouseInfo.x = 0;
                     MouseInfo.y = 0;
                 }
-
+// std.debug.print("y:{d} x:{d}\r\n",.{MouseInfo.y,MouseInfo.x});
                 return Event;
             },
             else => {

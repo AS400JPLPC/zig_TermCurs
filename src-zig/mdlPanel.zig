@@ -1490,6 +1490,8 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
                 const msg = std.fmt.allocPrint(allocator,"{d} Position X is out of bounds",.{termSize.height})
                     catch unreachable;
         defer allocator.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
     }
@@ -1504,6 +1506,8 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
                 const msg = std.fmt.allocPrint(allocator,"{d} Position Y is out of bounds",.{termSize.width})
                     catch unreachable;
         defer allocator.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
     }
@@ -1520,6 +1524,8 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
             allocator,"{d} The number of rows is out of range",
             .{termSize.height}) catch unreachable;
             defer allocator.free(msg);
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
             vpnl.keyField = kbd.task;
         }
@@ -1536,6 +1542,8 @@ fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
             allocator,"{d} The number of columns is out of range",
             .{termSize.width }) catch unreachable;
         defer allocator.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
     }
@@ -1551,6 +1559,8 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         const msg = std.fmt.allocPrint(allocator,
             "{d} The number of Lines Cadre is out of range",.{termSize.width }) catch unreachable;
         defer allocator.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
         }

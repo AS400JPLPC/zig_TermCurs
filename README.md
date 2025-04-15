@@ -329,7 +329,7 @@ Adding the 'mdlGrid' function.<br />
 - Alt-G: Create GRID definition<BR/>
 - Alt-C: Create text columns<BR/>
 - Alt-R: Remove GRID<BR/>
-- Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell)<br />
+- Alt-W: Tools menu (View GRID, View Cell, Order Cell, Remove Cell, Update Grid)<br />
 
 
 →  MENU<BR/>
@@ -412,6 +412,14 @@ add ztring
 → 2025-03-12 02:52   update 0.14.0<BR/>
 </BR>
 → 2025-03-12 06:40   unicode.Decode deprecated change Utf8View <BR/>
+</BR>
+→ 2025-04-15 11:00   add function update Grid<BR/>
+→ 2025-04-15 11:00   standardization of color functions<BR/>
+→ 2025-04-15 11:00   Correction of a position cursor bug with the mouse<BR/>
+→ 2025-04-15 11:00   new “isfile” test with “access”.<BR/>
+</BR>
+</BR>
+</BR>
 </BR>
 </BR>
 **big bug input  change module utils of libtui**<BR/>

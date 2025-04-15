@@ -341,6 +341,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
     var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
     const pFmtH01 = Panel_HELP();
     while (true) {
+
         term.cursShow();
         Tkey = kbd.getKEY();
 
@@ -588,7 +589,7 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
 
         Tkey = kbd.getKEY();
 
-        //dspMouse(vpnl);  // active display Cursor x/y mouse
+        //forms.dspMouse(vpnl);  // active display Cursor x/y mouse
         //std.debug.print("Key: {d}  - {d}\n\r",.{term.posCurs.x, term.posCurs.y});
         switch (Tkey.Key) {
             .F1     => {
@@ -1288,6 +1289,8 @@ pub const FuncEnum = enum {
 fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     for (vpnl.field.items) |f| {
         if (std.mem.eql(u8, f.name, vfld.text)) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Already existing invalide Name field");
             vpnl.keyField = kbd.task;
             return;
@@ -1365,6 +1368,9 @@ fn TaskWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         const msg = std.fmt.allocPrint(utl.allocUtl,
             "{d} the length of the zone is excessive", .{val})
             catch |err| { @panic(@errorName(err)); };
+        defer utl.allocUtl.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
 
         vpnl.keyField = kbd.task;
@@ -1384,7 +1390,11 @@ fn TaskScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
                 "{d} the Scal of the zone is excessive", .{vscal}) 
                 catch |err| { @panic(@errorName(err)); }; 
                 
+            defer utl.allocUtl.free(msg);
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
+
             vpnl.keyField = kbd.task;
         }
     } else vfld.text = "";
@@ -1405,6 +1415,9 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
             const msg = std.fmt.allocPrint(utl.allocUtl,
                 "the length of the zone is excessive", .{})
                 catch |err| { @panic(@errorName(err)); };            
+            defer utl.allocUtl.free(msg);
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
 
             vpnl.keyField = kbd.task;
@@ -1415,6 +1428,8 @@ fn TaskEdtcar(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 fn TaskErrmsg(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     if (!vfld.zwitch and std.mem.eql(u8, "", vfld.text)) {
         pnl.msgErr(vpnl, "the error message text is invalid");
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         vpnl.keyField = kbd.task;
     }
 
@@ -1424,6 +1439,8 @@ fn TaskFunc(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     if (std.mem.eql(u8, vfld.text, "FUNC")) {
         if (std.mem.eql(u8, "", vfld.procfunc)) {
             pnl.msgErr(vpnl, "the function name is invalid");
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             vpnl.keyField = kbd.task;
         }
     }

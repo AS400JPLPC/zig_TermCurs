@@ -922,7 +922,7 @@ pub const btn = struct{
                                         @intFromEnum(term.Style.styleUnderscore),
                                         @intFromEnum(term.Style.notStyle)},
             .backgr = term.BackgroundColor.bgBlack,
-            .foregr = term.ForegroundColor.fgdCyan,
+            .foregr = term.ForegroundColor.fgCyan,
     };
 
 
@@ -1199,6 +1199,14 @@ pub const    fld = struct {
     };
 
 
+    pub var FldErr : term.ZONATRB = .{
+            .styled=[_]u32{@intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle)},
+            .backgr = term.BackgroundColor.bgRed,
+            .foregr = term.ForegroundColor.fgWhite
+    };
     /// define FIELD
     pub const FIELD = struct {
         name :    []const u8,
@@ -2591,7 +2599,7 @@ pub const    fld = struct {
     pub fn msgErr(vpnl: *pnl.PANEL, f : FIELD,    info: [] const u8 ) void {
 
         term.gotoXY(vpnl.posx + f.posx - 1 , vpnl.posy + f.posy - 1);
-        term.writeStyled(utl.listToStr(e_FIELD),MsgErr);
+        term.writeStyled(utl.listToStr(e_FIELD),FldErr);
 
 
         const x: usize    = vpnl.lines;
@@ -3185,6 +3193,14 @@ pub const    pnl = struct {
         };
 
 
+    pub var FldErr : term.ZONATRB = .{
+            .styled=[_]u32{@intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle)},
+            .backgr = term.BackgroundColor.bgRed,
+            .foregr = term.ForegroundColor.fgWhite
+    };
 
 
 

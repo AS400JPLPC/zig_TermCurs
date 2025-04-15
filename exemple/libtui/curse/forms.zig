@@ -922,7 +922,7 @@ pub const btn = struct{
                                         @intFromEnum(term.Style.styleUnderscore),
                                         @intFromEnum(term.Style.notStyle)},
             .backgr = term.BackgroundColor.bgBlack,
-            .foregr = term.ForegroundColor.fgdCyan,
+            .foregr = term.ForegroundColor.fgCyan,
     };
 
 
@@ -1199,6 +1199,14 @@ pub const    fld = struct {
     };
 
 
+    pub var FldErr : term.ZONATRB = .{
+            .styled=[_]u32{@intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle)},
+            .backgr = term.BackgroundColor.bgRed,
+            .foregr = term.ForegroundColor.fgWhite
+    };
     /// define FIELD
     pub const FIELD = struct {
         name :    []const u8,
@@ -2591,7 +2599,7 @@ pub const    fld = struct {
     pub fn msgErr(vpnl: *pnl.PANEL, f : FIELD,    info: [] const u8 ) void {
 
         term.gotoXY(vpnl.posx + f.posx - 1 , vpnl.posy + f.posy - 1);
-        term.writeStyled(utl.listToStr(e_FIELD),MsgErr);
+        term.writeStyled(utl.listToStr(e_FIELD),FldErr);
 
 
         const x: usize    = vpnl.lines;
@@ -3004,14 +3012,13 @@ pub const    fld = struct {
                                         e_curs    += 1;
                                         if (e_count == e_nbrcar) {
                                             e_count -= 1;
-                                            e_curs    -= 1;
+                                            e_curs  -= 1;
                                         }
                                     }
                                 },
                                 .UDECIMAL => {
                                     if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) or 
-                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
-                                        !std.mem.eql(u8, Fkey.Char, "-") and ! std.mem.eql(u8, Fkey.Char, "+") ) {
+                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) ){
 
                                         if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue ;
                                         
@@ -3029,7 +3036,7 @@ pub const    fld = struct {
                                     }
                                 },
                                 .DECIMAL => {
-                                    if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) and e_count > 0 or 
+                                    if (e_count < e_nbrcar and utl.isDecimalStr(Fkey.Char) and e_count > 0 or 
                                         (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
                                         (std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
                                         (std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
@@ -3186,6 +3193,14 @@ pub const    pnl = struct {
         };
 
 
+    pub var FldErr : term.ZONATRB = .{
+            .styled=[_]u32{@intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle),
+                                        @intFromEnum(term.Style.notStyle)},
+            .backgr = term.BackgroundColor.bgRed,
+            .foregr = term.ForegroundColor.fgWhite
+    };
 
 
 

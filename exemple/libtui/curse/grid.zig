@@ -3,7 +3,6 @@
 ///----------------------------
 
 const std = @import("std");
-const utf = @import("std").unicode;
 
 /// terminal Fonction
 const term = @import("cursed");
@@ -446,23 +445,15 @@ pub const grd = struct {
         var vAtrCell = AtrCell;
 
         switch (TextColor) {
-            .fgdBlack => vAtrCell.foregr = term.ForegroundColor.fgdBlack,
-            .fgdRed => vAtrCell.foregr = term.ForegroundColor.fgdRed,
-            .fgdGreen => vAtrCell.foregr = term.ForegroundColor.fgdGreen,
-            .fgdYellow => vAtrCell.foregr = term.ForegroundColor.fgdYellow,
-            .fgdBlue => vAtrCell.foregr = term.ForegroundColor.fgdBlue,
-            .fgdMagenta => vAtrCell.foregr = term.ForegroundColor.fgdMagenta,
-            .fgdCyan => vAtrCell.foregr = term.ForegroundColor.fgdCyan,
-            .fgdWhite => vAtrCell.foregr = term.ForegroundColor.fgdWhite,
-
             .fgBlack => vAtrCell.foregr = term.ForegroundColor.fgBlack,
-            .fgRed => vAtrCell.foregr = term.ForegroundColor.fgRed,
+            .fgRed   => vAtrCell.foregr = term.ForegroundColor.fgRed,
             .fgGreen => vAtrCell.foregr = term.ForegroundColor.fgGreen,
             .fgYellow => vAtrCell.foregr = term.ForegroundColor.fgYellow,
-            .fgBlue => vAtrCell.foregr = term.ForegroundColor.fgBlue,
+            .fgBlue  => vAtrCell.foregr = term.ForegroundColor.fgBlue,
             .fgMagenta => vAtrCell.foregr = term.ForegroundColor.fgMagenta,
-            .fgCyan => vAtrCell.foregr = term.ForegroundColor.fgCyan,
+            .fgCyan  => vAtrCell.foregr = term.ForegroundColor.fgCyan,
             .fgWhite => vAtrCell.foregr = term.ForegroundColor.fgWhite,
+            .fgGray  => vAtrCell.foregr = term.ForegroundColor.fgGray,
         }
         return vAtrCell;
     }

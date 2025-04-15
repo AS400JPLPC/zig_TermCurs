@@ -160,13 +160,17 @@ fn isFile(name: []const u8 ) bool {
     
     const cDIR = std.fs.cwd().openDir(vdir,.{}) catch unreachable;
     
-    var file = cDIR.createFile(name, .{ .read = true }) catch |e|
-        switch (e) {
-            error.PathAlreadyExists => return true,
-            else =>return false,
-        };
+    // var file = cDIR.createFile(name, .{ .read = true }) catch |e|
+    //     switch (e) {
+    //         error.PathAlreadyExists => return true,
+    //         else =>return false,
+    //     };
+        cDIR.access(name, .{}) catch |e| switch (e) {
+        error.FileNotFound => return false,
+        else => {},
+    };
 
-    defer file.close();
+    //  defer file.close();
     return true;
 }
 

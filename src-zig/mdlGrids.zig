@@ -344,6 +344,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
             "Cell-View",
             "Cell-Order",
             "Cell-Remove",
+            "Update-Grid",
             }
         );
   
@@ -464,10 +465,12 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     term.offMouse();
                     pnl.rstPanel(mnu.MENU,&mChoix,pFmt01);
                     term.onMouse();
+                    
                     if (nitem == 0) viewGrid(pFmt01,NGRID,numGrid );    // view  Grid
                     if (nitem == 1) viewCell(pFmt01,NGRID,numGrid );    // view  Cell
                     if (nitem == 2) orderCell(NGRID,numGrid );          // order Cell
                     if (nitem == 3) removeCell(NGRID,numGrid );         // order Cell
+                    if (nitem == 4) updateGrid(pFmt01,NGRID,numGrid );    // update  Grid
                  }
                 term.cls();
                 pnl.printPanel(pFmt01);
@@ -652,6 +655,8 @@ pub const FuncGrid = enum {
 fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     for (NGRID.items) |f| {
         if (std.mem.eql(u8, f.name, vfld.text)) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Already existing invalide Name");
             vpnl.keyField = kbd.task;
             return;
@@ -670,6 +675,8 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
             grd.allocatorGrid,"The number of rows Invalide",
             .{}) catch unreachable;
             defer grd.allocatorGrid.free(msg);
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
             vpnl.keyField = kbd.task;
         }
@@ -682,6 +689,8 @@ fn TaskStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         const msg = std.fmt.allocPrint(grd.allocatorGrid,
             "Style is invalide",.{}) catch unreachable;
         defer grd.allocatorGrid.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
         }
@@ -694,6 +703,8 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         const msg = std.fmt.allocPrint(grd.allocatorGrid,
             "Cadre is invalide",.{}) catch unreachable;
         defer grd.allocatorGrid.free(msg);
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
         vpnl.keyField = kbd.task;
         }
@@ -745,7 +756,6 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
     var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
     const idx: usize = 0;
     _ = idx;
-    var vlen: usize = 0;
     
 
     while (true) {
@@ -766,7 +776,6 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
             },
             // write field to panel
             .F9 => {
-                vlen = pFmt02.field.items[@intFromEnum(fp02.fname)].text.len;
             
                 NGRID.append( grd.initGrid(
                             pFmt02.field.items[@intFromEnum(fp02.fname)].text,
@@ -786,6 +795,82 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
 
             // exit panel field
             .F12 => {
+                pnl.freePanel(pFmt02);
+                defer forms.allocatorForms.destroy(pFmt02);
+                return;
+            },
+            else => {},
+        }
+    }
+}
+
+
+//---------------------------------------------------------------------------
+// update Grid
+// number of lines
+// type séparator,
+// cadre
+//---------------------------------------------------------------------------
+
+pub fn updateGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize  ) void {
+
+    if (vgrd.items[gridNum].cell.items.len == 0 ) return;
+    
+    term.getCursor();
+    const v_posx: usize = term.posCurs.x;
+    const v_posy: usize = term.posCurs.y;
+
+    // Init format panel
+    var v_pos :usize = 0;
+    if (v_posx >= 20 ) v_pos = 2 else v_pos = 22 ;
+    var pFmt02 = Panel_defGrid(v_pos);
+    pFmt02.field.items[@intFromEnum(fp02.fname)].text =vgrd.items[gridNum].name;
+    pFmt02.field.items[@intFromEnum(fp02.fposx)].text = usizeToStr(vgrd.items[gridNum].posx);
+    pFmt02.field.items[@intFromEnum(fp02.fposy)].text = usizeToStr(vgrd.items[gridNum].posy);
+    pFmt02.field.items[@intFromEnum(fp02.flines)].text = usizeToStr(vgrd.items[gridNum].pageRows);
+    pFmt02.field.items[@intFromEnum(fp02.fstyle)].text  = vgrd.items[gridNum].separator;
+    pFmt02.field.items[@intFromEnum(fp02.fcadre)].text  = usizeToStr(@intFromEnum(vgrd.items[gridNum].cadre));
+    pFmt02.field.items[@intFromEnum(fp02.fname)].protect = true;
+    // init struct key
+    var Tkey: term.Keyboard = undefined; // defines the receiving structure of the keyboard
+    const idx: usize = 0;
+    _ = idx;
+    
+
+    while (true) {
+        //Tkey = kbd.getKEY();
+
+        forms.dspCursor(vpnl, v_posx, v_posy,"Field");
+        Tkey.Key = pnl.ioPanel(pFmt02);
+        switch (Tkey.Key) {
+            // call function combo
+            .func => {
+                callFuncGrid = FuncGrid.searchFn(pFmt02.field.items[pFmt02.idxfld].procfunc);
+                callFuncGrid.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+            },
+            // call proc control chek value
+            .task => {
+                callTaskGrid = TaskGrid.searchFn(pFmt02.field.items[pFmt02.idxfld].proctask);
+                callTaskGrid.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+            },
+            // write field to panel
+            .F9 => {
+
+                pFmt02.field.items[@intFromEnum(fp02.fname)].protect = false;
+
+                vgrd.items[gridNum].pageRows = strToUsize(pFmt02.field.items[@intFromEnum(fp02.flines)].text);
+                vgrd.items[gridNum].separator = pFmt02.field.items[@intFromEnum(fp02.fstyle)].text;
+                vgrd.items[gridNum].cadre =
+                            @enumFromInt(strToUsize(pFmt02.field.items[@intFromEnum(fp02.fcadre)].text));
+
+                pnl.freePanel(pFmt02);
+                defer forms.allocatorForms.destroy(pFmt02);
+                return;
+            },
+
+            // exit panel field
+            .F12 => {
+                pFmt02.field.items[@intFromEnum(fp02.fname)].protect = false;
                 pnl.freePanel(pFmt02);
                 defer forms.allocatorForms.destroy(pFmt02);
                 return;
@@ -1068,6 +1153,8 @@ pub const FcellEnum = enum {
 
 fn TcellText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text , "")) {
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, "Already existing invalide Text field");
             vpnl.keyField = kbd.task;
             return;
@@ -1081,6 +1168,8 @@ fn TcellWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         const msg = std.fmt.allocPrint(utl.allocUtl,
             "{d} the length of the zone is invalid", .{val})
             catch |err| { @panic(@errorName(err)); };
+        term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+        term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
 
         vpnl.keyField = kbd.task;
@@ -1142,7 +1231,9 @@ fn TcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         if (std.mem.eql(u8, vfld.text,"")) {
             const msg = std.fmt.allocPrint(utl.allocUtl,
                 "the error message Color is invalid", .{})
-                catch |err| { @panic(@errorName(err)); };            
+                catch |err| { @panic(@errorName(err)); };
+            term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+            term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
 
             vpnl.keyField = kbd.task;
