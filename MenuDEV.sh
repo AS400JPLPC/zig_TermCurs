@@ -78,8 +78,6 @@ do
 	f_dsplyPos 10  20 $faGras$fcRouge'13.'; f_dsplyPos 10  24 $faGras$fcGreen 'exCallpgm'
 	f_dsplyPos 11  20 $faGras$fcRouge'15.'; f_dsplyPos 11  24 $faGras$fcGreen 'Gensrc'
 
-	f_dsplyPos 14  20 $faGras$fcRouge'20.'; f_dsplyPos 14  24 $faGras$fcGreen 'test'
-    f_dsplyPos 15  20 $faGras$fcRouge'21.'; f_dsplyPos 15  24 $faGras$fcGreen 'test2'
 
 	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
@@ -142,16 +140,6 @@ do
 			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gensrc"
 		;;
 
-
-#study 
-        20)
-			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test"	
-		;;
-
-#study 
-        21)
-			/home/soleil/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test2"	
-		;;
 
 
 #debug

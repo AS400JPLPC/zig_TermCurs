@@ -108,11 +108,18 @@
           "posy": 91,
           "text": "Long",
           "title": false
+        },
+        {
+          "name": "L396",
+          "posx": 3,
+          "posy": 96,
+          "text": "Hs",
+          "title": false
         }
       ],
       "field": [
         {
-          "name": "MNEXTD",
+          "name": "NAME",
           "posx": 4,
           "posy": 4,
           "reftyp": "TEXT_FREE",
@@ -163,7 +170,7 @@
           "protect": false,
           "edtcar": "",
           "errmsg": "Mnemonic onmigatoire",
-          "help": "mnemoniqque de la zone MXEXTD",
+          "help": "mnemoniqque de la zone NAME",
           "procfunc": "",
           "proctask": "TctlMnemo",
           "progcall": "",
@@ -250,6 +257,26 @@
           "typecall": "",
           "parmcall": false,
           "regex": ""
+        },
+        {
+          "name": "hs",
+          "posx": 4,
+          "posy": 96,
+          "reftyp": "SWITCH",
+          "width": 1,
+          "scal": 0,
+          "text": "",
+          "requier": false,
+          "protect": false,
+          "edtcar": "",
+          "errmsg": ".",
+          "help": "Hors service",
+          "procfunc": "",
+          "proctask": "",
+          "progcall": "",
+          "typecall": "",
+          "parmcall": false,
+          "regex": ""
         }
       ],
       "linev": [],
@@ -266,7 +293,7 @@
       "cadre": "line1",
       "cells": [
         {
-          "text": "MNXETD",
+          "text": "NAME",
           "long": 15,
           "reftyp": "TEXT_FREE",
           "posy": 0,
@@ -301,7 +328,7 @@
           "text": "WIGTH",
           "long": 5,
           "reftyp": "UDIGIT",
-          "posy": 5,
+          "posy": 4,
           "edtcar": "",
           "atrcell": "fgMagenta"
         },
@@ -309,7 +336,7 @@
           "text": "SCAL",
           "long": 4,
           "reftyp": "UDIGIT",
-          "posy": 6,
+          "posy": 5,
           "edtcar": "",
           "atrcell": "fgMagenta"
         },
@@ -317,9 +344,17 @@
           "text": "LONG",
           "long": 4,
           "reftyp": "UDIGIT",
-          "posy": 4,
+          "posy": 6,
           "edtcar": "",
           "atrcell": "fgCyan"
+        },
+        {
+          "text": "Hs",
+          "long": 2,
+          "reftyp": "TEXT_FREE",
+          "posy": 7,
+          "edtcar": "",
+          "atrcell": "fgRed"
         }
       ]
     },
@@ -327,7 +362,7 @@
       "name": "Ctype",
       "posx": 4,
       "posy": 76,
-      "pagerows": 3,
+      "pagerows": 5,
       "separator": "│",
       "cadre": "line1",
       "cells": [

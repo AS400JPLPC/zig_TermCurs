@@ -62,6 +62,7 @@ var NLINEH = std.ArrayList(def.DEFLINEH).init(allocator);
 var NLINEV = std.ArrayList(def.DEFLINEV).init(allocator);
 var NBUTTON= std.ArrayList(def.DEFBUTTON).init(allocator);
 
+
 var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
 var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
 var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
@@ -384,7 +385,7 @@ for( xobjet.items) | m | {
         if (NFIELD.items.len > 0) {
             wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
             for( NPANEL.items[m.index].field.items) | f | {
-                wrt.print("\n",.{}) catch {};
+                wrt.print("\n\n",.{}) catch {};
                 switch(f.reftyp) {
                 forms.REFTYP.TEXT_FREE => {
                 wrt.print("\t\t\tPanel.field.append(fld.newFieldTextFree(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
@@ -472,7 +473,7 @@ for( xobjet.items) | m | {
                 },
             
                 forms.REFTYP.SWITCH => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldSwitchl(\"{s}\",{d},{d},{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(fld.newFieldSwitch(\"{s}\",{d},{d},{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy,f.zwitch,f.errmsg, f.help}) catch {} ;
                 },
             
@@ -757,10 +758,21 @@ if (workTask) {
     wrt.print("\tvar callTask: TaskEnum = undefined;\n",.{}) catch {};
 
 }
-    
+wrt.print("\n\n\n\n",.{}) catch {};
 
-    wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
-    wrt.print("// squelette\n",.{}) catch {};
+var nbrPanel : usize = 0;
+for ( NOBJET.items) | o | {
+    if ( o.objtype  == def.OBJTYPE.PANEL ) {
+        nbrPanel += 1;
+        wrt.print("// define Panel\n",.{}) catch {};
+        wrt.print("var {s} : *pnl.PANEL = undefined ;\n\n",.{o.name}) catch {};
+    }
+}
+    wrt.print("var nbr_panel : i32 = {d} ;\n\n",.{nbrPanel}) catch {}; 
+
+  
+    wrt.print("\n//----------------------------------\n",.{}) catch {};
+    wrt.print("// squelette MAIN \n",.{}) catch {};
     wrt.print("//----------------------------------\n\n",.{}) catch {};
 
     wrt.print("pub fn main() !void {{\n",.{}) catch {};
@@ -768,101 +780,238 @@ if (workTask) {
     wrt.print("term.enableRawMode();\n",.{}) catch {};
     wrt.print("defer term.disableRawMode() ;\n\n",.{}) catch {};
 
-    wrt.print("// Initialisation\n",.{}) catch {};
-    wrt.print("term.titleTerm(\"MY-TITLE\");\n\n",.{}) catch {};
+for ( NOBJET.items) | o | {
+    if ( o.objtype  == def.OBJTYPE.PANEL ) {
+        wrt.print("// init Panel\n",.{}) catch {};
+        wrt.print("{s} = Panel_{s}();\n\n",.{o.name,o.name}) catch {};
+    }
+}
 
+
+    wrt.print("// Initialisation\n",.{}) catch {};
+    wrt.print("term.resizeTerm({s}.lines,{s}.cols);\n\n",.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
+    wrt.print("term.titleTerm(\"MY-TITLE\");\n\n",.{}) catch {};
     wrt.print("term.cls();\n\n",.{}) catch {};
     
-    wrt.print("// define Panel\n",.{}) catch {};
-    wrt.print("var {s} = Panel_{s}();\n\n",.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    
-    wrt.print("// work Panel-01\n",.{}) catch {};
-    wrt.print("term.resizeTerm({s}.lines,{s}.cols);\n\n",.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
 
-    wrt.print("// defines the receiving structure of the keyboard\n",.{}) catch {};
-    wrt.print("var Tkey : term.Keyboard = undefined ;\n\n",.{}) catch {};
-    
-    wrt.print("\twhile (true) {{\n",.{}) catch {};
-    wrt.print("\t\tTkey.Key = pnl.ioPanel({s});\n",.{NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t//--- ---\n\n",.{}) catch {};
-    
-    wrt.print("\t\tswitch (Tkey.Key) {{\n",.{}) catch {};
-
-if (workFunc) {
-    // wrt.print("\t\t\t// call function combo ... \n",.{}) catch {};
-    wrt.print("\t\t\t.func => {{\n",.{}) catch {};
-
-    wrt.print("\t\t\tcallFunc = FuncEnum.searchFn({s}.field.items[{s}.idxfld].procfunc);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {}; 
-    wrt.print("\t\t\tcallFunc.run({s}, &{s}.field.items[{s}.idxfld]);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t}},\n\n",.{}) catch {};
-}
-if (workTask) {
-    wrt.print("\t\t\t// call proc contrôl chek value\n",.{}) catch {};
-    wrt.print("\t\t\t.task => {{\n",.{}) catch {};
-    wrt.print("\t\t\tcallTask = TaskEnum.searchFn({s}.field.items[{s}.idxfld].proctask);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\tcallTask.run({s}, &{s}.field.items[{s}.idxfld]);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t}},\n\n",.{}) catch {};
-}
-
-if (workCall) {
-    wrt.print("\t\t\t.call => {{\n",.{}) catch {};
-
-    wrt.print("\t\t\tcallProg = FnProg.searchFn({s}.field.items[{s}.idxfld].progcall);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\tcallProg.run({s}, &{s}.field.items[p{s}.idxfld]);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t}},\n\n",.{}) catch {};
-}
-
-    wrt.print("\t\t\t// add enrg.\n",.{}) catch {};
-    wrt.print("\t\t\t.F9  => {{\n",.{}) catch {};
-    wrt.print("\t\t\t\tfor( {s}.field.items, 0..) | f , idxfld | {{\n"
-        ,.{NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\tif ( !std.mem.eql(u8,f.proctask,\"\") ) {{\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t\t{s}.idxfld = idxfld ;\n"
-        ,.{NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\t\tcallTask = TaskEnum.searchFn(f.proctask);\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t\tcallTask.run({s}, &{s}.field.items[idxfld]);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\t\tif ( check ) break; \n",.{}) catch {};
-    wrt.print("\t\t\t\t\t}}\n",.{}) catch {};
-    wrt.print("\t\t\t\t}}\n",.{}) catch {};
-    wrt.print("\t\t\t\tif (! check ) {{\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t// work enrg.\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t// ...\n",.{}) catch {};
-    wrt.print("\t\t\t\t}}\n",.{}) catch {};        
-    wrt.print("\t\t\t}},\n",.{}) catch {};
-    
-    wrt.print("\t\t\t// update enrg.\n",.{}) catch {};
-    wrt.print("\t\t\t.F11 => {{\n",.{}) catch {};
-    wrt.print("\t\t\t\tfor( {s}.field.items, 0..) | f , idxfld | {{\n"
-        ,.{NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\tif ( !std.mem.eql(u8,f.proctask,\"\") ) {{\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t\t{s}.idxfld = idxfld ;\n"
-        ,.{NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\t\tcallTask = TaskEnum.searchFn(f.proctask);\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t\tcallTask.run({s}, &{s}.field.items[idxfld]);\n"
-        ,.{NPANEL.items[0].name,NPANEL.items[0].name}) catch {};
-    wrt.print("\t\t\t\t\t\tif ( check ) break; \n",.{}) catch {};
-    wrt.print("\t\t\t\t\t}}\n",.{}) catch {};
-    wrt.print("\t\t\t\t}}\n",.{}) catch {};
-    wrt.print("\t\t\t\tif (! check ) {{\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t// work update.\n",.{}) catch {};
-    wrt.print("\t\t\t\t\t// ...\n",.{}) catch {};
-    wrt.print("\t\t\t\t}}\n",.{}) catch {};        
-    wrt.print("\t\t\t}},\n",.{}) catch {};
-    
-    wrt.print("\t\t\telse => {{}},\n\n",.{}) catch {};
-    
+    wrt.print("var Tkey : term.Keyboard = undefined ;\n",.{}) catch {};
+    wrt.print("var npnl : i32 = 1 ;\n\n",.{}) catch {};
+    wrt.print("\t\twhile(npnl <= nbr_panel) {{\n",.{}) catch {};
+    wrt.print("\t\t\tswitch(npnl) {{\n",.{}) catch {};
+    var nbrswitch :usize = 0;
+for ( NOBJET.items) | o | {
+    if ( o.objtype  == def.OBJTYPE.PANEL ) {
+        nbrswitch += 1;
+        wrt.print("\t\t\t\t{d} => {{\n",.{nbrswitch}) catch {};
+        wrt.print("\t\t\t\t\tTkey = pnl_{s}();\n",.{o.name}) catch {};
+        wrt.print("\t\t\t\t\t//--- traitement ---\n",.{}) catch {};
+        wrt.print("\t\t\t\t}},\n",.{}) catch {};
+    }
+    }
+    wrt.print("\t\t\t\telse => {{}},\n",.{}) catch {};
+    wrt.print("\t\t\t}}\n",.{}) catch {};
+    wrt.print("\t\t\tif (Tkey.Key == kbd.F3) break; // end work\n",.{}) catch {};
+    wrt.print("\t\t\tif (Tkey.Key == kbd.F12 and npnl > 1 ) npnl -=1; // preview work\n",.{}) catch {};
     wrt.print("\t\t}}\n\n",.{}) catch {};
-    
-    
-    wrt.print("\t\tif (Tkey.Key == kbd.F3) break; // end work\n",.{}) catch {};
-    wrt.print("\t}}\n\n",.{}) catch {};
     wrt.print("}}\n\n",.{}) catch {};
+
+
+    wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
+    wrt.print("// squelette PANEL\n",.{}) catch {};
+    wrt.print("//----------------------------------\n\n",.{}) catch {};
+    for ( NOBJET.items, 0..) | o,indicePanel | {
+        if ( o.objtype  == def.OBJTYPE.PANEL ) {
+            wrt.print("fn pnl_{s}() term.Keyboard {{\n",.{o.name}) catch {};
+
+
+        wrt.print("\n//----------------------------------\n",.{}) catch {};
+        wrt.print("//  run Function ex: PANEL\n",.{}) catch {};
+        wrt.print("//----------------------------------\n",.{}) catch {};
+    
+    
+        wrt.print("// defines the receiving structure of the keyboard\n",.{}) catch {};
+        wrt.print("var Tkey : term.Keyboard = undefined ;\n\n",.{}) catch {};
+    
+        wrt.print("\twhile (true) {{\n",.{}) catch {};
+        wrt.print("\t\tTkey.Key = pnl.ioPanel({s});\n",.{o.name}) catch {};
+        wrt.print("\t\t//--- ---\n\n",.{}) catch {};
+    
+        wrt.print("\t\tswitch (Tkey.Key) {{\n",.{}) catch {};
+
+        if (workFunc) {
+            // wrt.print("\t\t\t// call function combo ... \n",.{}) catch {};
+            wrt.print("\t\t\t.func => {{\n",.{}) catch {};
+
+            wrt.print("\t\t\tcallFunc = FuncEnum.searchFn({s}.field.items[{s}.idxfld].procfunc);\n"
+                ,.{o.name,o.name}) catch {}; 
+            wrt.print("\t\t\tcallFunc.run({s}, &{s}.field.items[{s}.idxfld]);\n"
+                ,.{o.name,o.name,o.name}) catch {};
+            wrt.print("\t\t\t}},\n\n",.{}) catch {};
+        }
+        if (workTask) {
+            wrt.print("\t\t\t// call proc contrôl chek value\n",.{}) catch {};
+            wrt.print("\t\t\t.task => {{\n",.{}) catch {};
+            wrt.print("\t\t\tcallTask = TaskEnum.searchFn({s}.field.items[{s}.idxfld].proctask);\n"
+                ,.{o.name,o.name}) catch {};
+            wrt.print("\t\t\tcallTask.run({s}, &{s}.field.items[{s}.idxfld]);\n"
+                ,.{o.name,o.name,o.name}) catch {};
+            wrt.print("\t\t\t}},\n\n",.{}) catch {};
+        }
+
+        if (workCall) {
+            wrt.print("\t\t\t.call => {{\n",.{}) catch {};
+
+            wrt.print("\t\t\tcallProg = FnProg.searchFn({s}.field.items[{s}.idxfld].progcall);\n"
+                ,.{o.name,o.name}) catch {};
+            wrt.print("\t\t\tcallProg.run({s}, &{s}.field.items[p{s}.idxfld]);\n"
+                ,.{o.name,o.name,o.name}) catch {};
+            wrt.print("\t\t\t}},\n\n",.{}) catch {};
+        }
+
+    
+        // Button
+        if (NBUTTON.items.len > 0) {
+            wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
+            for( NPANEL.items[indicePanel].button.items) | b | {
+
+
+                    switch(b.key) {
+                        kbd.F9 => {
+                            wrt.print("\t\t\t//{s} \"{s}\"\n"
+                            ,.{@tagName(b.key), b.title}) catch {} ;
+                    
+                            wrt.print("\t\t\t.F9  => {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\tfor( {s}.field.items, 0..) | f , idxfld | {{\n"
+                                ,.{o.name}) catch {};
+                            wrt.print("\t\t\t\t\tif ( !std.mem.eql(u8,f.proctask,\"\") ) {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t\t{s}.idxfld = idxfld ;\n"
+                                ,.{o.name}) catch {};
+                            wrt.print("\t\t\t\t\t\tcallTask = TaskEnum.searchFn(f.proctask);\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t\tcallTask.run({s}, &{s}.field.items[idxfld]);\n"
+                                ,.{o.name,o.name}) catch {};
+                            wrt.print("\t\t\t\t\t\tif ( check ) break; \n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t}}\n",.{}) catch {};
+                            wrt.print("\t\t\t\t}}\n",.{}) catch {};
+                            wrt.print("\t\t\t\tif (! check ) {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t// work enrg.\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t// ...\n",.{}) catch {};
+                            wrt.print("\t\t\t\t}}\n",.{}) catch {};        
+                            wrt.print("\t\t\t}},\n",.{}) catch {};
+                        },
+                        kbd.F11 => {
+                            wrt.print("\t\t\t//{s} \"{s}\"\n"
+                            ,.{@tagName(b.key), b.title}) catch {} ;
+                    
+                            wrt.print("\t\t\t.F11  => {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\tfor( {s}.field.items, 0..) | f , idxfld | {{\n"
+                                ,.{o.name}) catch {};
+                            wrt.print("\t\t\t\t\tif ( !std.mem.eql(u8,f.proctask,\"\") ) {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t\t{s}.idxfld = idxfld ;\n"
+                                ,.{o.name}) catch {};
+                            wrt.print("\t\t\t\t\t\tcallTask = TaskEnum.searchFn(f.proctask);\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t\tcallTask.run({s}, &{s}.field.items[idxfld]);\n"
+                                ,.{o.name,o.name}) catch {};
+                            wrt.print("\t\t\t\t\t\tif ( check ) break; \n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t}}\n",.{}) catch {};
+                            wrt.print("\t\t\t\t}}\n",.{}) catch {};
+                            wrt.print("\t\t\t\tif (! check ) {{\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t// work update.\n",.{}) catch {};
+                            wrt.print("\t\t\t\t\t// ...\n",.{}) catch {};
+                            wrt.print("\t\t\t\t}}\n",.{}) catch {};        
+                            wrt.print("\t\t\t}},\n",.{}) catch {};
+                        },
+                        else => {
+                            if (b.key != .F3 ) {
+                                wrt.print("\t\t\t//{s} \"{s}\"\n"
+                                ,.{@tagName(b.key), b.title}) catch {} ;
+                                wrt.print("\t\t\t.{s}  => {{\n",.{@tagName(b.key)}) catch {};
+                                wrt.print("\t\t\t}},\n",.{}) catch {};
+                            }
+                        },
+
+                    }
+            }
+        }
+
+    
+        wrt.print("\t\t\telse => {{}},\n\n",.{}) catch {};
+    
+        wrt.print("\t\t}}\n\n",.{}) catch {};
+    
+    
+        wrt.print("\t\tif (Tkey.Key == kbd.F3) break; // end work\n",.{}) catch {};
+        wrt.print("\t}}\n\n",.{}) catch {};
+        wrt.print("\treturn Tkey;\n",.{}) catch {};
+        wrt.print("}}\n\n",.{}) catch {};
+        }
+    }    
+
+
+
+    wrt.print("\n\n\n//----------------------------------\n",.{}) catch {};
+    wrt.print("//  run Function ex: SFLD\n",.{}) catch {};
+    wrt.print("//----------------------------------\n",.{}) catch {};
+
+    for ( NOBJET.items) | o | {
+        if ( o.objtype  == def.OBJTYPE.SFLD ) {
+            wrt.print("\tfn {s}( vpnl : *pnl.PANEL ) ?[] const u8 {{\n",.{o.name}) catch {};
+            // wrt.print("\t\tvar cellPos:usize = 0;\n",.{}) catch {};
+            wrt.print("\t\tconst SFLDX: *grd.GRID = grd.newGridC(\n",.{}) catch {};
+            wrt.print("\t\t\t\t\"{s}\",\n",.{o.name}) catch {};
+            wrt.print("\t\t\t\t{d}, {d},\n",.{NGRID.items[o.index].posx, NGRID.items[o.index].posy,}) catch {};
+            wrt.print("\t\t\t\t{d},\n",.{NGRID.items[o.index].pageRows}) catch {};
+            if (std.mem.eql(u8,NGRID.items[o.index].separator , grd.gridStyle) )
+            wrt.print("\t\t\t\tgrd.gridStyle,\n",.{}) catch {}
+            else wrt.print("\t\t\t\tgrd.gridStyle2,\n",.{}) catch {};
+            wrt.print("\t\t\t\tgrd.CADRE.{s},\n",.{@tagName(NGRID.items[o.index].cadre)}) catch {};
+            wrt.print("\t\t);\n\n",.{}) catch {};
+            
+            //wrt.print("\t\tdefer grd.freeGrid(Xcombo);\n",.{}) catch {};
+            //wrt.print("\t\tdefer grd.allocatorGrid.destroy(Xcombo);\n\n",.{}) catch {};
+
+            wrt.print("\t\tif (grd.countColumns(SFLDX)  == 0) {{\n",.{}) catch {};
+            for(NGRID.items[o.index].cell.items) |c| {
+            wrt.print("\t\t\tgrd.newCell(SFLDX,\"{s}\",{d}, grd.REFTYP.{s}, term.ForegroundColor.{s});\n"
+                ,.{c.text,c.long,@tagName(c.reftyp),@tagName(c.atrCell.foregr) }) catch {};
+            }
+            wrt.print("\t\t}}\n",.{}) catch {};
+                        
+            wrt.print("\t\tgrd.setHeaders(SFLDX) ;\n\n",.{}) catch {};
+            
+            wrt.print("\t\t// data\n",.{}) catch {};
+            wrt.print("\t\tif (grd.countColumns(SFLDX)  == 0) {{\n",.{}) catch {};
+            wrt.print("\t\tgrd.resetRows(SFLDX);\n",.{}) catch {};
+            wrt.print("\t\tgrd.addRows(SFLDX , &.{{\"??\"}});\n\n",.{}) catch {};
+            wrt.print("\t\t}}\n",.{}) catch {};
+
+            
+            wrt.print("\n\t\t// Interrogation\n",.{}) catch {};
+            wrt.print("\t\tvar Gkey :grd.GridSelect = undefined ;\n",.{}) catch {};
+            wrt.print("\t\tdefer Gkey.Buf.deinit();\n\n",.{}) catch {};
+            
+            wrt.print("\t\twhile (true ){{\n",.{}) catch {};
+            wrt.print("\t\t\tGkey =grd.ioGrid(SFLDX ,true);\n",.{}) catch {};
+            wrt.print("\t\t\tpnl.rstPanel(grd.GRID,SFLDX, vpnl);\n\n",.{}) catch {};
+            
+            wrt.print("\t\t\tif ( Gkey.Key == kbd.esc ) return null ;\n",.{}) catch {};
+
+            wrt.print("\t\t\tif ( Gkey.Key == kbd.enter ) {{\n",.{}) catch {};
+                    wrt.print("\t\t\t\treturn Gkey.Buf.items[0];\n",.{}) catch {};
+                    wrt.print("\t\t\t}}\n",.{}) catch {};
+           
+            wrt.print("\t\t\tif (Gkey.Key    == kbd.pageDown) {{\n",.{}) catch {};
+            wrt.print("\t\t\t\tgrd.resetRows(SFLDX);\n",.{}) catch {};
+            wrt.print("\t\t\t\tgrd.addRows(SFLDX , &.{{\"??\"}});\n\n",.{}) catch {};
+            wrt.print("\t\t\t}}\n",.{}) catch {};
+            
+            wrt.print("\t\t\tif (Gkey.Key    == kbd.pageUp) {{\n",.{}) catch {};
+            wrt.print("\t\t\t\tgrd.resetRows(SFLDX);\n",.{}) catch {};
+            wrt.print("\t\t\t\tgrd.addRows(SFLDX , &.{{\"??\"}});\n\n",.{}) catch {};
+            wrt.print("\t\t\t}}\n",.{}) catch {};
+            wrt.print("\t\t}}\n",.{}) catch {};
+
+            wrt.print("\t}}\n",.{}) catch {};
+        }    
+    }
 
 }

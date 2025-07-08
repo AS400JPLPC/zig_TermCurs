@@ -109,7 +109,7 @@ pub fn wrtMenu( NMENU : std.ArrayList(mnu.DEFMENU ) )  void {
 
 
     const file = std.fs.cwd().createFile(
-        "menusrc.zig", .{ .read = true } ) catch unreachable;
+        "Menusrc.zig", .{ .read = true } ) catch unreachable;
     defer file.close();
     const wrt = file.writer();
 

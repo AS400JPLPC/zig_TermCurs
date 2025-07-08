@@ -153,7 +153,14 @@ fn padingLeft(a: []const u8, len: usize) []const u8 {
     return b;    
 }
 
+pub fn isMatch(testval : [] const u8, pattern : [] const u8 ) bool {
 
+    
+     const maybe_regex = reg.compile(pattern) ;
+      if (maybe_regex) |regex|{     return regex.isMatch(testval);} else return false;
+    
+       
+ }
 // main----------------------------------
 
 pub fn main() !void {
@@ -264,7 +271,7 @@ pub fn main() !void {
                            catch unreachable
                 else
                       NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.SFLD})
-                           catch unreachable;
+                          catch unreachable;
             }
             
         }
@@ -468,6 +475,8 @@ pub fn addCombo(vpnl :*pnl.PANEL ) [] const u8 {
     }    
 }
 
+
+
 fn controlRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEFFIELD)) void {
 
     del_Log("ref_control.txt");
@@ -526,30 +535,34 @@ fn controlRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEF
         var ok = true;
         for( xfield.items) | e | {
             if (std.mem.eql(u8 ,m.name, e.panel)) { 
-                if ( ! std.mem.eql(u8 ,e.func ,"") and std.mem.eql(u8 ,e.fgrid,"") 
-                                                    or !std.mem.eql(u8 ,e.func , e.fgrid)) {
-                if ( ok) {
-                pref(.NFIELD).ligne(
-                "┌────────────────{s}─────{s}───────────────{s}───────────────{s}────────────────────────────┐"
-                ,.{e0, e0, e0, e0});
+                if (  ! std.mem.eql(u8 ,e.func ,"") and !std.mem.eql(u8 ,e.fgrid,"")){
+                    if (! isMatch(e.func  , "^[F]{1}[a-zA-Z0-9]{1,}$") or
+                        ! isMatch(e.fgrid , "^[C]{1}[a-zA-Z0-9]{1,}$")) {
+                    if ( ok) {
+                        pref(.NFIELD).ligne(
+                        "┌────────────────{s}─────{s}───────────────{s}───────────────{s}────────────────────────────┐"
+                        ,.{e0, e0, e0, e0});
             
-                pref(.NFIELD).ligne(
-                "│ field          {s}Index{s}func           {s}grid           {s}                            │"
-                ,.{e1, e1, e1, e1});
+                        pref(.NFIELD).ligne(
+                        "│ field          {s}Index{s}func           {s}grid           {s}                            │"
+                        ,.{e1, e1, e1, e1});
             
-                pref(.NFIELD).ligne(
-                "├────────────────{s}─────{s}───────────────{s}───────────────{s}────────────────────────────┤"
-                ,.{e2, e2, e2, e2});
+                        pref(.NFIELD).ligne(
+                        "├────────────────{s}─────{s}───────────────{s}───────────────{s}────────────────────────────┤"
+                        ,.{e2, e2, e2, e2});
             
-                ok =false;
-                }
-                    const field = padingRight(e.field ,15);
-                    const index = padingLeft(usizeToStr(e.index),5);
-                    const func  = padingRight(e.func  ,15);
-                    const fgrid = padingRight(e.fgrid ,15);
-                    pref(.NFIELD).ligne(
-                    "│ {s}{s}{s}{s}{s}{s}{s}{s}ERROR combo ≠ Func          │"
-                    ,.{field, e1, index, e1, func, e1, fgrid, e1});
+                        ok =false;
+                        }
+
+                        const field = padingRight(e.field ,15);
+                        const index = padingLeft(usizeToStr(e.index),5);
+                        const func  = padingRight(e.func  ,15);
+                        const fgrid = padingRight(e.fgrid ,15);
+                        pref(.NFIELD).ligne(
+                        "│ {s}{s}{s}{s}{s}{s}{s}{s}ERROR combo ≠ Func          │"
+                        ,.{field, e1, index, e1, func, e1, fgrid, e1});
+
+                    }
                 }
             }
         }

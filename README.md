@@ -407,24 +407,21 @@ add ztring
 → 2025-01-05 18:31 update Terminal.7z clear cache <BR/>
 <BR/>
 → 2025-01-16 10:32 <BR/>
-</BR>
+<BR/>
 <BR/>
 → 2025-03-12 02:52   update 0.14.0<BR/>
-</BR>
+<BR/>
 → 2025-03-12 06:40   unicode.Decode deprecated change Utf8View <BR/>
 </BR>
 → 2025-04-15 11:00   add function update Grid<BR/>
 → 2025-04-15 11:00   standardization of color functions<BR/>
 → 2025-04-15 11:00   Correction of a position cursor bug with the mouse<BR/>
 → 2025-04-15 11:00   new “isfile” test with “access”.<BR/>
-</BR>
-</BR>
-</BR>
-</BR>
-</BR>
+<BR/>
+<BR/>
 **big bug input  change module utils of libtui**<BR/>
 Anyway, it's all fixed now.<BR/>
-</BR>
+<BR/>
 I've been chasing memory leaks too much
 Hello, sorry for the bug in the zone entry, I tried to run after the leaks euuhh a big slap.<BR/>
 
@@ -437,12 +434,32 @@ LIBSQL: in preparation now that I've finished DATE-TIME<BR/>
 I'm going to work on open date space so that FIELDs are easy to access.<BR/>
 
 the source generator isn't finished, I'd like to process the GRIDs, that's why I'm on sql....<BR/>
+<BR/><BR/><BR/>
+
+
+**---------------------------------------------------------**<BR/>
+
+→ 2025-07-08 15:00 : annonce <BR/>
+The ZIG source generator (“./Src”) is up and running, translating the saved JSON into source code, two sources Formsrc.zig or Menusrc.zig.<BR/><BR/>
+
+A test with the Zprog folder, shows the source FormeSrc.zig and how in formTest.zig I retrieve and finalize it.<BR/>
+Don't forget that this is a mock-up.<BR/><BR/>
+
+This isn't the end, I'm also working on mocking up sql<BR/>
+and using it to show how to make the link with screen management.<BR/><BR/>
+
+
+Look at the **zig_prog** folder
+<BR/><BR/>
+
+
+
 <BR/>
 <BR/>
 <BR/>
 <BR/>
 <BR/>
-I recommend using the GENSRC program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
+I recommend using the Gen Src program (C/C++) that emulates a clean terminal and allows for debugging.<BR/>
 You can see the source generation of formsrc and formtest, which has been reworked.<BR/>
 <BR/>
 Keep in mind that the generation is a skeleton; I am trying to reduce the repetitive overhead of programming so we can focus on the requested functionality.<BR/>
@@ -457,3 +474,4 @@ Now that the entire designer allows for saving and restoring the code, this has 
 PAUSE<br /> <br />
 
 In the current state, one could very well use JSON files and encapsulate them in the program, and why not make the forms in the project dynamic... I did this on the AS400.<br />
+ 
