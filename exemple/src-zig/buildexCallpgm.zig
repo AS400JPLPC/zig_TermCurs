@@ -17,13 +17,16 @@ pub fn build(b: *std.Build) void {
     // const logger  = b.dependency("libtui", .{}).module("logger");
 
     // Building the executable
-    
+
     const Prog = b.addExecutable(.{
-    .name = "exCallpgm",
-    .root_source_file = b.path("./exCallpgm.zig" ),
-    .target = target,
-    .optimize = optimize,
+        .name = "exCallpgm",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./exCallpgm.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
+
 
     Prog.linkLibC();
     Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});

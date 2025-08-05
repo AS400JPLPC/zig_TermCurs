@@ -7,7 +7,7 @@ const builtin = @import("builtin");
 const root = @import("root");
 
 var flog :std.fs.File = undefined;
-
+const allocator = std.heap.page_allocator;
 
 
 pub const EnumList = enum {
@@ -42,9 +42,12 @@ fn customLog(
     const scope_name = "(" ++ @tagName(scope) ++ ")";
 
 
-    const writer = flog.writer();
+    const out_buffer: []u8 =  allocator.alloc(u8, 4096) catch unreachable;
+    defer allocator.free(out_buffer);
+    var writer =std.Io.Writer.fixed(out_buffer);
         nosuspend {
             writer.print("[" ++  level_txt ++ scope_name ++  "] " ++ format ++ "\n", args) catch return;
+            flog.writeAll(writer.buffered()) catch unreachable;
         }
 }
 
@@ -59,10 +62,13 @@ fn editLog(
             \\freestanding targets do not have I/O configured;
             \\please provide at least an empty `log` function declaration
         );
-
-     const writer = flog.writer();
+            
+    const out_buffer: []u8 =  allocator.alloc(u8, 4096) catch unreachable;
+    defer allocator.free(out_buffer);
+    var writer =std.Io.Writer.fixed(out_buffer);
         nosuspend {
             writer.print("" ++ format ++ "\n", args) catch return;
+            flog.writeAll(writer.buffered()) catch unreachable;
         }
 }
 
@@ -109,9 +115,12 @@ pub fn closeFile() void {
 
 
 pub fn newLine() void { 
-    const writer = flog.writer();
+    const out_buffer: []u8 = allocator.alloc(u8, 4096) catch unreachable;
+    defer allocator.free(out_buffer);
+    var writer =std.Io.Writer.fixed(out_buffer);
         nosuspend {
             writer.print("\n",.{}) catch return;
+            flog.writeAll(writer.buffered()) catch unreachable;
         }
     }
 

@@ -92,16 +92,19 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			Panel.label.append(lbl.newLabel("L380",3,80,"Width")) catch unreachable ;
 			Panel.label.append(lbl.newLabel("L386",3,86,"Scal")) catch unreachable ;
 			Panel.label.append(lbl.newLabel("L391",3,91,"Long")) catch unreachable ;
+			Panel.label.append(lbl.newLabel("L396",3,96,"Hs")) catch unreachable ;
 
 			//----------------------
 
-			Panel.field.append(fld.newFieldTextFree("MNEXTD",4,4,15,
+
+			Panel.field.append(fld.newFieldTextFree("NAME",4,4,15,
 			"",
 			false,
 			"Le nom est obligantoire",
 			"Nom de la zone étendue",
 			"")) catch unreachable ;
-			fld.setTask(Panel,fld.getIndex(Panel,"MNEXTD") catch unreachable,"TctlName") catch unreachable ; 
+			fld.setTask(Panel,fld.getIndex(Panel,"NAME") catch unreachable,"TctlName") catch unreachable ; 
+
 
 			Panel.field.append(fld.newFieldTextFree("TEXT",4,20,50,
 			"",
@@ -111,13 +114,15 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			"")) catch unreachable ;
 			fld.setTask(Panel,fld.getIndex(Panel,"TEXT") catch unreachable,"TctlText") catch unreachable ; 
 
+
 			Panel.field.append(fld.newFieldAlphaNumericUpper("MNEMO",4,71,6,
 			"",
 			false,
 			"Mnemonic onmigatoire",
-			"mnemoniqque de la zone MXEXTD",
+			"mnemoniqque de la zone NAME",
 			"")) catch unreachable ;
 			fld.setTask(Panel,fld.getIndex(Panel,"MNEMO") catch unreachable,"TctlMnemo") catch unreachable ; 
+
 
 			Panel.field.append(fld.newFieldFunc("TYPE",4,78,1,
 			"",
@@ -127,6 +132,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			"Type de zone")) catch unreachable ;
 			fld.setTask(Panel,fld.getIndex(Panel,"TYPE") catch unreachable,"TctrlType") catch unreachable ; 
 
+
 			Panel.field.append(fld.newFieldUDigit("WIDTH",4,82,3,
 			"",
 			false,
@@ -134,6 +140,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			"longueur de la zone numérique",
 			"[0-9]{1,3}")) catch unreachable ;
 			fld.setTask(Panel,fld.getIndex(Panel,"WIDTH") catch unreachable,"TctrlWidth") catch unreachable ; 
+
 
 			Panel.field.append(fld.newFieldUDigit("SCAL",4,87,3,
 			"",
@@ -143,6 +150,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			"[0-9]{1,3}")) catch unreachable ;
 			fld.setTask(Panel,fld.getIndex(Panel,"SCAL") catch unreachable,"TctrlScal") catch unreachable ; 
 
+
 			Panel.field.append(fld.newFieldUDigit("LONG",4,92,3,
 			"",
 			false,
@@ -151,6 +159,11 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 			"[0-9]{1,3}")) catch unreachable ;
 			fld.setProtect(Panel,fld.getIndex(Panel,"LONG") catch unreachable, true) catch unreachable ; 
 			fld.setTask(Panel,fld.getIndex(Panel,"LONG") catch unreachable,"TcrtlLong") catch unreachable ; 
+
+
+			Panel.field.append(fld.newFieldSwitch("hs",4,96,false,
+			".",
+			"Hors service")) catch unreachable ;
 
 
 			return Panel;
@@ -179,7 +192,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		const Xcombo : *grd.GRID = grd.newGridC(
 				"Ctype",
 				4, 76,
-				3,
+				5,
 				grd.gridStyle,
 				grd.CADRE.line1,
 		);
@@ -215,7 +228,7 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 		none,
 		fn run(self: FuncEnum, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void {
 			switch (self) {
-			.Ftype => (vpnl,vfld),
+			.Ftype => Ctype(vpnl,vfld),
 			else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
 			}
 		}
@@ -235,6 +248,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 //----------------------------------
 	fn TctlName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Le nom est obligantoire");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -242,6 +257,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TctlText(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Text Invalide");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -249,6 +266,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TctlMnemo(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Mnemonic onmigatoire");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -256,6 +275,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TctrlType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Type obligatoire");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -263,6 +284,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TctrlWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Width Obligatoire");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -270,6 +293,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TctrlScal(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Scal Obligatoire");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -277,6 +302,8 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 	}
 	fn TcrtlLong(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		if (std.mem.eql(u8, vfld.text ,"")) {
+			term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
+			term.writeStyled(vfld.text,pnl.FldErr);
 			pnl.msgErr(vpnl, "Longueur de la zone extended Invalide");
 			vpnl.keyField = kbd.task;
 			check = true;
@@ -323,8 +350,15 @@ pub fn Panel_DEFREP() *pnl.PANEL{
 
 
 
+
+// define Panel
+var DEFREP : *pnl.PANEL = undefined ;
+
+var nbr_panel : i32 = 1 ;
+
+
 //----------------------------------
-// squelette
+// squelette MAIN 
 //----------------------------------
 
 pub fn main() !void {
@@ -332,17 +366,45 @@ pub fn main() !void {
 term.enableRawMode();
 defer term.disableRawMode() ;
 
+// init Panel
+DEFREP = Panel_DEFREP();
+
 // Initialisation
+term.resizeTerm(DEFREP.lines,DEFREP.cols);
+
 term.titleTerm("MY-TITLE");
 
 term.cls();
 
-// define Panel
-var DEFREP = Panel_DEFREP();
+var Tkey : term.Keyboard = undefined ;
+var npnl : i32 = 1 ;
 
-// work Panel-01
-term.resizeTerm(DEFREP.lines,DEFREP.cols);
+		while(npnl <= nbr_panel) {
+			switch(npnl) {
+				1 => {
+					Tkey = pnl_DEFREP();
+					//--- traitement ---
+				},
+				else => {},
+			}
+			if (Tkey.Key == kbd.F3) break; // end work
+			if (Tkey.Key == kbd.F12 and npnl > 1 ) npnl -=1; // preview work
+		}
 
+}
+
+
+
+
+//----------------------------------
+// squelette PANEL
+//----------------------------------
+
+fn pnl_DEFREP() term.Keyboard {
+
+//----------------------------------
+//  run Function ex: PANEL
+//----------------------------------
 // defines the receiving structure of the keyboard
 var Tkey : term.Keyboard = undefined ;
 
@@ -362,7 +424,15 @@ var Tkey : term.Keyboard = undefined ;
 			callTask.run(DEFREP, &DEFREP.field.items[DEFREP.idxfld]);
 			},
 
-			// add enrg.
+
+			//----------------------
+			//F1 "Help"
+			.F1  => {
+			},
+			//F7 "Display GRID"
+			.F7  => {
+			},
+			//F9 "Enrg."
 			.F9  => {
 				for( DEFREP.field.items, 0..) | f , idxfld | {
 					if ( !std.mem.eql(u8,f.proctask,"") ) {
@@ -377,8 +447,8 @@ var Tkey : term.Keyboard = undefined ;
 					// ...
 				}
 			},
-			// update enrg.
-			.F11 => {
+			//F11 "Update"
+			.F11  => {
 				for( DEFREP.field.items, 0..) | f , idxfld | {
 					if ( !std.mem.eql(u8,f.proctask,"") ) {
 						DEFREP.idxfld = idxfld ;
@@ -392,12 +462,78 @@ var Tkey : term.Keyboard = undefined ;
 					// ...
 				}
 			},
+			//F12 "Return"
+			.F12  => {
+			},
+			//F23 "Delette"
+			.F23  => {
+			},
 			else => {},
 
 		}
 
 		if (Tkey.Key == kbd.F3) break; // end work
+		if (Tkey.Key == kbd.F12) break; // end work
 	}
 
+	return Tkey;
 }
 
+
+
+
+//----------------------------------
+//  run Function ex: SFLD
+//----------------------------------
+	fn Grept( vpnl : *pnl.PANEL ) ?[] const u8 {
+		const SFLDX: *grd.GRID = grd.newGridC(
+				"Grept",
+				6, 2,
+				30,
+				grd.gridStyle,
+				grd.CADRE.line1,
+		);
+
+		if (grd.countColumns(SFLDX)  == 0) {
+			grd.newCell(SFLDX,"NAME",15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+			grd.newCell(SFLDX,"TEXT",50, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
+			grd.newCell(SFLDX,"MNEMO",6, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
+			grd.newCell(SFLDX,"T",1, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgRed);
+			grd.newCell(SFLDX,"WIGTH",5, grd.REFTYP.UDIGIT, term.ForegroundColor.fgMagenta);
+			grd.newCell(SFLDX,"SCAL",4, grd.REFTYP.UDIGIT, term.ForegroundColor.fgMagenta);
+			grd.newCell(SFLDX,"LONG",4, grd.REFTYP.UDIGIT, term.ForegroundColor.fgCyan);
+			grd.newCell(SFLDX,"Hs",2, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgRed);
+		}
+		grd.setHeaders(SFLDX) ;
+
+		// data
+		if (grd.countColumns(SFLDX)  == 0) {
+		grd.resetRows(SFLDX);
+		grd.addRows(SFLDX , &.{"??"});
+
+		}
+
+		// Interrogation
+		var Gkey :grd.GridSelect = undefined ;
+		defer Gkey.Buf.deinit();
+
+		while (true ){
+			Gkey =grd.ioGrid(SFLDX ,true);
+			pnl.rstPanel(grd.GRID,SFLDX, vpnl);
+
+			if ( Gkey.Key == kbd.esc ) return null ;
+			if ( Gkey.Key == kbd.enter ) {
+				return Gkey.Buf.items[0];
+			}
+			if (Gkey.Key    == kbd.pageDown) {
+				grd.resetRows(SFLDX);
+				grd.addRows(SFLDX , &.{"??"});
+
+			}
+			if (Gkey.Key    == kbd.pageUp) {
+				grd.resetRows(SFLDX);
+				grd.addRows(SFLDX , &.{"??"});
+
+			}
+		}
+	}

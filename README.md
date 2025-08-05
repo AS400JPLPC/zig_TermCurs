@@ -365,77 +365,6 @@ Added Gensrc definition Programme<br />
 <BR/>
 <BR/>
 
-→ 2024-11-20 15:40<BR/>
--  update library CURSED  -> Modification of keyboard key retrieval for a terminal in a more functional way. <BR/>
--  update module MDLFILE  -> Improved sorting algorithm integrated, with the ability to add a file attribute.<BR/>
--  I am currently testing source code generation, and sometimes I question my code, particularly the way I approach the matrix.<BR/>
-<BR/>
-
-→ 2024-11-23 15:40<BR/>
--  update MOUSE  -> click Left Middle = none click Right Enter for MENU and GRID <BR/>
--  new module    -> Gensrc SrcMenu SrcForms générate source main<BR/>
--  I am currently testing source code generation, and sometimes I question my code, particularly the way I approach the matrix.<BR/>
--  update ENV-WORK<BR/>
--  update MenuDEV.sh new MenuTEST.sh<br/>
--  First test Gensrc - srcforms - srcMenu <BR/>
--  folder OUT-ZIG to test <BR/>
--  use for test only folder(repertoire) 
-<BR/><BR/>
-→ 2024-11-26 20:28<BR/>
-Please refer to the files in the directory: dspf/repertoire/.<BR/>
-You will notice that function keys are assigned, such as F9 for adding a record and F11 for updating a record; these are standard industrial practices recommended in management.<BR/>
-You can compare the output source with the SRC program.<BR/>
-<BR/><BR/><BR/>
-→ 2024-12:18 00:00<BR/>
-
-"I have refactored all the sources to make them compatible with Zig's LSP and code editors: all indentation tabs are spaces '....' and not '→'.
-At the moment, I just finished testing the decimal function, and I now need to test the zstring function to ensure everything complies with industrial SQL database standards, such as varchar(10) or decimal(5,2).
-For decimal, see my Git repository Zdecimal; the number of digits goes far beyond the limitations of C or Zig."
-
-<BR/>
-→ 2024-12-19 04:20<BR/>
-add ztring 
-<BR/>
-→ 2024-12-21 04:20<BR/>
-  harmonization of functions between ZSTRING AND DECIMAL, in order to have a simplification in programming<br>
-<BR/>
-→ 2025-01-05 02:52<BR/>
-    Fixed bug for range detected zig 0.14.0-dev.2598 from "mdlforms" / "mdlgrids".<BR/>
-    err: for (vgrd.items[gridNum].pageRows)...<BR/>
-    ex: for (0..vgrd.items[gridNum].pageRows)...><BR/>
-<BR/>
-→ 2025-01-05 18:31 update Terminal.7z clear cache <BR/>
-<BR/>
-→ 2025-01-16 10:32 <BR/>
-<BR/>
-<BR/>
-→ 2025-03-12 02:52   update 0.14.0<BR/>
-<BR/>
-→ 2025-03-12 06:40   unicode.Decode deprecated change Utf8View <BR/>
-</BR>
-→ 2025-04-15 11:00   add function update Grid<BR/>
-→ 2025-04-15 11:00   standardization of color functions<BR/>
-→ 2025-04-15 11:00   Correction of a position cursor bug with the mouse<BR/>
-→ 2025-04-15 11:00   new “isfile” test with “access”.<BR/>
-<BR/>
-<BR/>
-**big bug input  change module utils of libtui**<BR/>
-Anyway, it's all fixed now.<BR/>
-<BR/>
-I've been chasing memory leaks too much
-Hello, sorry for the bug in the zone entry, I tried to run after the leaks euuhh a big slap.<BR/>
-
-I worked on the dates and that led me to restructure all the libraries for a smoother future.<BR/>
-I retested and only compiled.<BR/>
-LIBTUI: includes everything related to the terminal and its execution.<BR/>
-LIBZND: processing -> Decimal, Zfield, Date-time.<BR/>
-LIBSQL: in preparation now that I've finished DATE-TIME<BR/>
-
-I'm going to work on open date space so that FIELDs are easy to access.<BR/>
-
-the source generator isn't finished, I'd like to process the GRIDs, that's why I'm on sql....<BR/>
-<BR/><BR/><BR/>
-
 
 **---------------------------------------------------------**<BR/>
 
@@ -451,7 +380,9 @@ and using it to show how to make the link with screen management.<BR/><BR/>
 
 Look at the **zig_prog** folder
 <BR/><BR/>
-
+→ 2025-08-05 09:00 : update for 0.15.dev incompatibilité 0.14.1   <BR/>
+GRID function generation is supported.<BR/>
+Remember, these are just models.<BR/>
 
 
 <BR/>

@@ -17,13 +17,15 @@ pub fn build(b: *std.Build) void {
 
     const zenlib_tui = b.dependency("libtui", .{});
 
-    // Building the executable
-    
+     // Building the executable
+
     const Prog = b.addExecutable(.{
-    .name = "Exemple",
-    .root_source_file =     b.path( "./Exemple.zig" ),
-    .target = target,
-    .optimize = optimize,
+        .name = "Exemple",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Exemple.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
 
@@ -45,28 +47,30 @@ pub fn build(b: *std.Build) void {
 
     
     // Building the executable
-    
+
     const docs = b.addTest(.{
-    .name = "Exemple",
-    .root_source_file = b.path( "./Exemple.zig" ),
-    .target = target,
-    .optimize = optimize,
+        .name = "Exemple",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Exemple.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
-    
+  
 
-    Prog.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
+    docs.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
 
-    Prog.root_module.addImport("utils",    zenlib_tui.module("utils"));
+    docs.root_module.addImport("utils",    zenlib_tui.module("utils"));
 
-    Prog.root_module.addImport("mvzr",     zenlib_tui.module("mvzr"));
+    docs.root_module.addImport("mvzr",     zenlib_tui.module("mvzr"));
     
-    Prog.root_module.addImport("forms",    zenlib_tui.module("forms"));
+    docs.root_module.addImport("forms",    zenlib_tui.module("forms"));
     
-    Prog.root_module.addImport("grid" ,    zenlib_tui.module("grid"));
+    docs.root_module.addImport("grid" ,    zenlib_tui.module("grid"));
     
-    Prog.root_module.addImport("menu" ,    zenlib_tui.module("menu"));
+    docs.root_module.addImport("menu" ,    zenlib_tui.module("menu"));
     
-    Prog.root_module.addImport("callpgm" , zenlib_tui.module("callpgm"));
+    docs.root_module.addImport("callpgm" , zenlib_tui.module("callpgm"));
 
     
     const install_docs = b.addInstallDirectory(.{

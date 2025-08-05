@@ -218,8 +218,8 @@ const T = struct {
     }
 
     pub fn ctrlPack(self: T, Xtype: Ctype) bool {
-        var out = std.ArrayList(u8).init(allocatorJson);
-        defer out.deinit();
+        // var out = std.ArrayList(u8).init(allocatorJson);
+        // defer out.deinit();
 
         switch (self.x.?) {
             .null => {

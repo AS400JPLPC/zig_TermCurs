@@ -45,7 +45,7 @@ unsigned int ROW =    44;        /// max 42 including a line for the system
 
 /// Font DejaVu Sans Mono -> xfce4-terminal
 /// defined not optional  -> gnome-terminal
-#define VTEFONT    "Source Code Pro"
+#define VTEFONT    "SourceCodePro"
 
 //*******************************************************
 // PROGRAME
@@ -158,12 +158,12 @@ void    init_Terminal()
 
     /// confortable and extend numbers columns and rows
 
-    if ( s->width <= 1600 && s->height >=1024 ) {             // ex: 13"... 15"
+    if ( s->width <= 1600 && s->height >=1024 ) {             // ex: 13"... 10"
         sprintf(font_terminal,"%s %s" , VTEFONT,"10");
         COL = 168;
         ROW = 44;
         }
-    else if ( s->width <= 1920 && s->height >=1080 ) {        // ex: 17"... 32"
+    else if ( s->width <= 1920 && s->height >=1080 ) {        // ex: 17"... 12"
         sprintf(font_terminal,"%s %s" , VTEFONT,"12");
         COL = 168;
         ROW = 44;

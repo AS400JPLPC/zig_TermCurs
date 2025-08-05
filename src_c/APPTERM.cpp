@@ -59,7 +59,7 @@ unsigned int COL=    132;      /// max 132
 unsigned int ROW =    42;        /// max 42 including a line for the system
 
 /// defined not optional
-#define VTEFONT    "Source Code Pro"
+#define VTEFONT    "SourceCodePro"
 
 //*******************************************************
 // PROGRAME
@@ -174,17 +174,17 @@ void    init_Terminal()
     /// Font DejaVu Sans Mono -> xfce4-terminal
     /// confortable and extend numbers columns and rows
 
-    if ( s->width <= 1600 && s->height >=1024 ) {                    // ex: 13"... 15"
+    if ( s->width <= 1600 && s->height >=1024 ) {             // ex: 13"... 10"
         sprintf(font_terminal,"%s %s" , VTEFONT,"10");
         COL = 168;
         ROW = 44;
         }
-    else if ( s->width <= 1920 && s->height >=1080 ) {            // ex: 17"... 32"
+    else if ( s->width <= 1920 && s->height >=1080 ) {        // ex: 17"... 12"
         sprintf(font_terminal,"%s %s" , VTEFONT,"12");
         COL = 168;
         ROW = 44;
         }
-    else if ( s->width > 1920  ) {                                          //  ex: 2560 x1600 > 27"  font 13
+    else if ( s->width > 1920  ) {                            //  ex: 2560 x1600 > 27"  font 13
         sprintf(font_terminal,"%s %s" , VTEFONT,"13");        //  ex: 3840 x2160 > 32"  font 15
         COL = 168;
         ROW = 44;

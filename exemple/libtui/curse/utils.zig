@@ -210,6 +210,7 @@ pub fn isDigitStr(str: []const u8) bool {
     var b: bool = true;
     const view = std.unicode.Utf8View.init(str) catch |err| {@panic(@errorName(err)); };
     var iter = view.iterator();
+
     while (iter.nextCodepoint()) |x| {
         switch (x) {
             '0'...'9' => continue,

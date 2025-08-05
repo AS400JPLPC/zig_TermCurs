@@ -4,7 +4,7 @@
 ///-----------------------
 
 const std = @import("std");
-
+const builtin = @import("builtin");
 
 pub fn build(b: *std.Build) void {
     // Standard release options allow the person running `zig build` to select
@@ -114,10 +114,12 @@ pub fn build(b: *std.Build) void {
     // Building the executable
 
     const Prog = b.addExecutable(.{
-    .name = "Gencurs",
-    .root_source_file = b.path( "./Gencurs.zig" ),
-    .target = target,
-    .optimize = optimize,
+        .name = "Gencurs",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Gencurs.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),    
     });
 
 

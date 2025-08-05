@@ -34,7 +34,24 @@ const forms = @import("forms");
 
 const allocator = std.heap.page_allocator;
 
+fn isFile(name: []const u8, vdir : [] const u8 ) bool {
 
+    
+    const cDIR = std.fs.cwd().openDir(vdir,.{}) catch unreachable;
+    
+    // var file = cDIR.createFile(name, .{ .read = true }) catch |e|
+    //     switch (e) {
+    //         error.PathAlreadyExists => return true,
+    //         else =>return false,
+    //     };
+        cDIR.access(name, .{}) catch |e| switch (e) {
+        error.FileNotFound => return false,
+        else => {},
+    };
+
+    //  defer file.close();
+    return true;
+}
 
 pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
                 XGRID: *std.ArrayList(grd.GRID),
@@ -48,13 +65,24 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
     const cDIR = std.fs.cwd().openDir(dir,.{})
     catch |err| {@panic(try std.fmt.allocPrint(allocator,"err Open DIR.{any}\n", .{err}));};
 
-    var fjson = cDIR.openFile(nameJson, .{.mode = .read_write}) catch |err| {
-                @panic(try std.fmt.allocPrint(allocator,"err Open FILE.{any}\n", .{err}));};
+    if ( isFile(nameJson, dir)) {
+        cDIR.deleteFile(nameJson) catch unreachable;
+    }
+    var fjson= cDIR.createFile(nameJson, .{ .truncate = true }) catch unreachable;    
     defer fjson.close();
 
-    const out  = fjson.writer();
 
-    var w = std.json.writeStream( out, .{ .whitespace = .indent_2 });
+    // v0.14.1
+    // const out  = fjson.writer();
+    // var w = std.json.writeStream( out, .{ .whitespace = .indent_2 });
+
+
+    // v0.15.dev
+    const out_buffer: []u8 = try allocator.alloc(u8, 2048000);
+    defer allocator.free(out_buffer);
+    var fixed_writer: std.io.Writer = .fixed(out_buffer);
+    var w: std.json.Stringify = .{ .writer = &fixed_writer, .options = .{ .whitespace = .indent_2 }};
+
 
 //----------------------------------
 // Panel JSON
@@ -532,5 +560,8 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
     }
     try w.endArray();
     } 
-      if ( nbrMenu > 0 )  try w.endObject(); 
+    if ( nbrMenu > 0 )  try w.endObject();
+
+    // write buffer JSON
+    try fjson.writeAll(w.writer.buffered());
 }

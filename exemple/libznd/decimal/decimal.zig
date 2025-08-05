@@ -116,7 +116,12 @@ pub const DCMLFX = struct {
 	// normalize this conforms to the attributes 
 	fn normalize( dst : *DCMLFX, r: f128) [] u8 {
 		var sx : []  u8 = "";
-		work = std.fmt.allocPrint(allocDcml,"{d}",.{r}) catch unreachable;
+		var sign :u8 = ' ';
+		if ( r > 0 ) sign = '+';
+		if ( r < 0 ) sign = '-';
+		const val  = if(r > 0 or r == 0 ) r else r * -1 ;
+
+     	work = std.fmt.allocPrint(allocDcml,"{c}{d:}",.{sign,val}) catch unreachable;
 		defer allocDcml.free(work);
 
 		var nx: isize = 0 ;
@@ -416,7 +421,8 @@ pub const DCMLFX = struct {
                 ,.{s.file, s.line, s.column,s.fn_name,dst.val,Error.Overflow_number, dst.entier})
                     catch unreachable);
         }
-		work = normalize(dst , dst.val );
+
+        work = normalize(dst , dst.val );
 		defer allocDcml.free(work);
 
 		var iterA = iterator(work);
@@ -461,9 +467,71 @@ pub const DCMLFX = struct {
 		return allocDcml.dupe(u8, result) catch unreachable;
 	}
 
+	// It's not SQL-compliant, but it's handy for paper editions...
+	pub fn editCodeFlt( dst: *DCMLFX, comptime  CODE_EDIT : []const u8)  [] const u8 {
+		var PRINT_CODE: []const u8 = undefined;
+		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const m: c_int = 10;
+
+		const e = @trunc(v);
+		
+		var r = v - e;
+
+		var i : i128 = 1;
+		while( i <= dst.scale) : (i += 1) {
+				r *=  m ;
+		}
+		r = @trunc(r);
+
+		if ( dst.val == 0 ) PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{' ',e,r}) catch unreachable;
+		if ( dst.val > 0 )  PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{'+',e,r}) catch unreachable;
+		if ( dst.val < 0 )  PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{'-',e,r}) catch unreachable;
+		return allocDcml.dupe(u8, PRINT_CODE) catch unreachable;
+	}
 
 
+	// It's not SQL-compliant, but it's handy for paper editions...
+	pub fn strUFlt( dst: *DCMLFX)  [] const u8 {
+		var PRINT_CODE: []const u8 = undefined;
+		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const m: c_int = 10;
 
+		const e = @trunc(v);
+		
+		var r = v - e;
+
+		var i : i128 = 1;
+		while( i <= dst.scale) : (i += 1) {
+				r *=  m ;
+		}
+		r = @trunc(r);
+
+		PRINT_CODE = std.fmt.allocPrint(allocDcml, "{d}.{d}",.{e,r}) catch unreachable;
+		return allocDcml.dupe(u8, PRINT_CODE) catch unreachable;
+	}
+
+	// It's not SQL-compliant, but it's handy for paper editions...
+	pub fn editCodeInt( dst: *DCMLFX, comptime  CODE_EDIT : []const u8 )  [] const u8 {
+		var PRINT_CODE: []const u8 = undefined;
+		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const e = @trunc(v);
+		if ( dst.val == 0) PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{' ',e}) catch unreachable;
+		if ( dst.val > 0 )  PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{'+',e}) catch unreachable;
+		if ( dst.val < 0 )  PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{'-',e}) catch unreachable;
+		return allocDcml.dupe(u8, PRINT_CODE) catch unreachable;
+	}
+
+
+	// It's not SQL-compliant, but it's handy for paper editions...
+	pub fn strUInt( dst: *DCMLFX )  [] const u8 {
+		var PRINT_CODE: []const u8 = undefined;
+		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const e = @trunc(v);
+		PRINT_CODE = std.fmt.allocPrint(allocDcml,"{d}",.{e}) catch unreachable;
+		return allocDcml.dupe(u8, PRINT_CODE) catch unreachable;
+	}
+
+	
 	// function ADD
 	pub fn add(dst: *DCMLFX ,a: DCMLFX) void {
 		if ( (dst.entier == 0 and dst.scale == 0) or ( a.entier == 0 and a.scale == 0) ) {

@@ -46,11 +46,11 @@ const def = @import("srcdef");
 
 
 // REFERENCE CONTROL
-const deb_Log = @import("logsrc").openFile;   // open  file
-const del_Log = @import("logsrc").deleteFile; // delete file
-const end_Log = @import("logsrc").closeFile;  // close file
-const new_Line = @import("logsrc").newLine;   // new line
-const pref      = @import("logsrc").scoped;     // print file 
+// const deb_Log = @import("logsrc").openFile;   // open  file
+// const del_Log = @import("logsrc").deleteFile; // delete file
+// const end_Log = @import("logsrc").closeFile;  // close file
+// const new_Line = @import("logsrc").newLine;   // new line
+// const pref      = @import("logsrc").scoped;     // print file 
 
 const allocator = std.heap.page_allocator;
 
@@ -250,10 +250,12 @@ fn wrtSrc(xobjet: std.ArrayList(def.DEFOBJET ) , xfield: std.ArrayList(def.DEFFI
     }
 
     const file = std.fs.cwd().createFile(
-        "Formsrc.zig", .{ .read = true } ) catch unreachable;
+        "Formsrc.zig", .{ .read = true ,.truncate =true } ) catch unreachable;
     defer file.close();
-    const wrt = file.writer();
-
+    
+    const out_buffer: []u8 =  allocator.alloc(u8, 2048000) catch unreachable;
+    defer allocator.free(out_buffer);
+    var wrt =std.Io.Writer.fixed(out_buffer);
     
     
     wrt.print("//----------------------\n",.{}) catch {};
@@ -940,6 +942,7 @@ for ( NOBJET.items) | o | {
     
     
         wrt.print("\t\tif (Tkey.Key == kbd.F3) break; // end work\n",.{}) catch {};
+        wrt.print("\t\tif (Tkey.Key == kbd.F12) break; // end work\n",.{}) catch {};
         wrt.print("\t}}\n\n",.{}) catch {};
         wrt.print("\treturn Tkey;\n",.{}) catch {};
         wrt.print("}}\n\n",.{}) catch {};
@@ -1013,5 +1016,6 @@ for ( NOBJET.items) | o | {
             wrt.print("\t}}\n",.{}) catch {};
         }    
     }
+file.writeAll(wrt.buffered()) catch unreachable;
 
 }

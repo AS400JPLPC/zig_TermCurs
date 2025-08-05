@@ -121,10 +121,10 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     Panel.label.append(lbl.newLabel("digit",14,2,"Text-signed.Digit...........:")
     ) catch unreachable ; 
 
-    Panel.label.append(lbl.newLabel("udecimal",15,2,"Text-unsigned.Ddecimal......:")
+    Panel.label.append(lbl.newLabel("udecimal",15,2,"Text-unsigned.Decimal.......:")
     ) catch unreachable ; 
 
-    Panel.label.append(lbl.newLabel("decimal",16,2,"Text-signed.Ddecimal........:")
+    Panel.label.append(lbl.newLabel("decimal",16,2,"Text-signed.Decimal.........:")
     ) catch unreachable ;
 
     Panel.label.append(lbl.newLabel("dateiso",18,2,"Text-Date-ISO...............:")
@@ -159,114 +159,114 @@ pub fn Panel_Fmt01() *pnl.PANEL {
  // Field 
 
     
-    Panel.field.append(fld.newFieldTextFree("free",2,32,        // Name , posx posy
-                                        30,                        // width
-                                        "free",                    // text
-                                        true,                    // tofill
-                                        "required",                // error msg
-                                        "please enter text",    // help
-                                        "",                        // regex
+    Panel.field.append(fld.newFieldTextFree("free",2,32,                   // Name , posx posy
+                                        30,                                // width
+                                        "free",                            // text
+                                        true,                              // tofill
+                                        "required",                        // error msg
+                                        "please enter text",               // help
+                                        "",                                // regex
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldTextFull("full",3,32,        // Name , posx posy
-                                        30,                        // width
-                                        "full",                    // text
-                                        true,                    // tofill
-                                        "required",                // error msg
-                                        "please enter text",    // help
-                                        "",                        // regex
+    Panel.field.append(fld.newFieldTextFull("full",3,32,                    // Name , posx posy
+                                        30,                                 // width
+                                        "full",                             // text
+                                        true,                               // tofill
+                                        "required",                         // error msg
+                                        "please enter text",                // help
+                                        "",                                 // regex
                                         )
     ) catch unreachable ;
 
     fld.setProtect(Panel,1,true) catch unreachable;
 
-    Panel.field.append(fld.newFieldAlpha("alpha",5,32,                // Name , posx posy
-                                        30,                            // width
-                                        "abcd",                        // text
-                                        true,                        // tofill
-                                        "required",                    // error msg
+    Panel.field.append(fld.newFieldAlpha("alpha",5,32,                      // Name , posx posy
+                                        30,                                 // width
+                                        "abcd",                             // text
+                                        true,                               // tofill
+                                        "required",                         // error msg
                                         "please enter text Alpha crtl+p call Exemple",    // help
-                                        "^[a-z]{1,1}[a-zA-Z]{0,}$"    // regex
+                                        "^[a-z]{1,1}[a-zA-Z]{0,}$"          // regex
                                         )
     ) catch unreachable ;
     
     fld.setCall(Panel,fld.getIndex(Panel,"alpha") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
         
-    Panel.field.append(fld.newFieldAlphaUpper("alphaU",6,32,                    // Name , posx posy
-                                        30,                                        // width
-                                        "ABCD",                                    // text
-                                        true,                                    // tofill
-                                        "required",                                // error msg
-                                        "please enter text Alpha Uppercase",    // help
-                                        "",                                        // regex
+    Panel.field.append(fld.newFieldAlphaUpper("alphaU",6,32,                 // Name , posx posy
+                                        30,                                  // width
+                                        "ABCD",                              // text
+                                        true,                                // tofill
+                                        "required",                          // error msg
+                                        "please enter text Alpha Uppercase", // help
+                                        "",                                  // regex
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldAlphaNumeric("alphaN",7,32,                // Name , posx posy
-                                        30,                                    // width
-                                        "abécàd12345",                        // text
-                                        true,                                // tofill
-                                        "required",                            // error msg
-                                        "please enter text Alpha Numéric",    // help
+    Panel.field.append(fld.newFieldAlphaNumeric("alphaN",7,32,              // Name , posx posy
+                                        30,                                 // width
+                                        "abécàd12345",                      // text
+                                        true,                               // tofill
+                                        "required",                         // error msg
+                                        "please enter text Alpha Numéric",  // help
                                         "^[a-zA-Z]{1,}",                    // regex
                                         )
     ) catch unreachable ;
 
     Panel.field.append(fld.newFieldAlphaNumericUpper("alphaNU",8,32,        // Name , posx posy
-                                        30,                                    // width
+                                        30,                                 // width
                                         "ABCD12345",                        // text
-                                        true,                                // tofill
-                                        "required",                            // error msg
-                                        "please enter text Alpha Numéric",    // help
-                                        "^[A-Z]{1,1}[A-Z0-9]{0,}$",            // regex
+                                        true,                               // tofill
+                                        "required",                         // error msg
+                                        "please enter text Alpha Numéric",  // help
+                                        "^[A-Z]{1,1}[A-Z0-9]{0,}$",         // regex
                                         )
     ) catch unreachable ;
 
     Panel.field.append(fld.newFieldPassword("password",10,32,                // Name , posx posy
-                                        30,                                    // width
+                                        30,                                  // width
                                         "SECRET",                            // text
                                         true,                                // tofill
-                                        "required",                            // error msg
-                                        "please enter text Alpha Numéric",    // help
-                                        "",                                    // regex
+                                        "required",                          // error msg
+                                        "please enter text Alpha Numéric",   // help
+                                        "",                                  // regex
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldYesNo("yesno",11,32,        // Name , posx posy
-                                        "N",                // text
-                                        true,                // tofill
-                                        "required Y or N",    // error msg
-                                        "",                    // help default "to validate Y or N "
+    Panel.field.append(fld.newFieldYesNo("yesno",11,32,             // Name , posx posy
+                                        "N",                        // text
+                                        true,                       // tofill
+                                        "required Y or N",          // error msg
+                                        "",                         // help default "to validate Y or N "
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit("udigit",13,32,            // Name , posx posy
-                                        5,                            // width
+    Panel.field.append(fld.newFieldUDigit("udigit",13,32,           // Name , posx posy
+                                        5,                          // width
                                         "00102",                    // text
-                                        true,                        // tofill
-                                        "Invalide value",            // error msg
-                                        "value numeric not signed",    // help
-                                        "",                            // regex default standard
+                                        true,                       // tofill
+                                        "Invalide value",           // error msg
+                                        "value numeric not signed", // help
+                                        "",                         // regex default standard
                                         )
     ) catch unreachable ;
 
     Panel.field.append(fld.newFieldDigit("digit",14,32,            // Name , posx posy
-                                        5,                        // width
-                                        "+00102",                // text
-                                        true,                    // tofill
-                                        "Invalide value",        // error msg
+                                        5,                         // width
+                                        "+00102",                  // text
+                                        true,                      // tofill
+                                        "Invalide value",          // error msg
                                         "value numeric signed",    // help
                                         "",                        // regex default standard
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDecimal("udecimal",15,32,         // Name , posx posy
-                                        10,                         // width
-                                        2,                        // scal
-                                        "001.02",                // text
-                                        true,                    // tofill
-                                        "Invalide value",        // error msg
+    Panel.field.append(fld.newFieldUDecimal("udecimal",15,32,      // Name , posx posy
+                                        10,                        // width
+                                        2,                         // scal
+                                        "001.02",                  // text
+                                        true,                      // tofill
+                                        "Invalide value",          // error msg
                                         "",                        // help default
                                         "",                        // regex default standard
                                         )
@@ -274,20 +274,20 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
     Panel.field.append(fld.newFieldDecimal("decimal",16,32,        // Name , posx posy
                                         10,                        // width
-                                        2,                        // scal
-                                        "+001.02",                // text
-                                        true,                    // tofill
-                                        "Invalide value",        // error msg
+                                        2,                         // scal
+                                        "+001.02",                 // text
+                                        true,                      // tofill
+                                        "Invalide value",          // error msg
                                         "",                        // help default
                                         "",                        // regex default standard
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldDateISO("dateiso",18,32,            // Name , posx posy
-                                        "",                // text
-                                        true,                        // tofill
-                                        "date out of calendar",        // error msg
-                                        "",                            // help default
+    Panel.field.append(fld.newFieldDateISO("dateiso",18,32,        // Name , posx posy
+                                        "",                        // text
+                                        true,                      // tofill
+                                        "date out of calendar",    // error msg
+                                        "",                        // help default
                                         )
     ) catch unreachable ;
     // test with a calendar file to know the opening days
@@ -299,8 +299,8 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     Panel.field.append(fld.newFieldDateFR("datefr",19,32,            // Name , posx posy
                                         "12/10/1951",                // text
                                         true,                        // tofill
-                                        "date hors calendrier",        // error msg
-                                        "",                            // help default
+                                        "date hors calendrier",      // error msg
+                                        "",                          // help default
                                         )
     ) catch unreachable ;
     fld.setTask(Panel,fld.getIndex(Panel,"datefr") catch unreachable,"TaskDateFr") catch unreachable ;
@@ -308,67 +308,67 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     Panel.field.append(fld.newFieldDateUS("dateus",20,32,            // Name , posx posy
                                         "07/04/1776",                // text
                                         true,                        // tofill
-                                        "date out of calendar",    // error msg
-                                        "",                            // help default
+                                        "date out of calendar",      // error msg
+                                        "",                          // help default
                                         )
     ) catch unreachable ;
     fld.setTask(Panel,fld.getIndex(Panel,"dateus") catch unreachable,"TaskDateUs") catch unreachable ;
 
-    Panel.field.append(fld.newFieldTelephone("telephone",22,32,        // Name , posx posy
-                                        25,                            // width
-                                        "+(001)451 452 453 545",    // text
+    Panel.field.append(fld.newFieldTelephone("telephone",22,32,      // Name , posx posy
+                                        25,                          // width
+                                        "+(001)451 452 453 545",     // text
                                         true,                        // tofill
-                                        "required or invalide",        // error msg
-                                        "ex:+(001)456.123.789",        // help
+                                        "required or invalide",      // error msg
+                                        "ex:+(001)456.123.789",      // help
                  "[+][(][0-9]{3}[)][0-9]{3}([-. ]?[0-9]{3}){1,4}"    // regex US default standard
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldTelephone("telephone2",24,32,    // Name , posx posy
-                                        25,                            // width
+    Panel.field.append(fld.newFieldTelephone("telephone2",24,32,     // Name , posx posy
+                                        25,                          // width
                                         "+(33)6 01 02 03 04",        // text
-                                        false,                        // tofill
-                                        "required or invalide",        // error msg
-                                        "ex:+(33)6.12.34.56.78",    // help
+                                        false,                       // tofill
+                                        "required or invalide",      // error msg
+                                        "ex:+(33)6.12.34.56.78",     // help
                 "[+][(][0-9]{2,3}[)][0-9]([-. ]?[0-9]{2,3}){1,4}"    // regex default standard fr
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldMail("mail",26,32,            // Name , posx posy
-                                        100,                    // width
-                                        "gloups@gmail.com",        // text error
-                                        true,                    // tofill
-                                        "required",                // error msg
-                                        "",                        // help default
+    Panel.field.append(fld.newFieldMail("mail",26,32,                // Name , posx posy
+                                        100,                         // width
+                                        "gloups@gmail.com",          // text error
+                                        true,                        // tofill
+                                        "required",                  // error msg
+                                        "",                          // help default
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldSwitch("Switch",28,32,        // Name , posx posy
-                                        true,                    // switch
-                                        "required",                // error msg
-                                        "",                        // help
+    Panel.field.append(fld.newFieldSwitch("Switch",28,32,            // Name , posx posy
+                                        true,                        // switch
+                                        "required",                  // error msg
+                                        "",                          // help
                                         )
     ) catch unreachable ;
 
-     Panel.field.append(fld.newFieldFunc("cb01",3,76,            // Name , posx posy
-                                        20,                        // width
-                                        "Amis",                    // text
-                                        true,                    // tofill
-                                        "comboFn01",            // Process for FUNC 
-                                        "required",                // error msg
-                                        "select combo",            // help
+     Panel.field.append(fld.newFieldFunc("cb01",3,76,                // Name , posx posy
+                                        20,                          // width
+                                        "Amis",                      // text
+                                        true,                        // tofill
+                                        "comboFn01",                 // Process for FUNC 
+                                        "required",                  // error msg
+                                        "select combo",              // help
                                         )
     ) catch unreachable ;
     
     fld.setCall(Panel,fld.getIndex(Panel,"cb01") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
     
-    Panel.field.append(fld.newFieldFunc("cb02",4,76,            // Name , posx posy
-                                        20,                        // width
-                                        "",                        // text
-                                        false,                    // tofill
-                                        "comboFn02",            // Process for FUNC 
-                                        "required",                // error msg
-                                        "select combo",            // help
+    Panel.field.append(fld.newFieldFunc("cb02",4,76,                 // Name , posx posy
+                                        20,                          // width
+                                        "",                          // text
+                                        false,                       // tofill
+                                        "comboFn02",                 // Process for FUNC 
+                                        "required",                  // error msg
+                                        "select combo",              // help
                                         )
     ) catch unreachable ;
 
@@ -428,6 +428,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         "Refresh"                // title enrg record
                         )
     ) catch unreachable ;
+
     return Panel;
 }
 
@@ -447,7 +448,8 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
                     8,
                     70,
                     forms.CADRE.line1,
-                    "TEST WINDOW");
+                    "TEST WINDOW"
+    );
 
     //-------------------------------------------------
     // Label
@@ -467,6 +469,7 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
                         "Return"                // title
                         )
     ) catch unreachable ;
+
     return Panel;
 }
 //-------------------------------------------------
@@ -677,9 +680,9 @@ pub const FnProg = enum {
         switch (self) {
             .exCallpgm=> {
             const pgmParm : ?[] const u8 = null;
-             mdl.callPgmPid("APPTERM",vfld.progcall,pgmParm) 
+             mdl.callPgmPid("APPTERM",vfld.progcall,pgmParm, true) 
                         catch |err | switch(err)  {
-                                mdl.ErrChild.Module_Invalid => {
+                                mdl.ErrCallpgm .Module_Error => {
                                 const msgerr  = std.fmt.allocPrint(utl.allocUtl,
                                 " module {s} invalide appeller service Informatique ",
                                 .{vfld.progcall}) catch unreachable;

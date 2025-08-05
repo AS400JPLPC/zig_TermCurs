@@ -174,16 +174,6 @@ fn isFile(name: []const u8 ) bool {
     return true;
 }
 
-fn newFile(name: []const u8 ) void {
-
-    
-    const cDIR = std.fs.cwd().openDir(vdir,.{}) catch unreachable;
-
-    var file = cDIR.openFile(name, .{}) catch unreachable;
-    cDIR.deleteFile(name) catch unreachable;
-    file= cDIR.createFile(name, .{ .read = true }) catch unreachable;    
-    defer file.close();
-}
 
 fn cleanProgram(vpnl : *pnl.PANEL ) void {
     vdir = "";
@@ -502,7 +492,6 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
                         nameJson =Gkey.Buf.items[0];
                         pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Working {s} Json", .{nameJson})) ;
                         if (wrkSav){
-                            newFile(nameJson);
                             try mdlSjson.SavJson(XPANEL, XGRID, XMENU, vdir ,nameJson);
                         } 
                         else try mdlRjson.RstJson(XPANEL, XGRID, XMENU, vdir ,nameJson) ;

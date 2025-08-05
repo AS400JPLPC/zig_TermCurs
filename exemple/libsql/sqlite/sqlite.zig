@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @cImport(@cInclude("sqlite3.h"));
 
 
+
 pub const Error = error{
     // Generic error
     SQLITE_ERROR,
@@ -137,7 +138,8 @@ pub fn boolean(data: bool) Bool {
 pub fn cbool(data : bool ) i32 {
      if(data) return 1 else return 0;
 }
-
+//=========================================================
+//=========================================================
 
 pub fn isDir( vdir : []const u8) bool {
     _= std.fs.cwd().openDir(vdir,.{}) catch {return false;};
@@ -184,7 +186,8 @@ pub fn openTmp(tDir: std.fs.Dir, name: []const u8) !Database {
 
     return try Database.open(.{ .path = path_file });
 }
-
+//=========================================================
+//=========================================================
 
 pub const Database = struct {
     pub const Mode = enum { ReadWrite, ReadOnly };
@@ -462,11 +465,6 @@ pub fn Statement(comptime Params: type, comptime Result: type) type {
             try throw(c.sqlite3_bind_int(stmt.ptr, idx, value));
         }
 
-        fn bindBoolean(stmt: Self, idx: c_int, value: Bool) !void {
-            var val:i32 = 0;
-            if (value.data == true) val =1;
-             try throw(c.sqlite3_bind_int(stmt.ptr, idx, val));
-        }
         fn bindInt64(stmt: Self, idx: c_int, value: i64) !void {
             try throw(c.sqlite3_bind_int64(stmt.ptr, idx, value));
         }
@@ -500,7 +498,14 @@ pub fn Statement(comptime Params: type, comptime Result: type) type {
             const len = value.data.len;
             try throw(c.sqlite3_bind_text64(stmt.ptr, idx, ptr, @intCast(len), c.SQLITE_STATIC, c.SQLITE_UTF8));
         }
-       
+
+        fn bindBoolean(stmt: Self, idx: c_int, value: Bool) !void {
+            var val:i32 = 0;
+            if (value.data == true) val =1;
+             try throw(c.sqlite3_bind_int(stmt.ptr, idx, val));
+        }
+
+
         fn row(stmt: Self) !Result {
             var result: Result = undefined;
 

@@ -17,12 +17,6 @@ const utl = @import("utils");
 const def = @import("srcdef");
 
 
-// REFERENCE CONTROL
-const deb_Log = @import("logsrc").openFile;   // open  file
-const del_Log = @import("logsrc").deleteFile; // delete file
-const end_Log = @import("logsrc").closeFile;  // close file
-const new_Line = @import("logsrc").newLine;   // new line
-const pref     = @import("logsrc").scoped;    // print file 
 
 const allocator = std.heap.page_allocator;
 
@@ -109,9 +103,12 @@ pub fn wrtMenu( NMENU : std.ArrayList(mnu.DEFMENU ) )  void {
 
 
     const file = std.fs.cwd().createFile(
-        "Menusrc.zig", .{ .read = true } ) catch unreachable;
+        "Menusrc.zig", .{ .read = true, .truncate = true } ) catch unreachable;
     defer file.close();
-    const wrt = file.writer();
+        
+    const out_buffer: []u8 =  allocator.alloc(u8, 2048000) catch unreachable;
+    defer allocator.free(out_buffer);
+    var wrt =std.Io.Writer.fixed(out_buffer);
 
     wrt.print("//----------------------\n",.{}) catch {};
     wrt.print("//---date text----------\n",.{}) catch {};
@@ -195,4 +192,6 @@ pub fn wrtMenu( NMENU : std.ArrayList(mnu.DEFMENU ) )  void {
     wrt.print("\t\t}}\n\n",.{}) catch {};
     wrt.print("}}\n\n",.{}) catch {};
 
+
+    file.writeAll(wrt.buffered()) catch unreachable;
 }
