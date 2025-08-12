@@ -1977,7 +1977,7 @@ pub const    fld = struct {
             "[0-9]{{1,{d}}}",.{vwidth})    catch |err| { @panic(@errorName(err));}
 
             else xfield.regex = std.fmt.allocPrint(allocatorForms,
-            "[0-9]{{1,{d}}}[.][0-9]{{{d}}}",.{vwidth,vscal,})
+            "[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal})
             catch |err| { @panic(@errorName(err));};
         }
         if (xfield.help.len == 0 ) xfield.help = "ex: 12301 or 123.01" ;
@@ -2035,7 +2035,7 @@ pub const    fld = struct {
             "([+]|[-])[0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
 
             else xfield.regex = std.fmt.allocPrint(allocatorForms,
-            "([+]|[-])[0-9]{{1,{d}}}[.][0-9]{{{d}}}",.{vwidth,vscal}) 
+            "([+]|[-])[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) 
             catch |err| { @panic(@errorName(err));};
 
         }
@@ -2849,8 +2849,11 @@ pub const    fld = struct {
                                     e_count = 0 ;
                                     continue;
                                 }
-                            },    
-                            else => { 
+                            },
+                            else => {
+                                if (!vfld.requier and utl.trimStr(utl.listToStr(e_FIELD)).len == 0 ) {
+                                    continue;
+                                }                                
                                 if ( ! isMatch(ToStr(utl.trimStr(utl.listToStr(e_FIELD))) ,vfld.regex) ) {
                                     msgErr(vpnl,vfld,vfld.errmsg);
                                     e_curs = e_posy;
@@ -3018,10 +3021,7 @@ pub const    fld = struct {
                                 },
                                 .UDECIMAL => {
                                     if (e_count < e_nbrcar and utl.isDigitStr(Fkey.Char) or 
-                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) ){
-
-                                        if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue ;
-                                        
+                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 0) ){
 
                                         if (statusCursInsert and e_count < e_nbrcar - 1) insert(Fkey.Char,e_count)
                                         else    e_FIELD.items[e_count] = Fkey.Char;
@@ -3037,11 +3037,9 @@ pub const    fld = struct {
                                 },
                                 .DECIMAL => {
                                     if (e_count < e_nbrcar and utl.isDecimalStr(Fkey.Char) and e_count > 0 or 
-                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 1) or
+                                        (std.mem.eql(u8, Fkey.Char, ".") and e_count > 0) or
                                         (std.mem.eql(u8, Fkey.Char, "-") and e_count == 0) or
                                         (std.mem.eql(u8, Fkey.Char, "+") and e_count == 0)) {
-
-                                        if (vfld.scal == 0 and std.mem.eql(u8, Fkey.Char, ".") ) continue; 
 
                                         if (statusCursInsert and e_count < e_nbrcar - 1) insert(Fkey.Char,e_count)
                                         else    e_FIELD.items[e_count] = Fkey.Char;

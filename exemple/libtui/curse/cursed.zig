@@ -19,13 +19,15 @@ var use_termios: os.linux.termios = undefined;
 
 //============================================================================================
 var stdin = std.fs.File.stdin();
-var stdout = std.fs.File.stdout().writerStreaming(&.{});
+var stdout = std.fs.File.stdout().writer(&.{});
 
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
     stdout.interface.print(format,args )  catch {} ;
+    stdout.interface.flush() catch  {} ;
 }
 pub inline fn WriteAll( args: [] const u8) void {
     stdout.interface.writeAll(args)  catch {} ;
+    stdout.interface.flush() catch  {} ;
 }
 
 //============================================================================================
@@ -722,7 +724,8 @@ pub const kbd = enum {
         var Event: Keyboard = Keyboard{ .Key = kbd.none, .Char = "" };
 
         // TODO: Check buffer size
-        var keybuf: [16] u8 =  [_]u8{0} ** 16;
+        // var keybuf: [16] u8 =  [_]u8{0} ** 16;
+        var keybuf : [16] u8 = @splat(0);
 
         flushIO();
 
