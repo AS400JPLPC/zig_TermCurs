@@ -9,6 +9,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -54,18 +57,17 @@ const def = @import("srcdef");
 
 const allocator = std.heap.page_allocator;
 
+var NOBJET = std.ArrayList(def.DEFOBJET).initCapacity(mem.allocTui,0) catch unreachable;
+var NFIELD = std.ArrayList(def.DEFFIELD).initCapacity(mem.allocTui,0) catch unreachable;
+var NLABEL = std.ArrayList(def.DEFLABEL).initCapacity(mem.allocTui,0) catch unreachable;
+var NLINEH = std.ArrayList(def.DEFLINEH).initCapacity(mem.allocTui,0) catch unreachable;
+var NLINEV = std.ArrayList(def.DEFLINEV).initCapacity(mem.allocTui,0) catch unreachable;
+var NBUTTON= std.ArrayList(def.DEFBUTTON).initCapacity(mem.allocTui,0) catch unreachable;
 
-var NOBJET = std.ArrayList(def.DEFOBJET).init(allocator);
-var NFIELD = std.ArrayList(def.DEFFIELD).init(allocator);
-var NLABEL = std.ArrayList(def.DEFLABEL).init(allocator);
-var NLINEH = std.ArrayList(def.DEFLINEH).init(allocator);
-var NLINEV = std.ArrayList(def.DEFLINEV).init(allocator);
-var NBUTTON= std.ArrayList(def.DEFBUTTON).init(allocator);
 
-
-var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
-var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
+var NPANEL = std.ArrayList(pnl.PANEL).initCapacity(mem.allocTui,0) catch unreachable;
+var NGRID  = std.ArrayList(grd.GRID ).initCapacity(mem.allocTui,0) catch unreachable;
+var NMENU  = std.ArrayList(mnu.DEFMENU ).initCapacity(mem.allocTui,0) catch unreachable;
 
 
 var numPanel: usize = undefined;
@@ -111,7 +113,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -119,7 +121,7 @@ fn usizeToStr(v: usize) []const u8 {
 fn padingRight(a: []const u8, len: usize) []const u8 {
      var b :[] const u8 = a;
      while ( b.len < len ) {
-        b = std.fmt.allocPrint(    utl.allocUtl,"{s} ",.{ b}) catch unreachable;
+        b = std.fmt.allocPrint(    mem.allocUtl,"{s} ",.{ b}) catch unreachable;
     }
     return b;    
 }
@@ -127,7 +129,7 @@ fn padingRight(a: []const u8, len: usize) []const u8 {
 fn padingLeft(a: []const u8, len: usize) []const u8 {
      var b :[] const u8 = a;
      while ( b.len < len ) {
-        b = std.fmt.allocPrint(    utl.allocUtl," {s}",.{ b}) catch unreachable;
+        b = std.fmt.allocPrint(    mem.allocUtl," {s}",.{ b}) catch unreachable;
     }
     return b;    
 }
@@ -144,7 +146,7 @@ pub fn wrtForms( xPANEL : std.ArrayList(pnl.PANEL ),
                  xLABEL : std.ArrayList(def.DEFLABEL),
                  xLINEH : std.ArrayList(def.DEFLINEH),
                  xLINEV : std.ArrayList(def.DEFLINEV),
-                 xBUTTON : std.ArrayList(def.DEFBUTTON)
+                 xBUTTON : std.ArrayList(def.DEFBUTTON),
                )  void {
     //term.offscrool();
     // open terminal and config and offMouse , cursHide->(cursor hide)
@@ -183,21 +185,21 @@ pub fn wrtForms( xPANEL : std.ArrayList(pnl.PANEL ),
 
     pnl.printPanel(base);
     term.deinitTerm();
-    utl.deinitUtl();
+    mem.deinitUtl();
     nopt = mnu.ioMenu(MenuPrincipal,0);
 
     if (nopt == @intFromEnum(choix.exit ) or nopt == 999) {return; }
  
-    for( xPANEL.items) | p | {NPANEL.append(p) catch unreachable;}
-    for( xGRID.items)  | g | {NGRID.append(g) catch unreachable;}
-    for( xMENU.items)  | m | {NMENU.append(m) catch unreachable;}
+    for( xPANEL.items) | p | {NPANEL.append(mem.allocTui,p) catch unreachable;}
+    for( xGRID.items)  | g | {NGRID.append(mem.allocTui,g) catch unreachable;}
+    for( xMENU.items)  | m | {NMENU.append(mem.allocTui,m) catch unreachable;}
 
-    for( xOBJET.items) | o | {NOBJET.append(o) catch unreachable;}
-    for( xFIELD.items) | f | {NFIELD.append(f) catch unreachable;}
-    for( xLABEL.items) | l | {NLABEL.append(l) catch unreachable;}
-    for( xLINEH.items) | h | {NLINEH.append(h) catch unreachable;}
-    for( xLINEV.items) | v | {NLINEV.append(v) catch unreachable;}
-    for( xBUTTON.items) | b | {NBUTTON.append(b) catch unreachable;}
+    for( xOBJET.items) | o | {NOBJET.append(mem.allocTui,o) catch unreachable;}
+    for( xFIELD.items) | f | {NFIELD.append(mem.allocTui,f) catch unreachable;}
+    for( xLABEL.items) | l | {NLABEL.append(mem.allocTui,l) catch unreachable;}
+    for( xLINEH.items) | h | {NLINEH.append(mem.allocTui,h) catch unreachable;}
+    for( xLINEV.items) | v | {NLINEV.append(mem.allocTui,v) catch unreachable;}
+    for( xBUTTON.items) | b | {NBUTTON.append(mem.allocTui,b) catch unreachable;}
         
 
 
@@ -206,8 +208,7 @@ pub fn wrtForms( xPANEL : std.ArrayList(pnl.PANEL ),
 
     
 
-    utl.deinitUtl();
-    grd.deinitGrid();
+    mem.deinitUtl();
             
     if (NPANEL.items.len > 0) {
         NPANEL.clearRetainingCapacity();
@@ -269,6 +270,9 @@ fn wrtSrc(xobjet: std.ArrayList(def.DEFOBJET ) , xfield: std.ArrayList(def.DEFFI
     wrt.print("// keyboard\n",.{}) catch {};
     wrt.print("const kbd = @import(\"cursed\").kbd;\n",.{}) catch {};
 
+    wrt.print("// alloc\n",.{}) catch {};
+    wrt.print("const mem = @import(\"alloc\");\n",.{}) catch {};
+    
     wrt.print("\n// cadre\n",.{}) catch {};
     wrt.print("const cdr = @import(\"forms\").CADRE;\n",.{}) catch {};
     wrt.print("const lne = @import(\"forms\").LINE;\n",.{}) catch {};
@@ -331,12 +335,10 @@ fn wrtSrc(xobjet: std.ArrayList(def.DEFOBJET ) , xfield: std.ArrayList(def.DEFFI
 
 
     wrt.print("// arena allocator \n",.{}) catch {};
-    wrt.print("var arenaProg = std.heap.ArenaAllocator.init(std.heap.page_allocator);\n",.{}) catch {};
-    wrt.print("var  alloc = arenaProg.allocator();\n",.{}) catch {};
-    wrt.print("fn deinitForms() void {{\n",.{}) catch {};
-    wrt.print("\tarenaProg.deinit();\n",.{}) catch {};
-    wrt.print("\tarenaProg = std.heap.ArenaAllocator.init(std.heap.page_allocator);\n",.{}) catch {};
-    wrt.print("\talloc = arenaProg.allocator();\n",.{}) catch {};
+    wrt.print("var arenaPgm = std.heap.ArenaAllocator.init(std.heap.page_allocator);\n",.{}) catch {};
+    wrt.print("var  allocPgm = arenaPgm .allocator();\n",.{}) catch {};
+    wrt.print("fn deinitPgm () void {{\n",.{}) catch {};
+    wrt.print("\tarenaPgm .reset(.free_all);\n",.{}) catch {};
     wrt.print("}}\n",.{}) catch {};
 
 for( xobjet.items) | m | {
@@ -362,7 +364,7 @@ for( xobjet.items) | m | {
         if (NBUTTON.items.len > 0) {
             wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
             for( NPANEL.items[m.index].button.items) | b | {
-                    wrt.print("\t\t\tPanel.button.append(btn.newButton(kbd.{s},{},{},\"{s}\")) catch unreachable ;\n"
+                    wrt.print("\t\t\tPanel.button.append(mem.allocTui,btn.newButton(kbd.{s},{},{},\"{s}\")) catch unreachable ;\n"
                     ,.{@tagName(b.key), b.show, b.check, b.title}) catch {} ;
             }
         }
@@ -372,11 +374,11 @@ for( xobjet.items) | m | {
             wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
             for( NPANEL.items[m.index].label.items) | l | {
                 if (l.title == true ) {
-                    wrt.print("\t\t\tPanel.label.append(lbl.newTitle(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
+                    wrt.print("\t\t\tPanel.label.append(mem.allocTui,lbl.newTitle(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
                     ,.{l.name, l.posx, l.posy, l.text}) catch {} ;
                     }
                     else {
-                    wrt.print("\t\t\tPanel.label.append(lbl.newLabel(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
+                    wrt.print("\t\t\tPanel.label.append(mem.allocTui,lbl.newLabel(\"{s}\",{d},{d},\"{s}\")) catch unreachable ;\n"
                     ,.{l.name, l.posx, l.posy, l.text}) catch {} ;
                     }
             }
@@ -390,97 +392,97 @@ for( xobjet.items) | m | {
                 wrt.print("\n\n",.{}) catch {};
                 switch(f.reftyp) {
                 forms.REFTYP.TEXT_FREE => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldTextFree(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldTextFree(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.TEXT_FULL => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldTextFull(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldTextFull(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.ALPHA => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldAlpha(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlpha(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.ALPHA_UPPER => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.ALPHA_NUMERIC => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaNumeric(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaNumeric(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
 
                 forms.REFTYP.ALPHA_NUMERIC_UPPER=> {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldAlphaNumericUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaNumericUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.PASSWORD => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldPassword(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldPassword(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.YES_NO => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldYesNo(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldYesNo(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
                 },
             
                 forms.REFTYP.UDIGIT => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldUDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldUDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.DIGIT => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldDigit(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.UDECIMAL => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldUDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldUDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.scal, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.DECIMAL => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldDecimal(\"{s}\",{d},{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.scal, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.DATE_ISO => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldDateISO(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldDateISO(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
                 },
             
                 forms.REFTYP.DATE_FR => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldDateFR(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldDateFR(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
                 },
             
                 forms.REFTYP.DATE_US => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldDateUS(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldDateUS(\"{s}\",{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.text, f.requier, f.errmsg, f.help}) catch {} ;
                 },
             
                 forms.REFTYP.TELEPHONE => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldTelephone(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldTelephone(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.MAIL_ISO => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldMail(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldMail(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
             
                 forms.REFTYP.SWITCH => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldSwitch(\"{s}\",{d},{d},{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldSwitch(\"{s}\",{d},{d},{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy,f.zwitch,f.errmsg, f.help}) catch {} ;
                 },
             
                 forms.REFTYP.FUNC => {
-                wrt.print("\t\t\tPanel.field.append(fld.newFieldFunc(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldFunc(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width,"",f.requier, f.procfunc, f.errmsg, f.help}) catch {} ;
                 },
 
@@ -503,7 +505,7 @@ for( xobjet.items) | m | {
         if (NLINEH.items.len > 0) {
             wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
             for( NPANEL.items[m.index].lineh.items) | h | {
-                wrt.print("\t\t\tPanel.lineh.append(lnh.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.lineh.append(mem.allocTui,lnh.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
                     ,.{h.name, h.posx, h.posy, h.lng,@tagName(h.trace)}) catch {} ;
             }
         }
@@ -511,7 +513,7 @@ for( xobjet.items) | m | {
         if (NLINEV.items.len > 0) {
             wrt.print("\n\t\t\t//----------------------\n",.{}) catch {};
             for( NPANEL.items[m.index].linev.items) | v | {
-                wrt.print("\t\t\tPanel.linev.append(lnv.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
+                wrt.print("\t\t\tPanel.linev.append(mem.allocTui,lnv.newLine(\"{s}\",{d},{d},{d},lne.{s})) catch unreachable ;\n"
                     ,.{v.name, v.posx, v.posy, v.lng,@tagName(v.trace)}) catch {} ;
             }
         }
@@ -520,9 +522,8 @@ for( xobjet.items) | m | {
         wrt.print("\n\n\t\t\treturn Panel;\n",.{}) catch {};
         wrt.print("\n\n\t}}\n",.{}) catch {};
     }
-        
-
-        
+ 
+}
 
     if (m.objtype == def.OBJTYPE.MENU)    {
 
@@ -553,11 +554,8 @@ for( xobjet.items) | m | {
             wrt.print("\t\t\t\"{s}\",\n", .{text}) catch {};
         }
         wrt.print("\t\t\t}}\n", .{}) catch {};
-        wrt.print("\t\t\t);\n", .{}) catch {};
+        wrt.print(");\n", .{}) catch {};
     }
-
-}
-
 } // end full NOBJET
 
     wrt.print("\n\n\n\t//Errors\n",.{}) catch {};
@@ -589,7 +587,7 @@ if (workFunc) {
             wrt.print("\t\t);\n\n",.{}) catch {};
             
             wrt.print("\t\tdefer grd.freeGrid(Xcombo);\n",.{}) catch {};
-            wrt.print("\t\tdefer grd.allocatorGrid.destroy(Xcombo);\n\n",.{}) catch {};
+            wrt.print("\t\tdefer mem.allocTui.destroy(Xcombo);\n\n",.{}) catch {};
             for(NGRID.items[o.index].cell.items) |c| {
             wrt.print("\t\tgrd.newCell(Xcombo,\"{s}\",{d}, grd.REFTYP.{s}, term.ForegroundColor.{s});\n"
                 ,.{c.text,c.long,@tagName(c.reftyp),@tagName(c.atrCell.foregr) }) catch {};
@@ -604,7 +602,7 @@ if (workFunc) {
 
             wrt.print("\n\t\t// Interrogation\n",.{}) catch {};
             wrt.print("\t\tvar Gkey :grd.GridSelect = undefined ;\n",.{}) catch {};
-            wrt.print("\t\tdefer Gkey.Buf.deinit();\n\n",.{}) catch {};
+            wrt.print("\t\tdefer Gkey.Buf.deinit(mem.allocTui);\n\n",.{}) catch {};
 
             wrt.print("\t\tGkey =grd.ioCombo(Xcombo,cellPos);\n",.{}) catch {};
             wrt.print("\t\tpnl.rstPanel(grd.GRID,Xcombo, vpnl);\n\n",.{}) catch {};
@@ -665,10 +663,9 @@ if (workTask) {
 
             wrt.print("\t\tif ( ! fld.isMatchiFixedIso(vfld.text) ) {{\n",.{}) catch {};
 
-            wrt.print("\t\t\tconst allocator = std.heap.page_allocator;\n",.{}) catch {};
-            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
+            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(mem.allocTui,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format ISO \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
-            wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tdefer mem.allocTui.free(msg);\n",.{}) catch {};
             wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
             wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
@@ -681,11 +678,9 @@ if (workTask) {
             wrt.print("\tfn TaskDateFr( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {{\n",.{}) catch {};
 
             wrt.print("\t\tif ( ! fld.isMatchiFixedIso(vfld.text) ) {{\n",.{}) catch {};
-
-            wrt.print("\t\t\tconst allocator = std.heap.page_allocator;\n",.{}) catch {};
-            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
+            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(mem.allocTui,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format Fr \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
-            wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tdefer mem.allocTui.free(msg);\n",.{}) catch {};
             wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
             wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
@@ -699,10 +694,9 @@ if (workTask) {
 
             wrt.print("\t\tif ( ! fld.isMatchiFixedIso(vfld.text) ) {{\n",.{}) catch {};
 
-            wrt.print("\t\t\tconst allocator = std.heap.page_allocator;\n",.{}) catch {};
-            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(allocator,\n",.{}) catch {};
+            wrt.print("\t\t\tconst msg = std.fmt.allocPrint(mem.allocTui,\n",.{}) catch {};
             wrt.print("\t\t\t\"{{s}} Invalid date format Us \",.{{vfld.text}}) catch unreachable;\n",.{}) catch {};
-            wrt.print("\t\t\tdefer allocator.free(msg);\n",.{}) catch {};
+            wrt.print("\t\t\tdefer mem.allocTui.free(msg);\n",.{}) catch {};
             wrt.print("\t\t\tterm.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);\n",.{}) catch {};
             wrt.print("\t\t\tterm.writeStyled(vfld.text,pnl.FldErr);\n",.{}) catch {};
             wrt.print("\t\t\tpnl.msgErr(vpnl, msg);\n",.{}) catch {};
@@ -970,7 +964,7 @@ for ( NOBJET.items) | o | {
             wrt.print("\t\t);\n\n",.{}) catch {};
             
             //wrt.print("\t\tdefer grd.freeGrid(Xcombo);\n",.{}) catch {};
-            //wrt.print("\t\tdefer grd.allocatorGrid.destroy(Xcombo);\n\n",.{}) catch {};
+            //wrt.print("\t\tdefer mem.allocTui.destroy(Xcombo);\n\n",.{}) catch {};
 
             wrt.print("\t\tif (grd.countColumns(SFLDX)  == 0) {{\n",.{}) catch {};
             for(NGRID.items[o.index].cell.items) |c| {
@@ -990,7 +984,7 @@ for ( NOBJET.items) | o | {
             
             wrt.print("\n\t\t// Interrogation\n",.{}) catch {};
             wrt.print("\t\tvar Gkey :grd.GridSelect = undefined ;\n",.{}) catch {};
-            wrt.print("\t\tdefer Gkey.Buf.deinit();\n\n",.{}) catch {};
+            wrt.print("\t\tdefer Gkey.Buf.deinit(mem.allocTui);\n\n",.{}) catch {};
             
             wrt.print("\t\twhile (true ){{\n",.{}) catch {};
             wrt.print("\t\t\tGkey =grd.ioGrid(SFLDX ,true);\n",.{}) catch {};

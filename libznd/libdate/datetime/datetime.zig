@@ -90,10 +90,8 @@ pub const DTIME = struct {
     nanosecond: u64 = 0,// 0> 999999999
     tmz : i16 = 0,
 
-	pub fn deinitAlloc() void {
-	    arenaDtime.deinit();
-	    arenaDtime = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDtime = arenaDtime.allocator();
+	pub fn deinitDtime() void {
+	    _=arenaDtime.reset(.free_all);
 	}
     //Change of field attribute
     pub fn hardTime(buf :[]const u8, ntmz :i32) DTIME{
@@ -306,10 +304,8 @@ pub const DATE = struct {
     week: u6, // Week of year 1-53
     status : bool = false, // date null
 
-	pub fn deinitAlloc() void {
-	    arenaDate.deinit();
-	    arenaDate = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDate = arenaDate.allocator();
+	pub fn deinitDate() void {
+	    _=arenaDate.reset(.free_all);
 	}
 
     // Create and validate the date

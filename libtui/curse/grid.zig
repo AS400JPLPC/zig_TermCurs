@@ -9,9 +9,11 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// alloc TUI
+const mem = @import("alloc");
+
 // tools utility
 const utl = @import("utils");
-
 
 const os = std.os;
 const io = std.io;
@@ -85,16 +87,6 @@ pub const grd = struct {
         FUNC, // call Function
     };
 
-    var arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    pub var allocatorGrid = arenaGrid.allocator();
-    pub fn deinitGrid() void {
-        arenaGrid.deinit();
-        arenaGrid = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-        allocatorGrid = arenaGrid.allocator();
-        
-    }
-
-    pub const allocatorArgData = std.heap.page_allocator;
 
     pub var AtrGrid: term.ZONATRB = .{ .styled = [_]u32{
         @intFromEnum(term.Style.styleDim),
@@ -171,7 +163,7 @@ pub const grd = struct {
     };
 
     const ArgData = struct {
-        buf: std.ArrayList([]const u8) = std.ArrayList([]const u8).init(allocatorArgData),
+        buf: std.ArrayList([]const u8) = std.ArrayList([]const u8).initCapacity(mem.allocData,0) catch unreachable,
     };
 
     /// define GRID
@@ -201,7 +193,7 @@ pub const grd = struct {
     /// concat String
     fn concatStr(a: []const u8, b: []const u8) []const u8 {
         return std.fmt.allocPrint(
-            allocatorGrid,
+            mem.allocTui,
             "{s}{s}",
             .{ a, b },
         ) catch |err| {
@@ -215,14 +207,14 @@ pub const grd = struct {
 
         if (pos > a.len) @panic("ErrGrid.Invalide_subStr_pos");
 
-        const result = allocatorGrid.alloc(u8, n - pos) catch |err| {
+        const result = mem.allocTui.alloc(u8, n - pos) catch |err| {
             @panic(@errorName(err));
         };
-        defer allocatorGrid.free(result);
+        defer mem.allocTui.free(result);
 
         @memcpy(result, a[pos..n]);
         return std.fmt.allocPrint(
-            allocatorGrid,
+            mem.allocTui,
             "{s}",
             .{result},
         ) catch |err| {
@@ -300,8 +292,8 @@ pub const grd = struct {
         .separator = vseparator,
         .pageRows  = vpageRows,
         .data    = std.MultiArrayList(ArgData){},
-        .headers = std.ArrayList(CELL).init(allocatorGrid),
-        .cell    = std.ArrayList(CELL).init(allocatorGrid),
+        .headers = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable,
+        .cell    = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable,
         .actif   = true,
         .attribut = AtrGrid,
         .atrTitle = AtrTitle,
@@ -313,7 +305,7 @@ pub const grd = struct {
         .cursligne = 0,
         .curspage  = 1,
 
-        .buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid)
+        .buf = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable
         };
 
         return device;
@@ -327,7 +319,7 @@ pub const grd = struct {
         vseparator: []const u8,
         vcadre: CADRE,
     ) *GRID {
-        var device = allocatorGrid.create(GRID) catch |err| {
+        var device = mem.allocTui.create(GRID) catch |err| {
             @panic(@errorName(err));
         };
 
@@ -339,8 +331,8 @@ pub const grd = struct {
         device.separator = vseparator;
         device.pageRows  = vpageRows;
         device.data    = std.MultiArrayList(ArgData){};
-        device.headers = std.ArrayList(CELL).init(allocatorGrid);
-        device.cell    = std.ArrayList(CELL).init(allocatorGrid);
+        device.headers = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable;
+        device.cell    = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable;
         device.actif   = true;
         device.attribut = AtrGrid;
         device.atrTitle = AtrTitle;
@@ -352,7 +344,7 @@ pub const grd = struct {
         device.cursligne = 0;
         device.curspage  = 1;
 
-        device.buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid);
+        device.buf = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable;
 
         return device;
     }
@@ -376,8 +368,8 @@ pub const grd = struct {
         self.separator = vseparator;
         self.pageRows = vpageRows;
         self.data = std.MultiArrayList(ArgData){};
-        self.headers = std.ArrayList(CELL).init(allocatorGrid);
-        self.cell = std.ArrayList(CELL).init(allocatorGrid);
+        self.headers = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable;
+        self.cell = std.ArrayList(CELL).initCapacity(mem.allocTui,0) catch unreachable;
         self.actif = true;
         self.attribut = AtrGrid;
         self.atrTitle = AtrTitle;
@@ -389,7 +381,7 @@ pub const grd = struct {
         self.cursligne = 0;
         self.curspage = 1;
 
-        self.buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid);
+        self.buf = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable;
     }
 
     // return len header---> arraylist panel-grid
@@ -419,7 +411,7 @@ pub const grd = struct {
     pub fn setHeaders(self: *GRID) void {
         self.cols = 0;
         for (self.cell.items) |xcell| {
-            self.headers.append(xcell) catch |err| {
+            self.headers.append(mem.allocTui,xcell) catch |err| {
                 @panic(@errorName(err));
             };
         }
@@ -433,7 +425,7 @@ pub const grd = struct {
         // init matrix
         while (true) {
             if (i == 0) break;
-            self.buf.append(doublebuffer) catch |err| {
+            self.buf.append(mem.allocTui,doublebuffer) catch |err| {
                 @panic(@errorName(err));
             };
             i -= 1;
@@ -469,7 +461,7 @@ pub const grd = struct {
             .text = vtext, .reftyp = vreftyp, .long = nlong, .posy = self.cell.items.len, .edtcar = "",
             .atrCell = toRefColor(TextColor) };
 
-        self.cell.append(cell) catch |err| {
+        self.cell.append(mem.allocTui,cell) catch |err| {
             @panic(@errorName(err));
         };
     }
@@ -525,12 +517,11 @@ pub const grd = struct {
 
     // add row -data ---> arraylist panel-grid
     pub fn addRows(self: *GRID, vrows: []const []const u8) void {
-        const vlist = std.ArrayList([]const u8);
-        var m = vlist.init(allocatorGrid);
-        m.appendSlice(vrows) catch |err| {
+        var vlist = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable;
+        vlist.appendSlice(mem.allocTui,vrows) catch |err| {
             @panic(@errorName(err));
         };
-        self.data.append(allocatorArgData, .{ .buf = m }) catch |err| {
+        self.data.append(mem.allocData, .{ .buf = vlist }) catch |err| {
             @panic(@errorName(err));
         };
         setPageGrid(self);
@@ -562,20 +553,20 @@ pub const grd = struct {
         while (self.data.len > 0) {
             self.data.orderedRemove(self.data.len - 1);
         }
-        self.data.clearAndFree(allocatorArgData);
-        self.data.deinit(allocatorArgData);
+        self.data.clearAndFree(mem.allocData);
+        self.data.deinit(mem.allocData);
         
-        self.headers.clearAndFree();
-        self.headers.deinit();
-        self.cell.clearAndFree();
-        self.cell.deinit();
+        self.headers.clearAndFree(mem.allocTui);
+        self.headers.deinit(mem.allocTui);
+        self.cell.clearAndFree(mem.allocTui);
+        self.cell.deinit(mem.allocTui);
         self.lignes = 0;
         self.pages = 0;
         self.maxligne = 0;
         self.cursligne = 0;
         self.curspage = 0;
-        self.buf.clearAndFree();
-        self.buf.deinit();
+        self.buf.clearAndFree(mem.allocTui);
+        self.buf.deinit(mem.allocTui);
         self.actif = false;
     }
 
@@ -689,20 +680,20 @@ pub const grd = struct {
 
         for (self.headers.items) |cellx| {
             if (std.mem.eql(u8, cellx.edtcar, "") == true)
-                buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}",
+                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}",
                     .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long) })
                     catch |err| {@panic(@errorName(err));
                 }
             else
-                buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}{s}",
+                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}{s}",
                     .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long), Blanc })
                     catch |err| {@panic(@errorName(err));};
         }
-        buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}", .{ buf, self.separator }) catch |err| {
+        buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}", .{ buf, self.separator }) catch |err| {
             @panic(@errorName(err));
         };
 
-        defer allocatorGrid.free(buf);
+        defer mem.allocTui.free(buf);
 
         var x: usize = 1;
         var y: usize = 0;
@@ -713,7 +704,7 @@ pub const grd = struct {
             var iter = utl.iteratStr.iterator(buf);
             defer iter.deinit();
             while (iter.next()) |ch| : (n += 1) {
-                self.buf.items[n].ch = std.fmt.allocPrint(allocatorGrid, "{s}", .{ch}) catch unreachable;
+                self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
                 self.buf.items[n].attribut = self.attribut;
                 self.buf.items[n].on = false;
             }
@@ -725,17 +716,17 @@ pub const grd = struct {
                 cellx.reftyp == REFTYP.DIGIT or
                 cellx.reftyp == REFTYP.UDECIMAL or
                 cellx.reftyp == REFTYP.DECIMAL)
-                buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}",
+                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}",
                     .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.rigth, cellx.long) })
                     catch |err| {@panic(@errorName(err));
                 }
             else
-                buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}", 
+                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}", 
                     .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.left, cellx.long) })
                     catch |err| {@panic(@errorName(err));
                 };
 
-            if (std.mem.eql(u8, cellx.edtcar, "") == false) buf =std.fmt.allocPrint(allocatorGrid, "{s}{s}",
+            if (std.mem.eql(u8, cellx.edtcar, "") == false) buf =std.fmt.allocPrint(mem.allocTui, "{s}{s}",
                 .{ buf, Blanc }) catch |err| {@panic(@errorName(err));
             };
 
@@ -743,7 +734,7 @@ pub const grd = struct {
             var iter = utl.iteratStr.iterator(buf);
             defer iter.deinit();
             while (iter.next()) |ch| : (n += 1) {
-                self.buf.items[n].ch = std.fmt.allocPrint(allocatorGrid, "{s}", .{ch}) catch unreachable;
+                self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
                 self.buf.items[n].attribut = self.atrTitle;
                 self.buf.items[n].on = true;
             }
@@ -792,7 +783,6 @@ pub const grd = struct {
 
                     // formatage buffer
                     bufItems = self.data.items(.buf)[l].items[h];
-
                     buf = padingCell(bufItems, self.headers.items[h]);
 
                     // write matrice
@@ -800,7 +790,7 @@ pub const grd = struct {
                     defer iter.deinit();
                     n = nposy + self.headers.items[h].posy;
                     while (iter.next()) |ch| : (n += 1) {
-                        self.buf.items[n].ch = std.fmt.allocPrint(allocatorGrid, "{s}", .{ch}) catch unreachable;
+                        self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
                         if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
                         else self.buf.items[n].attribut = self.headers.items[h].atrCell;
                         self.buf.items[n].on = true;
@@ -841,7 +831,8 @@ pub const grd = struct {
     // -----------------------------------
 
     pub fn ioGrid(self: *GRID, manual: bool) GridSelect {
-        var gSelect: GridSelect = .{ .Key = term.kbd.none, .Buf = std.ArrayList([]const u8).init(allocatorGrid) };
+        var gSelect: GridSelect = .{ .Key = term.kbd.none,
+            .Buf = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable };
 
         if (self.actif == false) return gSelect;
 
@@ -965,7 +956,8 @@ pub const grd = struct {
     /// enter  = return enter and line select
     /// -----------------------------------
     pub fn ioGridKey(self: *GRID, gKey: term.kbd, manual: bool) GridSelect {
-        var gSelect: GridSelect = .{ .Key = term.kbd.none, .Buf = std.ArrayList([]const u8).init(allocatorGrid) };
+        var gSelect: GridSelect = .{ .Key = term.kbd.none,
+            .Buf = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable };
 
         if (self.actif == false) return gSelect;
 
@@ -1098,7 +1090,8 @@ pub const grd = struct {
     pub fn ioCombo(self: *GRID, pos: usize) GridSelect {
         var CountLigne: usize = 0;
 
-        var gSelect: GridSelect = .{ .Key = term.kbd.none, .Buf = std.ArrayList([]const u8).init(allocatorGrid) };
+        var gSelect: GridSelect = .{ .Key = term.kbd.none,
+            .Buf = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable };
 
         gSelect.Key = term.kbd.none;
         if (self.actif == false) return gSelect;

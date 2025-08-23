@@ -8,8 +8,10 @@ var db  : lmdb.Database = undefined;
 var tr : lmdb.Transaction = undefined; 
 var cursor : lmdb.Cursor = undefined;
 
-var tbl_key = std.ArrayList([] const u8).init(allocTZ);
-var tbl_offset =  std.ArrayList(i32).init(allocTZ);
+var tbl_key = std.ArrayList([] const u8).initCapacity(allocTZ,0) catch unreachable;
+
+var tbl_offset =  std.ArrayList(i32).initCapacity(allocTZ,0) catch unreachable;
+
 
 const lib = "/tmp/Timezone";
 
@@ -24,10 +26,10 @@ pub fn writeTimezone() void {
 
     const user = std.posix.getenv("USER") orelse "INITTIMEZONE";
 
-    const fileTZ = std.fmt.allocPrintZ(allocTZ,"/tmp/{s}{d}.txt" ,.{user,timesStamp_ms})  catch unreachable;
+    const fileTZ = std.fmt.allocPrint(allocTZ,"/tmp/{s}{d}.txt" ,.{user,timesStamp_ms})  catch unreachable;
     defer allocTZ.free(fileTZ);
     
-    const batch = std.fmt.allocPrintZ(allocTZ,"/tmp/{s}{d}.sh" ,.{user,timesStamp_ms})  catch unreachable;
+    const batch = std.fmt.allocPrint(allocTZ,"/tmp/{s}{d}.sh" ,.{user,timesStamp_ms})  catch unreachable;
     defer allocTZ.free(batch);
 
     const file = std.fs.cwd().createFile(batch, .{.read = true, .truncate = true,.exclusive = false, })
@@ -42,24 +44,24 @@ pub fn writeTimezone() void {
 
 
     // Construire le script Bash ligne par ligne
-    var lines = std.ArrayList([]const u8).init(allocTZ);
-    defer lines.clearAndFree();
+    var lines = std.ArrayList([]const u8).initCapacity(allocTZ,0) catch unreachable;
+    defer lines.clearAndFree(allocTZ);
 
-    lines.append("#!/bin/bash") catch unreachable;
-    lines.append("format='%z'") catch unreachable;
-    lines.append("zoneinfo=/usr/share/zoneinfo/") catch unreachable;
-    lines.append("if command -v timedatectl >/dev/null; then") catch unreachable;
-    lines.append("    tzlist=$(timedatectl list-timezones)") catch unreachable;
-    lines.append("fi \n") catch unreachable;
-    lines.append("line=\"\" \n") catch unreachable;
-    lines.append("grep -i \"$search\" <<< \"$tzlist\" | while read z") catch unreachable;
-    lines.append("do \n") catch unreachable;
-    lines.append("    d=$(TZ=$z date +\"$format\")") catch unreachable;
-    lines.append("    printf -v line \"%-32s%s%s%s\" \"$z\"\"|\"\"$d\"\"|\"") catch unreachable;
-    lines.append(std.fmt.allocPrint(allocTZ, "    echo \"$line\" >> {s}", .{fileTZ}) catch unreachable) catch unreachable;
-    lines.append("done") catch unreachable;
-    lines.append(std.fmt.allocPrint(allocTZ, "echo \"END\" >> {s}", .{fileTZ}) catch unreachable ) catch unreachable;
-    lines.append("exit 0") catch unreachable;
+    lines.append(allocTZ,"#!/bin/bash") catch unreachable;
+    lines.append(allocTZ,"format='%z'") catch unreachable;
+    lines.append(allocTZ,"zoneinfo=/usr/share/zoneinfo/") catch unreachable;
+    lines.append(allocTZ,"if command -v timedatectl >/dev/null; then") catch unreachable;
+    lines.append(allocTZ,"    tzlist=$(timedatectl list-timezones)") catch unreachable;
+    lines.append(allocTZ,"fi \n") catch unreachable;
+    lines.append(allocTZ,"line=\"\" \n") catch unreachable;
+    lines.append(allocTZ,"grep -i \"$search\" <<< \"$tzlist\" | while read z") catch unreachable;
+    lines.append(allocTZ,"do \n") catch unreachable;
+    lines.append(allocTZ,"    d=$(TZ=$z date +\"$format\")") catch unreachable;
+    lines.append(allocTZ,"    printf -v line \"%-32s%s%s%s\" \"$z\"\"|\"\"$d\"\"|\"") catch unreachable;
+    lines.append(allocTZ,std.fmt.allocPrint(allocTZ, "    echo \"$line\" >> {s}", .{fileTZ}) catch unreachable) catch unreachable;
+    lines.append(allocTZ,"done") catch unreachable;
+    lines.append(allocTZ,std.fmt.allocPrint(allocTZ, "echo \"END\" >> {s}", .{fileTZ}) catch unreachable ) catch unreachable;
+    lines.append(allocTZ,"exit 0") catch unreachable;
 
     // ecriture du code source batch
     for (lines.items) |line| {
@@ -104,8 +106,8 @@ pub fn writeTimezone() void {
     // And commit
     tr.commit() catch unreachable;
 
-    tbl_key.clearAndFree();
-    tbl_offset.clearAndFree();
+    tbl_key.clearAndFree(allocTZ);
+    tbl_offset.clearAndFree(allocTZ);
 
 }
 
@@ -230,8 +232,8 @@ fn readFileTZ( fbatch :[]const u8)  void {
         minutes = std.fmt.parseInt(i32, lmdboffset[3..5], 10) catch unreachable;
         totalminutes  = (hours * 60 + minutes) * sign;
 
-        tbl_key.append(lmdbkey) catch unreachable;
-        tbl_offset.append(totalminutes ) catch unreachable;
+        tbl_key.append(allocTZ,lmdbkey) catch unreachable;
+        tbl_offset.append(allocTZ,totalminutes ) catch unreachable;
 
     }
 

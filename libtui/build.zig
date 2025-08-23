@@ -1,6 +1,6 @@
 	///-----------------------
 	/// build (library)
-	/// zig 0.12.0 dev
+	/// zig 0.15.0 dev
 	///-----------------------
 
 const std = @import("std");
@@ -16,6 +16,12 @@ pub fn build(b: *std.Build) void {
 		.root_source_file =  b.path( "./log/logsrc.zig" ),
 	});
 
+
+	const alloc_mod = b.addModule("alloc", .{
+		.root_source_file = b.path( "./curse/alloc.zig" ),
+	});
+
+
 	const cursed_mod = b.addModule("cursed", .{
 		.root_source_file = b.path( "./curse/cursed.zig" ),
 	});
@@ -23,6 +29,7 @@ pub fn build(b: *std.Build) void {
 	const utils_mod = b.addModule("utils", .{
 		.root_source_file = b.path( "./curse/utils.zig" ),
 		.imports= &.{
+		.{ .name = "alloc", .module = alloc_mod },
 		.{ .name = "cursed", .module = cursed_mod },
 		},
 	});
@@ -31,18 +38,20 @@ pub fn build(b: *std.Build) void {
 		.root_source_file = b.path( "./regex/mvzr.zig" ),
 	});
 
- 	const forms_mod = b.addModule("forms", .{
+	const forms_mod = b.addModule("forms", .{
 		.root_source_file = b.path( "./curse/forms.zig" ),
 		.imports= &.{
-		.{ .name = "cursed", .module = cursed_mod },
-		.{ .name = "utils",  .module = utils_mod},
-		.{ .name = "mvzr",   .module = mvzr_mod },
+		.{ .name = "alloc", .module = alloc_mod },
+		.{ .name = "cursed",   .module = cursed_mod },
+		.{ .name = "utils",    .module = utils_mod},
+		.{ .name = "mvzr",     .module = mvzr_mod },
 		},
 	});
 
 	const grid_mod = b.addModule("grid", .{
 		.root_source_file = b.path( "./curse/grid.zig" ),
 		.imports = &.{
+		.{ .name = "alloc", .module = alloc_mod },
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
 		},
@@ -51,6 +60,7 @@ pub fn build(b: *std.Build) void {
 	const menu_mod= b.addModule("menu", .{
 		.root_source_file = b.path( "./curse/menu.zig" ),
 		.imports= &.{
+		.{ .name = "alloc", .module = alloc_mod },
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
 		},
@@ -80,10 +90,12 @@ pub fn build(b: *std.Build) void {
 
 
 
-	
+
 	const library_mod = b.addModule("library", .{
 		.root_source_file = b.path( "library.zig" ),
 		.imports = &.{
+		.{ .name = "alloc", .module = alloc_mod },
+
 		.{ .name = "cursed",	.module = cursed_mod },
 		.{ .name = "utils",		.module = utils_mod },
 		.{ .name = "mvzr",		.module = mvzr_mod },
@@ -91,11 +103,11 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "forms",		.module = forms_mod },
 		.{ .name = "grid",		.module = grid_mod },
 		.{ .name = "menu",		.module = menu_mod },
-		
+
 		.{ .name = "callpgm",	.module = callpgm_mod },
 		.{ .name = "zmmap",		.module = zmmap_mod },
 		.{ .name = "crypto",	.module = crypto_mod },
-		
+
 		.{ .name = "logger",	.module = logger_mod },
 		.{ .name = "logsrc",	.module = logsrc_mod },
 
@@ -107,7 +119,7 @@ pub fn build(b: *std.Build) void {
 
 
 
-	
+
 	_ = library_mod;
 
 

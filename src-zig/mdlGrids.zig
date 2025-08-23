@@ -9,6 +9,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const msgerr = @import("forms").ErrForms;
 const dsperr = @import("forms").dsperr;
@@ -64,7 +67,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -84,9 +87,9 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
     grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -127,9 +130,9 @@ pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
     grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -165,7 +168,7 @@ pub fn Panel_HELP() *pnl.PANEL {
                                         ""
                                         );
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F12,        // function
                                     true,            // show
                                     false,            // check field
@@ -174,16 +177,16 @@ pub fn Panel_HELP() *pnl.PANEL {
                                 ) catch unreachable ;
     
 
-    Panel.field.append(fld.newFieldTextFull("HELP1",2,5,90,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP1",2,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
     fld.setProtect(Panel,0,true) catch unreachable;
 
-    Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP2",3,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
     
-    Panel.field.append(fld.newFieldTextFull("HELP3",4,5,90,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP3",4,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
                     
@@ -215,10 +218,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
     if (numPanel == 999) return;
 
-    NGRID = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
-    for (XGRID.items) |xgrd| { NGRID.append(xgrd) catch unreachable; }
-    defer NGRID.clearAndFree();
-    defer NGRID.deinit();
+    NGRID = std.ArrayList(grd.GRID).initCapacity(mem.allocTui,0) catch unreachable;
+    for (XGRID.items) |xgrd| { NGRID.append(mem.allocTui,xgrd) catch unreachable; }
+    defer NGRID.clearRetainingCapacity();
 
     term.cls();
     var pFmt01: *pnl.PANEL = pnl.newPanelC("FRAM01",
@@ -228,15 +230,15 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
         XPANEL.items[numPanel].frame.title);
 
     for (XPANEL.items[numPanel].button.items) |p| {
-        pFmt01.button.append(p)
+        pFmt01.button.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].label.items) |p| {
-        pFmt01.label.append(p)
+        pFmt01.label.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].field.items, 0..) |p, idx| {
-        pFmt01.field.append(p) catch |err| { @panic(@errorName(err)); };
+        pFmt01.field.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         var vText: [] u8 = undefined ;
         
  
@@ -253,7 +255,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     @memset(vText[0..p.width], '0');
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -261,11 +263,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                 forms.REFTYP.DIGIT =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 1) catch unreachable;
                     @memset(vText[0..p.width], '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "+{s}", .{vText[0..p.width]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "+{s}", .{vText[0..p.width]})
                             catch unreachable;
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -273,11 +275,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                 forms.REFTYP.UDECIMAL =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 1 + p.scal) catch unreachable;
                     @memset(vText[0..(p.width + p.scal)] , '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
                             catch unreachable;
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -285,21 +287,21 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                 forms.REFTYP.DECIMAL =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 2 + p.scal) catch unreachable;
                     @memset(vText[0..(p.width + p.scal)], '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
                             catch unreachable;
                 //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
             
-                forms.REFTYP.DATE_ISO =>    vText = std.fmt.allocPrint(utl.allocUtl, "YYYY-MM-DD", .{})
+                forms.REFTYP.DATE_ISO =>    vText = std.fmt.allocPrint(mem.allocUtl, "YYYY-MM-DD", .{})
                                                 catch unreachable,
-                forms.REFTYP.DATE_FR  =>    vText = std.fmt.allocPrint(utl.allocUtl, "DD/MM/YYYY", .{})
+                forms.REFTYP.DATE_FR  =>    vText = std.fmt.allocPrint(mem.allocUtl, "DD/MM/YYYY", .{})
                                                 catch unreachable,
 
-                forms.REFTYP.DATE_US  =>    vText = std.fmt.allocPrint(utl.allocUtl, "MM/DD/YYYY", .{})
+                forms.REFTYP.DATE_US  =>    vText = std.fmt.allocPrint(mem.allocUtl, "MM/DD/YYYY", .{})
                                                 catch unreachable,
 
                 forms.REFTYP.TELEPHONE =>{
@@ -311,7 +313,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
                     @memset(vText[0..p.width], '@');
                 } ,
-                forms.REFTYP.SWITCH   =>    vText = std.fmt.allocPrint(utl.allocUtl, "{s}", .{forms.CTRUE})
+                forms.REFTYP.SWITCH   =>    vText = std.fmt.allocPrint(mem.allocUtl, "{s}", .{forms.CTRUE})
                                                 catch unreachable,
 
                 forms.REFTYP.FUNC  =>{
@@ -326,11 +328,11 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
 
     for (XPANEL.items[numPanel].linev.items) |p| {
-        pFmt01.linev.append(p)
+        pFmt01.linev.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].lineh.items) |p| {
-        pFmt01.lineh.append(p)
+        pFmt01.lineh.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
 
@@ -394,7 +396,7 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                 for (NGRID.items, 0..) |xgrd,idx| {
                     grd.resetRows(&NGRID.items[idx]);
                     
-                    XGRID.append( grd.initGrid(
+                    XGRID.append(mem.allocTui, grd.initGrid(
                             xgrd.name,
                             xgrd.posx,
                             xgrd.posy,
@@ -408,12 +410,12 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     }
                 }
                 pnl.freePanel(pFmt01);
-                defer forms.allocatorForms.destroy(pFmt01);
+                defer mem.allocTui.destroy(pFmt01);
                 return;
             },
             .F12 => {
                 pnl.freePanel(pFmt01);
-                defer forms.allocatorForms.destroy(pFmt01);
+                defer mem.allocTui.destroy(pFmt01);
                 return;
             },
 
@@ -509,53 +511,53 @@ fn Panel_defGrid(nposx: usize) *pnl.PANEL {
 
     var Panel: *pnl.PANEL = pnl.newPanelC("FRAM02", nposx ,2,9, 42, forms.CADRE.line1, "Def.field");
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F9, // function
         true, // show
         true, // check field
         "Enrg", // title
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F12, // function
         true, // show
         false, // check field
         "Return", // title
     )) catch |err| { @panic(@errorName(err)); }; 
 
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fname)  ,2,2, "name.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fposx)  ,3,2, "posX.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fposy)  ,4,2, "posy.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.flines) ,5,2, "lines....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fstyle) ,6,2, "style....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fcadre) ,7,2, "cadre....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fname)  ,2,2, "name.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fposx)  ,3,2, "posX.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fposy)  ,4,2, "posy.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.flines) ,5,2, "lines....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fstyle) ,6,2, "style....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fcadre) ,7,2, "cadre....:") ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
+    Panel.field.append(mem.allocTui,fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
                             "required","please enter :text [a-zA-Z]{1,1} [A-z0-9]",
                             "^[CG]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fname),"TaskName") catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp02.fposx),3,12,2,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp02.fposx),3,12,2,"",false,
                             "","please enter Pos X 1...",
                             "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
     fld.setProtect(Panel,@intFromEnum(fp02.fposx),true) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp02.fposy),4,12,3,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp02.fposy),4,12,3,"",false,
                             "","please enter Pos y 1...",
                             "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
     fld.setProtect(Panel,@intFromEnum(fp02.fposy),true) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp02.flines),5,12,2,"",true,
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp02.flines),5,12,2,"",true,
                             "required","please enter Lines 1...",
                             "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.flines),"TaskLines") catch unreachable ;
 
-    Panel.field.append(fld.newFieldFunc(@tagName(fp02.fstyle),6,12,1,"",false,"FuncStyle",
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(@tagName(fp02.fstyle),6,12,1,"",false,"FuncStyle",
                             "required","please enter gridStyle = | gridnoStyles = ' '",
                             )) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fstyle),"TaskStyle") catch unreachable ;
 
-    Panel.field.append(fld.newFieldFunc(@tagName(fp02.fcadre),7,12,1,"",true,"FuncCadre",
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(@tagName(fp02.fcadre),7,12,1,"",true,"FuncCadre",
                             "required","please choose the type of frame")) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fcadre),"TaskCadre") catch unreachable ; 
 
@@ -594,7 +596,7 @@ fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         if (nitem != 9999) break;
     }
 
-    vfld.text = std.fmt.allocPrint(forms.allocatorForms,"{d}",.{nitem}) catch unreachable; 
+    vfld.text = std.fmt.allocPrint(mem.allocTui,"{d}",.{nitem}) catch unreachable; 
     pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
 // description Function
@@ -620,8 +622,8 @@ fn FuncStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         if (nitem != 9999) break;
     }
 
-    if (nitem == 1 ) vfld.text = std.fmt.allocPrint(forms.allocatorForms,"{s}",.{grd.gridStyle}) catch unreachable
-    else vfld.text = std.fmt.allocPrint(forms.allocatorForms,"║",.{}) catch unreachable; 
+    if (nitem == 1 ) vfld.text = std.fmt.allocPrint(mem.allocTui,"{s}",.{grd.gridStyle}) catch unreachable
+    else vfld.text = std.fmt.allocPrint(mem.allocTui,"║",.{}) catch unreachable; 
     pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
 }
 //=================================================
@@ -672,9 +674,9 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         
         if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
             const msg = std.fmt.allocPrint(
-            grd.allocatorGrid,"The number of rows Invalide",
+            mem.allocTui,"The number of rows Invalide",
             .{}) catch unreachable;
-            defer grd.allocatorGrid.free(msg);
+            defer mem.allocTui.free(msg);
             term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
             term.writeStyled(vfld.text,pnl.FldErr);
             pnl.msgErr(vpnl, msg);
@@ -686,9 +688,9 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 fn TaskStyle( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     
     if (std.mem.eql(u8, vfld.text,"")) {
-        const msg = std.fmt.allocPrint(grd.allocatorGrid,
+        const msg = std.fmt.allocPrint(mem.allocTui,
             "Style is invalide",.{}) catch unreachable;
-        defer grd.allocatorGrid.free(msg);
+        defer mem.allocTui.free(msg);
         term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
         term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
@@ -700,9 +702,9 @@ fn TaskCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const cadre =    utl.strToUsize(vfld.text);
     
     if (cadre == 0 ) {
-        const msg = std.fmt.allocPrint(grd.allocatorGrid,
+        const msg = std.fmt.allocPrint(mem.allocTui,
             "Cadre is invalide",.{}) catch unreachable;
-        defer grd.allocatorGrid.free(msg);
+        defer mem.allocTui.free(msg);
         term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
         term.writeStyled(vfld.text,pnl.FldErr);
         pnl.msgErr(vpnl, msg);
@@ -777,7 +779,7 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
             // write field to panel
             .F9 => {
             
-                NGRID.append( grd.initGrid(
+                NGRID.append(mem.allocTui, grd.initGrid(
                             pFmt02.field.items[@intFromEnum(fp02.fname)].text,
                             strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
                             strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
@@ -789,14 +791,14 @@ pub fn writeDefGrid(vpnl: *pnl.PANEL) void {
         
         
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
 
             // exit panel field
             .F12 => {
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
             else => {},
@@ -864,7 +866,7 @@ pub fn updateGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usiz
                             @enumFromInt(strToUsize(pFmt02.field.items[@intFromEnum(fp02.fcadre)].text));
 
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
 
@@ -872,7 +874,7 @@ pub fn updateGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usiz
             .F12 => {
                 pFmt02.field.items[@intFromEnum(fp02.fname)].protect = false;
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
             else => {},
@@ -897,24 +899,24 @@ const fp03 = enum {
 fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
     var Panel: *pnl.PANEL = pnl.newPanelC("FRAM03", nposx, 2, 13, 62, forms.CADRE.line1, "Def.field");
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F9, // function
         true, // show
         true, // check field
         "Enrg", // title
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F12, // function
         true, // show
         false, // check field
         "Return", // title
     )) catch |err| { @panic(@errorName(err)); }; 
     
-    Panel.label.append(lbl.newLabel(@tagName(fp03.ftext), 2, 2, "Text.....:")) 
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp03.ftext), 2, 2, "Text.....:")) 
     catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext), 2, // posx
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext), 2, // posx
         2 + Panel.label.items[@intFromEnum(fp03.ftext)].text.len, //posy
         20, // len
         "", // text
@@ -928,10 +930,10 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
     catch |err| { @panic(@errorName(err)); }; 
 
 
-    Panel.label.append(lbl.newLabel(@tagName(fp03.fwidth), 3, 2, "Width....:"))
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp03.fwidth), 3, 2, "Width....:"))
         catch |err| { @panic(@errorName(err)); }; 
         
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp03.fwidth), 3, // posx
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp03.fwidth), 3, // posx
         2 + Panel.label.items[@intFromEnum(fp03.fwidth)].text.len, //posy
         3, // len
         "", // text
@@ -945,10 +947,10 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
         catch |err| { @panic(@errorName(err)); }; 
 
 
-    Panel.label.append(lbl.newLabel(@tagName(fp03.ftype), 3, 32, "Type.:"))
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp03.ftype), 3, 32, "Type.:"))
         catch |err| { @panic(@errorName(err)); }; 
         
-    Panel.field.append(fld.newFieldFunc(
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(
         @tagName(fp03.ftype),
         3, // posx
         32 + Panel.label.items[@intFromEnum(fp03.ftype)].text.len, //posy
@@ -965,10 +967,10 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
         catch |err| { @panic(@errorName(err)); };
 
 
-    Panel.label.append(lbl.newLabel(@tagName(fp03.fedtcar), 4, 2, "Edit Car.:"))
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp03.fedtcar), 4, 2, "Edit Car.:"))
         catch |err| { @panic(@errorName(err)); }; 
         
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.fedtcar), 4, // posx
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.fedtcar), 4, // posx
         2 + Panel.label.items[@intFromEnum(fp03.fedtcar)].text.len, //posy
         1, // len
         "", // text
@@ -979,10 +981,10 @@ fn Panel_Fmt03(nposx: usize) *pnl.PANEL {
     )) catch |err| { @panic(@errorName(err)); }; 
  
 
-    Panel.label.append(lbl.newLabel(@tagName(fp03.fatrcell), 5, 2, "Color...:"))
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp03.fatrcell), 5, 2, "Color...:"))
         catch |err| { @panic(@errorName(err)); }; 
         
-    Panel.field.append(fld.newFieldFunc(
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(
         @tagName(fp03.fatrcell),
         5, // posx
         2 + Panel.label.items[@intFromEnum(fp03.fatrcell)].text.len, //posy
@@ -1026,9 +1028,9 @@ fn FcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
     
     grd.newCell(Xcombo, "Ref.Type", 19, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
     grd.setHeaders(Xcombo);
@@ -1077,9 +1079,9 @@ fn FcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
     
     grd.newCell(Xcombo, "Color-Text", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
     grd.setHeaders(Xcombo);
@@ -1107,7 +1109,7 @@ fn FcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
         Gkey = grd.ioCombo(Xcombo, pos);
 
         if (Gkey.Key == kbd.enter) {
-            vtext = std.fmt.allocPrint(grd.allocatorGrid,"fg{s}",.{Gkey.Buf.items[0]}) catch unreachable;
+            vtext = std.fmt.allocPrint(mem.allocTui,"fg{s}",.{Gkey.Buf.items[0]}) catch unreachable;
             fld.setText(vpnl, @intFromEnum(fp03.fatrcell),    vtext) 
                 catch |err| { @panic(@errorName(err)); };
             
@@ -1165,7 +1167,7 @@ fn TcellWidth(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     const val = strToUsize(vfld.text);
 
     if (val == 0) {
-        const msg = std.fmt.allocPrint(utl.allocUtl,
+        const msg = std.fmt.allocPrint(mem.allocUtl,
             "{d} the length of the zone is invalid", .{val})
             catch |err| { @panic(@errorName(err)); };
         term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
@@ -1229,7 +1231,7 @@ fn TcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 fn TcellAtr(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
         if (std.mem.eql(u8, vfld.text,"")) {
-            const msg = std.fmt.allocPrint(utl.allocUtl,
+            const msg = std.fmt.allocPrint(mem.allocUtl,
                 "the error message Color is invalid", .{})
                 catch |err| { @panic(@errorName(err)); };
             term.gotoXY(vpnl.posx + vfld.posx - 1 , vpnl.posy + vfld.posy - 1);
@@ -1310,14 +1312,14 @@ pub fn writeDefCell(vGrid: *std.ArrayList(grd.GRID) , gridNum : usize) void {
                 grd.setCellEditCar(&vGrid.items[gridNum].cell.items[vlen],
                                     pFmt03.field.items[@intFromEnum(fp03.fedtcar)].text);
                 pnl.freePanel(pFmt03);
-                defer forms.allocatorForms.destroy(pFmt03);
+                defer mem.allocTui.destroy(pFmt03);
                 return;
             },
 
             // exit panel field
             .F12 => {
                 pnl.freePanel(pFmt03);
-                defer forms.allocatorForms.destroy(pFmt03);
+                defer mem.allocTui.destroy(pFmt03);
                 return;
             },
             else => {},
@@ -1341,9 +1343,9 @@ pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
         vgrd.items[gridNum].separator,
         vgrd.items[gridNum].cadre,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     for (vgrd.items[numGrid].cell.items, 0..) |p, idx| {
     grd.newCell(Xcombo, p.text, p.long, p.reftyp, p.atrCell.foregr);
@@ -1351,19 +1353,19 @@ pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
     }
     grd.setHeaders(Xcombo);
 
-    const vlist = std.ArrayList([] const u8);
-    var m = vlist.init(grd.allocatorGrid);
+    var vlist = std.ArrayList([] const u8).initCapacity(mem.allocTui,0) catch unreachable;
     for (vgrd.items[gridNum].cell.items) |p|  {
         var vText: []u8= std.heap.page_allocator.alloc(u8, p.long) catch unreachable;
         @memset(vText[0..p.long], '#');
-        m.append(vText) catch unreachable;
+        vlist.append(mem.allocTui,vText) catch unreachable;
     }
     for (0..vgrd.items[gridNum].pageRows) |_| {
-        Xcombo.data.append(grd.allocatorArgData, .{ .buf = m }) catch |err| {
+        Xcombo.data.append(mem.allocData, .{ .buf = vlist }) catch |err| {
             @panic(@errorName(err));
         };
     }
     grd.setPageGrid(Xcombo);
+    defer vlist.clearRetainingCapacity();
 
     while (true) {
         Gkey = grd.ioCombo(Xcombo, cellPos);
@@ -1376,13 +1378,13 @@ pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
 }
 // remove Grid
 fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
-    var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+    var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).initCapacity(mem.allocTui,0) catch unreachable;
 
     var Gkey: grd.GridSelect = undefined;
 
     
     for (vgrid.items) |p| {
-        savgrid.append(p)  
+        savgrid.append(mem.allocTui,p)  
             catch |err| { @panic(@errorName(err)); };
     }
 
@@ -1394,9 +1396,9 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.clearAndFree();
+    defer Gkey.Buf.clearAndFree(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
 
     grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
@@ -1429,17 +1431,17 @@ fn removeGrid(vgrid: *std.ArrayList(grd.GRID)) void {
 
     // restor and exit
     if (Gkey.Key == kbd.esc) {
-        vgrid.clearAndFree();
+        vgrid.clearAndFree(mem.allocTui);
         vgrid.clearRetainingCapacity();
 
         for (savgrid.items) |p| {
-            vgrid.append(p) 
+            vgrid.append(mem.allocTui,p) 
              catch |err| { @panic(@errorName(err)); };
         }
     }
 
-    savgrid.clearAndFree();
-    savgrid.deinit();
+    savgrid.clearAndFree(mem.allocTui);
+    savgrid.deinit(mem.allocTui);
 }
 
 // order GRID
@@ -1448,13 +1450,13 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
     if (vgrd.items.len == 0 ) return;
 
 
-    var newgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
-    var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
+    var newgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).initCapacity(mem.allocTui,0) catch unreachable;
+    var savgrid: std.ArrayList(grd.GRID) = std.ArrayList(grd.GRID).initCapacity(mem.allocTui,0) catch unreachable;
 
 
     
     for (vgrd.items) |p| {
-        savgrid.append(p)  
+        savgrid.append(mem.allocTui,p)  
             catch |err| { @panic(@errorName(err)); };
     }
 
@@ -1471,9 +1473,9 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
     grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
     grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.setHeaders(Origine);
@@ -1489,7 +1491,7 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
         grd.CADRE.line1,
     );
     defer grd.freeGrid(Order);
-    defer grd.allocatorGrid.destroy(Order);
+    defer mem.allocTui.destroy(Order);
     grd.newCell(Order, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Order, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.setHeaders(Order);
@@ -1507,7 +1509,7 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
         if (Gkey.Key == kbd.esc) break;
         if (Gkey.Key == kbd.ctrlV) break;
         if (Gkey.Key == kbd.enter) {
-            newgrid.append(vgrd.items[ strToUsize(Gkey.Buf.items[0])])
+            newgrid.append(mem.allocTui,vgrd.items[ strToUsize(Gkey.Buf.items[0])])
                 catch |err| { @panic(@errorName(err)); };
             const ridn =usizeToStr(idxligne);
             grd.addRows(Order, &.{ ridn, Gkey.Buf.items[1]});
@@ -1519,25 +1521,25 @@ pub fn orderGrid(vgrd: *std.ArrayList(grd.GRID)) void {
         }
     }
 
-    vgrd.clearAndFree();
+    vgrd.clearAndFree(mem.allocTui);
     vgrd.clearRetainingCapacity();
     // restor and exit
     if (Gkey.Key == kbd.esc) {
         for (savgrid.items) |p| {
-            vgrd.append(p) catch |err| { @panic(@errorName(err)); };
+            vgrd.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         }
     }
     // new Order and exit
     else {
         for (newgrid.items) |p| {
-            vgrd.append(p) catch |err| { @panic(@errorName(err)); };
+            vgrd.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         }
     }
-    newgrid.clearAndFree();
-    newgrid.deinit();
+    newgrid.clearAndFree(mem.allocTui);
+    newgrid.deinit(mem.allocTui);
 
-    savgrid.clearAndFree();
-    savgrid.deinit();
+    savgrid.clearAndFree(mem.allocTui);
+    savgrid.deinit(mem.allocTui);
 }
 
 // view Cell
@@ -1555,9 +1557,9 @@ pub fn viewCell(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Xcombo, "len"   , 3,  grd.REFTYP.UDIGIT,     term.ForegroundColor.fgGreen);
@@ -1589,13 +1591,13 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
     if (vgrd.items[gridNum].cell.items.len == 0 ) return;
 
 
-    var newcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
-    var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
+    var newcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).initCapacity(mem.allocTui,0) catch unreachable;
+    var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).initCapacity(mem.allocTui,0) catch unreachable;
 
 
     
     for (vgrd.items[gridNum].cell.items) |p|  {
-        savcell.append(p)
+        savcell.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
 
@@ -1612,9 +1614,9 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
     grd.newCell(Origine, "col"  , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -1636,7 +1638,7 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         grd.CADRE.line1,
     );
     defer grd.freeGrid(Order);
-    defer grd.allocatorGrid.destroy(Order);
+    defer mem.allocTui.destroy(Order);
     grd.newCell(Order, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Order, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Order, "len"   , 3,  grd.REFTYP.UDIGIT,     term.ForegroundColor.fgGreen);
@@ -1659,7 +1661,7 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         if (Gkey.Key == kbd.esc) break;
         if (Gkey.Key == kbd.ctrlV) break;
         if (Gkey.Key == kbd.enter) {
-            newcell.append(vgrd.items[gridNum].cell.items[ strToUsize(Gkey.Buf.items[0])])
+            newcell.append(mem.allocTui,vgrd.items[gridNum].cell.items[ strToUsize(Gkey.Buf.items[0])])
                 catch |err| { @panic(@errorName(err)); };
             const ridn =usizeToStr(idxligne);
             grd.addRows(Order, &.{ ridn, Gkey.Buf.items[1], Gkey.Buf.items[2],
@@ -1672,12 +1674,12 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         }
     }
 
-    vgrd.items[gridNum].cell.clearAndFree();
+    vgrd.items[gridNum].cell.clearAndFree(mem.allocTui);
     vgrd.items[gridNum].cell.clearRetainingCapacity();
     // restor and exit
     if (Gkey.Key == kbd.esc) {
         for (savcell.items) |p| {
-            vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
+            vgrd.items[gridNum].cell.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         }
     }
     // new Order and exit
@@ -1686,14 +1688,14 @@ pub fn orderCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
             newcell.items[idx].posy= idx;
         }
         for (newcell.items) |p| {
-            vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
+            vgrd.items[gridNum].cell.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         }
     }
-    newcell.clearAndFree();
-    newcell.deinit();
+    newcell.clearAndFree(mem.allocTui);
+    newcell.deinit(mem.allocTui);
 
-    savcell.clearAndFree();
-    savcell.deinit();
+    savcell.clearAndFree(mem.allocTui);
+    savcell.deinit(mem.allocTui);
 }
 
 
@@ -1702,10 +1704,10 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 
     if (vgrd.items[gridNum].cell.items.len == 0 ) return;
 
-    var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).init(grd.allocatorGrid);
+    var savcell: std.ArrayList(grd.CELL) = std.ArrayList(grd.CELL).initCapacity(mem.allocTui,0) catch unreachable;
 
     for (vgrd.items[gridNum].cell.items) |p|  {
-        savcell.append(p)
+        savcell.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
 
@@ -1721,9 +1723,9 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
     grd.newCell(Origine, "Col"   , 3, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
     grd.newCell(Origine, "Name"  , 20, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -1755,10 +1757,10 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
 
     // restor and exit
     if (Gkey.Key == kbd.esc) {
-        vgrd.items[gridNum].cell.clearAndFree();
+        vgrd.items[gridNum].cell.clearAndFree(mem.allocTui);
         vgrd.items[gridNum].cell.clearRetainingCapacity();
         for (savcell.items) |p| {
-            vgrd.items[gridNum].cell.append(p) catch |err| { @panic(@errorName(err)); };
+            vgrd.items[gridNum].cell.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         }
     }
     // new Order and exit
@@ -1769,7 +1771,7 @@ pub fn removeCell(vgrd: std.ArrayList(grd.GRID), gridNum: usize) void {
         }
     }
 
-    savcell.clearAndFree();
-    savcell.deinit();
+    savcell.clearAndFree(mem.allocTui);
+    savcell.deinit(mem.allocTui);
 }
 

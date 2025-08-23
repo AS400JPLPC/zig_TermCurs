@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.14.0**</u><BR />
+<u>**zig 0.15.1**</u><BR />
 <br />
 
 **Major library restructuring:**
@@ -383,6 +383,11 @@ Look at the **zig_prog** folder
 → 2025-08-05 09:00 : update for 0.15.dev incompatibilité 0.14.1   <BR/>
 GRID function generation is supported.<BR/>
 Remember, these are just models.<BR/>
+<BR/><BR/>
+→ 2025-08-12 15:20 : update module cursed @slplat <BR/>
+  forms consideration of zone entries null   <BR/>
+BR/><BR/>
+→ 2025-08-23 04:10 : update for 0.15.1    <BR/>
 
 
 <BR/>

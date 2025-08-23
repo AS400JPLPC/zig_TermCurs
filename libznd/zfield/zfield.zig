@@ -22,9 +22,7 @@ pub const ZFIELD = struct {
     pub const cmp = enum { lt, eq, gt };
 
     pub fn deinitZfld() void {
-        arenaZfld.deinit();
-        arenaZfld = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-        allocZfld = arenaZfld.allocator();
+        _=arenaZfld.reset(.free_all);
     }
 
     /// Errors that may occur when using ZFIELD

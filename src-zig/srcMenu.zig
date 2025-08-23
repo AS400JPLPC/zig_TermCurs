@@ -8,6 +8,10 @@ const std = @import("std");
 const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
+
+// allocator
+const mem = @import("alloc");
+
 // menu
 const mnu = @import("menu").mnu;
 // tools utility
@@ -20,7 +24,7 @@ const def = @import("srcdef");
 
 const allocator = std.heap.page_allocator;
 
-var NOBJET = std.ArrayList(def.DEFOBJET).init(allocator);
+var NOBJET = std.ArrayList(def.DEFOBJET).initCapacity(mem.allocTui,0) catch unreachable;
 
 
 var numMenu : usize = undefined;
@@ -122,11 +126,15 @@ pub fn wrtMenu( NMENU : std.ArrayList(mnu.DEFMENU ) )  void {
     wrt.print("const mnu = @import(\"menu\").mnu;\n",.{}) catch {};
 
     
-    wrt.print("\nconst allocator = std.heap.page_allocator;\n",.{}) catch {};
-    wrt.print("var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);\n",.{}) catch {};
+    wrt.print("// arena allocator \n",.{}) catch {};
+    wrt.print("var arenaPgm = std.heap.ArenaAllocator.init(std.heap.page_allocator);\n",.{}) catch {};
+    wrt.print("var  allocPgm = arenaPgm .allocator();\n",.{}) catch {};
+    wrt.print("fn deinitPgm () void {{\n",.{}) catch {};
+    wrt.print("\tarenaPgm .reset(.free_all);\n",.{}) catch {};
+    wrt.print("}}\n",.{}) catch {};
 
     for( NMENU.items,0..) | m , i | {
-        NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.MENU}) catch unreachable;
+        NOBJET.append(mem.allocTui,def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.MENU}) catch unreachable;
         }
 
     for( NOBJET.items) | m | {

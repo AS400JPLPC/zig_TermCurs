@@ -9,6 +9,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -62,7 +65,6 @@ const end_Log = @import("logsrc").closeFile;  // close file
 const new_Line = @import("logsrc").newLine;   // new line
 const pref      = @import("logsrc").scoped;     // print file 
 
-const allocator = std.heap.page_allocator;
 
 
     // PANEL = FORMULAIRE
@@ -75,16 +77,25 @@ const allocator = std.heap.page_allocator;
 
 
 
-var NOBJET = std.ArrayList(def.DEFOBJET).init(allocator);
-var NFIELD = std.ArrayList(def.DEFFIELD).init(allocator);
-var NLABEL = std.ArrayList(def.DEFLABEL).init(allocator);
-var NLINEH = std.ArrayList(def.DEFLINEH).init(allocator);
-var NLINEV = std.ArrayList(def.DEFLINEV).init(allocator);
-var NBUTTON= std.ArrayList(def.DEFBUTTON).init(allocator);
+var NOBJET = std.ArrayList(def.DEFOBJET).initCapacity(mem.allocTui,0) catch unreachable;
 
-var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
-var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
+var NFIELD = std.ArrayList(def.DEFFIELD).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NLABEL = std.ArrayList(def.DEFLABEL).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NLINEH = std.ArrayList(def.DEFLINEH).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NLINEV = std.ArrayList(def.DEFLINEV).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NBUTTON= std.ArrayList(def.DEFBUTTON).initCapacity(mem.allocTui,0) catch unreachable;
+
+
+var NPANEL = std.ArrayList(pnl.PANEL).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NGRID  = std.ArrayList(grd.GRID ).initCapacity(mem.allocTui,0) catch unreachable;
+
+var NMENU  = std.ArrayList(mnu.DEFMENU ).initCapacity(mem.allocTui,0) catch unreachable;
+
 
 
 var numPanel: usize = undefined;
@@ -132,7 +143,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -140,7 +151,7 @@ fn usizeToStr(v: usize) []const u8 {
 fn padingRight(a: []const u8, len: usize) []const u8 {
      var b :[] const u8 = a;
      while ( b.len < len ) {
-        b = std.fmt.allocPrint(    utl.allocUtl,"{s} ",.{ b}) catch unreachable;
+        b = std.fmt.allocPrint(    mem.allocUtl,"{s} ",.{ b}) catch unreachable;
     }
     return b;    
 }
@@ -148,7 +159,7 @@ fn padingRight(a: []const u8, len: usize) []const u8 {
 fn padingLeft(a: []const u8, len: usize) []const u8 {
      var b :[] const u8 = a;
      while ( b.len < len ) {
-        b = std.fmt.allocPrint(    utl.allocUtl," {s}",.{ b}) catch unreachable;
+        b = std.fmt.allocPrint(    mem.allocUtl," {s}",.{ b}) catch unreachable;
     }
     return b;    
 }
@@ -210,7 +221,7 @@ pub fn main() !void {
 
         pnl.printPanel(base);
         term.deinitTerm();
-        utl.deinitUtl();
+        mem.deinitUtl();
 
 
         nopt = mnu.ioMenu(MenuPrincipal,0);
@@ -230,56 +241,55 @@ pub fn main() !void {
             try mdlFile.wrkJson(&NPANEL, &NGRID, &NMENU, false) ;// use mdlRjson  
             if (NPANEL.items.len > 0) {
                 for( NPANEL.items,0..) | p , i | {
-                    NOBJET.append(def.DEFOBJET {.name = p.name, .index = i, .objtype = def.OBJTYPE.PANEL})
+                    NOBJET.append(mem.allocTui,def.DEFOBJET {.name = p.name, .index = i, .objtype = def.OBJTYPE.PANEL})
                          catch unreachable;
                     
                     for( p.field.items,0..) | f , x | {
-                    NFIELD.append(def.DEFFIELD {.panel = p.name, .npnl = i , .field = f.name, .index = x,
+                    NFIELD.append(mem.allocTui,def.DEFFIELD {.panel = p.name, .npnl = i , .field = f.name, .index = x,
                     .func = f.procfunc , .fgrid ="",
                     .task = f.proctask , .call =f.typecall}) catch unreachable;
                     }
                     
                     for( p.label.items,0..) | l , y | {
-                    NLABEL.append(def.DEFLABEL {.panel = p.name, .npnl = i , .label = l.name, .index = y
+                    NLABEL.append(mem.allocTui,def.DEFLABEL {.panel = p.name, .npnl = i , .label = l.name, .index = y
                     }) catch unreachable;
                     }
                     
                     for( p.lineh.items,0..) | h , y | {
-                    NLINEH.append(def.DEFLINEH {.panel = p.name, .npnl = i , .line = h.name, .index = y
+                    NLINEH.append(mem.allocTui,def.DEFLINEH {.panel = p.name, .npnl = i , .line = h.name, .index = y
                     }) catch unreachable;
                     }
                     
                     for( p.linev.items,0..) | v , y | {
-                    NLINEV.append(def.DEFLINEV {.panel = p.name, .npnl = i , .line = v.name, .index = y
+                    NLINEV.append(mem.allocTui,def.DEFLINEV {.panel = p.name, .npnl = i , .line = v.name, .index = y
                     }) catch unreachable;
                     }
                                         
                     for( p.button.items,0..) | b , y | {
-                    NBUTTON.append(def.DEFBUTTON {.panel = p.name, .npnl = i ,
+                    NBUTTON.append(mem.allocTui,def.DEFBUTTON {.panel = p.name, .npnl = i ,
                          .button = b.name, .index = y, .title = b.title
                     }) catch unreachable;
                     }
                 }
             }    
             for( NMENU.items,0..) | m , i | {
-                NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.MENU})
+                NOBJET.append(mem.allocTui,def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.MENU})
                      catch unreachable;
                 }
             for( NGRID.items,0..) | m , i | {
                 if (m.name[0] == 'C')
-                      NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.COMBO})
+                      NOBJET.append(mem.allocTui,def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.COMBO})
                            catch unreachable
                 else
-                      NOBJET.append(def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.SFLD})
+                      NOBJET.append(mem.allocTui,def.DEFOBJET {.name = m.name,.index = i, .objtype = def.OBJTYPE.SFLD})
                           catch unreachable;
             }
             
         }
         // clean allocator *all
         if (nopt == @intFromEnum(choix.clean)) {
-            utl.deinitUtl();
-            grd.deinitGrid();
-            
+            mem.deinitUtl();
+           
             if (NPANEL.items.len > 0) {
                 NPANEL.clearRetainingCapacity();
             }
@@ -328,9 +338,9 @@ fn qryCellGrid(vpnl : *pnl.PANEL, vobjet: *std.ArrayList(def.DEFOBJET )) usize {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
     grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -365,10 +375,10 @@ pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(def.DEFFIELD) ) void {
     if (numOBJET == 999) return;
 
     
-    var savObjet: std.ArrayList(def.DEFFIELD) = std.ArrayList(def.DEFFIELD).init(utl.allocUtl);
+    var savObjet: std.ArrayList(def.DEFFIELD) = std.ArrayList(def.DEFFIELD).initCapacity(mem.allocTui,0) catch unreachable;
 
     for (NFIELD.items) |p| {
-        savObjet.append(p)  
+        savObjet.append(mem.allocTui,p)  
         catch |err| { @panic(@errorName(err)); };
     }
 
@@ -381,9 +391,9 @@ pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(def.DEFFIELD) ) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.clearAndFree();
+    defer Gkey.Buf.clearAndFree(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
 
     grd.newCell(Origine, "Key", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
@@ -425,12 +435,12 @@ pub fn linkCombo(vpnl :*pnl.PANEL, xfield: *std.ArrayList(def.DEFFIELD) ) void {
         NFIELD.clearRetainingCapacity();
 
         for (savObjet.items) |p| {
-            NFIELD.append(p) 
+            NFIELD.append(mem.allocTui,p) 
              catch |err| { @panic(@errorName(err)); };
         }
     }
-    savObjet.clearAndFree();
-    savObjet.deinit();
+    savObjet.clearAndFree(mem.allocTui);
+    savObjet.deinit(mem.allocTui);
     term.cls();
 }
 
@@ -445,9 +455,9 @@ pub fn addCombo(vpnl :*pnl.PANEL ) [] const u8 {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.clearAndFree();
+    defer Gkey.Buf.clearAndFree(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
     grd.newCell(Origine, "name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
     grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgGreen);
@@ -575,7 +585,7 @@ fn controlRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEF
         }
     }
     end_Log();
-    utl.deinitUtl();
+    mem.deinitUtl();
 }
 
 
@@ -776,6 +786,6 @@ fn listRef(xobjet: std.ArrayList(def.DEFOBJET), xfield: std.ArrayList(def.DEFFIE
     }
     }
     end_Log();
-    utl.deinitUtl();
+    mem.deinitUtl();
 
 }

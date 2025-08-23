@@ -11,6 +11,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -63,9 +66,9 @@ const mdlFile = @import("mdlFile");
 
 const allocator = std.heap.page_allocator;
 
-var NPANEL = std.ArrayList(pnl.PANEL).init(allocator);
-var NGRID  = std.ArrayList(grd.GRID ).init(allocator);
-var NMENU  = std.ArrayList(mnu.DEFMENU ).init(allocator);
+var NPANEL = std.ArrayList(pnl.PANEL).initCapacity(mem.allocTui,0) catch unreachable;
+var NGRID  = std.ArrayList(grd.GRID ).initCapacity(mem.allocTui,0) catch unreachable;
+var NMENU  = std.ArrayList(mnu.DEFMENU ).initCapacity(mem.allocTui,0) catch unreachable;
 
 
 
@@ -137,7 +140,7 @@ pub fn main() !void {
 
         pnl.printPanel(base);
         term.deinitTerm();
-        utl.deinitUtl();
+        // mem.deinitUtl();
 
 
         nopt = mnu.ioMenu(MenuPrincipal,0);
@@ -157,23 +160,17 @@ pub fn main() !void {
             pnl.freePanel(base);
 
             term.deinitTerm();
-            grd.deinitGrid();
-            utl.deinitUtl();
-            forms.deinitForms();
-            
-            mdlMenus.deinitMenu();
+            mem.deinitUtl();
+            mem.deinitTui();
 
             if (NPANEL.items.len > 0) {
-                NPANEL.clearAndFree();
-                NPANEL.deinit();
+                NPANEL.clearRetainingCapacity();
             }
             if (NGRID.items.len > 0) {
-                NGRID.clearAndFree();
-                NGRID.deinit();
+                NGRID.clearRetainingCapacity();
             }
             if (NMENU.items.len > 0) {
-                NMENU.clearAndFree();
-                NMENU.deinit();
+                NMENU.clearRetainingCapacity();
             }
             base = pnl.newPanelC("base",
             1, 1,

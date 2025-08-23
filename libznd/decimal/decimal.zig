@@ -36,9 +36,7 @@ pub const DCMLFX = struct {
 	// Definition ex: for management -> accounting, stock, order...
 	//--------------------------------------------------------------
 	pub fn deinitDcml() void {
-	    arenaDcml.deinit();
-	    arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDcml = arenaDcml.allocator();
+	    _=arenaDcml.reset(.free_all);
 	}
 
 
@@ -861,20 +859,22 @@ pub const DCMLFX = struct {
 	}
 
 
-	fn show_helper(expr: *const Payload, expr_name: []const u8, stdout: *const @TypeOf(std.io.getStdOut().writer())) anyerror!void {
-	    try stdout.print("{s}", .{expr_name});
-	    try show(expr.left, stdout);
-	    try stdout.print(", ", .{});
-	    try show(expr.right, stdout);
-	    try stdout.print(")", .{});
+	fn show_helper(expr: *const Payload, expr_name: []const u8) anyerror!void {
+		var w = std.fs.File.stdout().writerStreaming(&.{});
+		w.interface.print("{s}", .{expr_name}) catch unreachable;
+	    try show(expr.left);
+	    w.interface.print(", ", .{}) catch unreachable;
+	    try show(expr.right);
+	    w.interface.print(")", .{}) catch unreachable;
 	}
-	pub fn show(e: *const Expr, stdout: *const @TypeOf(std.io.getStdOut().writer())) anyerror !void {
+	pub fn show(e: *const Expr) anyerror !void {
+		var w = std.fs.File.stdout().writerStreaming(&.{});
 	    switch (e.*) {
-	        Expr.Val => |n| try stdout.print("Val {d}", .{n}),
-	        Expr.Add => |a| try show_helper(&a, "Add (", stdout),
-	        Expr.Sub => |s| try show_helper(&s, "Sub (", stdout),
-	        Expr.Mul => |m| try show_helper(&m, "Mul (", stdout),
-	        Expr.Div => |d| try show_helper(&d, "Div (", stdout),
+	        Expr.Val => |n| w.interface.print("Val {d}", .{n}) catch unreachable,
+	        Expr.Add => |a| try show_helper(&a, "Add ("),
+	        Expr.Sub => |s| try show_helper(&s, "Sub ("),
+	        Expr.Mul => |m| try show_helper(&m, "Mul ("),
+	        Expr.Div => |d| try show_helper(&d, "Div ("),
 	    }
 	}
 

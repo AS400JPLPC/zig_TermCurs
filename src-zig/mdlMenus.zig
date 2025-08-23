@@ -10,6 +10,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const msgerr = @import("forms").ErrForms;
 const dsperr = @import("forms").dsperr;
@@ -45,15 +48,6 @@ const reg = @import("mvzr");
 
 var numPanel: usize = undefined;
 var numMenu : usize = undefined;
-
-// for panel all arraylist (forms. label button line field pnl:)
-var arenaMenu = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorMenu = arenaMenu.allocator();
-pub fn deinitMenu() void {
-    arenaMenu.deinit();
-    arenaMenu = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorMenu = arenaMenu.allocator();
-}
 
 
 pub const ErrMain = error{
@@ -93,7 +87,7 @@ fn strToUsize(v: []const u8) usize {
 }
 
 fn usizeToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(utl.allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -124,9 +118,9 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
     grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -167,9 +161,9 @@ pub fn qryCellMenu(vpnl : * pnl.PANEL, vmnu: *std.ArrayList(mnu.DEFMENU), posx: 
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo, "ID", 3, grd.REFTYP.UDIGIT, term.ForegroundColor.fgGreen);
     grd.newCell(Xcombo, "Name", 10, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgYellow);
@@ -207,7 +201,7 @@ pub fn Panel_HELP() *pnl.PANEL {
                                         ""
                                         );
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F12,        // function
                                     true,            // show
                                     false,            // check field
@@ -216,12 +210,12 @@ pub fn Panel_HELP() *pnl.PANEL {
                                 ) catch unreachable ;
     
 
-    Panel.field.append(fld.newFieldTextFull("HELP1",2,5,90,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP1",2,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
     fld.setProtect(Panel,0,true) catch unreachable;
 
-    Panel.field.append(fld.newFieldTextFull("HELP2",3,5,90,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP2",3,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
     fld.setProtect(Panel,1,true) catch unreachable;
@@ -252,17 +246,15 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 
     if (numPanel == 999) return;
 
-    NGRID = std.ArrayList(grd.GRID).init(grd.allocatorGrid);
-    for (XGRID.items) |xgrd| { NGRID.append(xgrd) catch unreachable; }
-    defer NGRID.clearAndFree();
-    defer NGRID.deinit();
+    NGRID = std.ArrayList(grd.GRID).initCapacity(mem.allocTui,0) catch unreachable;
+    for (XGRID.items) |xgrd| { NGRID.append(mem.allocTui,xgrd) catch unreachable; }
+    defer NGRID.clearRetainingCapacity();
 
 
-    NMENU = std.ArrayList(mnu.DEFMENU).init(allocatorMenu);
-    for (XMENU.items) |xmenu| { NMENU.append(xmenu) catch unreachable; }
-    defer NMENU.clearAndFree();
-    defer NMENU.deinit();
-
+    NMENU = std.ArrayList(mnu.DEFMENU).initCapacity(mem.allocTui,0) catch unreachable;
+    for (XMENU.items) |xmenu| { NMENU.append(mem.allocTui,xmenu) catch unreachable; }
+    defer NMENU.clearRetainingCapacity();
+ 
     term.cls();
     var pFmt01: *pnl.PANEL = pnl.newPanelC("FRAM01",
         XPANEL.items[numPanel].posx, XPANEL.items[numPanel].posy,
@@ -271,19 +263,19 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
         XPANEL.items[numPanel].frame.title);
 
     for (XPANEL.items[numPanel].button.items) |p| {
-        pFmt01.button.append(p)
+        pFmt01.button.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].label.items) |p| {
-        pFmt01.label.append(p)
+        pFmt01.label.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].field.items, 0..) |p, idx| {
-        pFmt01.field.append(p) catch |err| { @panic(@errorName(err)); };
+        pFmt01.field.append(mem.allocTui,p) catch |err| { @panic(@errorName(err)); };
         var vText: [] u8 = undefined ;
         
- 
-            switch(p.reftyp) {
+
+             switch(p.reftyp) {
                 forms.REFTYP.TEXT_FREE, forms.REFTYP.TEXT_FULL , forms.REFTYP.ALPHA ,
                 forms.REFTYP.ALPHA_UPPER, forms.REFTYP.ALPHA_NUMERIC, forms.REFTYP.ALPHA_NUMERIC_UPPER,
                 forms.REFTYP.PASSWORD, forms.REFTYP.YES_NO  =>{
@@ -296,7 +288,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                     @memset(vText[0..p.width], '0');
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -304,11 +296,11 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                 forms.REFTYP.DIGIT =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 1) catch unreachable;
                     @memset(vText[0..p.width], '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "+{s}", .{vText[0..p.width]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "+{s}", .{vText[0..p.width]})
                             catch unreachable;
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -316,11 +308,11 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                 forms.REFTYP.UDECIMAL =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 1 + p.scal) catch unreachable;
                     @memset(vText[0..(p.width + p.scal)] , '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
                             catch unreachable;
                     //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
@@ -328,21 +320,21 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                 forms.REFTYP.DECIMAL =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width + 2 + p.scal) catch unreachable;
                     @memset(vText[0..(p.width + p.scal)], '0');
-                    vText = std.fmt.allocPrint(utl.allocUtl, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
+                    vText = std.fmt.allocPrint(mem.allocUtl, "+{s}.{s}", .{vText[0..p.width],vText[0..p.scal]})
                             catch unreachable;
                 //editcar
                     if (p.edtcar.len > 0) {
-                        vText = std.fmt.allocPrint(utl.allocUtl, "{s}{s}", .{vText, p.edtcar }
+                        vText = std.fmt.allocPrint(mem.allocUtl, "{s}{s}", .{vText, p.edtcar }
                         ) catch unreachable;
                     }
                 } ,
             
-                forms.REFTYP.DATE_ISO =>    vText = std.fmt.allocPrint(utl.allocUtl, "YYYY-MM-DD", .{})
+                forms.REFTYP.DATE_ISO =>    vText = std.fmt.allocPrint(mem.allocUtl, "YYYY-MM-DD", .{})
                                                 catch unreachable,
-                forms.REFTYP.DATE_FR  =>    vText = std.fmt.allocPrint(utl.allocUtl, "DD/MM/YYYY", .{})
+                forms.REFTYP.DATE_FR  =>    vText = std.fmt.allocPrint(mem.allocUtl, "DD/MM/YYYY", .{})
                                                 catch unreachable,
 
-                forms.REFTYP.DATE_US  =>    vText = std.fmt.allocPrint(utl.allocUtl, "MM/DD/YYYY", .{})
+                forms.REFTYP.DATE_US  =>    vText = std.fmt.allocPrint(mem.allocUtl, "MM/DD/YYYY", .{})
                                                 catch unreachable,
 
                 forms.REFTYP.TELEPHONE =>{
@@ -354,7 +346,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                     vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
                     @memset(vText[0..p.width], '@');
                 } ,
-                forms.REFTYP.SWITCH   =>    vText = std.fmt.allocPrint(utl.allocUtl, "{s}", .{forms.CTRUE})
+                forms.REFTYP.SWITCH   =>    vText = std.fmt.allocPrint(mem.allocUtl, "{s}", .{forms.CTRUE})
                                                 catch unreachable,
 
                 forms.REFTYP.FUNC  =>{
@@ -369,11 +361,11 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
 
 
     for (XPANEL.items[numPanel].linev.items) |p| {
-        pFmt01.linev.append(p)
+        pFmt01.linev.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
     for (XPANEL.items[numPanel].lineh.items) |p| {
-        pFmt01.lineh.append(p)
+        pFmt01.lineh.append(mem.allocTui,p)
         catch |err| { @panic(@errorName(err)); };
     }
 
@@ -421,7 +413,7 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                 for (NMENU.items) |xmnu| {
                     for (xmnu.xitems) |text | {
                         if (text.len > 0) {
-                            XMENU.append(
+                            XMENU.append(mem.allocTui,
                                 initMenuDef(
                                     xmnu.name,
                                     xmnu.posx,
@@ -436,16 +428,14 @@ pub fn fnPanel( XPANEL: *std.ArrayList(pnl.PANEL),
                     }
                 }
                 pnl.freePanel(pFmt01);
-                defer forms.allocatorForms.destroy(pFmt01);
-                defer NMENU.clearAndFree();
-                defer NMENU.deinit();
-                defer NGRID.clearAndFree();
-                defer NGRID.deinit();
+                defer mem.allocTui.destroy(pFmt01);
+                defer NMENU.clearRetainingCapacity();
+                defer NGRID.clearRetainingCapacity();
                 return;
             },
             .F12 => {
                 pnl.freePanel(pFmt01);
-                defer forms.allocatorForms.destroy(pFmt01);
+                defer mem.allocTui.destroy(pFmt01);
                 return;
             },
 
@@ -572,46 +562,46 @@ fn Panel_defMenu(nposx: usize) *pnl.PANEL {
 
     var Panel: *pnl.PANEL = pnl.newPanelC("FRAM02", nposx ,2,9, 42, forms.CADRE.line1, "Def.field");
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F9, // function
         true, // show
         true, // check field
         "Enrg", // title
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F12, // function
         true, // show
         false, // check field
         "Return", // title
     )) catch |err| { @panic(@errorName(err)); }; 
 
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fname)  ,2,2, "name.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fposx)  ,3,2, "posX.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fposy)  ,4,2, "posy.....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fcadre) ,5,2, "cadre....:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel(@tagName(fp02.fsens)  ,6,2, "sens.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fname)  ,2,2, "name.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fposx)  ,3,2, "posX.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fposy)  ,4,2, "posy.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fcadre) ,5,2, "cadre....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp02.fsens)  ,6,2, "sens.....:") ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
+    Panel.field.append(mem.allocTui,fld.newFieldAlphaNumeric(@tagName(fp02.fname),2,12,10,"",true,
                             "required","please enter :text [a-zA-Z]{1,1} [A-z0-9]",
                             "^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$")) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fname),"TaskName") catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp02.fposx),3,12,2,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp02.fposx),3,12,2,"",false,
                             "","please enter Pos X 1...",
                             "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
     fld.setProtect(Panel,@intFromEnum(fp02.fposx),true) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit(@tagName(fp02.fposy),4,12,3,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit(@tagName(fp02.fposy),4,12,3,"",false,
                             "","please enter Pos y 1...",
                             "^[1-9]{1,1}?[0-9]{0,}$")) catch unreachable ;
     fld.setProtect(Panel,@intFromEnum(fp02.fposy),true) catch unreachable ;
 
-    Panel.field.append(fld.newFieldFunc(@tagName(fp02.fcadre),5,12,5,"",true,"FuncCadre",
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(@tagName(fp02.fcadre),5,12,5,"",true,"FuncCadre",
                             "required","please enter line1 line2")) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fcadre),"TaskCadre") catch unreachable ; 
 
-    Panel.field.append(fld.newFieldFunc(@tagName(fp02.fsens),6,12,10,"",false,"FuncSens",
+    Panel.field.append(mem.allocTui,fld.newFieldFunc(@tagName(fp02.fsens),6,12,10,"",false,"FuncSens",
                             "required","please enter horizontal verticale ",
                             )) catch unreachable ;
     fld.setTask(Panel,@intFromEnum(fp02.fsens),"TaskSens") catch unreachable ;
@@ -649,7 +639,7 @@ fn FuncCadre( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         if (nitem != 9999) break;
     }
 
-    vfld.text = std.fmt.allocPrint(utl.allocUtl,"{s}",
+    vfld.text = std.fmt.allocPrint(mem.allocUtl,"{s}",
                         .{@tagName(@as(mnu.CADRE,@enumFromInt(nitem + 1)))}) catch unreachable;
 
     pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
@@ -678,7 +668,7 @@ fn FuncSens( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         nitem    = mnu.ioMenu(mCadre,pos);
         if (nitem != 9999) break;
     }
-    vfld.text = std.fmt.allocPrint(utl.allocUtl,"{s}",
+    vfld.text = std.fmt.allocPrint(mem.allocUtl,"{s}",
                         .{@tagName(@as(mnu.MNUVH,@enumFromInt(nitem    )))}) catch unreachable;
 
      pnl.rstPanel(mnu.MENU,&mCadre,vpnl);
@@ -811,10 +801,10 @@ pub fn writeDefMenu(vpnl: *pnl.PANEL) void {
                     }
                 }
                 if (pFmt02.keyField == kbd.task) continue;
-                const vitems : [][]const u8 = allocatorMenu.alloc([]const u8, 1) catch unreachable;
+                const vitems : [][]const u8 = mem.allocTui.alloc([]const u8, 1) catch unreachable;
                 const bl : []const u8 = "";
                 vitems[0] = bl;
-                NMENU.append( initMenuDef(
+                NMENU.append(mem.allocTui, initMenuDef(
                             pFmt02.field.items[@intFromEnum(fp02.fname)].text,
                             strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposx)].text),
                             strToUsize(pFmt02.field.items[@intFromEnum(fp02.fposy)].text),
@@ -824,14 +814,14 @@ pub fn writeDefMenu(vpnl: *pnl.PANEL) void {
                         )) catch unreachable;
 
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
 
             // exit panel field
             .F12 => {
                 pnl.freePanel(pFmt02);
-                defer forms.allocatorForms.destroy(pFmt02);
+                defer mem.allocTui.destroy(pFmt02);
                 return;
             },
             else => {},
@@ -876,14 +866,14 @@ const fp03 = enum {
 fn Panel_Fmt03() *pnl.PANEL {
     var Panel: *pnl.PANEL = pnl.newPanelC("FRAM03", 2, 2 , 30, 82, forms.CADRE.line1, "Def.Menu");
     
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F9, // function
         true, // show
         true, // check field
         "Enrg", // title
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
         kbd.F12, // function
         true, // show
         false, // check field
@@ -891,7 +881,7 @@ fn Panel_Fmt03() *pnl.PANEL {
     )) catch |err| { @panic(@errorName(err)); }; 
     
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext1),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext1),
         2, 2 ,
         80, // len
         "", // text
@@ -901,7 +891,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext2),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext2),
         3, 2 ,
         80, // len
         "", // text
@@ -911,7 +901,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext3),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext3),
         4, 2 ,
         80, // len
         "", // text
@@ -921,7 +911,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext4),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext4),
         5, 2 ,
         80, // len
         "", // text
@@ -931,7 +921,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext5),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext5),
         6, 2 ,
         80, // len
         "", // text
@@ -941,7 +931,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext6),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext6),
         7, 2 ,
         80, // len
         "", // text
@@ -951,7 +941,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext7),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext7),
         8, 2 ,
         80, // len
         "", // text
@@ -961,7 +951,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext8),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext8),
         9, 2 ,
         80, // len
         "", // text
@@ -971,7 +961,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext9),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext9),
         10, 2 ,
         80, // len
         "", // text
@@ -981,7 +971,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext10),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext10),
         11, 2 ,
         80, // len
         "", // text
@@ -991,7 +981,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext11),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext11),
         12, 2 ,
         80, // len
         "", // text
@@ -1001,7 +991,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext12),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext12),
         13, 2 ,
         80, // len
         "", // text
@@ -1011,7 +1001,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext13),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext13),
         14, 2 ,
         80, // len
         "", // text
@@ -1021,7 +1011,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext14),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext14),
         15, 2 ,
         80, // len
         "", // text
@@ -1031,7 +1021,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext15),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext15),
         16, 2 ,
         80, // len
         "", // text
@@ -1041,7 +1031,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext16),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext16),
         17, 2 ,
         80, // len
         "", // text
@@ -1051,7 +1041,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext17),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext17),
         18, 2 ,
         80, // len
         "", // text
@@ -1061,7 +1051,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext18),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext18),
         19, 2 ,
         80, // len
         "", // text
@@ -1071,7 +1061,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext19),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext19),
         20, 2 ,
         80, // len
         "", // text
@@ -1081,7 +1071,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext20),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext20),
         21, 2 ,
         80, // len
         "", // text
@@ -1091,7 +1081,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext21),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext21),
         22, 2 ,
         80, // len
         "", // text
@@ -1101,7 +1091,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext22),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext22),
         23, 2 ,
         80, // len
         "", // text
@@ -1111,7 +1101,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext23),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext23),
         24, 2 ,
         80, // len
         "", // text
@@ -1121,7 +1111,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext24),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext24),
         25, 2 ,
         80, // len
         "", // text
@@ -1131,7 +1121,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext25),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext25),
         26, 2 ,
         80, // len
         "", // text
@@ -1141,7 +1131,7 @@ fn Panel_Fmt03() *pnl.PANEL {
         "" // regex
     )) catch |err| { @panic(@errorName(err)); };
     
-    Panel.field.append(fld.newFieldTextFull(@tagName(fp03.ftext26),
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp03.ftext26),
         27, 2 ,
         80, // len
         "", // text
@@ -1188,25 +1178,25 @@ pub fn writeDefCell(vMenu: *std.ArrayList(mnu.DEFMENU) , menuNum : usize) void {
                         pnl.msgErr(pFmt03, "No definition, INVALID record");
                     }
                     else {
-                        var xmenu =  std.ArrayList([]const u8).init(allocatorMenu);
+                        var xmenu =  std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable;
                         fxx  = @intFromEnum(fp03.ftext1);
                         nTst = 0;
                         while ( fxx <= @intFromEnum(fp03.ftext26)) :( fxx += 1 ) {
                             if (pFmt03.field.items[fxx].text.len > 0) {
                                 nTst += 1;
-                                xmenu.append(pFmt03.field.items[fxx].text) catch unreachable;
+                                xmenu.append(mem.allocTui,pFmt03.field.items[fxx].text) catch unreachable;
                             }
                         }
                         var menu : [] []const u8 = undefined;
                         if ( nTst > 0) {
-                            menu = allocatorMenu.alloc([]const u8, nTst) catch unreachable;
+                            menu = mem.allocTui.alloc([]const u8, nTst) catch unreachable;
                             for (xmenu.items, 0.. ) |txt,idx | {
                                 menu[idx] = txt; 
                             }
                             vMenu.items[menuNum].xitems = menu;
                         } 
                         else {
-                            menu = allocatorMenu.alloc([]const u8, 1) catch unreachable;
+                            menu = mem.allocTui.alloc([]const u8, 1) catch unreachable;
                             
                             const bl : []const u8 = "";
                             menu[0] = bl;
@@ -1214,7 +1204,7 @@ pub fn writeDefCell(vMenu: *std.ArrayList(mnu.DEFMENU) , menuNum : usize) void {
                         vMenu.items[menuNum].xitems = menu;
                     
                         pnl.freePanel(pFmt03);
-                        defer forms.allocatorForms.destroy(pFmt03);
+                        defer mem.allocTui.destroy(pFmt03);
                         return;
                     }
             },
@@ -1222,7 +1212,7 @@ pub fn writeDefCell(vMenu: *std.ArrayList(mnu.DEFMENU) , menuNum : usize) void {
             // exit panel field Menu
             .F12 => {
                 pnl.freePanel(pFmt03);
-                defer forms.allocatorForms.destroy(pFmt03);
+                defer mem.allocTui.destroy(pFmt03);
                 return;
             },
             else => {},
@@ -1248,13 +1238,13 @@ pub fn viewMenu(vpnl: *pnl.PANEL ,vmnu: std.ArrayList(mnu.DEFMENU), menuNum: usi
 }
 // remove MenuGrid
 fn removeMenu(vmenu: *std.ArrayList(mnu.DEFMENU)) void {
-    var savgrid: std.ArrayList(mnu.DEFMENU) = std.ArrayList(mnu.DEFMENU).init(grd.allocatorGrid);
+    var savgrid: std.ArrayList(mnu.DEFMENU) = std.ArrayList(mnu.DEFMENU).initCapacity(mem.allocTui,0) catch unreachable;
 
     var Gkey: grd.GridSelect = undefined;
 
     
     for (vmenu.items) |p| {
-        savgrid.append(p)  
+        savgrid.append(mem.allocTui,p)  
             catch |err| { @panic(@errorName(err)); };
     }
 
@@ -1266,9 +1256,9 @@ fn removeMenu(vmenu: *std.ArrayList(mnu.DEFMENU)) void {
         grd.gridStyle,
         grd.CADRE.line1,
     );
-    defer Gkey.Buf.clearAndFree();
+    defer Gkey.Buf.clearAndFree(mem.allocTui);
     defer grd.freeGrid(Origine);
-    defer grd.allocatorGrid.destroy(Origine);
+    defer mem.allocTui.destroy(Origine);
 
 
     grd.newCell(Origine, "index", 3, grd.REFTYP.UDIGIT , term.ForegroundColor.fgWhite);
@@ -1299,15 +1289,15 @@ fn removeMenu(vmenu: *std.ArrayList(mnu.DEFMENU)) void {
 
     // restor and exit
     if (Gkey.Key == kbd.esc) {
-        vmenu.clearAndFree();
+        vmenu.clearAndFree(mem.allocTui);
         vmenu.clearRetainingCapacity();
 
         for (savgrid.items) |p| {
-            vmenu.append(p) 
+            vmenu.append(mem.allocTui,p) 
              catch |err| { @panic(@errorName(err)); };
         }
     }
 
-    savgrid.clearAndFree();
-    savgrid.deinit();
+    savgrid.clearAndFree(mem.allocTui);
+    savgrid.deinit(mem.allocTui);
 }

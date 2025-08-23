@@ -9,6 +9,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -65,7 +68,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
                                         title,
                                         );
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F3,            // function
                                     true,            // show
                                     false,            // check field
@@ -73,7 +76,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
                                     )
                                 ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F6,            // function
                                     true,            // show
                                     false,            // check field
@@ -81,7 +84,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
                                     )
                                 ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F9,                // function
                                     true,                // show
                                     true,                // check field
@@ -91,7 +94,7 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 
 
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F11,            // function
                                         true,            // show
                                         false,            // check field
@@ -102,12 +105,12 @@ pub fn Panel_Fmt01(title: [] const u8) *pnl.PANEL {
 
 
 
-    Panel.label.append(lbl.newLabel("hdir"         ,2,2, "Dir......:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel("dir"         ,2,12, "?") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel("nameJson"     ,4,2, "name.....:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel("hdir"         ,2,2, "Dir......:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel("dir"         ,2,12, "?") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel("nameJson"     ,4,2, "name.....:") ) catch unreachable ;
 
 
-    Panel.field.append(fld.newFieldTextFull  ("nameJson",4,12,30,"",false,
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull  ("nameJson",4,12,30,"",false,
                                 "required","please enter text ex:Panel09",
                                 "^[a-z]{1,1}[a-z0-9.]{0,}$")) catch unreachable ;
 
@@ -126,7 +129,7 @@ pub fn Panel_Fmt00(title: [] const u8) *pnl.PANEL {
                                         title,
                                         );
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.F3,            // function
                                     true,            // show
                                     false,            // check field
@@ -134,7 +137,7 @@ pub fn Panel_Fmt00(title: [] const u8) *pnl.PANEL {
                                     )
                                 ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                                     kbd.enter,            // function
                                     true,            // show
                                     false,            // check field
@@ -143,8 +146,8 @@ pub fn Panel_Fmt00(title: [] const u8) *pnl.PANEL {
                                 ) catch unreachable ;
 
 
-    Panel.label.append(lbl.newLabel("hdir"         ,2,2, "Dir......:") ) catch unreachable ;
-    Panel.label.append(lbl.newLabel("dir"         ,2,12, "?") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel("hdir"         ,2,2, "Dir......:") ) catch unreachable ;
+    Panel.label.append(mem.allocTui,lbl.newLabel("dir"         ,2,12, "?") ) catch unreachable ;
 
     return Panel;
 }
@@ -178,10 +181,10 @@ fn isFile(name: []const u8 ) bool {
 fn cleanProgram(vpnl : *pnl.PANEL ) void {
     vdir = "";
     pnl.freePanel(vpnl);
-    forms.allocatorForms.destroy(vpnl);
+    mem.allocTui.destroy(vpnl);
 
     term.deinitTerm();
-    utl.deinitUtl();
+    mem.deinitUtl();
 }
 
 const Data = struct {
@@ -209,15 +212,17 @@ const typeQuery = enum { folder , file} ;
 
 const myallocator = std.heap.page_allocator;
 
-var list_Sorted = std.ArrayList(Data).init(myallocator);
+var list_Sorted = std.ArrayList(Data).initCapacity(mem.allocData,0) catch unreachable;
 
 fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
 
 
-    var list_Query = std.ArrayList(Data).init(myallocator);
-    defer list_Query.clearAndFree();
-     list_Sorted.clearAndFree();
+    var list_Query = std.ArrayList(Data).initCapacity(mem.allocData,0) catch unreachable;
+    defer list_Query.clearAndFree(mem.allocData);
+    
+    list_Sorted.clearAndFree(mem.allocData);
 
+    
     // query *all folder this program
     var iterdir= try std.fs.cwd().openDir(myDir,.{ .iterate = true}) ;
     defer iterdir.close();
@@ -230,7 +235,7 @@ fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
                 switch(e.kind) {
                    .directory  => { 
                        var new_buf = try std.fmt.allocPrint(myallocator,"{s}",.{e.name}) ;
-                       try    list_Query.append(Data{.dta = new_buf[0..] }) ;
+                       try    list_Query.append(mem.allocData,Data{.dta = new_buf[0..] }) ;
                        // std.debug.print("{s}: {s}\r\n", .{@tagName(e.kind), e.name});
                     },
                     else => {},
@@ -242,7 +247,7 @@ fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
                 switch(e.kind) {
                        .file  => { 
                            var new_buf = try std.fmt.allocPrint(myallocator,"{s}",.{e.name}) ;
-                           try    list_Query.append(Data{.dta = new_buf[0..] }) ;
+                           try    list_Query.append(mem.allocData,Data{.dta = new_buf[0..] }) ;
                            // std.debug.print("{s}: {s}\r\n", .{@tagName(e.kind), e.name});
                         },
                         else => {},
@@ -261,7 +266,7 @@ fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
                      swapData(list_Query, r,i   );
                 }
                 if (i == n - 1 ) { 
-                    try list_Sorted.append(Data{.dta =list_Query.items[r].dta}) ;
+                    try list_Sorted.append(mem.allocData,Data{.dta =list_Query.items[r].dta}) ;
                     _=list_Query.orderedRemove(0);
                     n = list_Query.items.len;
                     r = 0; i = 0; 
@@ -269,7 +274,7 @@ fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
             }
         }
         else {
-                try list_Sorted.append(Data{.dta =list_Query.items[r].dta}) ;
+                try list_Sorted.append(mem.allocData,Data{.dta =list_Query.items[r].dta}) ;
                 _=list_Query.orderedRemove(r);
                 break ; 
             }
@@ -279,8 +284,8 @@ fn queryTree(myDir: [] const u8 , choix : typeQuery  ) ! void{
 fn wrkDir(pnlFmt :*pnl.PANEL, xDir : []const u8) !void {
     vdir ="";
     // folder my program
-    const path = try std.fs.realpathAlloc(utl.allocUtl,xDir) ;
-    defer utl.allocUtl.free(path);
+    const path = try std.fs.realpathAlloc(mem.allocUtl,xDir) ;
+    defer mem.allocUtl.free(path);
     try queryTree(path , .folder);
 
 
@@ -319,7 +324,7 @@ fn wrkDir(pnlFmt :*pnl.PANEL, xDir : []const u8) !void {
          }
 
         if ( Gkey.Key == kbd.enter) {
-            vdir = std.fmt.allocPrint(utl.allocUtl,"{s}" ,.{Gkey.Buf.items[0]}) catch unreachable;
+            vdir = std.fmt.allocPrint(mem.allocUtl,"{s}" ,.{Gkey.Buf.items[0]}) catch unreachable;
             lbl.updateText(pnlFmt,1,vdir) catch unreachable;
             break;
         }
@@ -346,8 +351,8 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
     var pFmt01 = Panel_Fmt01(twork);
     const pFmt00 = Panel_Fmt00(twork);
     defer pnl.freePanel(pFmt00);
-    defer forms.allocatorForms.destroy(pFmt00);
-     defer list_Sorted.clearAndFree();
+    defer mem.allocTui.destroy(pFmt00);
+    defer list_Sorted.clearAndFree(mem.allocData);
      
      while(std.mem.eql(u8 ,vdir, "") == true) {
         
@@ -449,7 +454,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
                     
                         if (err) pnl.msgErr(pFmt01, "Name Json incorrect allready exist ")
                         else {
-                            pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Save {s} Json", .{nameJson})) ;
+                            pnl.msgErr(pFmt01, try std.fmt.allocPrint(mem.allocUtl, "Save {s} Json", .{nameJson})) ;
                             try mdlSjson.SavJson(XPANEL, XGRID, XMENU, vdir ,nameJson);
                             cleanProgram(pFmt01);
                         return;
@@ -490,7 +495,7 @@ pub fn wrkJson (XPANEL: *std.ArrayList(pnl.PANEL),
 
                     if ( Gkey.Key == kbd.enter) {
                         nameJson =Gkey.Buf.items[0];
-                        pnl.msgErr(pFmt01, try std.fmt.allocPrint(utl.allocUtl, "Working {s} Json", .{nameJson})) ;
+                        pnl.msgErr(pFmt01, try std.fmt.allocPrint(mem.allocUtl, "Working {s} Json", .{nameJson})) ;
                         if (wrkSav){
                             try mdlSjson.SavJson(XPANEL, XGRID, XMENU, vdir ,nameJson);
                         } 

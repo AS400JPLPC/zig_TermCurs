@@ -23,11 +23,9 @@ var stdout = std.fs.File.stdout().writer(&.{});
 
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
     stdout.interface.print(format,args )  catch {} ;
-    stdout.interface.flush() catch  {} ;
 }
 pub inline fn WriteAll( args: [] const u8) void {
     stdout.interface.writeAll(args)  catch {} ;
-    stdout.interface.flush() catch  {} ;
 }
 
 //============================================================================================
@@ -37,9 +35,7 @@ pub inline fn WriteAll( args: [] const u8) void {
 var arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 pub var allocatorTerm = arenaTerm.allocator();
 pub fn deinitTerm() void {
-    arenaTerm.deinit();
-    arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorTerm = arenaTerm.allocator();
+    _=arenaTerm.reset(.free_all);
 }
 
 pub const Style = enum(u8) {
@@ -268,8 +264,6 @@ pub fn getCursor() void {
 
     posCurs.y = 0;
 
-    flushIO();
-
     // Don't forget to flush!
     WriteAll("\x1b[?6n");
 
@@ -277,7 +271,6 @@ pub fn getCursor() void {
     while (c == 0) {
         c = stdin.read(&cursBuf) catch unreachable;
     }
-    flushIO();
 
     // columns = 1 digit
     if (cursBuf[4] == 59) {
@@ -315,7 +308,6 @@ pub fn getCursor() void {
             posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[8]);
         }
     }
-    flushIO();
 }
 
 ///-------------------------

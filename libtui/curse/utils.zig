@@ -5,6 +5,9 @@ const std = @import("std");
 
 const utf = @import("std").unicode;
 
+// allocator
+const mem = @import("alloc");
+
 // display grid
 pub const CTRUE = "✔";
 pub const CFALSE = " ";
@@ -19,16 +22,6 @@ pub const ALIGNS = enum { left, rigth };
 ///------------------------------------
 /// utility
 ///------------------------------------
-//free memory
-var arenaUtl = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-
-pub var allocUtl = arenaUtl.allocator();
-
-pub fn deinitUtl() void {
-    arenaUtl.deinit();
-    arenaUtl = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocUtl = arenaUtl.allocator();
-}
 
 /// Errors that may occur when using String
 pub const ErrUtils = error{char_not_digital_invalide};
@@ -55,7 +48,7 @@ pub fn strToUint(str: []const u8) usize {
 }
 
 pub fn UintToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -66,7 +59,7 @@ pub fn strToUsize(v: []const u8) usize {
     };
 }
 pub fn usizeToStr(v: usize) []const u8 {
-    return std.fmt.allocPrint(allocUtl, "{d}", .{v}) catch |err| {
+    return std.fmt.allocPrint(mem.allocUtl, "{d}", .{v}) catch |err| {
         @panic(@errorName(err));
     };
 }
@@ -90,7 +83,7 @@ pub const iteratStr = struct {
 
 
 		fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			const buf = allocUtl.alloc(u8, size) catch {
+			const buf = mem.allocUtl.alloc(u8, size) catch {
 				return ErrNbrch.InvalideAllocBuffer;
 			};
 			return buf;
@@ -98,7 +91,7 @@ pub const iteratStr = struct {
 
 		/// Deallocates the internal buffer
 		pub fn deinit(self: *StringIterator) void {
-			if (self.buf.len > 0)	allocUtl.free(self.buf);
+			if (self.buf.len > 0)	mem.allocUtl.free(self.buf);
 			strbuf = undefined;
 		}
 
@@ -159,10 +152,10 @@ pub fn trimStr(str: []const u8) []const u8 {
 
 /// is String isAlphabetic Latin
 pub fn isAlphabeticStr(str: []const u8) bool {
-    const result = allocUtl.alloc(u8, str.len) catch |err| {
+    const result = mem.allocUtl.alloc(u8, str.len) catch |err| {
         @panic(@errorName(err));
     };
-    defer allocUtl.free(result);
+    defer mem.allocUtl.free(result);
 
     std.mem.copy(u8, result, str);
     var idx: usize = 0;
@@ -175,10 +168,10 @@ pub fn isAlphabeticStr(str: []const u8) bool {
 
 /// is String Upper Latin
 pub fn isUpperStr(str: []const u8) bool {
-    const result = allocUtl.alloc(u8, str.len) catch |err| {
+    const result = mem.allocUtl.alloc(u8, str.len) catch |err| {
         @panic(@errorName(err));
     };
-    defer allocUtl.free(result);
+    defer mem.allocUtl.free(result);
 
     std.mem.copy(u8, result, str);
     var idx: usize = 0;
@@ -191,10 +184,10 @@ pub fn isUpperStr(str: []const u8) bool {
 
 /// is String Lower Latin
 pub fn isLowerStr(str: []const u8) bool {
-    const result = allocUtl.alloc(u8, str.len) catch |err| {
+    const result = mem.allocUtl.alloc(u8, str.len) catch |err| {
         @panic(@errorName(err));
     };
-    defer allocUtl.free(result);
+    defer mem.allocUtl.free(result);
 
     std.mem.copy(u8, result, str);
     var idx: usize = 0;
@@ -560,10 +553,10 @@ pub fn isMailStr(str: []const u8) bool {
 
 /// upper-case String Latin
 pub fn upperStr(str: []const u8) []const u8 {
-    const work = allocUtl.alloc(u8, str.len) catch |err| {
+    const work = mem.allocUtl.alloc(u8, str.len) catch |err| {
         @panic(@errorName(err));
     };
-    defer allocUtl.free(work);
+    defer mem.allocUtl.free(work);
 
     @memcpy(work, str);
     var string: []const u8 = "";
@@ -598,10 +591,10 @@ pub fn upperStr(str: []const u8) []const u8 {
 
 /// Lower String Latin
 pub fn lowerStr(str: []const u8) []const u8 {
-    const result = allocUtl.alloc(u8, str.len) catch |err| {
+    const result = mem.allocUtl.alloc(u8, str.len) catch |err| {
         @panic(@errorName(err));
     };
-    defer allocUtl.free(result);
+    defer mem.allocUtl.free(result);
 
     std.mem.copy(u8, result, str);
     var idx: usize = 0;
@@ -609,7 +602,7 @@ pub fn lowerStr(str: []const u8) []const u8 {
         result[idx] = std.ascii.toLower(result[idx]);
     }
     return std.fmt.allocPrint(
-        allocUtl,
+        mem.allocUtl,
         "{s}",
         .{result},
     ) catch |err| {
@@ -620,7 +613,7 @@ pub fn lowerStr(str: []const u8) []const u8 {
 /// concat String
 pub fn concatStr(a: []const u8, b: []const u8) []const u8 {
     return std.fmt.allocPrint(
-        allocUtl,
+        mem.allocUtl,
         "{s}{s}",
         .{ a, b },
     ) catch |err| {
@@ -673,10 +666,10 @@ pub fn alignStr(text: []const u8, aligns: ALIGNS, wlen: usize) []const u8 {
 
 /// Delete Items ArrayList
 pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void {
-    var LIST = std.ArrayList([]const u8).init(allocUtl);
+    var LIST = std.ArrayList([]const u8).initCapacity(mem.allocUtl,0) catch unreachable;
     var idx: usize = 0;
     for (self.items) |val| {
-        if (idx != i - 1) LIST.append(val) catch |err| {
+        if (idx != i - 1) LIST.append(mem.allocUtl,val) catch |err| {
             @panic(@errorName(err));
         };
         idx += 1;
@@ -684,7 +677,7 @@ pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void {
     self.clearAndFree();
 
     for (LIST.items) |val| {
-        self.append(val) catch |err| {
+        self.append(mem.allocUtl,val) catch |err| {
             @panic(@errorName(err));
         };
     }
@@ -695,7 +688,7 @@ pub fn addListStr(self: *std.ArrayList([]const u8), text: []const u8) void {
     var iter = iteratStr.iterator(text);
     defer iter.deinit();
     while (iter.next()) |ch| {
-        self.append(ch) catch |err| { @panic(@errorName(err)); };
+        self.append(mem.allocTui,ch) catch |err| { @panic(@errorName(err)); };
      }
  }
 
