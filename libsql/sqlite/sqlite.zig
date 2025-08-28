@@ -141,10 +141,6 @@ pub fn boolean(data: bool) Bool {
 pub fn cbool(data : bool ) i32 {
      if(data) return 1 else return 0;
 }
-
-pub fn zbool(data : bool ) [] const u8 {
-     if(data) return  "1" else return "0";
-}
 //=========================================================
 //=========================================================
 
@@ -252,33 +248,22 @@ pub const Database = struct {
         try stmt.exec(params);
     }
 
-    pub fn istable(db: Database, sqltbl: []const u8) bool  {
+    pub fn istable(db: Database, sqltbl: []const u8) ! bool  {
 
         const allocsql = std.heap.page_allocator;
-        const sqlTable = std.fmt.allocPrint(allocsql,
-            "SELECT count(*) as count FROM  sqlite_master WHERE type='table' AND name = \"{s}\"",.{sqltbl})
-            catch unreachable;
+        const sqlTable = try std.fmt.allocPrint(allocsql,
+            "SELECT count(*) as count FROM  sqlite_master WHERE type='table' AND name = \"{s}\"",.{sqltbl});
         defer allocsql.free(sqlTable);
 
         const Result = struct { count: usize };
-        
-        const select = db.prepare(struct {}, Result, sqlTable)
-            catch |err| {
-            const s = @src();
-                @panic( std.fmt.allocPrint(allocsql,
-                "\n\n\r file:{s} line:{d} column:{d} func:{s}() err:{}\n\r"
-                ,.{s.file, s.line, s.column,s.fn_name,err})
-                    catch unreachable
-                );
-            };
-            
+        const select = try db.prepare(struct {}, Result, sqlTable);
         defer select.finalize();
 
-        select.bind(.{}) catch unreachable;
+        try select.bind(.{});
 
         defer select.reset();
 
-        while (select.step() catch unreachable ) | testx| {
+        while (try select.step()) | testx| {
             if(testx.count > 0) return true;
         }
         return false;
