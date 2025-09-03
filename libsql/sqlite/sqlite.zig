@@ -111,6 +111,8 @@ pub fn throw(code: c_int) Error!void {
 
 pub const Mode = enum { ReadWrite, ReadOnly};
 
+pub const Jrn = enum { Begin, Commit, Rollback};
+
 //=========================================================
 //=========================================================
 pub const Blob = struct { data: []const u8 };
@@ -141,8 +143,98 @@ pub fn boolean(data: bool) Bool {
 pub fn cbool(data : bool ) i32 {
      if(data) return 1 else return 0;
 }
-//=========================================================
-//=========================================================
+
+pub fn zbool(data : bool ) [] const u8 {
+     if(data) return  "1" else return "0";
+}
+
+
+//============================================================================================
+var stdout = std.fs.File.stdout().writer(&.{});
+
+
+inline fn Print( comptime format: []const u8, args: anytype) void {
+    stdout.interface.print(format, args) catch  {} ;
+    stdout.interface.flush() catch  {} ;
+}
+//============================================================================================
+
+
+
+
+
+//================================================================================================
+// config PRAGMA SQLITE
+//https://sqlite.fr/
+//================================================================================================
+pub fn execPragma( path: [] const u8, name: [] const u8) void {
+
+
+    const allocData = std.heap.page_allocator;
+
+    const pathName = std.fmt.allocPrint(allocData,"./{s}/{s}",.{path,name}) catch unreachable;
+    defer allocData.free(pathName);
+ 
+         
+    var db: ?*c.sqlite3 = null;
+    var rc = c.sqlite3_open(@ptrCast(pathName), &db);
+    defer _ = c.sqlite3_close(db);
+    if (rc != c.SQLITE_OK) {
+        Print("Cannot open database: {s}\n", .{c.sqlite3_errmsg(db)});
+        const s = @src();
+        @panic(std.fmt.allocPrint(allocData, "\n\n\r file:{s} line:{d} column:{d} func:{s} )\n\r",
+        .{ s.file, s.line, s.column, s.fn_name}) catch unreachable);
+    }
+
+    var pragma = std.ArrayList([] const u8).initCapacity(allocData,0) catch unreachable;
+    pragma.append(allocData,"PRAGMA encoding = 'UTF-8'") catch unreachable;
+
+    // Très sûr mais plus lent
+    pragma.append(allocData,"PRAGMA synchronous = FULL") catch unreachable;
+    
+    // CSuppression sécurisée des données sensible
+    pragma.append(allocData,"PRAGMA secure_delete = ON") catch unreachable;
+    
+    // Crée un fichier journal temporaire qui est supprimé à la fin de chaque transaction réussie
+    pragma.append(allocData,"PRAGMA journal_mode = DELETE") catch unreachable;
+
+    // Activer les contraintes de clé étrangère
+    pragma.append(allocData,"PRAGMA foreign_keys = ON") catch unreachable;
+
+    // Schéma non fiable pour la sécurité
+    pragma.append(allocData,"PRAGMA trusted_schema = OFF;") catch unreachable;
+
+    // Définir la taille de page (puissance de 2 entre 512 et 65536)
+    pragma.append(allocData,"PRAGMA page_size = 4096") catch unreachable;
+
+    // Consulter le mode de stockage temporaire actuel
+    pragma.append(allocData,"PRAGMA temp_store = DEFAULT") catch unreachable;
+
+    // Consulter le mode de verrouillage actuel
+    pragma.append(allocData,"PRAGMA locking_mode = NORMAL") catch unreachable;
+     
+    // Permet une réorganisation manuelle
+    pragma.append(allocData,"PRAGMA auto_vacuum = NONE") catch unreachable;
+
+    defer pragma.clearRetainingCapacity();
+
+
+    for (pragma.items) |dta| {
+        var errMsg: [*c]u8 = undefined;
+        rc = c.sqlite3_exec(db, @ptrCast(dta), null, null, &errMsg);
+            if (rc != c.SQLITE_OK) {
+
+                Print("SQL error: {s}\n", .{errMsg});
+                c.sqlite3_free(errMsg);
+                const s = @src();
+                @panic(std.fmt.allocPrint(allocData, "\n\n\r file:{s} line:{d} column:{d} func:{s} )\n\r",
+                .{ s.file, s.line, s.column, s.fn_name}) catch unreachable);                
+            }
+    }        
+    
+}
+
+//===============================================================================================
 
 pub fn isDir( vdir : []const u8) bool {
     _= std.fs.cwd().openDir(vdir,.{}) catch {return false;};
@@ -177,6 +269,8 @@ pub fn open(vdir : []const u8, name: []const u8, opt:Mode) !Database {
     if( isDbxist(vdir,name)) crt = true;
     return try Database.open(.{ .path = path_file , .mode = opt, .create = crt} );
 }
+
+
 
 
 pub fn openTmp() !Database {
@@ -248,22 +342,43 @@ pub const Database = struct {
         try stmt.exec(params);
     }
 
-    pub fn istable(db: Database, sqltbl: []const u8) ! bool  {
+    pub fn jrnlog(db: Database, jrnsql: Jrn) ! void {
+
+        switch( jrnsql) {
+            Jrn.Begin    => try exec(db , "BEGIN TRANSACTION;" ,.{}),
+            Jrn.Commit   => try exec(db , "COMMIT;" ,.{}),
+            Jrn.Rollback => try exec(db , "ROLLBACK;" ,.{})
+        }
+    }
+
+
+     pub fn istable(db: Database, sqltbl: []const u8) bool  {
 
         const allocsql = std.heap.page_allocator;
-        const sqlTable = try std.fmt.allocPrint(allocsql,
-            "SELECT count(*) as count FROM  sqlite_master WHERE type='table' AND name = \"{s}\"",.{sqltbl});
+        const sqlTable = std.fmt.allocPrint(allocsql,
+            "SELECT count(*) as count FROM  sqlite_master WHERE type='table' AND name = \"{s}\"",.{sqltbl})
+            catch unreachable;
         defer allocsql.free(sqlTable);
 
         const Result = struct { count: usize };
-        const select = try db.prepare(struct {}, Result, sqlTable);
+        
+        const select = db.prepare(struct {}, Result, sqlTable)
+            catch |err| {
+            const s = @src();
+                @panic( std.fmt.allocPrint(allocsql,
+                "\n\n\r file:{s} line:{d} column:{d} func:{s}() err:{}\n\r"
+                ,.{s.file, s.line, s.column,s.fn_name,err})
+                    catch unreachable
+                );
+            };
+            
         defer select.finalize();
 
-        try select.bind(.{});
+        select.bind(.{}) catch unreachable;
 
         defer select.reset();
 
-        while (try select.step()) | testx| {
+        while (select.step() catch unreachable ) | testx| {
             if(testx.count > 0) return true;
         }
         return false;
