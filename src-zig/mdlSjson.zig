@@ -80,7 +80,7 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
     // v0.15.dev
     const out_buffer: []u8 = try allocator.alloc(u8, 2048000);
     defer allocator.free(out_buffer);
-    var fixed_writer: std.io.Writer = .fixed(out_buffer);
+    var fixed_writer: std.Io.Writer = .fixed(out_buffer);
     var w: std.json.Stringify = .{ .writer = &fixed_writer, .options = .{ .whitespace = .indent_2 }};
 
 

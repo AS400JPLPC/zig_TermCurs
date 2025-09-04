@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.15.1**</u><BR />
+<u>**zig 0.16.0 dev**</u><BR />
 <br />
 
 **Major library restructuring:**
@@ -390,6 +390,8 @@ BR/><BR/>
 → 2025-08-23 04:10 : update for 0.15.1    <BR/>
 → 2025-08-28 00:30 : update libsql    <BR/>
 → 2025-09-03 21:45 : update libsql    <BR/>
+
+→ 2025-09-04 09:10 : update for 0.16.dev  chg std.io ->std.IO   ex mdlSjson.zig  <BR/>
 
 <BR/>
 <BR/>
