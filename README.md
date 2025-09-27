@@ -393,6 +393,12 @@ BR/><BR/>
 
 → 2025-09-04 09:10 : update for 0.16.dev  chg std.io ->std.IO   ex mdlSjson.zig  <BR/>
 
+ <BR/>
+→ 2025-09-27 04:10 : uAfter lots of testing and bug fixes,  you can now have multiple panels in a JSON file.
+I still have a typo with the grids; for now, you need to have a full panel.  <BR/>
+→ 2025-09-27 04:10 :n the panel definition, all functions are recognized. <BR/>
+
+
 <BR/>
 <BR/>
 <BR/>

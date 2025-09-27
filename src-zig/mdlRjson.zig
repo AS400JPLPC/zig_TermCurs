@@ -1076,8 +1076,8 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),
         @panic(try std.fmt.allocPrint(mem.allocTui, "err JsonDecode.{any}\n", .{err}));
     };
 
-    XPANEL.clearAndFree(mem.allocTui);
-
+    XPANEL.clearRetainingCapacity();
+         
     for (NPANEL.items, 0..) |pnlx, idx| {
         var vPanel: pnl.PANEL = undefined;
         vPanel = pnl.initPanel(NPANEL.items[idx].name, NPANEL.items[idx].posx, NPANEL.items[idx].posy,

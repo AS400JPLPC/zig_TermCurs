@@ -45,6 +45,7 @@ const utl = @import("utils");
 // tools regex
 const reg = @import("mvzr");
 
+
 var numPanel: usize = undefined;
 var numGrid : usize = undefined;
 var NGRID : std.ArrayList(grd.GRID) = .empty;
@@ -481,7 +482,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     term.posCurs.y < minY or term.posCurs.y > maxY) continue;
                 
                 for (pFmt01.field.items, 0..) |p, nI| {
-                    if (p.posx == term.posCurs.x  and p.posy == term.posCurs.y) {
+                    if (p.posx == ((term.posCurs.x - pFmt01.posx) + 1)  and
+                    p.posy == ((term.posCurs.y - pFmt01.posy ) + 1 )) {
                         term.writeStyled("?", pFmt01.attribut);
                         term.gotoXY(term.posCurs.x , term.posCurs.y );
                         term.getCursor();
@@ -573,8 +575,8 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
     defer e_LABEL.deinit(mem.allocTui);
     defer mem.allocTui.destroy(&e_LABEL);
 
-    const e_posx: usize = term.posCurs.x;
-    const e_posy: usize = term.posCurs.y;
+    var e_posx: usize = term.posCurs.x;
+    var e_posy: usize = term.posCurs.y;
     var e_curs: usize = e_posy;
 
     // defines the receiving structure of the keyboard
@@ -606,15 +608,16 @@ fn writeLabel(vpnl: *pnl.PANEL, vtitle: bool) void {
             .F12 => return,
 
             .ctrlV => {
-                tampon = std.fmt.allocPrint(mem.allocTui, "L{d}{d}", .{ e_posx, e_posy })
+                e_posx -= vpnl.posx ; e_posy -= vpnl.posy;
+                tampon = std.fmt.allocPrint(mem.allocTui, "L{d}{d}", .{e_posx + 1, e_posy + 1 })
                     catch |err| { @panic(@errorName(err)); };
                 
                 text = utl.trimStr(utl.listToStr(e_LABEL));
                 if (vtitle == true ) {
-                    vpnl.label.append(mem.allocTui,lbl.newTitle(tampon, e_posx, e_posy, fld.ToStr(text)))
+                    vpnl.label.append(mem.allocTui,lbl.newTitle(tampon, e_posx + 1, e_posy + 1 , fld.ToStr(text)))
                     catch |err| { @panic(@errorName(err)); };
                 } else {
-                    vpnl.label.append(mem.allocTui,lbl.newLabel(tampon, e_posx, e_posy, fld.ToStr(text))) 
+                    vpnl.label.append(mem.allocTui,lbl.newLabel(tampon, e_posx + 1, e_posy + 1 , fld.ToStr(text))) 
                        catch |err| { @panic(@errorName(err)); };
                 }
                 return;
@@ -1552,9 +1555,10 @@ pub const TaskEnum = enum {
 
 pub fn writefield(vpnl: *pnl.PANEL) void {
     term.getCursor();
+    
     var v_posx: usize = term.posCurs.x;
     const v_posy: usize = term.posCurs.y;
-
+    const e_posx : usize = (v_posx - vpnl.posx) + 1 ; const e_posy : usize= ( v_posy - vpnl.posy) + 1;
     if (v_posx < 15) v_posx = 15 else v_posx = 2;
 
     // Init format panel
@@ -1562,9 +1566,9 @@ pub fn writefield(vpnl: *pnl.PANEL) void {
 
     v_posx = term.posCurs.x;
     // init zone field
-    fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(mem.allocUtl, "{d}", .{v_posx})
+    fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(mem.allocUtl, "{d}", .{e_posx})
         catch unreachable) catch unreachable;
-    fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(mem.allocUtl, "{d}", .{v_posy})
+    fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(mem.allocUtl, "{d}", .{e_posy})
         catch unreachable) catch unreachable;
 
     // init struct key
@@ -2137,7 +2141,7 @@ pub fn updateField(vpnl : *pnl.PANEL, nI: usize,vfld: fld.FIELD) void {
     term.getCursor();
     var v_posx: usize = term.posCurs.x;
     const v_posy: usize = term.posCurs.y;
-
+    const e_posx : usize = (v_posx - vpnl.posx) + 1 ; const e_posy : usize= ( v_posy - vpnl.posy) + 1;
     if (v_posx < 15) v_posx = 15 else v_posx = 2;
 
     // Init format panel
@@ -2145,12 +2149,12 @@ pub fn updateField(vpnl : *pnl.PANEL, nI: usize,vfld: fld.FIELD) void {
 
     v_posx = term.posCurs.x;
     // init zone field
-    fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(mem.allocUtl, "{d}", .{v_posx})
+    fld.setText(pFmt02, @intFromEnum(fp02.fposx), std.fmt.allocPrint(mem.allocUtl, "{d}", .{e_posx})
         catch unreachable) catch unreachable;
 
     fld.setProtect(pFmt02, @intFromEnum(fp02.fposx),true) catch unreachable;
 
-    fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(mem.allocUtl, "{d}", .{v_posy})
+    fld.setText(pFmt02, @intFromEnum(fp02.fposy), std.fmt.allocPrint(mem.allocUtl, "{d}", .{e_posy})
         catch unreachable) catch unreachable;
 
     fld.setProtect(pFmt02, @intFromEnum(fp02.fposy), true) catch unreachable;
@@ -3509,7 +3513,8 @@ pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
     
     for (vgrd.items[gridNum].cell.items) |p|  {
         var vText: []u8= std.heap.page_allocator.alloc(u8, p.long) catch unreachable;
-        @memset(vText[0..p.long], '#');
+        if(!std.mem.eql(u8,"SWITCH",@tagName(p.reftyp))) @memset(vText[0..p.long], '#')
+        else vText = std.fmt.allocPrint(mem.allocTui, "{s}",.{"true"}) catch  unreachable;
         vlist.append(mem.allocTui,vText) catch unreachable;
     }
     for (0..vgrd.items[gridNum].pageRows) |_| {

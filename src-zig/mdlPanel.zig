@@ -47,7 +47,6 @@ const utl = @import("utils");
 const reg = @import("mvzr");
 
 
-
 //var numPanel : usize = undefined ;
 
 pub const ErrMain = error{
@@ -121,7 +120,6 @@ const    fp01 = enum (u9)    {
     F8,
     F8_shw,
     F8_chk,
-
     F8_txt,
     F9,
     F9_shw,
@@ -1484,7 +1482,7 @@ var callTask: TaskEnum = undefined;
 
 fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const termSize = term.getSize();
-    const posx =     utl.strToUsize(vfld.text);
+    const posx     = utl.strToUsize(vfld.text);
     
     if (termSize.height < posx or posx    == 0 ) {
                 const allocator = std.heap.page_allocator;
@@ -1500,7 +1498,7 @@ fn TaskPosx( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const termSize = term.getSize();
-    const posy    =    utl.strToUsize(vfld.text);
+    const posy     = utl.strToUsize(vfld.text);
     
     if (termSize.width < posy or posy == 0 ) {
                 const allocator = std.heap.page_allocator;
@@ -1516,8 +1514,8 @@ fn TaskPosy( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
         const termSize = term.getSize() ;
-        const lines =    utl.strToUsize(vfld.text);
-        const posx    =    utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
+        const lines    = utl.strToUsize(vfld.text);
+        const posx     = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posx)) catch unreachable) ;
         
         if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
             const allocator = std.heap.page_allocator;
@@ -1534,8 +1532,8 @@ fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
 
 fn TaskCols( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
     const termSize = term.getSize();
-    const cols    =    utl.strToUsize(vfld.text);
-    const posy    =    utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
+    const cols     = utl.strToUsize(vfld.text);
+    const posy     = utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp01.posy)) catch unreachable);
 
     if (termSize.width < cols or cols == 0 or termSize.width < cols + posy - 1 ) {
         const allocator = std.heap.page_allocator;
@@ -1645,14 +1643,14 @@ pub const TaskEnum = enum {
                 switch (self) {
                 .TaskPosx    => TaskPosx(vpnl,vfld),
                 .TaskPosy    => TaskPosy(vpnl,vfld),
-                .TaskLines    => TaskLines(vpnl,vfld),
+                .TaskLines   => TaskLines(vpnl,vfld),
                 .TaskCols    => TaskCols(vpnl,vfld),
-                .TaskCadre    => TaskCadre(vpnl,vfld),
+                .TaskCadre   => TaskCadre(vpnl,vfld),
 
-                .TaskPanel => TaskPanel(VPANEL,vpnl,vfld, panelNum),
+                .TaskPanel   => TaskPanel(VPANEL,vpnl,vfld, panelNum),
 
-                .TaskF9    => TaskF9(VPANEL,vpnl,vfld,panelNum),
-                .TaskF11 => TaskF11(VPANEL,vpnl,vfld, panelNum),
+                .TaskF9      => TaskF9(VPANEL,vpnl,vfld,panelNum),
+                .TaskF11     => TaskF11(VPANEL,vpnl,vfld, panelNum),
 
                 else => dsperr.errorForms(vpnl,    ErrMain.main_run_EnumTask_invalide),
                 }
@@ -1856,9 +1854,9 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
 
 
         var fxx:    usize = 0;
-        var show:    usize = 0;
-        var check:    usize = 0 ;
-        var title:    usize = 0 ;
+        var show:   usize = 0;
+        var check:  usize = 0 ;
+        var title:  usize = 0 ;
         var buf: [] const u8 = "";
         for (src.button.items) |b| {
             if (@intFromEnum(b.key) >= @intFromEnum(kbd.F1) and @intFromEnum(b.key) <= @intFromEnum(kbd.F36) ) {
@@ -1882,16 +1880,15 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
                                                                 else fxx = 206 + ( (fxx - 50) * 4) - 3 ;
                                                                 buf = @tagName(@as(fp01,@enumFromInt(fxx))) ;
             }
-
-            fxx = fld.getIndex(dst, buf) catch |err| { @panic(@errorName(err));};
+            fxx   = fld.getIndex(dst, buf) catch |err| { @panic(@errorName(err));};
             show  = fxx + 1;
             check = fxx + 2 ;
             title = fxx + 3 ;
 
-            fld.setSwitch(dst , fxx         , true)        catch |err| { @panic(@errorName(err));};
-            fld.setSwitch(dst , show    , b.show)        catch |err| { @panic(@errorName(err));};
-            fld.setSwitch(dst , check     , b.check)        catch |err| { @panic(@errorName(err));};
-            fld.setText(dst    , title , b.title)            catch |err| { @panic(@errorName(err));};
+            fld.setSwitch(dst , fxx     , true)        catch |err| { @panic(@errorName(err));};
+            fld.setSwitch(dst , show    , b.show)      catch |err| { @panic(@errorName(err));};
+            fld.setSwitch(dst , check   , b.check)     catch |err| { @panic(@errorName(err));};
+            fld.setText(dst   , title   , b.title)     catch |err| { @panic(@errorName(err));};
         }
 
 }
@@ -1913,19 +1910,19 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :    *std.ArrayList(pnl.PANEL),    vXPANEL
 
 
 
-    var fxx : usize = @intFromEnum(fp01.F1);
-    var kxx     : usize =0 ;
+    var fxx   : usize = @intFromEnum(fp01.F1);
+    var kxx   : usize =0 ;
 
-    var show    : usize =0 ;
+    var show  : usize =0 ;
     var check : usize =0 ;
     var title : usize =0 ;
 
-    while ( fxx <= @intFromEnum(fp01.F36)) :( fxx += 1 ) {
-        kxx     += 1;
-        show    = fxx + 1;    // pos fld show
+    while ( fxx <= @intFromEnum(fp01.ctrlZ)){
+        kxx   += 1;
+        show  = fxx + 1;    // pos fld show
         check = fxx + 2;    // pos fld show
         title = fxx + 3;    // pos fld show
-        fxx = title ; 
+        fxx = title + 1 ; 
 
         if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
             panel.button.append(mem.allocTui,btn.newButton(
@@ -1935,58 +1932,12 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :    *std.ArrayList(pnl.PANEL),    vXPANEL
                                             src.field.items[title].text,    // title 
                                             )
                                         ) catch unreachable ;
+                               
         }
     }
 
-    fxx = @intFromEnum(fp01.altA);
-    kxx     = @intFromEnum(kbd.F36) ;
-    show    = 0 ;
-    check = 0 ;
-    title = 0 ;
+ 
 
-    while ( fxx <= @intFromEnum(fp01.altZ)) :( fxx += 1 ) {
-        kxx     += 1;
-        show    = fxx + 1;    // pos fld show
-        check = fxx + 2;    // pos fld show
-        title = fxx + 3;    // pos fld show
-        fxx = title ;
-        if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
-            panel.button.append(mem.allocTui,btn.newButton(
-                                            kbd.toEnum(@tagName(@as(kbd,@enumFromInt(kxx)))),    // function
-                                            src.field.items[show].zwitch,    // show
-                                            src.field.items[check].zwitch,    // check field
-                                            src.field.items[title].text,    // title 
-                                            )
-                                        ) catch unreachable ;
-        }
-    }
-
-
-
-    fxx = @intFromEnum(fp01.ctrlA);
-    kxx     = @intFromEnum(kbd.altZ) ;
-
-    show    = 0 ;
-    check = 0 ;
-    title = 0 ;
-
-    while ( fxx <= @intFromEnum(fp01.ctrlZ)) :( fxx += 1 ) {
-        kxx     += 1;
-        show    = fxx + 1;    // pos fld show
-        check = fxx + 2;    // pos fld show
-        title = fxx + 3;    // pos fld show
-        fxx = title ;
-        if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
-
-            panel.button.append(mem.allocTui,btn.newButton(
-                                            kbd.toEnum(@tagName(@as(kbd,@enumFromInt(kxx)))),    // function
-                                            src.field.items[show].zwitch,    // show
-                                            src.field.items[check].zwitch,    // check field
-                                            src.field.items[title].text,    // title 
-                                            )
-                                        ) catch unreachable ;
-        }
-    }
     
     panel.buf.clearAndFree(mem.allocTui);
 
@@ -2009,77 +1960,32 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )    void
 
     defer mem.allocTui.destroy(panel);
 
-    var fxx : usize = @intFromEnum(fp01.F1);
-    var kxx     : usize =0 ;
+    var fxx   : usize = @intFromEnum(fp01.F1);
+    var kxx   : usize = 0 ;
 
-    var show    : usize =0 ;
+    var show  : usize =0 ;
     var check : usize =0 ;
     var title : usize =0 ;
 
-    while ( fxx <= @intFromEnum(fp01.F36)) :( fxx += 1 ) {
-        kxx     += 1;
-        show    = fxx + 1;    // pos fld show
-        check = fxx + 2;    // pos fld show
-        title = fxx + 3;    // pos fld show
 
-        fxx = title ; 
 
-        if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
-            panel.button.append(mem.allocTui,btn.newButton(
-                                            kbd.toEnum(@tagName(@as(kbd,@enumFromInt(kxx)))),    // function
-                                            src.field.items[show].zwitch,    // show
-                                            src.field.items[check].zwitch,    // check field
-                                            src.field.items[title].text,    // title 
-                                                )
-                                        ) catch |err| { @panic(@errorName(err));};
-        }
-    }
-
-    fxx = @intFromEnum(fp01.altA);
-    kxx     = @intFromEnum(kbd.F36) ;
-    show    = 0 ;
-    check = 0 ;
-    title = 0 ;
-
-    while ( fxx <= @intFromEnum(fp01.altZ)) :( fxx += 1 ) {
+    while ( fxx <= @intFromEnum(fp01.ctrlZ))  {
         kxx     += 1;
         show  = fxx + 1;    // pos fld show
         check = fxx + 2;    // pos fld show
         title = fxx + 3;    // pos fld show
-        fxx = title ;
+
+        fxx = title + 1 ; 
+
         if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
             panel.button.append(mem.allocTui,btn.newButton(
                                             kbd.toEnum(@tagName(@as(kbd,@enumFromInt(kxx)))),    // function
-                                            src.field.items[show].zwitch,    // show
-                                            src.field.items[check].zwitch,    // check field
+                                            src.field.items[show].zwitch,   // show
+                                            src.field.items[check].zwitch,  // check field
                                             src.field.items[title].text,    // title 
                                                 )
                                         ) catch |err| { @panic(@errorName(err));};
-        }
-    }
-
-
-    fxx = @intFromEnum(fp01.ctrlA);
-    kxx     = @intFromEnum(kbd.altZ) ;
-
-    show  = 0 ;
-    check = 0 ;
-    title = 0 ;
-
-    while ( fxx <= @intFromEnum(fp01.ctrlZ)) :( fxx += 1 ) {
-        kxx     += 1;
-        show  = fxx + 1;    // pos fld show
-        check = fxx + 2;    // pos fld show
-        title = fxx + 3;    // pos fld show
-        fxx = title ;
-        if ( src.field.items[show].zwitch or src.field.items[check].zwitch ) {
-            panel.button.append(mem.allocTui,btn.newButton(
-                                            kbd.toEnum(@tagName(@as(kbd,@enumFromInt(kxx)))),    // function
-                                            src.field.items[show].zwitch,    // show
-                                            src.field.items[check].zwitch,    // check field
-                                            src.field.items[title].text,    // title 
-                                                )
-                                        ) catch |err| { @panic(@errorName(err));};
+                               
         }
 
     }
@@ -2088,18 +1994,18 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )    void
     vNPANEL.name     = panel.name;
     vNPANEL.posx     = panel.posx;
     vNPANEL.posy     = panel.posy;
-    vNPANEL.lines     = panel.lines;
+    vNPANEL.lines    = panel.lines;
     vNPANEL.cols     = panel.cols;
-    vNPANEL.frame     = panel.frame;
+    vNPANEL.frame    = panel.frame;
     vNPANEL.button   = panel.button;
     vNPANEL.buf.clearAndFree(mem.allocTui); 
 
     vXPANEL.name     = panel.name;
     vXPANEL.posx     = panel.posx;
     vXPANEL.posy     = panel.posy;
-    vXPANEL.lines     = panel.lines;
+    vXPANEL.lines    = panel.lines;
     vXPANEL.cols     = panel.cols;
-    vXPANEL.frame     = panel.frame;
+    vXPANEL.frame    = panel.frame;
     vXPANEL.button   = panel.button;
     
 }

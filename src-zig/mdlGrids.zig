@@ -72,6 +72,7 @@ fn usizeToStr(v: usize) []const u8 {
     };
 }
 
+
 //=================================================
 // description Function
 // choix work panel
@@ -1039,13 +1040,17 @@ fn FcellType(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
     grd.addRows(Xcombo, &.{"DIGIT"}); // Digit signed
     grd.addRows(Xcombo, &.{"UDECIMAL"}); // Decimal unsigned
     grd.addRows(Xcombo, &.{"DECIMAL"}); // Decimal signed
+    grd.addRows(Xcombo, &.{"SWITCH"}); // Decimal signed
+    
 
     if (std.mem.eql(u8, vfld.text, "TEXT_FREE")) pos = 0;
     if (std.mem.eql(u8, vfld.text, "UDIGIT"))    pos = 1;
     if (std.mem.eql(u8, vfld.text, "DIGIT"))     pos = 2;
     if (std.mem.eql(u8, vfld.text, "UDECIMAL"))  pos = 3;
     if (std.mem.eql(u8, vfld.text, "DECIMAL"))   pos = 4;
+    if (std.mem.eql(u8, vfld.text, "SWITCH"))    pos = 5;
 
+    // Decimal signed>
     while (true) {
         Gkey = grd.ioCombo(Xcombo, pos);
 
@@ -1356,7 +1361,8 @@ pub fn viewGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usize)
     var vlist = std.ArrayList([] const u8).initCapacity(mem.allocTui,0) catch unreachable;
     for (vgrd.items[gridNum].cell.items) |p|  {
         var vText: []u8= std.heap.page_allocator.alloc(u8, p.long) catch unreachable;
-        @memset(vText[0..p.long], '#');
+        if(!std.mem.eql(u8,"SWITCH",@tagName(p.reftyp))) @memset(vText[0..p.long], '#')
+        else vText = std.fmt.allocPrint(mem.allocTui, "{s}",.{"true"}) catch  unreachable;
         vlist.append(mem.allocTui,vText) catch unreachable;
     }
     for (0..vgrd.items[gridNum].pageRows) |_| {

@@ -450,7 +450,6 @@ pub fn isCarOmit(str: []const u8) bool {
             ';' => continue,
             '~' => continue,
             '|' => continue,
-            '_' => continue,
             '"' => continue,
             '\'' => continue,
             '\\' => continue,

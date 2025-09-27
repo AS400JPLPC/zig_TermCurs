@@ -78,7 +78,7 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
 
 
     // v0.15.dev
-    const out_buffer: []u8 = try allocator.alloc(u8, 2048000);
+    const out_buffer: []u8 = try allocator.alloc(u8, 4096000);
     defer allocator.free(out_buffer);
     var fixed_writer: std.Io.Writer = .fixed(out_buffer);
     var w: std.json.Stringify = .{ .writer = &fixed_writer, .options = .{ .whitespace = .indent_2 }};
@@ -96,10 +96,12 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
 
     
     try w.objectField("PANEL");
+    try w.beginArray();
     const nbrPnl: usize = XPANEL.items.len;
     var np: usize = 0;
     while (np < nbrPnl) : (np += 1) {
-        try w.beginArray();
+        // try w.objectField("PANEL");
+        // try w.beginArray();
         try w.beginObject();
         var p: usize = 0;
         while (p < Ipanel.count) : (p += 1) {
@@ -399,8 +401,9 @@ pub fn  SavJson(XPANEL: *std.ArrayList(pnl.PANEL),
             }
         }
         try w.endObject();
-        try w.endArray();
+        // try w.endArray();
     }
+    try w.endArray();
     const nbrMenu: usize = XMENU.items.len;
     const nbrGrid: usize = XGRID.items.len;
     if ( nbrGrid == 0 and nbrMenu == 0)try w.endObject();

@@ -163,15 +163,12 @@ pub fn main() !void {
             mem.deinitUtl();
             mem.deinitTui();
 
-            if (NPANEL.items.len > 0) {
-                NPANEL.clearRetainingCapacity();
-            }
-            if (NGRID.items.len > 0) {
-                NGRID.clearRetainingCapacity();
-            }
-            if (NMENU.items.len > 0) {
-                NMENU.clearRetainingCapacity();
-            }
+            NPANEL.clearRetainingCapacity();
+
+            NGRID.clearRetainingCapacity();
+
+            NMENU.clearRetainingCapacity();
+
             base = pnl.newPanelC("base",
             1, 1,
             termSize.height,

@@ -119,7 +119,7 @@
       ],
       "field": [
         {
-          "name": "NAME",
+          "name": "REFNAME",
           "posx": 4,
           "posy": 4,
           "reftyp": "TEXT_FREE",
@@ -281,6 +281,105 @@
       ],
       "linev": [],
       "lineh": []
+    },
+    {
+      "name": "PQUERY",
+      "posx": 1,
+      "posy": 1,
+      "lines": 41,
+      "cols": 132,
+      "cadre": "line1",
+      "title": "QUERY",
+      "button": [
+        {
+          "name": "F1",
+          "key": "F1",
+          "show": true,
+          "check": false,
+          "title": "Help"
+        },
+        {
+          "name": "F3",
+          "key": "F3",
+          "show": true,
+          "check": false,
+          "title": "Exit"
+        },
+        {
+          "name": "F12",
+          "key": "F12",
+          "show": true,
+          "check": false,
+          "title": "Return"
+        },
+        {
+          "name": "ctrlV",
+          "key": "ctrlV",
+          "show": true,
+          "check": false,
+          "title": "ctrlV"
+        }
+      ],
+      "label": [
+        {
+          "name": "L73",
+          "posx": 7,
+          "posy": 3,
+          "text": "Text:",
+          "title": false
+        },
+        {
+          "name": "L43",
+          "posx": 4,
+          "posy": 3,
+          "text": "Field:",
+          "title": false
+        }
+      ],
+      "field": [
+        {
+          "name": "ztext",
+          "posx": 7,
+          "posy": 8,
+          "reftyp": "TEXT_FREE",
+          "width": 20,
+          "scal": 0,
+          "text": "",
+          "requier": false,
+          "protect": false,
+          "edtcar": "",
+          "errmsg": "Zone obligatoire",
+          "help": "recherhe valeur",
+          "procfunc": "",
+          "proctask": "Tctlztext",
+          "progcall": "",
+          "typecall": "",
+          "parmcall": false,
+          "regex": ""
+        },
+        {
+          "name": "zfield",
+          "posx": 4,
+          "posy": 9,
+          "reftyp": "FUNC",
+          "width": 25,
+          "scal": 0,
+          "text": "",
+          "requier": false,
+          "protect": false,
+          "edtcar": "",
+          "errmsg": "saisie obligatoire",
+          "help": "Choix des zones à scaner",
+          "procfunc": "CQUERY",
+          "proctask": "",
+          "progcall": "",
+          "typecall": "",
+          "parmcall": false,
+          "regex": ""
+        }
+      ],
+      "linev": [],
+      "lineh": []
     }
   ],
   "GRID": [
@@ -293,7 +392,7 @@
       "cadre": "line1",
       "cells": [
         {
-          "text": "NAME",
+          "text": "REFNAME",
           "long": 15,
           "reftyp": "TEXT_FREE",
           "posy": 0,
@@ -351,7 +450,7 @@
         {
           "text": "Hs",
           "long": 2,
-          "reftyp": "TEXT_FREE",
+          "reftyp": "SWITCH",
           "posy": 7,
           "edtcar": "",
           "atrcell": "fgRed"
@@ -381,6 +480,24 @@
           "posy": 1,
           "edtcar": "",
           "atrcell": "fgYellow"
+        }
+      ]
+    },
+    {
+      "name": "Cquery",
+      "posx": 4,
+      "posy": 39,
+      "pagerows": 6,
+      "separator": "│",
+      "cadre": "line1",
+      "cells": [
+        {
+          "text": "ztext",
+          "long": 25,
+          "reftyp": "TEXT_FREE",
+          "posy": 0,
+          "edtcar": "",
+          "atrcell": "fgGreen"
         }
       ]
     }

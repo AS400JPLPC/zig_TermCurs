@@ -263,10 +263,10 @@ pub fn getCursor() void {
     posCurs.x = 0;
 
     posCurs.y = 0;
-
+    flushIO();
     // Don't forget to flush!
     WriteAll("\x1b[?6n");
-
+    flushIO();
     var c: usize = 0;
     while (c == 0) {
         c = stdin.read(&cursBuf) catch unreachable;
@@ -667,14 +667,14 @@ pub const kbd = enum {
 
         if (name[0] == 'a' and name[1] == 'l' and name[2] == 't') {
             if (vlen != 4) return .none;
-            result = @as(u8, name[3]) - 41;
-            if (result < 25 or result > 50) return .none else return @as(kbd, @enumFromInt(result));
+            result = @as(u8, name[3] - 28) ;
+            return @as(kbd, @enumFromInt(result));
         }
 
         if (name[0] == 'c' and name[1] == 't' and name[2] == 'r' and name[3] == 'l') {
             if (vlen != 5) return .none;
-            result = @as(u8, name[4]) - 14;
-            if (result < 51 or result > 76) return .none else return @as(kbd, @enumFromInt(result));
+            result = @as(u8, name[4] - 2) ;
+            return @as(kbd, @enumFromInt(result));
         }
 
         //std.debug.print("{s}\r\n",.{name});
