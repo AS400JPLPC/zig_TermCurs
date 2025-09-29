@@ -119,7 +119,7 @@ pub fn qryPanel(vpnl: *std.ArrayList(pnl.PANEL)) usize {
 //=================================================
 // description Function
 // choix work Grid
-pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
+pub fn qryCellGrid(vgrd: *std.ArrayList(grd.GRID)) usize {
     const cellPos: usize = 0;
     var Gkey: grd.GridSelect = undefined;
 
@@ -147,23 +147,19 @@ pub fn qryCellGrid(vpnl : * pnl.PANEL, vgrd: *std.ArrayList(grd.GRID)) usize {
         Gkey = grd.ioCombo(Xcombo, cellPos);
 
         if (Gkey.Key == kbd.enter) {
-            pnl.rstPanel(grd.GRID,Xcombo, vpnl);
             return strToUsize(Gkey.Buf.items[0]);
         }
         
         if (Gkey.Key == kbd.esc) {
-            pnl.rstPanel(grd.GRID,Xcombo, vpnl);
             return 999;
         }
     }
 }
 
-
-
 pub fn Panel_HELP() *pnl.PANEL {
     var Panel : *pnl.PANEL = pnl.newPanelC("HELP",
                                         1, 1,
-                                        6,
+                                        7,
                                         100 ,
                                         forms.CADRE.line1,
                                         ""
@@ -186,12 +182,17 @@ pub fn Panel_HELP() *pnl.PANEL {
     Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP2",3,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
+    fld.setProtect(Panel,1,true) catch unreachable;
     
     Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP3",4,5,90,"",false,
                                 "","",
                                 "")) catch unreachable ;
-                    
-    fld.setProtect(Panel,0,true) catch unreachable;
+     fld.setProtect(Panel,2,true) catch unreachable;
+  
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("HELP4",5,5,90,"",false,
+                                "","",
+                                "")) catch unreachable ;
+    fld.setProtect(Panel,3,true) catch unreachable;
     return Panel;
     }
 
@@ -211,8 +212,9 @@ var NGRID : std.ArrayList(grd.GRID) = undefined;
 
 //pub fn main() !void {
 pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID)) void {
-    term.cls();
 
+
+    term.cls();
 
 
     numPanel = qryPanel(XPANEL);
@@ -386,11 +388,14 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     catch unreachable;
                 fld.setText(pFmtH01,2,"Alt-R remove Grid   Alt-O order Grid  AltW Outils ")
                     catch unreachable;
+                fld.setText(pFmtH01,3,"The “GRID” must be in the active panel, otherwise a problem occurs. ")
+                    catch unreachable;                   
 
                 _= pnl.ioPanel(pFmtH01);
-                pnl.rstPanel(pnl.PANEL,pFmtH01,pFmt01);
+                term.cls();
+                pnl.printPanel(pFmt01);
+
                 term.gotoXY(1,1);
-                continue;
             },
             .F11 => {
                 XGRID.clearRetainingCapacity();
@@ -440,8 +445,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
 
             // def field
             .altC => {
-                numGrid = qryCellGrid(pFmt01, &NGRID);
-
+                numGrid = qryCellGrid(&NGRID);
+                term.cls();
+                pnl.printPanel(pFmt01);
                 if (numGrid != 999) {
                     term.offMouse();
                     writeDefCell(&NGRID,numGrid);
@@ -460,7 +466,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
             },
             // Order / Remove
             .altW => {
-                numGrid = qryCellGrid(pFmt01, &NGRID);
+                numGrid = qryCellGrid(&NGRID);
+                
                 term.cursHide();
                 if (numGrid != 999) {
                     var nitem: usize = 0;
@@ -468,7 +475,8 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
                     term.offMouse();
                     pnl.rstPanel(mnu.MENU,&mChoix,pFmt01);
                     term.onMouse();
-                    
+                 term.cls();
+                pnl.printPanel(pFmt01);                  
                     if (nitem == 0) viewGrid(pFmt01,NGRID,numGrid );    // view  Grid
                     if (nitem == 1) viewCell(pFmt01,NGRID,numGrid );    // view  Cell
                     if (nitem == 2) orderCell(NGRID,numGrid );          // order Cell
@@ -669,11 +677,12 @@ fn TaskName(vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 
 
 fn TaskLines( vpnl: *pnl.PANEL , vfld: *fld.FIELD) void {
-        const termSize = term.getSize() ;
+        // const termSize = term.getSize() ;
         const lines =    utl.strToUsize(vfld.text);
         const posx    =    utl.strToUsize(fld.getText(vpnl,@intFromEnum(fp02.fposx)) catch unreachable) ;
+
         
-        if (termSize.height < lines or lines == 0 or termSize.height < lines + posx - 1 ) {
+        if (vpnl.lines < lines or lines == 0 or vpnl.lines < lines + posx - 1  )  {
             const msg = std.fmt.allocPrint(
             mem.allocTui,"The number of rows Invalide",
             .{}) catch unreachable;
@@ -858,6 +867,20 @@ pub fn updateGrid(vpnl: *pnl.PANEL ,vgrd: std.ArrayList(grd.GRID), gridNum: usiz
             },
             // write field to panel
             .F9 => {
+                     for (pFmt02.field.items , 0..) |f, ix| {
+                        if (f.proctask.len > 0) {
+                            pFmt02.idxfld = ix ;
+                            pFmt02.keyField = kbd.none;
+                            // specifique contrôle
+                            if (ix > 0) {
+                            callTaskGrid = TaskGrid.searchFn(f.proctask);
+                            
+                            callTaskGrid.run(pFmt02, &pFmt02.field.items[pFmt02.idxfld]);
+                            if (pFmt02.keyField == kbd.task) break;
+                            }
+                        }
+                    }
+                    if (pFmt02.keyField == kbd.task) continue;
 
                 pFmt02.field.items[@intFromEnum(fp02.fname)].protect = false;
 

@@ -59,7 +59,6 @@ pub const ErrMain = error{
 };
 
 
-
 const lp01 = enum {
     F_shw,
     F_chk,
@@ -445,7 +444,15 @@ const    fp01 = enum (u9)    {
     ctrlZ,
     ctrlZ_shw,
     ctrlZ_chk,
-    ctrlZ_txt
+    ctrlZ_txt,
+    pageUp,
+    pgUp_shw,
+    pgUp_chk,
+    pgUp_txt,
+    pageDown,
+    pgDwn_shw,
+    pgDwn_chk,
+    pgDwn_txt
 };
 
 
@@ -1203,6 +1210,10 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
     Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp01.ctrlZ),37,122 ,@tagName(fp01.ctrlZ))) catch unreachable;
 
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp01.pageUp),38,122 ,"pgUp")) catch unreachable;
+
+    Panel.label.append(mem.allocTui,lbl.newLabel(@tagName(fp01.pageDown),39,122 ,"pgDwn")) catch unreachable;
+
 
 
     Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.ctrlA)    ,12,128,false,"","")) catch unreachable;
@@ -1361,9 +1372,17 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp01.ctrlZ_txt) ,37,144,15,"",false,
                                         "required","please enter text fonction ","")) catch unreachable ;
 
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pageUp)   ,38,128,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pgUp_shw),38,132,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pgUp_chk),38,139,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp01.pgUp_txt) ,38,144,15,"",false,
+                                        "required","please enter text fonction ","")) catch unreachable ;
 
-
-
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pageDown) ,39,128,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pgDwn_shw),39,132,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch(@tagName(fp01.pgDwn_chk),39,139,false,"","")) catch unreachable;
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull(@tagName(fp01.pgDwn_txt) ,39,144,15,"",false,
+                                        "required","please enter text fonction ","")) catch unreachable ;
 
 
     return Panel;
@@ -1880,6 +1899,20 @@ fn loadPanel(src: *pnl.PANEL , dst:*pnl.PANEL ) void {
                                                                 else fxx = 206 + ( (fxx - 50) * 4) - 3 ;
                                                                 buf = @tagName(@as(fp01,@enumFromInt(fxx))) ;
             }
+
+            if (@intFromEnum(b.key) >= @intFromEnum(kbd.pageUp) and @intFromEnum(b.key) <= @intFromEnum(kbd.pageUp) ){
+                                                                fxx = @intFromEnum(b.key);
+                                                                if ( 89 == fxx) fxx = 359; 
+                                                                buf = @tagName(@as(fp01,@enumFromInt(fxx))) ;
+            }
+
+            if (@intFromEnum(b.key) >= @intFromEnum(kbd.pageDown)
+                                    and @intFromEnum(b.key) <= @intFromEnum(kbd.pageDown) ){
+                                                                fxx = @intFromEnum(b.key);
+                                                                if ( 90 == fxx) fxx = 363; 
+                                                                buf = @tagName(@as(fp01,@enumFromInt(fxx))) ;
+            }
+            
             fxx   = fld.getIndex(dst, buf) catch |err| { @panic(@errorName(err));};
             show  = fxx + 1;
             check = fxx + 2 ;
@@ -1917,7 +1950,7 @@ fn addPanel( src: *pnl.PANEL, vNPANEL :    *std.ArrayList(pnl.PANEL),    vXPANEL
     var check : usize =0 ;
     var title : usize =0 ;
 
-    while ( fxx <= @intFromEnum(fp01.ctrlZ)){
+    while ( fxx <= @intFromEnum(fp01.pageDown)){
         kxx   += 1;
         show  = fxx + 1;    // pos fld show
         check = fxx + 2;    // pos fld show
@@ -1969,7 +2002,7 @@ fn updPanel( src: *pnl.PANEL, vNPANEL: *pnl.PANEL, vXPANEL: *pnl.PANEL )    void
 
 
 
-    while ( fxx <= @intFromEnum(fp01.ctrlZ))  {
+    while ( fxx <= @intFromEnum(fp01.pageDown))  {
         kxx     += 1;
         show  = fxx + 1;    // pos fld show
         check = fxx + 2;    // pos fld show

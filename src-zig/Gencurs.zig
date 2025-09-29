@@ -164,10 +164,13 @@ pub fn main() !void {
             mem.deinitTui();
 
             NPANEL.clearRetainingCapacity();
-
+            NPANEL = std.ArrayList(pnl.PANEL).initCapacity(mem.allocTui,0) catch unreachable;
+            
             NGRID.clearRetainingCapacity();
+            NGRID  = std.ArrayList(grd.GRID ).initCapacity(mem.allocTui,0) catch unreachable;
 
             NMENU.clearRetainingCapacity();
+            NMENU  = std.ArrayList(mnu.DEFMENU ).initCapacity(mem.allocTui,0) catch unreachable;
 
             base = pnl.newPanelC("base",
             1, 1,

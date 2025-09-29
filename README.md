@@ -394,9 +394,16 @@ BR/><BR/>
 → 2025-09-04 09:10 : update for 0.16.dev  chg std.io ->std.IO   ex mdlSjson.zig  <BR/>
 
  <BR/>
-→ 2025-09-27 04:10 : uAfter lots of testing and bug fixes,  you can now have multiple panels in a JSON file.
+→ 2025-09-27 04:10 : After lots of testing and bug fixes,  you can now have multiple panels in a JSON file.
 I still have a typo with the grids; for now, you need to have a full panel.  <BR/>
 → 2025-09-27 04:10 :n the panel definition, all functions are recognized. <BR/>
+
+ <BR/>
+→ 2025-09-29 16:40 :Added PageUp/PageDown keys to the Panel definition. <BR/>
+Modified the processing of the mdlGRID module, resolved the bug, GRIDs can now be defined freely.  <BR/>
+in the Panel resolution definition, press UP/DOWN  <BR/>
+ <BR/>
+
 
 
 <BR/>

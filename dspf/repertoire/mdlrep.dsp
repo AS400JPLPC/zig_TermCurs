@@ -57,6 +57,20 @@
           "show": true,
           "check": false,
           "title": "Delette"
+        },
+        {
+          "name": "pageUp",
+          "key": "pageUp",
+          "show": true,
+          "check": false,
+          "title": ""
+        },
+        {
+          "name": "pageDown",
+          "key": "pageDown",
+          "show": true,
+          "check": false,
+          "title": ""
         }
       ],
       "label": [
@@ -286,8 +300,8 @@
       "name": "PQUERY",
       "posx": 1,
       "posy": 1,
-      "lines": 41,
-      "cols": 132,
+      "lines": 15,
+      "cols": 60,
       "cadre": "line1",
       "title": "QUERY",
       "button": [
@@ -486,7 +500,7 @@
     {
       "name": "Cquery",
       "posx": 4,
-      "posy": 39,
+      "posy": 30,
       "pagerows": 6,
       "separator": "│",
       "cadre": "line1",

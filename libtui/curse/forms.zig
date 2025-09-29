@@ -23,6 +23,7 @@ const io = std.io;
 
 const Child = @import("std").ChildProcess;
 
+
 ///-------------------------------
 /// FORMS
 ///-------------------------------
@@ -3606,6 +3607,7 @@ pub const    pnl = struct {
     fn isNextIO(vpnl: *PANEL, idx : usize ) usize {
         var i : usize = idx + 1;
         if (idx == vpnl.field.items.len) i = 0;
+
         while ( i < vpnl.field.items.len - 1) : (i += 1) {
             if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
         }
@@ -3617,8 +3619,8 @@ pub const    pnl = struct {
     ///search there available field
     fn isPriorIO(vpnl: *PANEL, idx : usize) usize {
         var i : usize = 0;
-        const x : i64 = @intCast(idx - 1) ;
-        if ( x > 0 ) i = @intCast(x);
+        if ( idx  == 0 ) i = @intCast(vpnl.field.items.len - 1  ) else i =@intCast(idx - 1);
+ 
         while ( i > 0 ) : (i -= 1) {
             if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
         }
@@ -3703,8 +3705,7 @@ pub const    pnl = struct {
                                     vpnl.idxfld = nField;
                                 },
                                 .up    => {
-                                    if (nField == 0) nField = isPriorIO(vpnl, nbrFieldIO - 1 )
-                                    else nField= isPriorIO(vpnl,nField);
+                                    nField= isPriorIO(vpnl,nField);
                                     vpnl.idxfld = nField;
                                 },
                                 .down    => {
@@ -3796,8 +3797,7 @@ pub const    pnl = struct {
                     vpnl.idxfld = nField;
                 },
                 .up    => {
-                    if (nField == 0) nField = nbrFieldIO - 1 
-                    else nField= isPriorIO(vpnl,nField);
+                    nField= isPriorIO(vpnl,nField);
                     vpnl.idxfld = nField;
                 },
                 .down    => {
