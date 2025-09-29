@@ -4,6 +4,9 @@ terminal access function <br />
 <u>**zig 0.16.0 dev**</u><BR />
 <br />
 
+To test it, I am developing a database definition application called “zig_prog.” You will find all the updated libraries there.
+
+
 **Major library restructuring:**
 remove library
 Libtui (curse, log, calling, crypt, mmap,regex)
