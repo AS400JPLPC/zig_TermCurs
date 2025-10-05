@@ -56,8 +56,8 @@ printf '\e[8;'35';'80't'
 envCPP="1"
 envZIG="2"
 PROJECT="ZTERM"
-LIBPROJECT="/home/soleil/Zterm/"
-LIBRARY="/home/soleil/Zterm/libtui/"
+LIBPROJECT=$HOME"/Zterm/"
+LIBRARY=$HOME"/Zterm/libtui/"
 choix=""
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -78,6 +78,8 @@ do
 	f_dsplyPos 10  20 $faGras$fcRouge'13.'; f_dsplyPos 10  24 $faGras$fcGreen 'exCallpgm'
 	f_dsplyPos 11  20 $faGras$fcRouge'15.'; f_dsplyPos 11  24 $faGras$fcGreen 'Gensrc'
 
+	f_dsplyPos 14  20 $faGras$fcRouge'20.'; f_dsplyPos 14  24 $faGras$fcGreen 'test'
+    f_dsplyPos 15  20 $faGras$fcRouge'21.'; f_dsplyPos 15  24 $faGras$fcGreen 'test2'
 
 	f_dsplyPos 16  24 $faGras$fcJaune '----------------------------------------'
 
@@ -109,68 +111,74 @@ do
 
 # Gen
 		1)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Gen"
+			$HOME/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Gen"
 		;;
 # APPTERM
 		2)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
+			$HOME/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
 		;;
 # Src
 		3)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Src"
+			$HOME/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Src"
 		;;
 
 #Gencurs
 		11)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gencurs"
+			$HOME/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gencurs"
 		;;
 
 #Example
 		12)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Exemple"
+			$HOME/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Exemple"
 		;;
 
 #callExample
 		13)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "exCallpgm"
+			$HOME/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "exCallpgm"
 		;;
 
 #Gensrc
 		15)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gensrc"
+			$HOME/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Gensrc"
 		;;
 
+
+#study 
+        20)
+			$HOME/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test"	
+		;;
+
+#study 
+        21)
+			$HOME/.Terminal/dispatch.sh $envZIG  $LIBPROJECT   "test2"	
+		;;
 
 
 #debug
 		33)
-			/home/soleil/.Terminal/debugZig.sh $PROJECT
+			$HOME/.Terminal/debugZig.sh $PROJECT
 		;;
 
 #print install enscript
 		44)
-			/home/soleil/.Terminal/enScript.sh  $LIBPROJECT
+			$HOME/.Terminal/enScript.sh  $LIBPROJECT
 		;;
 
 #library
 		50)
-			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBRARY
+			$HOME/.Terminal/myProject.sh  $PROJECT $LIBRARY
 			#sleep 2
 			#break
 		;;
 
 #project
 		60)
-			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"src-zig"
-			#sleep 2
-			#break
+			$HOME/.Terminal/myProject.sh  $PROJECT $LIBPROJECT"src-zig"
 		;;
 
 #?file
 		66)
-			/home/soleil/.Terminal/lastFileZig.sh $PROJECT $LIBPROJECT"src-zig"
-			#sleep 2
-			#break
+			$HOME/.Terminal/lastFileZig.sh $PROJECT $LIBPROJECT"src-zig"
 		;;
 
 #?clear 
@@ -181,7 +189,7 @@ do
 #console
 
 		88)
-			/home/soleil/.Terminal/console.sh 
+			$HOME/.Terminal/console.sh 
 		;;
 
 
