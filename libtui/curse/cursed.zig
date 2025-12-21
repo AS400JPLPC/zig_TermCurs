@@ -463,15 +463,23 @@ pub fn titleTerm(title: []const u8) void {
 }
 
 // if use resize ok : vte application terminal ex TermVte
-// change XTERM
-// sudo thunar /etc/X11/app-defaults/XTerm
-// *allowWindowOps: true *eightBitInput: false
-
 pub fn resizeTerm(line: usize, cols: usize) void {
     if (line > 0 and cols > 0) {
         Print("\x1b[8;{d};{d};t", .{ line, cols });
     }
 }
+
+
+// alternate buffer
+pub fn enter_alt_screen() void {
+        WriteAll("\x1b[?1049h");
+ }
+
+pub fn leave_alt_screen() void {
+        WriteAll("\x1b[?1049l");
+ }
+
+
 
 /// mouse struct
 pub const MouseAction = enum {

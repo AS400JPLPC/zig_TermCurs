@@ -36,9 +36,7 @@ pub const DCMLFX = struct {
 	// Definition ex: for management -> accounting, stock, order...
 	//--------------------------------------------------------------
 	pub fn deinitDcml() void {
-	    arenaDcml.deinit();
-	    arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-	    allocDcml = arenaDcml.allocator();
+	    _=arenaDcml.reset(.free_all);
 	}
 
 
@@ -470,7 +468,7 @@ pub const DCMLFX = struct {
 	// It's not SQL-compliant, but it's handy for paper editions...
 	pub fn editCodeFlt( dst: *DCMLFX, comptime  CODE_EDIT : []const u8)  [] const u8 {
 		var PRINT_CODE: []const u8 = undefined;
-		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const v : f128 = if(dst.val >= 0) dst.val else dst.val  * -1;
 		const m: c_int = 10;
 
 		const e = @trunc(v);
@@ -493,7 +491,7 @@ pub const DCMLFX = struct {
 	// It's not SQL-compliant, but it's handy for paper editions...
 	pub fn strUFlt( dst: *DCMLFX)  [] const u8 {
 		var PRINT_CODE: []const u8 = undefined;
-		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const v : f128 = if(dst.val >= 0) dst.val else dst.val  * -1;
 		const m: c_int = 10;
 
 		const e = @trunc(v);
@@ -513,7 +511,7 @@ pub const DCMLFX = struct {
 	// It's not SQL-compliant, but it's handy for paper editions...
 	pub fn editCodeInt( dst: *DCMLFX, comptime  CODE_EDIT : []const u8 )  [] const u8 {
 		var PRINT_CODE: []const u8 = undefined;
-		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const v : f128 = if(dst.val >= 0) dst.val else dst.val  * -1;
 		const e = @trunc(v);
 		if ( dst.val == 0) PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{' ',e}) catch unreachable;
 		if ( dst.val > 0 )  PRINT_CODE = std.fmt.allocPrint(allocDcml, CODE_EDIT,.{'+',e}) catch unreachable;
@@ -525,7 +523,7 @@ pub const DCMLFX = struct {
 	// It's not SQL-compliant, but it's handy for paper editions...
 	pub fn strUInt( dst: *DCMLFX )  [] const u8 {
 		var PRINT_CODE: []const u8 = undefined;
-		const v : f128 = if(dst.val > 0) dst.val else dst.val  * -1;
+		const v : f128 = if(dst.val >= 0) dst.val else dst.val  * -1;
 		const e = @trunc(v);
 		PRINT_CODE = std.fmt.allocPrint(allocDcml,"{d}",.{e}) catch unreachable;
 		return allocDcml.dupe(u8, PRINT_CODE) catch unreachable;
@@ -834,6 +832,18 @@ pub const DCMLFX = struct {
 	}
 
 
+	// recherche si value negative
+	pub fn isNegative(a: DCMLFX) bool {
+		if (a.entier == 0 and a.scale == 0) {
+			const s = @src();
+            @panic( std.fmt.allocPrint(allocDcml,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}({d}) out-of-service FIELD err:{}\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,a.val, Error.Failed_Number})
+            	catch unreachable);
+        }
+		if (a.val < 0 ) return true  else return false ;
+	}
+
 
 	pub const Expr = union(enum) {
 	    Val: f128,
@@ -861,20 +871,22 @@ pub const DCMLFX = struct {
 	}
 
 
-	fn show_helper(expr: *const Payload, expr_name: []const u8, stdout: *const @TypeOf(std.io.getStdOut().writer())) anyerror!void {
-	    try stdout.print("{s}", .{expr_name});
-	    try show(expr.left, stdout);
-	    try stdout.print(", ", .{});
-	    try show(expr.right, stdout);
-	    try stdout.print(")", .{});
+	fn show_helper(expr: *const Payload, expr_name: []const u8) anyerror!void {
+		var w = std.fs.File.stdout().writerStreaming(&.{});
+		w.interface.print("{s}", .{expr_name}) catch unreachable;
+	    try show(expr.left);
+	    w.interface.print(", ", .{}) catch unreachable;
+	    try show(expr.right);
+	    w.interface.print(")", .{}) catch unreachable;
 	}
-	pub fn show(e: *const Expr, stdout: *const @TypeOf(std.io.getStdOut().writer())) anyerror !void {
+	pub fn show(e: *const Expr) anyerror !void {
+		var w = std.fs.File.stdout().writerStreaming(&.{});
 	    switch (e.*) {
-	        Expr.Val => |n| try stdout.print("Val {d}", .{n}),
-	        Expr.Add => |a| try show_helper(&a, "Add (", stdout),
-	        Expr.Sub => |s| try show_helper(&s, "Sub (", stdout),
-	        Expr.Mul => |m| try show_helper(&m, "Mul (", stdout),
-	        Expr.Div => |d| try show_helper(&d, "Div (", stdout),
+	        Expr.Val => |n| w.interface.print("Val {d}", .{n}) catch unreachable,
+	        Expr.Add => |a| try show_helper(&a, "Add ("),
+	        Expr.Sub => |s| try show_helper(&s, "Sub ("),
+	        Expr.Mul => |m| try show_helper(&m, "Mul ("),
+	        Expr.Div => |d| try show_helper(&d, "Div ("),
 	    }
 	}
 

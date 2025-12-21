@@ -28,6 +28,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+    Prog.root_module.addImport("alloc",zenlib_tui.module("alloc"));
 
     Prog.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
 
@@ -57,6 +58,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
   
+    docs.root_module.addImport("alloc",    zenlib_tui.module("alloc"));
 
     docs.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
 

@@ -28,8 +28,10 @@ pub fn build(b: *std.Build) void {
     });
 
 
-    Prog.linkLibC();
-    Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
+    // Prog.linkLibC();
+    // Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
+
+    Prog.root_module.addImport("alloc",zenlib_tui.module("alloc"));
 
     Prog.root_module.addImport("cursed",   zenlib_tui.module("cursed"));
 

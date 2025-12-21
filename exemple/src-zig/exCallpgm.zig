@@ -10,6 +10,9 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -79,14 +82,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     // Label
     // Name , pos X, pos Y,
     // Text , Attribut Text
-    Panel.label.append(lbl.newLabel("free",2,2,"Text-Free...................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("free",2,2,"Text-Free...................:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
     ) catch unreachable ;
     
 
-    Panel.label.append(lbl.newLabel("alpha",5,2,"Text-Alpha..................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("alpha",5,2,"Text-Alpha..................:")
     ) catch unreachable ;
 
 
@@ -98,7 +101,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
  // Field 
 
     
-    Panel.field.append(fld.newFieldTextFree("free",2,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTextFree("free",2,32,        // Name , posx posy
                                         30,                        // width
                                         "free",                    // text
                                         true,                    // tofill
@@ -112,7 +115,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
      // fld.setProtect(Panel,0,true) catch unreachable;
     
     
-    Panel.field.append(fld.newFieldTextFull("full",3,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("full",3,32,        // Name , posx posy
                                         30,                        // width
                                         "full",                    // text
                                         true,                    // tofill
@@ -124,7 +127,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
     fld.setProtect(Panel,1,true) catch unreachable;
 
-    Panel.field.append(fld.newFieldAlpha("alpha",5,32,                // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldAlpha("alpha",5,32,                // Name , posx posy
                                         30,                            // width
                                         "Abcd",                        // text
                                         true,                        // tofill
@@ -139,7 +142,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
     
     // button--------------------------------------------------
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F3,                    // function
                         true,                    // show 
                         false,                    // check field
@@ -147,7 +150,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F2,                    // function
                         true,                    // show
                         true,                    // check field
@@ -155,7 +158,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F4,                    // function
                         true,                    // show
                         true,                    // check field
@@ -163,7 +166,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F5,                    // function
                         true,                    // show
                         false,                    // check field
@@ -171,7 +174,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F8,                    // function
                         true,                    // show 
                         false,                    // check control to Field 
@@ -179,14 +182,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F12,                // function
                         true,                    // show 
                         false,                    // check control to Field 
                         "ClearPanel"            // title enrg record
                         )
     ) catch unreachable ;
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F24,                // function
                         true,                    // show 
                         false,                    // check control to Field 
@@ -218,14 +221,14 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
     // Label
     // Name , pos X, pos Y,
     // Text , Attribut Text
-    Panel.label.append(lbl.newLabel("free",2,2,"Text-Free...................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("free",2,2,"Text-Free...................:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
     ) catch unreachable ;
 
     // button--------------------------------------------------
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F12,                // function
                         true,                    // show 
                         false,                    // check field
@@ -258,8 +261,7 @@ pub fn Menu01() mnu.MENU {
 
 pub fn deinitWrk() void {
     term.deinitTerm();
-    grd.deinitGrid();
-    utl.deinitUtl();
+    mem.deinitUtl();
 }
 
 //test ---------- pas de sortie output
@@ -295,10 +297,7 @@ pub fn main() !void {
 
     while (true) {
         // clean works
-        term.deinitTerm();
-        grd.deinitGrid();
-        utl.deinitUtl();
-        
+        deinitWrk() ;       
         Tkey.Key = pnl.ioPanel(pFmt01);
         
         switch (Tkey.Key) {
@@ -312,7 +311,7 @@ pub fn main() !void {
                 _= pnl.ioPanel(pFmt0X);
                 pnl.rstPanel(pnl.PANEL,pFmt0X, pFmt01);
                 pnl.freePanel(pFmt0X);
-                forms.allocatorForms.destroy(pFmt0X);
+                mem.allocTui.destroy(pFmt0X);
             },
             .F5 => {
                 const nitem = mnu.ioMenu(mMenu01,0);
@@ -322,7 +321,7 @@ pub fn main() !void {
             .F8 => {
                 var Gkey :grd.GridSelect = undefined ;
                 Gkey.Key = term.kbd.none;
-                Gkey.Buf = std.ArrayList([]const u8).init(grd.allocatorGrid);
+                Gkey.Buf = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable;
 
                 // Grid ---------------------------------------------------------------
                 var Grid01 : *grd.GRID =    grd.newGridC(
@@ -400,9 +399,8 @@ pub fn main() !void {
                 pnl.rstPanel(grd.GRID,Grid01, pFmt01);
                 // if you have several grids please do a freeGrid on exit and a reloadGrid on enter
                 grd.freeGrid(Grid01);
-                grd.allocatorGrid.destroy(Grid01);
-                Gkey.Buf.deinit();
-                grd.deinitGrid();
+                mem.allocTui.destroy(Grid01);
+                Gkey.Buf.deinit(mem.allocTui);
                 // for debug control memoire in test CODELLDB
                 // _= kbd.getKEY();
             },
@@ -416,7 +414,7 @@ pub fn main() !void {
             .F24 => {
             // function enrg file record
                 pnl.freePanel(pFmt01);
-                forms.deinitForms();
+                mem.deinitTui();
                 deinitWrk();
                 pFmt01 = Panel_Fmt01();
                 pnl.printPanel(pFmt01);

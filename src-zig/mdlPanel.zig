@@ -47,7 +47,39 @@ const utl = @import("utils");
 const reg = @import("mvzr");
 
 
-//var numPanel : usize = undefined ;
+//==========================================================================================
+var stdin = std.fs.File.stdin();
+var stdout = std.fs.File.stdout().writer(&.{});
+
+inline fn Print(comptime format: []const u8, args: anytype) void {
+    stdout.interface.print(format, args) catch {};
+    stdout.interface.flush() catch {};
+}
+
+inline fn WriteAll(args: anytype) void {
+    stdout.interface.writeAll(args) catch {};
+    stdout.interface.flush() catch {};
+}
+
+fn Pause(msg: []const u8) void {
+    Print("\nPause  {s}\r\n", .{msg});
+    var buf: [16]u8 = undefined;
+    var c: usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+fn Perror(errmsg: []const u8) void {
+    Print("\r\n please fix: {s}\n", .{errmsg});
+    var buf: [16]u8 = undefined;
+    var c: usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+
+//============================================================================================
+
 
 pub const ErrMain = error{
     main_append_NPANEL_invalide,

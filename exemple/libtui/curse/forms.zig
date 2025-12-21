@@ -10,15 +10,19 @@
 
 const std = @import("std");
 const utf = @import("std").unicode;
+
+const mem = @import("alloc");
+
 const kbd = @import("cursed").kbd;
 const term= @import("cursed");
 const utl = @import("utils");
 const reg = @import("mvzr");  // regex match
 
 const os = std.os;
-const io = std.io;
+//const io = std.io;
 
 const Child = @import("std").ChildProcess;
+
 
 ///-------------------------------
 /// FORMS
@@ -27,13 +31,13 @@ const Child = @import("std").ChildProcess;
 
 
 // for panel all arraylist (forms. label button line field pnl:)
-var arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-pub var  allocatorForms = arenaForms.allocator();
-pub fn deinitForms() void {
-    arenaForms.deinit();
-    arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorForms = arenaForms.allocator();
-}
+// var arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+// pub var  allocatorForms = arenaForms.allocator();
+// pub fn deinitForms() void {
+//     arenaForms.deinit();
+//     arenaForms = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+//     allocatorForms = arenaForms.allocator();
+// }
 
 
 pub const CTRUE  = "✔";
@@ -469,7 +473,7 @@ pub const    lbl = struct {
 
         while (iter.next()) |ch| {
             if (vlbl.actif == true) {
-                vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+                vpnl.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui,"{s}",.{ch}) catch unreachable;
                 vpnl.buf.items[n].attribut = vlbl.attribut;
                 vpnl.buf.items[n].on = true;
             }
@@ -695,7 +699,7 @@ pub const frm = struct {
                 var iter = utl.iteratStr.iterator(vfram.title);
                 defer iter.deinit();
                 while (iter.next()) |ch| {
-                    vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+                    vpnl.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui,"{s}",.{ch}) catch unreachable;
                     vpnl.buf.items[n].attribut = vfram.titleAttribut;
                     vpnl.buf.items[n].on = true;
                     n +=1;
@@ -1079,7 +1083,7 @@ pub const btn = struct{
                 defer iter.deinit();
                 while (iter.next()) |ch| {
                     if (button.actif == true) {
-                        vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+                        vpnl.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui,"{s}",.{ch}) catch unreachable;
 
                         vpnl.buf.items[n].attribut = button.attribut;
                         vpnl.buf.items[n].on = true;
@@ -1098,7 +1102,7 @@ pub const btn = struct{
 
                 while (iter.next()) |ch| {
                     if (button.actif == true) {
-                        vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+                        vpnl.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui,"{s}",.{ch}) catch unreachable;
 
                         vpnl.buf.items[n].attribut = button.titleAttribut;
                         vpnl.buf.items[n].on = true;
@@ -1125,7 +1129,7 @@ pub const    fld = struct {
 
 
     pub fn ToStr(text : [] const u8 ) []const u8 {
-        return std.fmt.allocPrint(allocatorForms,"{s}",.{text}) 
+        return std.fmt.allocPrint(mem.allocTui,"{s}",.{text}) 
                                     catch |err| { @panic(@errorName(err));};
     }
 
@@ -1325,7 +1329,7 @@ pub const    fld = struct {
             .atrCall    = AtrCall,
             .actif    = true
         };
-        if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}",.{vregex})
+        if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}",.{vregex})
              catch |err| { @panic(@errorName(err));} ;
         
         return xfield;
@@ -1605,7 +1609,7 @@ pub const    fld = struct {
         };
 
 
-        xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
+        xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}"
         ,.{"(0[1-9]|[12][0-9]|3[01])[\\/](0[1-9]|1[012])[\\/][0-9]{4}"}) 
         catch |err| { @panic(@errorName(err));};
 
@@ -1657,7 +1661,7 @@ pub const    fld = struct {
                 .actif    = true
         };
 
-        xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
+        xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}"
         ,.{"(0[1-9]|1[012])[\\/](0[1-9]|[12][0-9]|3[01])[\\/][0-9]{4}"})
         catch |err| { @panic(@errorName(err));};
 
@@ -1711,7 +1715,7 @@ pub const    fld = struct {
         };
 
 
-        xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
+        xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}"
         ,.{"[0-9]{4}[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])"})
         catch |err| { @panic(@errorName(err));};
 
@@ -1764,7 +1768,7 @@ pub const    fld = struct {
 
 
     // https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
-            xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
+            xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}"
             ,.{"^[a-zA-Z0-9_!#$%&=.^~|?*+'`{}/-]+@([a-zA-Z0-9.-])+$"})
             catch |err| { @panic(@errorName(err));};
             
@@ -1816,10 +1820,10 @@ pub const    fld = struct {
                 .actif    = true
             };
 
-            if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
+            if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(mem.allocTui,
             "^{s}",.{vregex}) catch |err| { @panic(@errorName(err));};
             // regex standard fr
-            if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,"{s}"
+            if (vregex.len == 0 ) xfield.regex = std.fmt.allocPrint(mem.allocTui,"{s}"
             ,.{"[+][(][0-9]{2,3}[)][0-9]([-. }?[0-9]{2,3}){1,4}"})
             catch |err| { @panic(@errorName(err));};
 
@@ -1870,7 +1874,7 @@ pub const    fld = struct {
         };
 
             if (vregex.len == 0 ) {
-                xfield.regex = std.fmt.allocPrint(allocatorForms,"[0-9]{{1,{d}}}",.{xfield.width})
+                xfield.regex = std.fmt.allocPrint(mem.allocTui,"[0-9]{{1,{d}}}",.{xfield.width})
                 catch |err| { @panic(@errorName(err));};
             }
             if (xfield.help.len == 0 ) xfield.help = "ex: 0..9" ;
@@ -1919,7 +1923,7 @@ pub const    fld = struct {
         };
             xfield.nbrcar = xfield.width + xfield.scal    + 1 ;
             if (vregex.len == 0 ) {
-                xfield.regex = std.fmt.allocPrint(allocatorForms,"([+]|[-])[0-9]{{1,{d}}}",.{xfield.width})
+                xfield.regex = std.fmt.allocPrint(mem.allocTui,"([+]|[-])[0-9]{{1,{d}}}",.{xfield.width})
                 catch |err| { @panic(@errorName(err));};
             }
             if (xfield.help.len == 0 ) xfield.help = "ex: +0..9" ;
@@ -1973,10 +1977,10 @@ pub const    fld = struct {
         else xfield.nbrcar = xfield.width + xfield.scal    + 1 ;
 
         if (vregex.len == 0 ) {
-            if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
+            if (vscal == 0 ) xfield.regex = std.fmt.allocPrint(mem.allocTui,
             "[0-9]{{1,{d}}}",.{vwidth})    catch |err| { @panic(@errorName(err));}
 
-            else xfield.regex = std.fmt.allocPrint(allocatorForms,
+            else xfield.regex = std.fmt.allocPrint(mem.allocTui,
             "[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal})
             catch |err| { @panic(@errorName(err));};
         }
@@ -2031,10 +2035,10 @@ pub const    fld = struct {
         else xfield.nbrcar = xfield.width + xfield.scal    + 2 ;
         if (vregex.len == 0 ) {
 
-            if (vscal == 0 ) xfield.regex =    std.fmt.allocPrint(allocatorForms,
+            if (vscal == 0 ) xfield.regex =    std.fmt.allocPrint(mem.allocTui,
             "([+]|[-])[0-9]{{1,{d}}}$",.{vwidth}) catch |err| { @panic(@errorName(err));}
 
-            else xfield.regex = std.fmt.allocPrint(allocatorForms,
+            else xfield.regex = std.fmt.allocPrint(mem.allocTui,
             "([+]|[-])[0-9]{{1,{d}}}[.][0-9]{{{d}}}$",.{vwidth,vscal}) 
             catch |err| { @panic(@errorName(err));};
 
@@ -2345,7 +2349,7 @@ pub const    fld = struct {
         while (iter.next()) |ch| {
             if (vfld.actif == true ) {
                 if (vfld.reftyp == REFTYP.PASSWORD) vpnl.buf.items[n].ch = "*" 
-                else vpnl.buf.items[n].ch = std.fmt.allocPrint(allocatorForms,"{s}",.{ch}) catch unreachable;
+                else vpnl.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui,"{s}",.{ch}) catch unreachable;
 
 
                 vpnl.buf.items[n].on = true;
@@ -2380,6 +2384,7 @@ pub const    fld = struct {
     }
 
 
+    
     //----------------------------------------------------
     // Input buffer management modeled on 5250/3270
     // inspiration ncurse
@@ -2408,7 +2413,7 @@ pub const    fld = struct {
     pub fn isMatchiFixedFr(testval : [] const u8) bool {
 
         const valtest = std.fmt.allocPrint(
-            utl.allocUtl,
+            mem.allocUtl,
             "{s}-{s}-{s}",
             .{ testval[6..10], testval[3..5], testval[0..2]}) catch unreachable;
     
@@ -2423,7 +2428,7 @@ pub const    fld = struct {
     pub fn isMatchiFixedUs(testval : [] const u8) bool {
 
         const valtest = std.fmt.allocPrint(
-            utl.allocUtl,
+            mem.allocUtl,
             "{s}-{s}-{s}",
             .{ testval[6..10], testval[0..2], testval[3..5]}) catch unreachable;
     
@@ -2435,7 +2440,7 @@ pub const    fld = struct {
     }
 
 
-    var e_FIELD : std.ArrayList([] const u8) = undefined;
+    var e_FIELD = std.ArrayList([] const u8).initCapacity(mem.allocTui,0) catch unreachable;
 
     var e_switch: bool = false;
 
@@ -2450,27 +2455,26 @@ pub const    fld = struct {
 
     fn delete(n : usize) void {
         _=e_FIELD.orderedRemove(n);
-        e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
+        e_FIELD.append(mem.allocTui," ") catch |err| { @panic(@errorName(err));};
     }
 
     fn insert(c: [] const u8 , n : usize) void {
         _=e_FIELD.orderedRemove(nbrCarField() - 1);
 
-        const allocator = std.heap.page_allocator;
-        var x_FIELD = std.ArrayList([] const u8).init(allocator);
-        defer x_FIELD.deinit();
+        var x_FIELD = std.ArrayList([] const u8).initCapacity(mem.allocTui,0) catch unreachable;
+        defer x_FIELD.deinit(mem.allocTui);
 
         for ( e_FIELD.items) |ch | {
-            x_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
+            x_FIELD.append(mem.allocTui,ch) catch |err| { @panic(@errorName(err));};
         }
         e_FIELD.clearRetainingCapacity();
 
 
         for ( x_FIELD.items ,0..) |ch , idx | {
-            if ( n != idx) e_FIELD.append(ch) catch |err| { @panic(@errorName(err));};
+            if ( n != idx) e_FIELD.append(mem.allocTui,ch) catch |err| { @panic(@errorName(err));};
             if ( n == idx) { 
-                e_FIELD.append(c)    catch |err| { @panic(@errorName(err));};
-                e_FIELD.append(ch)    catch |err| { @panic(@errorName(err));};
+                e_FIELD.append(mem.allocTui,c)    catch |err| { @panic(@errorName(err));};
+                e_FIELD.append(mem.allocTui,ch)    catch |err| { @panic(@errorName(err));};
             } 
         }
     }
@@ -2533,7 +2537,7 @@ pub const    fld = struct {
                 utl.addListStr(&e_FIELD    , f.text);
                 var i:usize = 0 ;
             while (i < (f.nbrcar - utl.nbrCharStr(f.text))) : ( i += 1) {
-                e_FIELD.append(" ") catch |err| { @panic(@errorName(err));};
+                e_FIELD.append(mem.allocTui," ") catch |err| { @panic(@errorName(err));};
             }
         }
     }
@@ -2654,9 +2658,8 @@ pub const    fld = struct {
         var statusCursInsert : bool = false ;
         var nfield :usize = 0 ;
 
-        const allocator = std.heap.page_allocator;
-        e_FIELD = std.ArrayList([] const u8).init(allocator);
-        defer e_FIELD.deinit();
+        e_FIELD = std.ArrayList([] const u8).initCapacity(mem.allocTui,0) catch unreachable;
+        defer e_FIELD.deinit(mem.allocTui);
         
         e_switch = vfld.zwitch;
         const e_reftyp = vfld.reftyp;
@@ -3170,7 +3173,7 @@ pub const    fld = struct {
 // defined Panel
 pub const    pnl = struct {
 
-    // define attribut default PANELallocatorForms
+    // define attribut default PANEL
     pub var AtrPanel : term.ZONATRB = .{
             .styled=[_]u32{@intFromEnum(term.Style.styleDim),
                                         @intFromEnum(term.Style.notStyle),
@@ -3230,6 +3233,8 @@ pub const    pnl = struct {
 
         idxfld: usize,
 
+        grid:    bool,
+
         key      : kbd ,    // Func task call
 
         keyField : kbd ,    // enter up down
@@ -3264,16 +3269,18 @@ pub const    pnl = struct {
                     .name     = vname,
                     .posx     = vposx,
                     .posy     = vposy,
-                    .lines   = vlines,
+                    .lines    = vlines,
                     .cols     = vcols,
                     .attribut = AtrPanel,
-                    .frame  = undefined,
-                    .label    = std.ArrayList(lbl.LABEL).init(allocatorForms),
-                    .button = std.ArrayList(btn.BUTTON).init(allocatorForms),
-                    .field    = std.ArrayList(fld.FIELD).init(allocatorForms),
-                    .linev    = std.ArrayList(lnv.LINEV).init(allocatorForms),
-                    .lineh    = std.ArrayList(lnh.LINEH).init(allocatorForms),
-                    .buf    = std.ArrayList(TERMINAL_CHAR).init(allocatorForms),
+                    .frame    = undefined,
+                    .label    = std.ArrayList(lbl.LABEL).initCapacity(mem.allocTui,0) catch unreachable,
+                    .button   = std.ArrayList(btn.BUTTON).initCapacity(mem.allocTui,0) catch unreachable,
+                    .field    = std.ArrayList(fld.FIELD).initCapacity(mem.allocTui,0) catch unreachable,
+                    .linev    = std.ArrayList(lnv.LINEV).initCapacity(mem.allocTui,0) catch unreachable,
+                    .lineh    = std.ArrayList(lnh.LINEH).initCapacity(mem.allocTui,0) catch unreachable,
+                    .buf      = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable,
+                    
+                    .grid   = false,
                     .idxfld = 9999,
                     .key    =    kbd.none,
                     .keyField = kbd.none,
@@ -3288,7 +3295,7 @@ pub const    pnl = struct {
         // init matrix
         while (true) {
                 if (i == 0) break ;
-                xpanel.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
+                xpanel.buf.append(mem.allocTui,doublebuffer) catch |err| { @panic(@errorName(err));};
                 i -=1 ;
         }
 
@@ -3313,7 +3320,7 @@ pub const    pnl = struct {
                     vcadre : CADRE,
                     vtitle: [] const u8 ) *PANEL {
 
-        var device = allocatorForms.create(PANEL) 
+        var device = mem.allocTui.create(PANEL) 
                                     catch |err| { @panic(@errorName(err)) ; };
 
         device.name     = vname;
@@ -3323,12 +3330,13 @@ pub const    pnl = struct {
         device.cols     = vcols;
         device.attribut = AtrPanel;
         device.frame    = undefined;
-        device.label    = std.ArrayList(lbl.LABEL).init(allocatorForms);
-        device.button   = std.ArrayList(btn.BUTTON).init(allocatorForms);
-        device.field    = std.ArrayList(fld.FIELD).init(allocatorForms);
-        device.linev    = std.ArrayList(lnv.LINEV).init(allocatorForms);
-        device.lineh    = std.ArrayList(lnh.LINEH).init(allocatorForms);
-        device.buf      = std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
+        device.label    = std.ArrayList(lbl.LABEL).initCapacity(mem.allocTui,0) catch unreachable;
+        device.button   = std.ArrayList(btn.BUTTON).initCapacity(mem.allocTui,0) catch unreachable;
+        device.field    = std.ArrayList(fld.FIELD).initCapacity(mem.allocTui,0) catch unreachable;
+        device.linev    = std.ArrayList(lnv.LINEV).initCapacity(mem.allocTui,0) catch unreachable;
+        device.lineh    = std.ArrayList(lnh.LINEH).initCapacity(mem.allocTui,0) catch unreachable;
+        device.buf      = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable;
+        device.grid     = false;
         device.idxfld   = 9999;
         device.key      = kbd.none;
         device.keyField = kbd.none;
@@ -3344,7 +3352,7 @@ pub const    pnl = struct {
         // init matrix
         while (true) {
                 if (i == 0) break ;
-                device.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
+                device.buf.append(mem.allocTui,doublebuffer) catch |err| { @panic(@errorName(err));};
                 i -=1 ;
         }
 
@@ -3361,8 +3369,8 @@ pub const    pnl = struct {
     }
 
     pub fn initMatrix(vpnl: *PANEL) void {
-        vpnl.buf.deinit();
-        vpnl.buf        = std.ArrayList(TERMINAL_CHAR).init(allocatorForms);
+        vpnl.buf.deinit(mem.allocTui);
+        vpnl.buf        = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable;
 
                 // INIT doublebuffer
         var i:usize = (vpnl.lines+1) * (vpnl.cols+1);
@@ -3373,25 +3381,28 @@ pub const    pnl = struct {
         // init matrix
         while (true) {
                 if (i == 0) break ;
-                vpnl.buf.append(doublebuffer) catch |err| { @panic(@errorName(err));};
+                vpnl.buf.append(mem.allocTui,doublebuffer) catch |err| { @panic(@errorName(err));};
                 i -=1 ;
         }
     }
 
 
     pub fn freePanel(vpnl: *PANEL) void {
-        vpnl.label.clearAndFree();
-        vpnl.button.clearAndFree();
-        vpnl.field.clearAndFree();
-        vpnl.lineh.clearAndFree();
-        vpnl.linev.clearAndFree();
-        vpnl.buf.clearAndFree();
-        vpnl.label.deinit();
-        vpnl.button.deinit();
-        vpnl.field.deinit();
-        vpnl.lineh.deinit();
-        vpnl.linev.deinit();
-        vpnl.buf.deinit();
+        vpnl.label.clearAndFree(mem.allocTui);
+        vpnl.button.clearAndFree(mem.allocTui);
+        vpnl.field.clearAndFree(mem.allocTui);
+        vpnl.lineh.clearAndFree(mem.allocTui);
+        vpnl.linev.clearAndFree(mem.allocTui);
+        vpnl.buf.clearAndFree(mem.allocTui);
+        vpnl.label.deinit(mem.allocTui);
+        vpnl.button.deinit(mem.allocTui);
+        vpnl.field.deinit(mem.allocTui);
+        vpnl.lineh.deinit(mem.allocTui);
+        vpnl.linev.deinit(mem.allocTui);
+        vpnl.buf.deinit(mem.allocTui);
+        vpnl.grid = false;
+        vpnl.idxfld =9999;
+        vpnl.keyField =kbd.none;        
     }
 
 
@@ -3419,14 +3430,19 @@ pub const    pnl = struct {
     pub fn getActif(vpnl: *PANEL) bool {
         return vpnl.actif;
     }
+    pub fn getGrid(vpnl: *PANEL) bool {
+        return vpnl.grid;
+    }
 
     pub fn setIdxfld(vpnl: *PANEL , n :usize) void {
         vpnl.idxfld = n ;
     }
     pub fn setActif(vpnl: *PANEL , b :bool) void {
-        vpnl.items.actif = b ;
+        vpnl.actif = b ;
     }
-
+    pub fn setGrid(vpnl: *PANEL , b :bool) void {
+        vpnl.grid = b ;
+    }
 
     pub fn displayPanel(vpnl: *PANEL)    void {
         // display matrice PANEL
@@ -3469,6 +3485,8 @@ pub const    pnl = struct {
 
         vpnl.idxfld =9999;
 
+        vpnl.grid = false;
+        
         vpnl.keyField =kbd.none;
 
         for (vpnl.field.items, 0..) |_, idx| {
@@ -3477,29 +3495,91 @@ pub const    pnl = struct {
 
         }
     }
+
+
     // restor -panel MATRIX to terminal
     pub fn rstPanel(comptime T: type , vsrc: *T , vdst : *PANEL) void {
         if (vdst.actif == false)    return ;
-        if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines    )    return ;
-        if (vsrc.posy + vsrc.cols    > vdst.posy + vdst.cols    )    return ;
+        if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines   )    return ;
+        if (vsrc.posy + vsrc.cols  > vdst.posy + vdst.cols    )    return ;
 
         var x :usize = 0;
         var y :usize = 0;
         var n :usize = 0;
-        var npos : usize =     vsrc.posx - vdst.posx   ;
+        var npos : usize = 0 ;
 
-    
-        while (x <= vsrc.lines) : (x += 1) {
-                n = (vdst.cols * npos) + vsrc.posy - vdst.posy ;
-                y = 0;
-                while (y <= vsrc.cols ) : (y += 1) {
-                    term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );
+
+        
+        if ( (vsrc.posx + vsrc.lines < vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  < vdst.posy + vdst.cols) )
+        {
+            x = 0;
+            npos = vsrc.posx - vdst.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos) + vsrc.posy - vdst.posy ;
+                    y = 0;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return;
+        }
+
+        if ( (vsrc.posx + vsrc.lines == vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  < vdst.posy + vdst.cols) )
+        {
+            x = 1 ;
+            npos = vdst.posx - vsrc.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos) + vsrc.posy - vdst.posy  ;
+                    y = 1;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vdst.posx - 1  , y + vdst.posy - 1 );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return ;
+        }
+
+
+        if ( (vsrc.posx + vsrc.lines < vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  == vdst.posy + vdst.cols) )
+        {
+            x = 1 ;
+            npos = vdst.posx - vsrc.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos)  ;
+                    y = 1;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vdst.posx - 1  , y + vdst.posy - 1 );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return;
+        }
+
+        
+        if ( (vsrc.posx + vsrc.lines == vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  == vdst.posy + vdst.cols) )
+        {
+            x = 1;
+            n = 0;
+            while (x <= vsrc.lines) : (x += 1) {
+                y = 1;
+                while (y <= vsrc.cols) : (y += 1) {
+                    term.gotoXY(x + vdst.posx - 1    , y + vdst.posy - 1 );
                     term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
                     n += 1;
                 }
-            npos += 1;
+            }
         }
+        
     }
+
+    
 
     /// print PANEL
     pub fn printPanel    (vpnl: *PANEL) void {
@@ -3509,6 +3589,9 @@ pub const    pnl = struct {
 
         // cursor HIDE par défault
         term.cursHide();
+
+        // grid off
+        vpnl.grid = false;
 
         // clear matrix
         clsPanel(vpnl);
@@ -3545,6 +3628,19 @@ pub const    pnl = struct {
 
         displayPanel(vpnl);
     }
+
+
+
+    pub fn refreshField(vpnl: *pnl.PANEL)    void {
+        // FIELD
+        for (vpnl.field.items) |fldprt| {
+            if (fldprt.actif) {
+                fld.printField(vpnl, fldprt);
+                fld.displayField(vpnl, fldprt);
+            }
+        }
+    }
+
 
     pub fn msgErr(vpnl: *PANEL, info: [] const u8) void {
 
@@ -3604,6 +3700,7 @@ pub const    pnl = struct {
     fn isNextIO(vpnl: *PANEL, idx : usize ) usize {
         var i : usize = idx + 1;
         if (idx == vpnl.field.items.len) i = 0;
+
         while ( i < vpnl.field.items.len - 1) : (i += 1) {
             if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
         }
@@ -3615,8 +3712,8 @@ pub const    pnl = struct {
     ///search there available field
     fn isPriorIO(vpnl: *PANEL, idx : usize) usize {
         var i : usize = 0;
-        const x : i64 = @intCast(idx - 1) ;
-        if ( x > 0 ) i = @intCast(x);
+        if ( idx  == 0 ) i = @intCast(vpnl.field.items.len - 1  ) else i =@intCast(idx - 1);
+ 
         while ( i > 0 ) : (i -= 1) {
             if (vpnl.field.items[i].actif and !vpnl.field.items[i].protect ) break ;
         }
@@ -3681,9 +3778,11 @@ pub const    pnl = struct {
             }
         }
             
-        // first time
+        // first time or Init 
+        // If grid = on, printPanel before querying the panel.
+        //This allows you to integrate the display of a grid into the panel
         if ( vpnl.idxfld == 9999) {
-                printPanel(vpnl); 
+                if ( !vpnl.grid) printPanel(vpnl); 
                 nField = 0;
                 // positioning on the first active Field zone
                 if (nbrField > 0 ) {
@@ -3701,8 +3800,7 @@ pub const    pnl = struct {
                                     vpnl.idxfld = nField;
                                 },
                                 .up    => {
-                                    if (nField == 0) nField = isPriorIO(vpnl, nbrFieldIO - 1 )
-                                    else nField= isPriorIO(vpnl,nField);
+                                    nField= isPriorIO(vpnl,nField);
                                     vpnl.idxfld = nField;
                                 },
                                 .down    => {
@@ -3794,8 +3892,7 @@ pub const    pnl = struct {
                     vpnl.idxfld = nField;
                 },
                 .up    => {
-                    if (nField == 0) nField = nbrFieldIO - 1 
-                    else nField= isPriorIO(vpnl,nField);
+                    nField= isPriorIO(vpnl,nField);
                     vpnl.idxfld = nField;
                 },
                 .down    => {

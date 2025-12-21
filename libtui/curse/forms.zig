@@ -19,7 +19,7 @@ const utl = @import("utils");
 const reg = @import("mvzr");  // regex match
 
 const os = std.os;
-const io = std.io;
+//const io = std.io;
 
 const Child = @import("std").ChildProcess;
 
@@ -2384,6 +2384,7 @@ pub const    fld = struct {
     }
 
 
+    
     //----------------------------------------------------
     // Input buffer management modeled on 5250/3270
     // inspiration ncurse
@@ -3232,6 +3233,8 @@ pub const    pnl = struct {
 
         idxfld: usize,
 
+        grid:    bool,
+
         key      : kbd ,    // Func task call
 
         keyField : kbd ,    // enter up down
@@ -3276,7 +3279,8 @@ pub const    pnl = struct {
                     .linev    = std.ArrayList(lnv.LINEV).initCapacity(mem.allocTui,0) catch unreachable,
                     .lineh    = std.ArrayList(lnh.LINEH).initCapacity(mem.allocTui,0) catch unreachable,
                     .buf      = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable,
-
+                    
+                    .grid   = false,
                     .idxfld = 9999,
                     .key    =    kbd.none,
                     .keyField = kbd.none,
@@ -3332,6 +3336,7 @@ pub const    pnl = struct {
         device.linev    = std.ArrayList(lnv.LINEV).initCapacity(mem.allocTui,0) catch unreachable;
         device.lineh    = std.ArrayList(lnh.LINEH).initCapacity(mem.allocTui,0) catch unreachable;
         device.buf      = std.ArrayList(TERMINAL_CHAR).initCapacity(mem.allocTui,0) catch unreachable;
+        device.grid     = false;
         device.idxfld   = 9999;
         device.key      = kbd.none;
         device.keyField = kbd.none;
@@ -3395,6 +3400,9 @@ pub const    pnl = struct {
         vpnl.lineh.deinit(mem.allocTui);
         vpnl.linev.deinit(mem.allocTui);
         vpnl.buf.deinit(mem.allocTui);
+        vpnl.grid = false;
+        vpnl.idxfld =9999;
+        vpnl.keyField =kbd.none;        
     }
 
 
@@ -3422,14 +3430,19 @@ pub const    pnl = struct {
     pub fn getActif(vpnl: *PANEL) bool {
         return vpnl.actif;
     }
+    pub fn getGrid(vpnl: *PANEL) bool {
+        return vpnl.grid;
+    }
 
     pub fn setIdxfld(vpnl: *PANEL , n :usize) void {
         vpnl.idxfld = n ;
     }
     pub fn setActif(vpnl: *PANEL , b :bool) void {
-        vpnl.items.actif = b ;
+        vpnl.actif = b ;
     }
-
+    pub fn setGrid(vpnl: *PANEL , b :bool) void {
+        vpnl.grid = b ;
+    }
 
     pub fn displayPanel(vpnl: *PANEL)    void {
         // display matrice PANEL
@@ -3472,6 +3485,8 @@ pub const    pnl = struct {
 
         vpnl.idxfld =9999;
 
+        vpnl.grid = false;
+        
         vpnl.keyField =kbd.none;
 
         for (vpnl.field.items, 0..) |_, idx| {
@@ -3480,29 +3495,91 @@ pub const    pnl = struct {
 
         }
     }
+
+
     // restor -panel MATRIX to terminal
     pub fn rstPanel(comptime T: type , vsrc: *T , vdst : *PANEL) void {
         if (vdst.actif == false)    return ;
-        if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines    )    return ;
-        if (vsrc.posy + vsrc.cols    > vdst.posy + vdst.cols    )    return ;
+        if (vsrc.posx + vsrc.lines > vdst.posx + vdst.lines   )    return ;
+        if (vsrc.posy + vsrc.cols  > vdst.posy + vdst.cols    )    return ;
 
         var x :usize = 0;
         var y :usize = 0;
         var n :usize = 0;
-        var npos : usize =     vsrc.posx - vdst.posx   ;
+        var npos : usize = 0 ;
 
-    
-        while (x <= vsrc.lines) : (x += 1) {
-                n = (vdst.cols * npos) + vsrc.posy - vdst.posy ;
-                y = 0;
-                while (y <= vsrc.cols ) : (y += 1) {
-                    term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );
+
+        
+        if ( (vsrc.posx + vsrc.lines < vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  < vdst.posy + vdst.cols) )
+        {
+            x = 0;
+            npos = vsrc.posx - vdst.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos) + vsrc.posy - vdst.posy ;
+                    y = 0;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vsrc.posx  , y + vsrc.posy  );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return;
+        }
+
+        if ( (vsrc.posx + vsrc.lines == vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  < vdst.posy + vdst.cols) )
+        {
+            x = 1 ;
+            npos = vdst.posx - vsrc.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos) + vsrc.posy - vdst.posy  ;
+                    y = 1;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vdst.posx - 1  , y + vdst.posy - 1 );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return ;
+        }
+
+
+        if ( (vsrc.posx + vsrc.lines < vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  == vdst.posy + vdst.cols) )
+        {
+            x = 1 ;
+            npos = vdst.posx - vsrc.posx   ;
+            while (x <= vsrc.lines) : (x += 1) {
+                    n = (vdst.cols * npos)  ;
+                    y = 1;
+                    while (y <= vsrc.cols ) : (y += 1) {
+                        term.gotoXY(x + vdst.posx - 1  , y + vdst.posy - 1 );
+                        term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
+                        n += 1;
+                    }
+                npos += 1;
+            }
+            return;
+        }
+
+        
+        if ( (vsrc.posx + vsrc.lines == vdst.posx + vdst.lines) and (vsrc.posy + vsrc.cols  == vdst.posy + vdst.cols) )
+        {
+            x = 1;
+            n = 0;
+            while (x <= vsrc.lines) : (x += 1) {
+                y = 1;
+                while (y <= vsrc.cols) : (y += 1) {
+                    term.gotoXY(x + vdst.posx - 1    , y + vdst.posy - 1 );
                     term.writeStyled(vdst.buf.items[n].ch,vdst.buf.items[n].attribut);
                     n += 1;
                 }
-            npos += 1;
+            }
         }
+        
     }
+
+    
 
     /// print PANEL
     pub fn printPanel    (vpnl: *PANEL) void {
@@ -3512,6 +3589,9 @@ pub const    pnl = struct {
 
         // cursor HIDE par défault
         term.cursHide();
+
+        // grid off
+        vpnl.grid = false;
 
         // clear matrix
         clsPanel(vpnl);
@@ -3548,6 +3628,19 @@ pub const    pnl = struct {
 
         displayPanel(vpnl);
     }
+
+
+
+    pub fn refreshField(vpnl: *pnl.PANEL)    void {
+        // FIELD
+        for (vpnl.field.items) |fldprt| {
+            if (fldprt.actif) {
+                fld.printField(vpnl, fldprt);
+                fld.displayField(vpnl, fldprt);
+            }
+        }
+    }
+
 
     pub fn msgErr(vpnl: *PANEL, info: [] const u8) void {
 
@@ -3685,9 +3778,11 @@ pub const    pnl = struct {
             }
         }
             
-        // first time
+        // first time or Init 
+        // If grid = on, printPanel before querying the panel.
+        //This allows you to integrate the display of a grid into the panel
         if ( vpnl.idxfld == 9999) {
-                printPanel(vpnl); 
+                if ( !vpnl.grid) printPanel(vpnl); 
                 nField = 0;
                 // positioning on the first active Field zone
                 if (nbrField > 0 ) {

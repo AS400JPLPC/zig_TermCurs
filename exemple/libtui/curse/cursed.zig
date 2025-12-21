@@ -23,11 +23,9 @@ var stdout = std.fs.File.stdout().writer(&.{});
 
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
     stdout.interface.print(format,args )  catch {} ;
-    stdout.interface.flush() catch  {} ;
 }
 pub inline fn WriteAll( args: [] const u8) void {
     stdout.interface.writeAll(args)  catch {} ;
-    stdout.interface.flush() catch  {} ;
 }
 
 //============================================================================================
@@ -37,9 +35,7 @@ pub inline fn WriteAll( args: [] const u8) void {
 var arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 pub var allocatorTerm = arenaTerm.allocator();
 pub fn deinitTerm() void {
-    arenaTerm.deinit();
-    arenaTerm = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    allocatorTerm = arenaTerm.allocator();
+    _=arenaTerm.reset(.free_all);
 }
 
 pub const Style = enum(u8) {
@@ -267,17 +263,14 @@ pub fn getCursor() void {
     posCurs.x = 0;
 
     posCurs.y = 0;
-
     flushIO();
-
     // Don't forget to flush!
     WriteAll("\x1b[?6n");
-
+    flushIO();
     var c: usize = 0;
     while (c == 0) {
         c = stdin.read(&cursBuf) catch unreachable;
     }
-    flushIO();
 
     // columns = 1 digit
     if (cursBuf[4] == 59) {
@@ -315,7 +308,6 @@ pub fn getCursor() void {
             posCurs.y = (posCurs.y * 10) + convIntCursor(cursBuf[8]);
         }
     }
-    flushIO();
 }
 
 ///-------------------------
@@ -471,15 +463,23 @@ pub fn titleTerm(title: []const u8) void {
 }
 
 // if use resize ok : vte application terminal ex TermVte
-// change XTERM
-// sudo thunar /etc/X11/app-defaults/XTerm
-// *allowWindowOps: true *eightBitInput: false
-
 pub fn resizeTerm(line: usize, cols: usize) void {
     if (line > 0 and cols > 0) {
         Print("\x1b[8;{d};{d};t", .{ line, cols });
     }
 }
+
+
+// alternate buffer
+pub fn enter_alt_screen() void {
+        WriteAll("\x1b[?1049h");
+ }
+
+pub fn leave_alt_screen() void {
+        WriteAll("\x1b[?1049l");
+ }
+
+
 
 /// mouse struct
 pub const MouseAction = enum {
@@ -675,14 +675,14 @@ pub const kbd = enum {
 
         if (name[0] == 'a' and name[1] == 'l' and name[2] == 't') {
             if (vlen != 4) return .none;
-            result = @as(u8, name[3]) - 41;
-            if (result < 25 or result > 50) return .none else return @as(kbd, @enumFromInt(result));
+            result = @as(u8, name[3] - 28) ;
+            return @as(kbd, @enumFromInt(result));
         }
 
         if (name[0] == 'c' and name[1] == 't' and name[2] == 'r' and name[3] == 'l') {
             if (vlen != 5) return .none;
-            result = @as(u8, name[4]) - 14;
-            if (result < 51 or result > 76) return .none else return @as(kbd, @enumFromInt(result));
+            result = @as(u8, name[4] - 2) ;
+            return @as(kbd, @enumFromInt(result));
         }
 
         //std.debug.print("{s}\r\n",.{name});
