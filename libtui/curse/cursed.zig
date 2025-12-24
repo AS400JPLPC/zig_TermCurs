@@ -727,7 +727,6 @@ pub const kbd = enum {
         // var keybuf: [16] u8 =  [_]u8{0} ** 16;
         var keybuf : [16] u8 = @splat(0);
 
-        flushIO();
 
         var c: usize = 0;
         while (c == 0) {
@@ -736,7 +735,7 @@ pub const kbd = enum {
                 return Event;
             };
         }
-
+        flushIO();
 
         const view = std.unicode.Utf8View.init(keybuf[0..c]) catch {
             Event.Key = kbd.none;
