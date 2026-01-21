@@ -1183,6 +1183,26 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),
                     vField.protect = p.protect;
                 },
 
+                forms.REFTYP.ALPHA_LOWER => {
+                    vField = fld.newFieldAlphaLower(
+                        p.name,
+                        p.posx,
+                        p.posy,
+                        p.width,
+                        p.text,
+                        p.requier,
+                        p.errmsg,
+                        p.help,
+                        p.regex,
+                    );
+                    vField.proctask = p.proctask;
+                    vField.progcall = p.progcall;
+                    vField.typecall = p.typecall;
+                    vField.parmcall = p.parmcall;
+                    vField.protect = p.protect;
+                },
+
+                
                 forms.REFTYP.ALPHA_NUMERIC => {
                     vField = fld.newFieldAlphaNumeric(
                         p.name,
@@ -1221,6 +1241,25 @@ pub fn RstJson(XPANEL: *std.ArrayList(pnl.PANEL),
                     vField.protect = p.protect;
                 },
 
+                forms.REFTYP.ALPHA_NUMERIC_LOWER => {
+                    vField = fld.newFieldAlphaNumericLower(
+                        p.name,
+                        p.posx,
+                        p.posy,
+                        p.width,
+                        p.text,
+                        p.requier,
+                        p.errmsg,
+                        p.help,
+                        p.regex,
+                    );
+                    vField.proctask = p.proctask;
+                    vField.progcall = p.progcall;
+                    vField.typecall = p.typecall;
+                    vField.parmcall = p.parmcall;
+                    vField.protect = p.protect;
+                },
+                
                 forms.REFTYP.PASSWORD => {
                     vField = fld.newFieldPassword(
                         p.name,

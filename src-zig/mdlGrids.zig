@@ -246,8 +246,9 @@ pub fn fnPanel(XPANEL: *std.ArrayList(pnl.PANEL), XGRID: *std.ArrayList(grd.GRID
         
  
             switch(p.reftyp) {
-                forms.REFTYP.TEXT_FREE, forms.REFTYP.TEXT_FULL , forms.REFTYP.ALPHA ,
-                forms.REFTYP.ALPHA_UPPER, forms.REFTYP.ALPHA_NUMERIC, forms.REFTYP.ALPHA_NUMERIC_UPPER,
+                forms.REFTYP.TEXT_FREE, forms.REFTYP.TEXT_FULL ,
+                forms.REFTYP.ALPHA , forms.REFTYP.ALPHA_UPPER, forms.REFTYP.ALPHA_LOWER,
+                forms.REFTYP.ALPHA_NUMERIC, forms.REFTYP.ALPHA_NUMERIC_UPPER, forms.REFTYP.ALPHA_NUMERIC_LOWER,
                 forms.REFTYP.PASSWORD, forms.REFTYP.YES_NO  =>{
                     vText = std.heap.page_allocator.alloc(u8, p.width) catch unreachable;
                     @memset(vText[0..p.width], '#');

@@ -410,8 +410,13 @@ for( xobjet.items) | m | {
                 wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
-            
-                forms.REFTYP.ALPHA_NUMERIC => {
+
+                 forms.REFTYP.ALPHA_LOWER => {
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaLower(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
+                },
+
+                 forms.REFTYP.ALPHA_NUMERIC => {
                 wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaNumeric(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
@@ -420,7 +425,12 @@ for( xobjet.items) | m | {
                 wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaNumericUpper(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
                 },
-            
+
+                forms.REFTYP.ALPHA_NUMERIC_LOWER=> {
+                wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldAlphaNumericLower(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
+                ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;
+                },
+
                 forms.REFTYP.PASSWORD => {
                 wrt.print("\t\t\tPanel.field.append(mem.allocTui,fld.newFieldPassword(\"{s}\",{d},{d},{d},\n\t\t\t\"{s}\",\n\t\t\t{},\n\t\t\t\"{s}\",\n\t\t\t\"{s}\",\n\t\t\t\"{s}\")) catch unreachable ;\n"
                 ,.{f.name, f.posx, f.posy, f.width, f.text, f.requier, f.errmsg, f.help, f.regex}) catch {} ;

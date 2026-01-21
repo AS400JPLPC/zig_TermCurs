@@ -595,7 +595,7 @@ pub fn lowerStr(str: []const u8) []const u8 {
     };
     defer mem.allocUtl.free(result);
 
-    std.mem.copy(u8, result, str);
+    @memcpy(result, str);
     var idx: usize = 0;
     while (idx < result.len) : (idx += 1) {
         result[idx] = std.ascii.toLower(result[idx]);

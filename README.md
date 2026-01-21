@@ -1,7 +1,7 @@
 # zig_TermCurs
 
 terminal access function <br />
-<u>**zig 0.16.0 dev**</u><BR />
+<u>**zig 0.15.2</u><BR />
 <br />
 
 To test it, I am developing a database definition application called “zig_prog.” You will find all the updated libraries there.
@@ -85,8 +85,10 @@ https://github.com/kissy24/zig-logger/<BR /> <br />
 | TEXT_FULL            | Y            | Y        | Letter Digit Char-special              |
 | ALPHA                | Y            | Y        | Letter                                 |
 | ALPHA_UPPER          | Y            | Y        | Letter                                 |
+| ALPHA_LOWER          | Y            | Y        | Letter                                 |
 | ALPHA_NUMERIC        | Y            | Y        | Letter Digit espace -                  |
 | ALPHA_NUMERICT_UPPER | Y            | Y        | Letter Digit espace -                  |
+| ALPHA_NUMERICT_LOWER | Y            | Y        | Letter Digit espace -                  |
 | PASSWORD             | N            | Y        | Letter Digit and normaliz char-special |
 | YES_NO               | N            | Y        | 'y' or 'Y' / 'o' or 'O'                |
 | UDIGIT               | N            | Y        | Digit unsigned                         |
@@ -406,7 +408,8 @@ I still have a typo with the grids; for now, you need to have a full panel.  <BR
 Modified the processing of the mdlGRID module, resolved the bug, GRIDs can now be defined freely.  <BR/>
 in the Panel resolution definition, press UP/DOWN  <BR/>
  <BR/>
-
+→ 2026-01-21 02:45 :add the “lower” function <BR/>
+→ 2026-01-21 02:45 :** update for 0.15.2  regression**  <BR/>
 
 
 <BR/>

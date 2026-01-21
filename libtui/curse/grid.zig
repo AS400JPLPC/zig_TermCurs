@@ -65,26 +65,29 @@ const TERMINAL_CHAR = struct { ch: []const u8, attribut: term.ZONATRB, on: bool 
 pub const grd = struct {
     pub const CADRE = enum { line0, line1, line2 };
 
+
     pub const REFTYP = enum {
-        TEXT_FREE, // Free
-        TEXT_FULL, // Letter Digit Char-special
-        ALPHA, // Letter
-        ALPHA_UPPER, // Letter
-        ALPHA_NUMERIC, // Letter Digit espace -
-        ALPHA_NUMERIC_UPPER, // Letter Digit espace -
-        PASSWORD, // Letter Digit and normaliz char-special
-        YES_NO, // 'y' or 'Y' / 'o' or 'O'
-        UDIGIT, // Digit unsigned
-        DIGIT, // Digit signed
-        UDECIMAL, // Decimal unsigned
-        DECIMAL, // Decimal signed
-        DATE_ISO, // YYYY/MM/DD
-        DATE_FR, // DD/MM/YYYY
-        DATE_US, // MM/DD/YYYY
-        TELEPHONE, // (+123) 6 00 01 00 02
-        MAIL_ISO, // normalize regex
-        SWITCH, // CTRUE CFALSE
-        FUNC, // call Function
+        TEXT_FREE,            // Free
+        TEXT_FULL,            // Letter Digit Char-special
+        ALPHA,                // Letter
+        ALPHA_UPPER,          // Letter
+        ALPHA_LOWER,          // Letter
+        ALPHA_NUMERIC,        // Letter Digit espace -
+        ALPHA_NUMERIC_UPPER,  // Letter Digit espace -
+        ALPHA_NUMERIC_LOWER,  // Letter Digit espace -
+        PASSWORD,             // Letter Digit and normaliz char-special
+        YES_NO,               // 'y' or 'Y' / 'o' or 'O'
+        UDIGIT,               // Digit unsigned
+        DIGIT,                // Digit signed 
+        UDECIMAL,             // Decimal unsigned
+        DECIMAL,              // Decimal signed
+        DATE_ISO,             // YYYY/MM/DD
+        DATE_FR,              // DD/MM/YYYY
+        DATE_US,              // MM/DD/YYYY
+        TELEPHONE,            // (+123) 6 00 01 00 02 
+        MAIL_ISO,             // normalize regex
+        SWITCH,               // CTRUE CFALSE
+        FUNC,                 // call Function
     };
 
 
