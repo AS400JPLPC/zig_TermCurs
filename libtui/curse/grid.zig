@@ -20,6 +20,40 @@ const io = std.io;
 
 pub const CTRUE = "✔";
 pub const CFALSE = " ";
+
+
+//==========================================================================================
+var stdin = std.fs.File.stdin();
+var stdout = std.fs.File.stdout().writer(&.{});
+
+inline fn Print(comptime format: []const u8, args: anytype) void {
+    stdout.interface.print(format, args) catch {};
+    stdout.interface.flush() catch {};
+}
+
+inline fn WriteAll(args: anytype) void {
+    stdout.interface.writeAll(args) catch {};
+    stdout.interface.flush() catch {};
+}
+
+fn Pause(msg: []const u8) void {
+    Print("\nPause  {s}\r\n", .{msg});
+    var buf: [16]u8 = undefined;
+    var c: usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+//============================================================================================
+
+
+
+
+
+
+
+
+
 //-------------------------------------------------------
 // management grid
 // ----------------
@@ -228,7 +262,6 @@ pub const grd = struct {
     // pading Cell
     fn padingCell(text: []const u8, cell: CELL) []const u8 {
         var i: usize = 0;
-
         var e_FIELD: []const u8 = text;
         var e_signed: []const u8 = undefined;
         if (cell.reftyp == REFTYP.PASSWORD) {
@@ -247,7 +280,7 @@ pub const grd = struct {
                 e_signed = subStrGrid(text, 0, 1);
             }
 
-            e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.rigth, cell.long);
+            e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.right, cell.long);
 
             if (cell.reftyp == REFTYP.DIGIT or cell.reftyp == REFTYP.DECIMAL) {
                 e_FIELD = subStrGrid(e_FIELD, 1, e_FIELD.len);
@@ -257,12 +290,20 @@ pub const grd = struct {
             }
         } else e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.left, cell.long);
 
-        if (cell.reftyp == REFTYP.SWITCH) {
-            if (std.mem.eql(u8, text[0..], "true") or std.mem.eql(u8, text[0..], "1")) e_FIELD = CTRUE
-            else e_FIELD = CFALSE;
-        }
 
-        if (std.mem.eql(u8, cell.edtcar, "") == false) e_FIELD = concatStr(e_FIELD, cell.edtcar);
+        if (cell.reftyp == REFTYP.SWITCH){
+                if (std.mem.eql(u8, std.mem.trim(u8, e_FIELD, " "), "true") == true or
+                     std.mem.eql(u8, std.mem.trim(u8, e_FIELD, " "), "1") == true)  {
+                e_FIELD = CTRUE;            
+                if (cell.long + 2 > 4) { e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.left, cell.long + 2);}
+                if (cell.long + 2 <= 4)  {e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.left, cell.long + 3);}
+            } else {
+                e_FIELD = CFALSE;
+                e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.left, cell.long + 1);
+            }
+        }  
+
+        if (!std.mem.eql(u8, cell.edtcar, "") ) e_FIELD = concatStr(e_FIELD, cell.edtcar);
 
         return e_FIELD;
     }
@@ -393,8 +434,8 @@ pub const grd = struct {
 
         for (self.headers.items) |xcell| {
             vlen += 1; // separator
-            vlen += xcell.long;
-            if (std.mem.eql(u8, xcell.edtcar, "") == false) vlen += 1;
+            if (xcell.text.len > xcell.long ) { vlen = xcell.text.len; } else vlen += xcell.long;
+            if (!std.mem.eql(u8, xcell.edtcar, "") ) vlen += 1;
         }
         vlen += 1; // separator
         return vlen;
@@ -600,10 +641,10 @@ pub const grd = struct {
         const cols: usize = getLenHeaders(self);
 
         var n: usize = 0;
-        var x: usize = self.posx - 1;
+        var x: usize = self.posx ;
 
         while (row <= self.lines) {
-            y = self.posy;
+            y = self.posy ;
             col = 1;
             while (col <= cols) {
                 edt = false;
@@ -667,103 +708,83 @@ pub const grd = struct {
         }
     }
 
+    // Efface la matrice rectangulaire de l'écran  (en utilisant des espaces).
+    fn clear_grid(self: *GRID) void {
+     
+        var x :usize = 0;
+        var y :usize = 0;
+        var n :usize = 0;
+
+        while (x < self.lines) : (x += 1) {
+                y = 1;
+                while (y <= self.cols) : (y += 1) {
+                    self.buf.items[n].ch = " ";
+                    self.buf.items[n].attribut    = self.attribut;
+                    self.buf.items[n].on = false;
+                    n += 1;
+                }
+            }
+    }
+
+
     // assign and display -header MATRIX TERMINAL ---> arraylist panel-grid
     pub fn printGridHeader(self: *GRID) void {
         if (self.actif == false) return;
 
         var buf: []const u8 = "";
-        const Blanc = " ";
-        var pos: usize = 0;
-
-        for (self.headers.items, 0..) |_, idx| {
-            self.headers.items[idx].posy = pos;
-            if (self.headers.items[idx].edtcar.len == 0) pos = pos + self.headers.items[idx].long + 1
-            else pos = pos + self.headers.items[idx].long + 1 + 1;
-        }
-
-        for (self.headers.items) |cellx| {
-            if (std.mem.eql(u8, cellx.edtcar, "") == true)
-                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}",
-                    .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long) })
-                    catch |err| {@panic(@errorName(err));
-                }
-            else
-                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}{s}",
-                    .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long), Blanc })
-                    catch |err| {@panic(@errorName(err));};
-        }
-        buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}", .{ buf, self.separator }) catch |err| {
-            @panic(@errorName(err));
-        };
-
-        defer mem.allocTui.free(buf);
 
         var x: usize = 1;
         var y: usize = 0;
-        var n: usize = 0;
+        var n: usize = self.cols;
 
-        while (x <= self.lines) : (x += 1) {
-            y = 1;
-            var iter = utl.iteratStr.iterator(buf);
-            defer iter.deinit();
-            while (iter.next()) |ch| : (n += 1) {
-                self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
-                self.buf.items[n].attribut = self.attribut;
-                self.buf.items[n].on = false;
-            }
-        }
-
+        
+        clear_grid(self);
+        
         buf = "";
         for (self.headers.items) |cellx| {
             if (cellx.reftyp == REFTYP.UDIGIT or
                 cellx.reftyp == REFTYP.DIGIT or
                 cellx.reftyp == REFTYP.UDECIMAL or
-                cellx.reftyp == REFTYP.DECIMAL)
-                buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}",
-                    .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.rigth, cellx.long) })
+                cellx.reftyp == REFTYP.DECIMAL) {
+                if (std.mem.eql(u8, cellx.edtcar, ""))  {
+                    buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}", 
+                    .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.right, cellx.long) })
                     catch |err| {@panic(@errorName(err));
+                    };
+                } else {
+                    buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}", 
+                    .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.right, cellx.long + 1) })
+                    catch |err| {@panic(@errorName(err));
+                    };
+                    
                 }
-            else
+            }
+            else{
                 buf = std.fmt.allocPrint(mem.allocTui, "{s}{s}{s}", 
                     .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.left, cellx.long) })
                     catch |err| {@panic(@errorName(err));
                 };
-
-            if (std.mem.eql(u8, cellx.edtcar, "") == false) buf =std.fmt.allocPrint(mem.allocTui, "{s}{s}",
-                .{ buf, Blanc }) catch |err| {@panic(@errorName(err));
-            };
-
-            n = getLenHeaders(self);
-            var iter = utl.iteratStr.iterator(buf);
-            defer iter.deinit();
-            while (iter.next()) |ch| : (n += 1) {
-                self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
-                self.buf.items[n].attribut = self.atrTitle;
-                self.buf.items[n].on = true;
             }
-
-            // this.lines + 2 = cadre + header
-            GridBox(self);
-
-            x = 1;
-            y = 0;
-            n = 0;
-            while (x <= self.lines) : (x += 1) {
-                y = 1;
-                while (y <= getLenHeaders(self)) : (y += 1) {
-                    term.gotoXY(x + self.posx, y + self.posy);
-                    term.writeStyled(self.buf.items[n].ch, self.buf.items[n].attribut);
-                    n += 1;
-                }
-            }
+         }
+         defer mem.allocTui.free(buf);
+        x = 1;
+        y = 0;
+        n = self.cols ;
+        var iter = utl.iteratStr.iterator(buf);
+        defer iter.deinit();
+        while (iter.next()) |ch| : (n += 1) {
+            self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
+            self.buf.items[n].attribut = self.atrTitle;
+            self.buf.items[n].on = true;
         }
+
     }
 
-    // assign and display -data MATRIX TERMINAL ---> arraylist panel-grid
+     // assign and display -data MATRIX TERMINAL ---> arraylist panel-grid
     pub fn printGridRows(self: *GRID) void {
         if (self.actif == false) return;
 
-        var nposy: usize = (getLenHeaders(self) * 2) + 1;
+        var npos: usize = 0 ;
         var n: usize = 0;
         var x: usize = 0;
         var y: usize = 0;
@@ -775,10 +796,13 @@ pub const grd = struct {
         var bufItems: []const u8 = "";
 
         self.maxligne = 0;
-        if (self.curspage == 0) start = 0 else start = (self.pageRows ) * (self.curspage - 1);
+        if (self.curspage == 1) start = 0 else start = (self.pageRows ) * (self.curspage - 1);
         var r: usize = 0;
+        npos = getLenHeaders(self) ;
+
         while (r < self.pageRows ) : (r += 1) {
             l = r + start;
+            n = npos + self.cols * (r + 1 ) + 1;
             if (l < self.lignes) {
                 self.maxligne = r;
                 h = 0;
@@ -787,11 +811,11 @@ pub const grd = struct {
                     // formatage buffer
                     bufItems = self.data.items(.buf)[l].items[h];
                     buf = padingCell(bufItems, self.headers.items[h]);
-
+                    buf = concatStr(buf,self.separator);
                     // write matrice
                     var iter = utl.iteratStr.iterator(buf);
                     defer iter.deinit();
-                    n = nposy + self.headers.items[h].posy;
+                    
                     while (iter.next()) |ch| : (n += 1) {
                         self.buf.items[n].ch = std.fmt.allocPrint(mem.allocTui, "{s}", .{ch}) catch unreachable;
                         if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
@@ -799,9 +823,10 @@ pub const grd = struct {
                         self.buf.items[n].on = true;
                     }
                 }
-                nposy = nposy + self.cols;
             }
         }
+
+        GridBox(self);
 
         x = 1;
         y = 0;
@@ -893,6 +918,7 @@ pub const grd = struct {
 
                 .enter => if (self.lignes > 0) {
                     gSelect.Key = kbd.enter;
+
                     if (self.curspage > 1 ) {
                         CountLigne = (self.pageRows  ) * (self.curspage - 1);
                         CountLigne += self.cursligne ;
@@ -1120,7 +1146,7 @@ pub const grd = struct {
                 if (((self.pageRows - 1) * (self.curspage - 1)) < pos) CountLigne = 0 
                 else CountLigne = ((self.pageRows - 1) * (self.curspage - 1)) - pos;
             }
-            CountLigne = pos;
+            else CountLigne = pos;
         }
         term.onMouse();
 
@@ -1162,9 +1188,7 @@ pub const grd = struct {
                 .none => continue,
 
                 .esc => {
-
-                    
-                                                            self.cursligne = 0;
+                    self.cursligne = 0;
                     gSelect.Key = kbd.esc;
                     term.offMouse();
                     return gSelect;

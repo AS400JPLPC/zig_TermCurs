@@ -411,7 +411,8 @@ in the Panel resolution definition, press UP/DOWN  <BR/>
 → 2026-01-21 02:45 :add the “lower” function <BR/>
 → 2026-01-21 02:45 :** update for 0.15.2  regression**  <BR/>
 
-
+→ 2026-02-17 03:40 : **Major update to GRID alignment with my Rust process**<BR/>
+<BR/>
 <BR/>
 <BR/>
 <BR/>

@@ -3467,7 +3467,7 @@ pub const    pnl = struct {
     }
 
     pub fn setIdxfld(vpnl: *PANEL , n :usize) void {
-        vpnl.idxfld = n ;
+        if ( n <= vpnl.field.len() ) vpnl.idxfld = n ;
     }
     pub fn setActif(vpnl: *PANEL , b :bool) void {
         vpnl.actif = b ;

@@ -14,9 +14,7 @@ pub const CFALSE = " ";
 
 pub const CMP = enum { LT, EQ, GT };
 
-pub const ALIGNS = enum { left, rigth };
-
-
+pub const ALIGNS = enum { left, right };
 
 
 ///------------------------------------
@@ -634,7 +632,7 @@ pub fn compStr(str1: []const u8, str2: []const u8) CMP {
 /// aligned string
 pub fn alignStr(text: []const u8, aligns: ALIGNS, wlen: usize) []const u8 {
     var idx: usize = 0;
-    var iter = iteratStr.iterator(text);
+    var iter = iteratStr.iterator(std.mem.trim(u8, text, " "));
 
     var string: []const u8 = "";
 
@@ -646,13 +644,15 @@ pub fn alignStr(text: []const u8, aligns: ALIGNS, wlen: usize) []const u8 {
         }
     }
 
+    idx = string.len;
+
     if (aligns == ALIGNS.left) {
         while (idx < wlen) : (idx += 1) {
             string = concatStr(string, " ");
         }
     }
-
-    if (aligns == ALIGNS.rigth) {
+    
+    if (aligns == ALIGNS.right) {
         while (idx < wlen) : (idx += 1) {
             string = concatStr(" ", string);
         }
