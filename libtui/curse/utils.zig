@@ -631,37 +631,47 @@ pub fn compStr(str1: []const u8, str2: []const u8) CMP {
 
 /// aligned string
 pub fn alignStr(text: []const u8, aligns: ALIGNS, wlen: usize) []const u8 {
-    var idx: usize = 0;
-    var iter = iteratStr.iterator(std.mem.trim(u8, text, " "));
 
-    var string: []const u8 = "";
 
-    while (iter.next()) |ch| {
-        idx += 1;
-        if (idx > wlen) break;
-        if (idx == 1) string = ch else {
-            string = concatStr(string, ch);
-        }
-    }
-
-    idx = string.len;
-
-    if (aligns == ALIGNS.left) {
-        while (idx < wlen) : (idx += 1) {
-            string = concatStr(string, " ");
-        }
-    }
+    const char_count: usize = nbrCharStr(text);
     
-    if (aligns == ALIGNS.right) {
-        while (idx < wlen) : (idx += 1) {
-            string = concatStr(" ", string);
-        }
+    const truncated_len = if (char_count < wlen) char_count else wlen;
+
+    // Collect truncated characters into a buffer
+    var truncated_buf = std.ArrayList(u8).initCapacity(mem.allocUtl,0) catch unreachable;
+    defer truncated_buf.clearAndFree(mem.allocUtl);
+
+    var it = iteratStr.iterator(text);
+    var taken: usize = 0;
+    while (taken < truncated_len) {
+        const c = it.next() orelse break;
+        truncated_buf.appendSlice(mem.allocUtl,c) catch unreachable;
+        taken += 1;
     }
 
-    return string;
+    const truncated = truncated_buf.toOwnedSlice(mem.allocUtl) catch unreachable;
+
+    // Prepare output buffer
+    var output_buf = std.ArrayList(u8).initCapacity(mem.allocUtl,0) catch unreachable;
+    defer output_buf.clearAndFree(mem.allocUtl);
+
+    const pad_len = if (wlen > truncated_len) wlen - truncated_len else 0;
+
+    switch (aligns) {
+        ALIGNS.left => {
+            output_buf.appendSlice(mem.allocUtl,truncated) catch unreachable;
+            for (0..pad_len) |_| output_buf.append( mem.allocUtl,' ') catch unreachable;
+
+        },
+        ALIGNS.right => {
+            for (0..pad_len) |_| output_buf.append( mem.allocUtl,' ') catch unreachable;
+            output_buf.appendSlice(mem.allocUtl,truncated) catch unreachable;
+
+        },
+    }
+
+    return output_buf.toOwnedSlice(mem.allocUtl) catch unreachable;
 }
-
-
 
 /// Delete Items ArrayList
 pub fn removeListStr(self: *std.ArrayList([]const u8), i: usize) void {
